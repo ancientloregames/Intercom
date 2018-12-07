@@ -40,11 +40,15 @@ dependencies {
     implementation "com.google.android.material:material:$rootProject.supportLibraryVersion"
     implementation 'androidx.constraintlayout:constraintlayout:2.0.0-alpha2'
 
-    implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
+    implementation "androidx.lifecycle:lifecycle-extensions:$rootProject.lifecycleVersion"
 
     implementation "com.google.dagger:dagger:$rootProject.daggerVersion"
     implementation "com.google.dagger:dagger-android-support:$rootProject.daggerVersion"
     kapt "com.google.dagger:dagger-compiler:$rootProject.daggerVersion"
+
+    implementation "androidx.room:room-runtime:$rootProject.roomVersion"
+    implementation "androidx.room:room-rxjava2:$rootProject.roomVersion"
+    kapt "androidx.room:room-compiler:$rootProject.roomVersion"
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.1.1-beta01'
