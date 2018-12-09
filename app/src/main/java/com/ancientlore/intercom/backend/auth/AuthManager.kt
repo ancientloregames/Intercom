@@ -1,6 +1,6 @@
 package com.ancientlore.intercom.backend.auth
 
-import com.ancientlore.intercom.RequestCallback
+import com.ancientlore.intercom.backend.RequestCallback
 
 abstract class AuthManager {
 	abstract fun signup(params: EmailAuthParams, callback: RequestCallback<User>)
