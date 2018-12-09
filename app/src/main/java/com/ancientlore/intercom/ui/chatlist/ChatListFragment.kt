@@ -1,28 +1,26 @@
 package com.ancientlore.intercom.ui.chatlist
 
-import androidx.lifecycle.ViewModelProviders
-import android.os.Bundle
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import com.ancientlore.intercom.R
+import com.ancientlore.intercom.databinding.ChatsListFragmentBinding
+import com.ancientlore.intercom.ui.BasicFragment
 
-class ChatListFragment : Fragment() {
+class ChatListFragment : BasicFragment<ChatsListViewModel, ChatsListFragmentBinding>() {
 
 	companion object {
 		fun newInstance() = ChatListFragment()
 	}
 
-	private lateinit var viewModel: ChatsListViewModel
+	override fun getLayoutResId() = R.layout.chats_list_fragment
 
-	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-		return inflater.inflate(R.layout.chats_list_fragment, container, false)
+	override fun createViewModel() = ChatsListViewModel()
+
+	override fun bind(view: View, viewModel: ChatsListViewModel) {
+		dataBinding = ChatsListFragmentBinding.bind(view)
+		dataBinding.viewModel = viewModel
 	}
 
-	override fun onActivityCreated(savedInstanceState: Bundle?) {
-		super.onActivityCreated(savedInstanceState)
-		viewModel = ViewModelProviders.of(this).get(ChatsListViewModel::class.java)
-		// TODO: Use the ViewModel
-	}
+	override fun initViewModel(viewModel: ChatsListViewModel) {}
+
+	override fun observeViewModel(viewModel: ChatsListViewModel) {}
 }

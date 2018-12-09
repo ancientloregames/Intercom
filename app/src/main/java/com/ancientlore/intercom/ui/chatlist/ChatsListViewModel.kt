@@ -1,7 +1,6 @@
 package com.ancientlore.intercom.ui.chatlist
 
-import androidx.lifecycle.ViewModel
+import com.ancientlore.intercom.ui.BasicViewModel
 
-class ChatsListViewModel : ViewModel() {
-	// TODO: Implement the ViewModel
+class ChatsListViewModel : BasicViewModel() {
 }
