@@ -6,6 +6,8 @@ import com.ancientlore.intercom.backend.auth.AuthManager
 import com.ancientlore.intercom.backend.BackendManager
 import com.ancientlore.intercom.backend.firebase.FirebaseFactory
 import com.ancientlore.intercom.ui.auth.AuthNavigator
+import com.ancientlore.intercom.ui.auth.login.LoginFragment
+import com.ancientlore.intercom.ui.auth.signup.SignupFragment
 import com.ancientlore.intercom.ui.chatlist.ChatListFragment
 import com.google.firebase.auth.FirebaseAuth
 
@@ -35,6 +37,9 @@ class MainActivity : AppCompatActivity(), AuthNavigator, BackendManager {
 	}
 
 	override fun openLoginForm() {
+		supportFragmentManager.beginTransaction()
+			.replace(R.id.container, LoginFragment.newInstance())
+			.commitNow()
 	}
 
 	override fun openSignupForm() {

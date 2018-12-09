@@ -1,3 +1,17 @@
 <resources>
 	<string name="app_name">Intercom</string>
+
+	<string name="login_form_title">Authorization</string>
+	<string name="signup_form_title">Registration</string>
+	<string name="goto_sighup_button">I do not have an account</string>
+	<string name="goto_login_button">I already have an account</string>
+	<string name="login">Login</string>
+	<string name="signup">Signup</string>
+	
+	<string name="auth_name">Name</string>
+	<string name="auth_email">Email</string>
+	<string name="auth_phone">Phone</string>
+	<string name="auth_password">Password</string>
+	<string name="auth_confirmpass">Confirm password</string>
+	<string name="auth_email_phone">Email or phone number</string>
 </resources>

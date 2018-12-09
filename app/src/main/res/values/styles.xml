@@ -8,4 +8,19 @@
 		<item name="colorAccent">@color/colorAccent</item>
 	</style>
 
+	<style name="authTitle" parent="@style/TextAppearance.AppCompat.Title">
+		<item name="android:textColor">@color/defaultTextColor</item>
+		<item name="android:maxLines">1</item>
+		<item name="android:singleLine">true</item>
+		<item name="android:gravity">center</item>
+	</style>
+
+	<style name="authField" parent="@style/TextAppearance.AppCompat.Medium">
+		<item name="android:textColor">@color/defaultTextColor</item>
+		<item name="android:textSize">17sp</item>
+		<item name="android:maxLines">1</item>
+		<item name="android:singleLine">true</item>
+		<item name="android:gravity">center</item>
+	</style>
+
 </resources>
