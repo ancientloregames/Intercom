@@ -43,6 +43,9 @@ class MainActivity : AppCompatActivity(), AuthNavigator, BackendManager {
 	}
 
 	override fun openSignupForm() {
+		supportFragmentManager.beginTransaction()
+			.replace(R.id.container, SignupFragment.newInstance())
+			.commitNow()
 	}
 
 	override fun onSuccessfullAuth(user: AuthManager.User) {
