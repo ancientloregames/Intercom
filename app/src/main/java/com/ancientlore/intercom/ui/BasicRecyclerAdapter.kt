@@ -21,6 +21,10 @@ abstract class BasicRecyclerAdapter<I, H: BasicRecyclerAdapter.ViewHolder<I, B>,
 
 	abstract fun getViewHolder(binding: B): H
 
+	abstract fun getItem(id: Long): I?
+
+	abstract fun getItemPosition(id: Long): Int?
+
 	abstract fun isTheSame(first: I, second: I) : Boolean
 
 	abstract fun isUnique(item: I) : Boolean
