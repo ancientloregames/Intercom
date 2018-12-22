@@ -1,4 +1,4 @@
-package com.ancientlore.intercom.ui.chatlist
+package com.ancientlore.intercom.ui.chat.list
 
 import com.ancientlore.intercom.ui.BasicViewModel
 
