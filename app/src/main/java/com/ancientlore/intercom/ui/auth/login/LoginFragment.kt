@@ -7,6 +7,9 @@ import com.ancientlore.intercom.backend.auth.AuthManager
 import com.ancientlore.intercom.backend.auth.EmailAuthParams
 import com.ancientlore.intercom.databinding.LoginUiBinding
 import com.ancientlore.intercom.ui.auth.AuthFragment
+import com.ancientlore.intercom.ui.auth.login.LoginViewModel.Companion.VALIDITY_EMPTY_FIELDS
+import com.ancientlore.intercom.ui.auth.login.LoginViewModel.Companion.VALIDITY_EMPTY_ID
+import com.ancientlore.intercom.ui.auth.login.LoginViewModel.Companion.VALIDITY_EMPTY_PASS
 
 class LoginFragment : AuthFragment<LoginViewModel, LoginUiBinding>() {
 
@@ -37,7 +40,12 @@ class LoginFragment : AuthFragment<LoginViewModel, LoginUiBinding>() {
 	}
 
 	override fun getAlertMessage(alertCode: Int): String {
-		TODO()
+		return when (alertCode) {
+			VALIDITY_EMPTY_FIELDS -> getString(R.string.auth_alert_no_creds_msg)
+			VALIDITY_EMPTY_ID -> getString(R.string.auth_alert_no_login_msg)
+			VALIDITY_EMPTY_PASS -> getString(R.string.auth_alert_no_pass_msg)
+			else -> getString(R.string.auth_failure_msg)
+		}
 	}
 
 	private fun openSignupForm() = navigator?.openSignupForm()

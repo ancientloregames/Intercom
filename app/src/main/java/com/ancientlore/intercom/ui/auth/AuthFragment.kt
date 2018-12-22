@@ -4,6 +4,7 @@ import android.content.Context
 import android.widget.Toast
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.ViewModel
+import com.ancientlore.intercom.R
 import com.ancientlore.intercom.backend.auth.AuthManager
 import com.ancientlore.intercom.ui.BasicFragment
 import java.lang.RuntimeException
@@ -28,7 +29,7 @@ abstract class AuthFragment<VM : ViewModel, B : ViewDataBinding> : BasicFragment
 
 	protected fun onFailedAuth(error: Throwable) {
 		error.printStackTrace()
-		//TODO show toast with error message
+		showAlert(getString(R.string.auth_failure_msg))
 	}
 
 	protected fun showAlert(message: String) = Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
