@@ -6,7 +6,7 @@
 	<data>
 		<variable
 				name="viewModel"
-				type="com.ancientlore.intercom.ui.chatlist.ChatsListViewModel"/>
+				type="com.ancientlore.intercom.ui.chat.list.ChatListViewModel"/>
 	</data>
 	<androidx.constraintlayout.widget.ConstraintLayout
 			android:id="@+id/chatslist"

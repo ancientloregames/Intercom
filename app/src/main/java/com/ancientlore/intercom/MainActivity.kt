@@ -8,7 +8,7 @@ import com.ancientlore.intercom.backend.firebase.FirebaseFactory
 import com.ancientlore.intercom.ui.auth.AuthNavigator
 import com.ancientlore.intercom.ui.auth.login.LoginFragment
 import com.ancientlore.intercom.ui.auth.signup.SignupFragment
-import com.ancientlore.intercom.ui.chatlist.ChatListFragment
+import com.ancientlore.intercom.ui.chat.list.ChatListFragment
 import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : AppCompatActivity(), AuthNavigator, BackendManager {

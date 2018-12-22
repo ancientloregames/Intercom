@@ -5,22 +5,22 @@ import com.ancientlore.intercom.R
 import com.ancientlore.intercom.databinding.ChatsListFragmentBinding
 import com.ancientlore.intercom.ui.BasicFragment
 
-class ChatListFragment : BasicFragment<ChatsListViewModel, ChatsListFragmentBinding>() {
+class ChatListFragment : BasicFragment<ChatListViewModel, ChatsListFragmentBinding>() {
 
 	companion object {
 		fun newInstance() = ChatListFragment()
 	}
 
-	override fun getLayoutResId() = R.layout.chats_list_fragment
+	override fun getLayoutResId() = R.layout.chat_list_fragment
 
-	override fun createViewModel() = ChatsListViewModel()
+	override fun createViewModel() = ChatListViewModel()
 
-	override fun bind(view: View, viewModel: ChatsListViewModel) {
+	override fun bind(view: View, viewModel: ChatListViewModel) {
 		dataBinding = ChatsListFragmentBinding.bind(view)
 		dataBinding.viewModel = viewModel
 	}
 
-	override fun initViewModel(viewModel: ChatsListViewModel) {}
+	override fun initViewModel(viewModel: ChatListViewModel) {}
 
-	override fun observeViewModel(viewModel: ChatsListViewModel) {}
+	override fun observeViewModel(viewModel: ChatListViewModel) {}
 }
