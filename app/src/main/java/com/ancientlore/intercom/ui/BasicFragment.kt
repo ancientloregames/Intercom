@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
 import com.ancientlore.intercom.backend.BackendManager
+import com.ancientlore.intercom.ui.auth.AuthNavigator
 import io.reactivex.internal.disposables.ListCompositeDisposable
 import java.lang.RuntimeException
 
@@ -19,6 +20,8 @@ abstract class BasicFragment<VM : ViewModel, B : ViewDataBinding> : Fragment() {
 	protected lateinit var dataBinding: B
 
 	protected val subscriptions = ListCompositeDisposable()
+
+	protected val navigator get() = activity as AuthNavigator?
 
 	protected val backend get() = (context as BackendManager).getBackend()
 

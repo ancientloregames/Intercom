@@ -13,8 +13,6 @@ abstract class AuthFragment<VM : ViewModel, B : ViewDataBinding> : BasicFragment
 
 	protected val auth get() = backend.getAuthManager()
 
-	protected val navigator: AuthNavigator? get() = activity as AuthNavigator
-
 	abstract fun getAlertMessage(alertCode: Int): String
 
 	protected fun onSuccessfulAuth(user: AuthManager.User) {
