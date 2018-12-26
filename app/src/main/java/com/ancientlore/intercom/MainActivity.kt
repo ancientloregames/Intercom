@@ -9,6 +9,7 @@ import com.ancientlore.intercom.ui.auth.AuthNavigator
 import com.ancientlore.intercom.ui.auth.login.LoginFragment
 import com.ancientlore.intercom.ui.auth.signup.SignupFragment
 import com.ancientlore.intercom.ui.chat.list.ChatListFragment
+import com.ancientlore.intercom.ui.contact.list.ContactListFragment
 import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : AppCompatActivity(), AuthNavigator, BackendManager {
@@ -45,6 +46,12 @@ class MainActivity : AppCompatActivity(), AuthNavigator, BackendManager {
 	override fun openSignupForm() {
 		supportFragmentManager.beginTransaction()
 			.replace(R.id.container, SignupFragment.newInstance())
+			.commitNow()
+	}
+
+	override fun openContactList() {
+		supportFragmentManager.beginTransaction()
+			.add(R.id.container, ContactListFragment.newInstance())
 			.commitNow()
 	}
 
