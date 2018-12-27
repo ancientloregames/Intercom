@@ -1,7 +1,10 @@
 package com.ancientlore.intercom
 
+import android.Manifest
+import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.core.app.ActivityCompat
 import com.ancientlore.intercom.backend.auth.AuthManager
 import com.ancientlore.intercom.backend.BackendManager
 import com.ancientlore.intercom.backend.firebase.FirebaseFactory
@@ -10,11 +13,19 @@ import com.ancientlore.intercom.ui.auth.login.LoginFragment
 import com.ancientlore.intercom.ui.auth.signup.SignupFragment
 import com.ancientlore.intercom.ui.chat.list.ChatListFragment
 import com.ancientlore.intercom.ui.contact.list.ContactListFragment
+import com.ancientlore.intercom.utils.PermissionManager
+import com.ancientlore.intercom.utils.Runnable1
 import com.google.firebase.auth.FirebaseAuth
 
-class MainActivity : AppCompatActivity(), AuthNavigator, BackendManager {
+class MainActivity : AppCompatActivity(), AuthNavigator, BackendManager, PermissionManager {
+
+	companion object {
+		private const val PERM_CONTACTS = 101
+	}
 
 	private val user get() = FirebaseAuth.getInstance().currentUser
+
+	private var permRequestCallback: Runnable1<Boolean>? = null
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -22,6 +33,13 @@ class MainActivity : AppCompatActivity(), AuthNavigator, BackendManager {
 
 		if (savedInstanceState == null)
 			onFirstStart()
+	}
+
+	override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+		super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+		val result = grantResults.all { it == PackageManager.PERMISSION_GRANTED }
+		permRequestCallback?.run(result)
 	}
 
 	override fun getBackend() = FirebaseFactory
@@ -57,5 +75,10 @@ class MainActivity : AppCompatActivity(), AuthNavigator, BackendManager {
 
 	override fun onSuccessfullAuth(user: AuthManager.User) {
 		openChatList()
+	}
+
+	override fun requestContacts(onResult: Runnable1<Boolean>) {
+		permRequestCallback = onResult
+		ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_CONTACTS), PERM_CONTACTS)
 	}
 }

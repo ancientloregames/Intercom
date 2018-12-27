@@ -11,6 +11,7 @@ import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
 import com.ancientlore.intercom.backend.BackendManager
 import com.ancientlore.intercom.ui.auth.AuthNavigator
+import com.ancientlore.intercom.utils.PermissionManager
 import io.reactivex.internal.disposables.ListCompositeDisposable
 import java.lang.RuntimeException
 
@@ -24,6 +25,8 @@ abstract class BasicFragment<VM : ViewModel, B : ViewDataBinding> : Fragment() {
 	protected val navigator get() = activity as AuthNavigator?
 
 	protected val backend get() = (context as BackendManager).getBackend()
+
+	protected val permissionManager get() = activity as PermissionManager?
 
 	@LayoutRes
 	protected abstract fun getLayoutResId(): Int
