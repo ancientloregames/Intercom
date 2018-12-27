@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools">
+	<data>
+		<import type="android.view.View" />
+		<variable
+				name="viewModel"
+				type="com.ancientlore.intercom.ui.chat.list.ChatListAdapter.ViewHolder"/>
+	</data>
+	<androidx.constraintlayout.widget.ConstraintLayout
+			android:id="@+id/content"
+			android:layout_width="match_parent"
+			android:layout_height="65dp"
+			android:padding="8dp"
+			android:orientation="vertical"
+	>
+		<androidx.appcompat.widget.AppCompatImageView
+				android:id="@+id/iconView"
+				android:layout_width="40dp"
+				android:layout_height="40dp"
+				android:layout_marginRight="8dp"
+				android:layout_marginEnd="8dp"
+				app:layout_constraintStart_toStartOf="parent"
+				app:layout_constraintBottom_toBottomOf="parent"
+				app:layout_constraintTop_toTopOf="parent"
+				app:layout_constraintEnd_toStartOf="@+id/titleView"
+				app:layout_constraintHorizontal_bias="0.0"
+				tools:src="@mipmap/ic_launcher"
+		/>
+
+		<androidx.appcompat.widget.AppCompatTextView
+				android:id="@+id/titleView"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				app:layout_constraintStart_toEndOf="@+id/iconView"
+				app:layout_constraintBottom_toTopOf="@+id/subtitleView"
+				app:layout_constraintTop_toTopOf="parent"
+				app:layout_constraintEnd_toStartOf="@+id/timestampView"
+				tools:text="Title"
+		/>
+
+		<androidx.appcompat.widget.AppCompatTextView
+				android:id="@+id/subtitleView"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				app:layout_constraintStart_toStartOf="@+id/titleView"
+				app:layout_constraintBottom_toBottomOf="parent"
+				app:layout_constraintTop_toBottomOf="@+id/titleView"
+				app:layout_constraintEnd_toEndOf="@+id/titleView"
+				tools:text="Subtitle"
+		/>
+
+		<androidx.appcompat.widget.AppCompatTextView
+				android:id="@+id/timestampView"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_marginLeft="8dp"
+				android:layout_marginStart="8dp"
+				app:layout_constraintStart_toEndOf="@id/titleView"
+				app:layout_constraintEnd_toEndOf="parent"
+				app:layout_constraintBottom_toBottomOf="parent"
+				app:layout_constraintTop_toTopOf="parent"
+				tools:text="08/08/2018"
+		/>
+	</androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
