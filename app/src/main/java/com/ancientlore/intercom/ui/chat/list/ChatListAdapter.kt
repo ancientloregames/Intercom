@@ -27,14 +27,6 @@ class ChatListAdapter(context: Context, items: MutableList<Chat>)
 		TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
 	}
 
-	override fun getItem(id: Long): Chat? {
-		TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-	}
-
-	override fun getItemPosition(id: Long): Int? {
-		TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-	}
-
 	override fun isTheSame(first: Chat, second: Chat): Boolean {
 		TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
 	}

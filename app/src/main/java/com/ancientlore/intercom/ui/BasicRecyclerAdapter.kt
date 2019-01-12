@@ -21,14 +21,6 @@ abstract class BasicRecyclerAdapter<I, H: BasicRecyclerAdapter.ViewHolder<I, B>,
 
 	abstract fun getViewHolder(binding: B): H
 
-	abstract fun getItem(id: Long): I?
-
-	abstract fun getItemPosition(id: Long): Int?
-
-	abstract fun isTheSame(first: I, second: I) : Boolean
-
-	abstract fun isUnique(item: I) : Boolean
-
 	override fun getItemCount() = items.count()
 
 	override fun getItemViewType(position: Int) = VIEW_TYPE_ITEM
@@ -49,6 +41,10 @@ abstract class BasicRecyclerAdapter<I, H: BasicRecyclerAdapter.ViewHolder<I, B>,
 	protected fun isValidPosition(position: Int) = position > -1 && position < items.size
 
 	protected fun getItemPosition(updatedItem: I) = items.indexOfFirst { isTheSame(it, updatedItem) }
+
+	protected open fun isTheSame(first: I, second: I) = first == second
+
+	protected open fun isUnique(item: I) = items.none { it == item }
 
 	abstract class ViewHolder<T, B: ViewDataBinding>(protected val binding: B) : RecyclerView.ViewHolder(binding.root), Bindable<T>
 }

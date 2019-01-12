@@ -9,15 +9,8 @@ import com.ancientlore.intercom.ui.MutableRecyclerAdapter
 import com.ancientlore.intercom.data.Contact
 import com.ancientlore.intercom.databinding.ContactListItemBinding
 
-class ContactListAdapter(context: Context, items: MutableList<Contact>)
-	: MutableRecyclerAdapter<Contact, ContactListAdapter.ViewHolder, ContactListItemBinding>(context, items) {
-	override fun getDiffCallback(newItems: List<Contact>): DiffUtil.Callback {
-		TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-	}
-
-	override fun deleteItem(id: Long): Boolean {
-		TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-	}
+class ContactListAdapter(context: Context, items: List<Contact>)
+	: BasicRecyclerAdapter<Contact, ContactListAdapter.ViewHolder, ContactListItemBinding>(context, items) {
 
 	override fun createItemViewDataBinding(parent: ViewGroup): ContactListItemBinding {
 		TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
@@ -27,21 +20,9 @@ class ContactListAdapter(context: Context, items: MutableList<Contact>)
 		TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
 	}
 
-	override fun getItem(id: Long): Contact? {
-		TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-	}
+	override fun isTheSame(first: Contact, second: Contact) = first.id == second.id
 
-	override fun getItemPosition(id: Long): Int? {
-		TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-	}
-
-	override fun isTheSame(first: Contact, second: Contact): Boolean {
-		TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-	}
-
-	override fun isUnique(item: Contact): Boolean {
-		TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-	}
+	override fun isUnique(item: Contact) = getItems().none { it.id == item.id }
 
 	class ViewHolder(binding: ContactListItemBinding)
 		: BasicRecyclerAdapter.ViewHolder<Contact, ContactListItemBinding>(binding) {
