@@ -5,15 +5,15 @@
 	<data>
 		<import type="android.view.View" />
 		<variable
-				name="item"
+				name="contact"
 				type="com.ancientlore.intercom.ui.contact.list.ContactListAdapter.ViewHolder"/>
 	</data>
 	<androidx.constraintlayout.widget.ConstraintLayout
-			android:id="@+id/content"
 			android:layout_width="match_parent"
 			android:layout_height="65dp"
 			android:padding="8dp"
 			android:orientation="vertical"
+			android:onClick="@{() -> contact.onClick()}"
 	>
 		<androidx.appcompat.widget.AppCompatImageView
 				android:id="@+id/iconView"

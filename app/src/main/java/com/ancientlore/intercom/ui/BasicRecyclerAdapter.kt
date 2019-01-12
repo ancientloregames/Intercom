@@ -15,7 +15,7 @@ abstract class BasicRecyclerAdapter<I, H: BasicRecyclerAdapter.ViewHolder<I, B>,
 		private const val VIEW_TYPE_ITEM = 0
 	}
 
-	private val layoutInflater: LayoutInflater = LayoutInflater.from(context)
+	protected val layoutInflater: LayoutInflater = LayoutInflater.from(context)
 
 	abstract fun createItemViewDataBinding(parent: ViewGroup): B
 
@@ -35,8 +35,6 @@ abstract class BasicRecyclerAdapter<I, H: BasicRecyclerAdapter.ViewHolder<I, B>,
 	fun isEmpty() = items.isEmpty()
 
 	protected fun getItems() = items
-
-	protected fun getViewHolderLayout(parent: ViewGroup, layoutRes: Int) = layoutInflater.inflate(layoutRes, parent, false)
 
 	protected fun isValidPosition(position: Int) = position > -1 && position < items.size
 
