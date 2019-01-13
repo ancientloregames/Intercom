@@ -11,7 +11,8 @@
 	<androidx.constraintlayout.widget.ConstraintLayout
 			android:layout_width="match_parent"
 			android:layout_height="65dp"
-			android:padding="8dp"
+			android:paddingStart="8dp"
+			android:paddingEnd="8dp"
 			android:orientation="vertical"
 			android:onClick="@{() -> contact.onClick()}"
 	>
@@ -25,20 +26,43 @@
 				app:layout_constraintBottom_toBottomOf="parent"
 				app:layout_constraintTop_toTopOf="parent"
 				app:layout_constraintEnd_toStartOf="@+id/titleView"
-				app:layout_constraintHorizontal_bias="0.0"
 				tools:src="@mipmap/ic_launcher"
 		/>
 
 		<androidx.appcompat.widget.AppCompatTextView
 				android:id="@+id/titleView"
 				android:layout_width="0dp"
-				android:layout_height="wrap_content"
+				android:layout_height="0dp"
 				app:layout_constraintStart_toEndOf="@+id/iconView"
-				app:layout_constraintBottom_toBottomOf="parent"
-				app:layout_constraintTop_toTopOf="parent"
+				app:layout_constraintBottom_toTopOf="@+id/subtitleView"
+				app:layout_constraintTop_toTopOf="@+id/iconView"
 				app:layout_constraintEnd_toEndOf="parent"
+				android:text="@={contact.nameField}"
 				tools:text="Title"
 		/>
+
+		<androidx.appcompat.widget.AppCompatTextView
+				android:id="@+id/subtitleView"
+				android:layout_width="0dp"
+				android:layout_height="0dp"
+				app:layout_constraintStart_toStartOf="@+id/titleView"
+				app:layout_constraintBottom_toBottomOf="@+id/iconView"
+				app:layout_constraintTop_toBottomOf="@+id/titleView"
+				app:layout_constraintEnd_toEndOf="parent"
+				android:text="@={contact.phoneField}"
+				tools:text="Subtitle"
+		/>
+
+		<View android:id="@+id/dividerView"
+		      android:layout_width="match_parent"
+		      android:layout_height="0.5dp"
+		      android:background="@android:color/darker_gray"
+		      app:layout_constraintEnd_toEndOf="parent"
+		      app:layout_constraintStart_toStartOf="parent"
+		      app:layout_constraintTop_toBottomOf="@id/subtitleView"
+		      app:layout_constraintBottom_toBottomOf="parent"
+		      app:layout_constraintVertical_bias="100"
+		      />
 
 	</androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -2,6 +2,7 @@ package com.ancientlore.intercom.ui.contact.list
 
 import android.content.Context
 import android.view.ViewGroup
+import androidx.databinding.ObservableField
 import com.ancientlore.intercom.BR
 import com.ancientlore.intercom.ui.BasicRecyclerAdapter
 import com.ancientlore.intercom.data.Contact
@@ -27,11 +28,16 @@ class ContactListAdapter(context: Context, items: List<Contact>)
 		}
 		var listener: Listener? = null
 
+		val nameField = ObservableField<String>("")
+		val phoneField = ObservableField<String>("")
+
 		init {
 			binding.setVariable(BR.contact, this)
 		}
 
 		override fun bind(data: Contact) {
+			nameField.set(data.name)
+			phoneField.set(data.phone)
 		}
 
 		fun onClick() = listener?.onItemClicked()
