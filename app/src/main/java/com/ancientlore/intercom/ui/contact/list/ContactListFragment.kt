@@ -6,6 +6,7 @@ import com.ancientlore.intercom.R
 import com.ancientlore.intercom.data.Contact
 import com.ancientlore.intercom.databinding.ContactListUiBinding
 import com.ancientlore.intercom.ui.BasicFragment
+import com.ancientlore.intercom.utils.Runnable1
 import com.ancientlore.intercom.utils.getContactPhones
 import com.ancientlore.intercom.utils.safeClose
 import kotlinx.android.synthetic.main.contact_list_ui.*
@@ -26,10 +27,11 @@ class ContactListFragment : BasicFragment<ContactListViewModel, ContactListUiBin
 		dataBinding.ui = viewModel
 	}
 
-	override fun initViewModel(viewModel: ContactListViewModel) {}
-
-	override fun initView() {
-		listView.adapter = ContactListAdapter(listView.context, getContactList())
+	override fun initViewModel(viewModel: ContactListViewModel) {
+		permissionManager?.requestContacts(Runnable1 { granted ->
+			if (granted)
+				listView.adapter = ContactListAdapter(listView.context, getContactList())
+		})
 	}
 
 	override fun observeViewModel(viewModel: ContactListViewModel) {}

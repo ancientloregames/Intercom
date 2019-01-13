@@ -62,6 +62,4 @@ abstract class BasicFragment<VM : ViewModel, B : ViewDataBinding> : Fragment() {
 		subscriptions.clear()
 		super.onDestroyView()
 	}
-
-	protected open fun initView() {}
 }
