@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import com.ancientlore.intercom.ui.BasicRecyclerAdapter
 import com.ancientlore.intercom.ui.MutableRecyclerAdapter
-import com.ancientlore.intercom.data.Chat
+import com.ancientlore.intercom.data.model.Chat
 import com.ancientlore.intercom.databinding.ChatListItemBinding
 
 class ChatListAdapter(context: Context, items: MutableList<Chat>)

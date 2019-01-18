@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.databinding.ObservableField
 import com.ancientlore.intercom.BR
 import com.ancientlore.intercom.ui.BasicRecyclerAdapter
-import com.ancientlore.intercom.data.Contact
+import com.ancientlore.intercom.data.model.Contact
 import com.ancientlore.intercom.databinding.ContactListItemBinding
 
 class ContactListAdapter(context: Context, items: List<Contact>)

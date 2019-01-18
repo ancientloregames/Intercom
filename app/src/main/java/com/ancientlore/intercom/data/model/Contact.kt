@@ -1,4 +1,4 @@
-package com.ancientlore.intercom.data
+package com.ancientlore.intercom.data.model
 
 import android.net.Uri
 

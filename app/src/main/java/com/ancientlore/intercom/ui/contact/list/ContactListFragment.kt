@@ -3,7 +3,7 @@ package com.ancientlore.intercom.ui.contact.list
 import android.provider.ContactsContract
 import android.view.View
 import com.ancientlore.intercom.R
-import com.ancientlore.intercom.data.Contact
+import com.ancientlore.intercom.data.model.Contact
 import com.ancientlore.intercom.databinding.ContactListUiBinding
 import com.ancientlore.intercom.ui.BasicFragment
 import com.ancientlore.intercom.utils.Runnable1

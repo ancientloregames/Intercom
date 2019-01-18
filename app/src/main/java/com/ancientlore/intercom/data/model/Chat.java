@@ -1,4 +1,4 @@
-package com.ancientlore.intercom.data;
+package com.ancientlore.intercom.data.model;
 
 import androidx.room.ColumnInfo;
 import androidx.room.PrimaryKey;
