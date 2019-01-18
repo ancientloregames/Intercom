@@ -7,6 +7,7 @@ import com.ancientlore.intercom.data.Contact
 import com.ancientlore.intercom.databinding.ContactListUiBinding
 import com.ancientlore.intercom.ui.BasicFragment
 import com.ancientlore.intercom.utils.Runnable1
+import com.ancientlore.intercom.utils.Utils
 import com.ancientlore.intercom.utils.getContactPhones
 import com.ancientlore.intercom.utils.safeClose
 import kotlinx.android.synthetic.main.contact_list_ui.*
@@ -48,16 +49,16 @@ class ContactListFragment : BasicFragment<ContactListViewModel, ContactListUiBin
 		if (cursor != null) {
 			try {
 				while (cursor.moveToNext()) {
-					val item = Contact()
-					item.id = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID))
-					item.name = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME)) ?: ""
-					item.imageUrl = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.PHOTO_URI)) ?: ""
+					val id = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID))
+					val name = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME)) ?: ""
+					val photoUri = Utils.parseUri(cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.PHOTO_URI)))
 					val hasPhone = cursor.getInt(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER)) > 0
-					if (hasPhone) {
-						val phones = resolver.getContactPhones(item.id)
-						item.phone = phones[0]
+					val phone = when {
+						hasPhone -> resolver.getContactPhones(id)[0]
+						else -> ""
 					}
-					list.add(item)
+					val contact = Contact(id, name, phone, photoUri)
+					list.add(contact)
 				}
 			} finally {
 				cursor.safeClose()

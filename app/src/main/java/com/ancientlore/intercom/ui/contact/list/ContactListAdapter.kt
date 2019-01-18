@@ -1,6 +1,7 @@
 package com.ancientlore.intercom.ui.contact.list
 
 import android.content.Context
+import android.net.Uri
 import android.view.ViewGroup
 import androidx.databinding.ObservableField
 import com.ancientlore.intercom.BR
@@ -30,6 +31,7 @@ class ContactListAdapter(context: Context, items: List<Contact>)
 
 		val nameField = ObservableField<String>("")
 		val phoneField = ObservableField<String>("")
+		val photoUri = ObservableField<Uri>(Uri.EMPTY)
 
 		init {
 			binding.setVariable(BR.contact, this)
@@ -38,6 +40,7 @@ class ContactListAdapter(context: Context, items: List<Contact>)
 		override fun bind(data: Contact) {
 			nameField.set(data.name)
 			phoneField.set(data.phone)
+			photoUri.set(data.photoUri)
 		}
 
 		fun onClick() = listener?.onItemClicked()
