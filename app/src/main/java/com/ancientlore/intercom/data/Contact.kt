@@ -2,7 +2,7 @@ package com.ancientlore.intercom.data
 
 import android.net.Uri
 
-data class Contact(var id: String = "",
-                   var phone: String = "",
-                   var name: String = "",
-                   var photoUri: Uri = Uri.EMPTY)
+data class Contact(val id: String = "",
+                   val phone: String = "",
+                   val name: String = "",
+                   val photoUri: Uri = Uri.EMPTY)
