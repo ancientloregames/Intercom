@@ -20,4 +20,6 @@ object FirebaseAuthManager : AuthManager() {
 			.addOnSuccessListener { result -> callback.onSuccess(User(result.user.uid)) }
 			.addOnFailureListener { error -> callback.onFailure(error) }
 	}
+
+	override fun getCurrentUser() = auth.currentUser?.let { User(it.uid) }
 }

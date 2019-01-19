@@ -15,7 +15,6 @@ import com.ancientlore.intercom.ui.chat.list.ChatListFragment
 import com.ancientlore.intercom.ui.contact.list.ContactListFragment
 import com.ancientlore.intercom.utils.PermissionManager
 import com.ancientlore.intercom.utils.Runnable1
-import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : AppCompatActivity(), AuthNavigator, BackendManager, PermissionManager {
 
@@ -23,7 +22,7 @@ class MainActivity : AppCompatActivity(), AuthNavigator, BackendManager, Permiss
 		private const val PERM_CONTACTS = 101
 	}
 
-	private val user get() = FirebaseAuth.getInstance().currentUser
+	private val user get() = getBackend().getAuthManager().getCurrentUser()
 
 	private var permRequestCallback: Runnable1<Boolean>? = null
 
@@ -45,7 +44,7 @@ class MainActivity : AppCompatActivity(), AuthNavigator, BackendManager, Permiss
 	override fun getBackend() = FirebaseFactory
 
 	private fun onFirstStart() {
-		user?.let { openChatList() }
+		user?.let { onSuccessfullAuth(it) }
 			?: openLoginForm()
 	}
 
