@@ -8,6 +8,8 @@ import androidx.core.app.ActivityCompat
 import com.ancientlore.intercom.backend.auth.AuthManager
 import com.ancientlore.intercom.backend.BackendManager
 import com.ancientlore.intercom.backend.firebase.FirebaseFactory
+import com.ancientlore.intercom.data.source.ChatRepository
+import com.ancientlore.intercom.data.source.MessageRepository
 import com.ancientlore.intercom.ui.auth.AuthNavigator
 import com.ancientlore.intercom.ui.auth.login.LoginFragment
 import com.ancientlore.intercom.ui.auth.signup.SignupFragment
@@ -73,11 +75,18 @@ class MainActivity : AppCompatActivity(), AuthNavigator, BackendManager, Permiss
 	}
 
 	override fun onSuccessfullAuth(user: AuthManager.User) {
+		initRepositories(user.id)
 		openChatList()
 	}
 
 	override fun requestContacts(onResult: Runnable1<Boolean>) {
 		permRequestCallback = onResult
 		ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_CONTACTS), PERM_CONTACTS)
+	}
+
+	private fun initRepositories(userId: String) {
+		val dataSourceProvider = getBackend().getDataSourceProvider(userId)
+		ChatRepository.setRemoteSource(dataSourceProvider.getChatSource())
+		MessageRepository.setRemoteSource(dataSourceProvider.getMessageSource())
 	}
 }
