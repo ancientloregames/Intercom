@@ -6,7 +6,7 @@
 	<data>
 		<variable
 				name="viewModel"
-				type="com.ancientlore.intercom.ui.auth.login.LoginViewModel"/>
+				type="com.ancientlore.intercom.ui.auth.email.login.LoginViewModel"/>
 	</data>
 	<androidx.constraintlayout.widget.ConstraintLayout
 			android:layout_width="match_parent"

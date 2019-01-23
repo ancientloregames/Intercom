@@ -1,28 +1,28 @@
-package com.ancientlore.intercom.ui.auth.login
+package com.ancientlore.intercom.ui.auth.email.login
 
 import android.view.View
 import com.ancientlore.intercom.R
 import com.ancientlore.intercom.backend.auth.AuthCallback
 import com.ancientlore.intercom.backend.auth.AuthManager
 import com.ancientlore.intercom.backend.auth.EmailAuthParams
-import com.ancientlore.intercom.databinding.LoginUiBinding
+import com.ancientlore.intercom.databinding.EmailLoginUiBinding
 import com.ancientlore.intercom.ui.auth.AuthFragment
-import com.ancientlore.intercom.ui.auth.login.LoginViewModel.Companion.VALIDITY_EMPTY_FIELDS
-import com.ancientlore.intercom.ui.auth.login.LoginViewModel.Companion.VALIDITY_EMPTY_ID
-import com.ancientlore.intercom.ui.auth.login.LoginViewModel.Companion.VALIDITY_EMPTY_PASS
+import com.ancientlore.intercom.ui.auth.email.login.LoginViewModel.Companion.VALIDITY_EMPTY_FIELDS
+import com.ancientlore.intercom.ui.auth.email.login.LoginViewModel.Companion.VALIDITY_EMPTY_ID
+import com.ancientlore.intercom.ui.auth.email.login.LoginViewModel.Companion.VALIDITY_EMPTY_PASS
 
-class LoginFragment : AuthFragment<LoginViewModel, LoginUiBinding>() {
+class LoginFragment : AuthFragment<LoginViewModel, EmailLoginUiBinding>() {
 
 	companion object {
 		fun newInstance() = LoginFragment()
 	}
 
-	override fun getLayoutResId() = R.layout.login_ui
+	override fun getLayoutResId() = R.layout.email_login_ui
 
 	override fun createViewModel() = LoginViewModel()
 
 	override fun bind(view: View, viewModel: LoginViewModel) {
-		dataBinding = LoginUiBinding.bind(view)
+		dataBinding = EmailLoginUiBinding.bind(view)
 		dataBinding.viewModel = viewModel
 	}
 

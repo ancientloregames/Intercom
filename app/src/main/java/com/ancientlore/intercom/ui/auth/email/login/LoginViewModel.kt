@@ -1,4 +1,4 @@
-package com.ancientlore.intercom.ui.auth.login
+package com.ancientlore.intercom.ui.auth.email.login
 
 import androidx.databinding.ObservableField
 import com.ancientlore.intercom.EmptyObject

@@ -11,8 +11,8 @@ import com.ancientlore.intercom.backend.firebase.FirebaseFactory
 import com.ancientlore.intercom.data.source.ChatRepository
 import com.ancientlore.intercom.data.source.MessageRepository
 import com.ancientlore.intercom.ui.auth.AuthNavigator
-import com.ancientlore.intercom.ui.auth.login.LoginFragment
-import com.ancientlore.intercom.ui.auth.signup.SignupFragment
+import com.ancientlore.intercom.ui.auth.email.login.LoginFragment
+import com.ancientlore.intercom.ui.auth.email.signup.SignupFragment
 import com.ancientlore.intercom.ui.chat.list.ChatListFragment
 import com.ancientlore.intercom.ui.contact.list.ContactListFragment
 import com.ancientlore.intercom.utils.PermissionManager

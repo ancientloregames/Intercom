@@ -1,25 +1,25 @@
-package com.ancientlore.intercom.ui.auth.signup
+package com.ancientlore.intercom.ui.auth.email.signup
 
 import android.view.View
 import com.ancientlore.intercom.R
 import com.ancientlore.intercom.backend.auth.AuthCallback
 import com.ancientlore.intercom.backend.auth.AuthManager
 import com.ancientlore.intercom.backend.auth.EmailAuthParams
-import com.ancientlore.intercom.databinding.SignupUiBinding
+import com.ancientlore.intercom.databinding.EmailSignupUiBinding
 import com.ancientlore.intercom.ui.auth.AuthFragment
 
-class SignupFragment : AuthFragment<SignupViewModel, SignupUiBinding>() {
+class SignupFragment : AuthFragment<SignupViewModel, EmailSignupUiBinding>() {
 
 	companion object {
 		fun newInstance() = SignupFragment()
 	}
 
-	override fun getLayoutResId() = R.layout.signup_ui
+	override fun getLayoutResId() = R.layout.email_signup_ui
 
 	override fun createViewModel() = SignupViewModel()
 
 	override fun bind(view: View, viewModel: SignupViewModel) {
-		dataBinding = SignupUiBinding.bind(view)
+		dataBinding = EmailSignupUiBinding.bind(view)
 		dataBinding.viewModel = viewModel
 	}
 
