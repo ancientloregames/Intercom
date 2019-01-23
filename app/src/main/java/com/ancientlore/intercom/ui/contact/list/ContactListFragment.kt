@@ -30,12 +30,20 @@ class ContactListFragment : BasicFragment<ContactListViewModel, ContactListUiBin
 
 	override fun initViewModel(viewModel: ContactListViewModel) {
 		permissionManager?.requestContacts(Runnable1 { granted ->
-			if (granted)
-				listView.adapter = ContactListAdapter(listView.context, getContactList())
+			if (granted) {
+				val adapter = ContactListAdapter(listView.context, getContactList())
+				listView.adapter = adapter
+				viewModel.init(adapter)
+			}
 		})
 	}
 
-	override fun observeViewModel(viewModel: ContactListViewModel) {}
+	override fun observeViewModel(viewModel: ContactListViewModel) {
+		subscriptions.add(viewModel.observeContactSelected()
+			.subscribe { onContactSelected(it) })
+	}
+
+	private fun onContactSelected(contact: Contact) {}
 
 	private fun getContactList(): List<Contact> {
 		val list = ArrayList<Contact>()

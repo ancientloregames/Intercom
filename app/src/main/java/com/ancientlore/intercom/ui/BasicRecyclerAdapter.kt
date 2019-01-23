@@ -36,6 +36,8 @@ abstract class BasicRecyclerAdapter<I, H: BasicRecyclerAdapter.ViewHolder<I, B>,
 
 	protected fun getItems() = items
 
+	protected fun getItem(pos: Int) = if (isValidPosition(pos)) items[pos] else null
+
 	protected fun isValidPosition(position: Int) = position > -1 && position < items.size
 
 	protected fun getItemPosition(updatedItem: I) = items.indexOfFirst { isTheSame(it, updatedItem) }

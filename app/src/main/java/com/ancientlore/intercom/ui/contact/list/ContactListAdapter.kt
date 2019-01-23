@@ -12,14 +12,34 @@ import com.ancientlore.intercom.databinding.ContactListItemBinding
 class ContactListAdapter(context: Context, items: List<Contact>)
 	: BasicRecyclerAdapter<Contact, ContactListAdapter.ViewHolder, ContactListItemBinding>(context, items) {
 
+	interface Listener {
+		fun onContactSelected(contact: Contact)
+	}
+
+	private var listener: Listener? = null
+
 	override fun createItemViewDataBinding(parent: ViewGroup): ContactListItemBinding =
 		ContactListItemBinding.inflate(layoutInflater, parent, false)
+
+	override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+		super.onBindViewHolder(holder, position)
+
+		val contact = getItem(position)!!
+
+		holder.listener = object : ViewHolder.Listener {
+			override fun onItemClicked() {
+				listener?.onContactSelected(contact)
+			}
+		}
+	}
 
 	override fun getViewHolder(binding: ContactListItemBinding) = ViewHolder(binding)
 
 	override fun isTheSame(first: Contact, second: Contact) = first.id == second.id
 
 	override fun isUnique(item: Contact) = getItems().none { it.id == item.id }
+
+	fun setListener(listener: Listener) { this.listener = listener }
 
 	class ViewHolder(binding: ContactListItemBinding)
 		: BasicRecyclerAdapter.ViewHolder<Contact, ContactListItemBinding>(binding) {
