@@ -3,29 +3,29 @@ package com.ancientlore.intercom.ui.auth.email.signup
 import android.view.View
 import com.ancientlore.intercom.R
 import com.ancientlore.intercom.backend.auth.AuthCallback
-import com.ancientlore.intercom.backend.auth.AuthManager
 import com.ancientlore.intercom.backend.auth.EmailAuthParams
+import com.ancientlore.intercom.backend.auth.User
 import com.ancientlore.intercom.databinding.EmailSignupUiBinding
 import com.ancientlore.intercom.ui.auth.AuthFragment
 
-class SignupFragment : AuthFragment<SignupViewModel, EmailSignupUiBinding>() {
+class EmailSignupFragment : AuthFragment<EmailSignupViewModel, EmailSignupUiBinding>() {
 
 	companion object {
-		fun newInstance() = SignupFragment()
+		fun newInstance() = EmailSignupFragment()
 	}
 
 	override fun getLayoutResId() = R.layout.email_signup_ui
 
-	override fun createViewModel() = SignupViewModel()
+	override fun createViewModel() = EmailSignupViewModel()
 
-	override fun bind(view: View, viewModel: SignupViewModel) {
+	override fun bind(view: View, viewModel: EmailSignupViewModel) {
 		dataBinding = EmailSignupUiBinding.bind(view)
 		dataBinding.viewModel = viewModel
 	}
 
-	override fun initViewModel(viewModel: SignupViewModel) {}
+	override fun initViewModel(viewModel: EmailSignupViewModel) {}
 
-	override fun observeViewModel(viewModel: SignupViewModel) {
+	override fun observeViewModel(viewModel: EmailSignupViewModel) {
 		subscriptions.add(viewModel.observeLoginRequest()
 			.subscribe { openLoginForm() })
 
@@ -43,8 +43,8 @@ class SignupFragment : AuthFragment<SignupViewModel, EmailSignupUiBinding>() {
 	private fun openLoginForm() = navigator?.openLoginForm()
 
 	private fun signup(params: EmailAuthParams) {
-		auth.signup(params, object : AuthCallback {
-			override fun onSuccess(result: AuthManager.User) = onSuccessfulAuth(result)
+		auth.signupViaEmail(params, object : AuthCallback {
+			override fun onSuccess(result: User) = onSuccessfulAuth(result)
 			override fun onFailure(error: Throwable) = onFailedAuth(error)
 		})
 	}

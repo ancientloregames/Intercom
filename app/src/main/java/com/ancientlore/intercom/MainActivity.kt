@@ -5,14 +5,14 @@ import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.core.app.ActivityCompat
-import com.ancientlore.intercom.backend.auth.AuthManager
 import com.ancientlore.intercom.backend.BackendManager
+import com.ancientlore.intercom.backend.auth.User
 import com.ancientlore.intercom.backend.firebase.FirebaseFactory
 import com.ancientlore.intercom.data.source.ChatRepository
 import com.ancientlore.intercom.data.source.MessageRepository
 import com.ancientlore.intercom.ui.auth.AuthNavigator
-import com.ancientlore.intercom.ui.auth.email.login.LoginFragment
-import com.ancientlore.intercom.ui.auth.email.signup.SignupFragment
+import com.ancientlore.intercom.ui.auth.email.login.EmailLoginFragment
+import com.ancientlore.intercom.ui.auth.email.signup.EmailSignupFragment
 import com.ancientlore.intercom.ui.chat.list.ChatListFragment
 import com.ancientlore.intercom.ui.contact.list.ContactListFragment
 import com.ancientlore.intercom.utils.PermissionManager
@@ -58,13 +58,13 @@ class MainActivity : AppCompatActivity(), AuthNavigator, BackendManager, Permiss
 
 	override fun openLoginForm() {
 		supportFragmentManager.beginTransaction()
-			.replace(R.id.container, LoginFragment.newInstance())
+			.replace(R.id.container, EmailLoginFragment.newInstance())
 			.commitNow()
 	}
 
 	override fun openSignupForm() {
 		supportFragmentManager.beginTransaction()
-			.replace(R.id.container, SignupFragment.newInstance())
+			.replace(R.id.container, EmailSignupFragment.newInstance())
 			.commitNow()
 	}
 
@@ -74,7 +74,7 @@ class MainActivity : AppCompatActivity(), AuthNavigator, BackendManager, Permiss
 			.commitNow()
 	}
 
-	override fun onSuccessfullAuth(user: AuthManager.User) {
+	override fun onSuccessfullAuth(user: User) {
 		initRepositories(user.id)
 		openChatList()
 	}

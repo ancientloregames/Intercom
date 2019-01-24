@@ -7,7 +7,7 @@ import com.ancientlore.intercom.ui.BasicViewModel
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 
-class LoginViewModel: BasicViewModel() {
+class EmailLoginViewModel: BasicViewModel() {
 
 	companion object {
 		const val VALIDITY_OK = 0

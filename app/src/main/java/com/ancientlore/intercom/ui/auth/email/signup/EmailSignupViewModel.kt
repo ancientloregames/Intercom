@@ -7,7 +7,7 @@ import com.ancientlore.intercom.ui.BasicViewModel
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 
-class SignupViewModel: BasicViewModel() {
+class EmailSignupViewModel: BasicViewModel() {
 
 	val emailField = ObservableField<String>("")
 	val passField = ObservableField<String>("")

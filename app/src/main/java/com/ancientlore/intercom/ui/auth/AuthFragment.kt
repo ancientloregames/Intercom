@@ -5,7 +5,7 @@ import android.widget.Toast
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.ViewModel
 import com.ancientlore.intercom.R
-import com.ancientlore.intercom.backend.auth.AuthManager
+import com.ancientlore.intercom.backend.auth.User
 import com.ancientlore.intercom.ui.BasicFragment
 import java.lang.RuntimeException
 
@@ -15,7 +15,7 @@ abstract class AuthFragment<VM : ViewModel, B : ViewDataBinding> : BasicFragment
 
 	abstract fun getAlertMessage(alertCode: Int): String
 
-	protected fun onSuccessfulAuth(user: AuthManager.User) {
+	protected fun onSuccessfulAuth(user: User) {
 		navigator?.onSuccessfullAuth(user)
 	}
 

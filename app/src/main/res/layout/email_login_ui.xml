@@ -6,7 +6,7 @@
 	<data>
 		<variable
 				name="viewModel"
-				type="com.ancientlore.intercom.ui.auth.email.login.LoginViewModel"/>
+				type="com.ancientlore.intercom.ui.auth.email.login.EmailLoginViewModel"/>
 	</data>
 	<androidx.constraintlayout.widget.ConstraintLayout
 			android:layout_width="match_parent"
@@ -33,7 +33,7 @@
 				app:layout_constraintBottom_toTopOf="@+id/passField"
 				app:layout_constraintStart_toStartOf="parent"
 				app:layout_constraintEnd_toEndOf="parent"
-				android:hint="@string/auth_email_phone"
+				android:hint="@string/auth_email"
 				android:text="@={viewModel.emailField}"
 				style="@style/authField"/>
 		<EditText
