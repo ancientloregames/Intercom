@@ -7,9 +7,10 @@ import com.ancientlore.intercom.backend.auth.EmailAuthParams
 import com.ancientlore.intercom.backend.auth.User
 import com.ancientlore.intercom.databinding.EmailLoginUiBinding
 import com.ancientlore.intercom.ui.auth.AuthFragment
-import com.ancientlore.intercom.ui.auth.email.login.EmailLoginViewModel.Companion.VALIDITY_EMPTY_FIELDS
-import com.ancientlore.intercom.ui.auth.email.login.EmailLoginViewModel.Companion.VALIDITY_EMPTY_ID
-import com.ancientlore.intercom.ui.auth.email.login.EmailLoginViewModel.Companion.VALIDITY_EMPTY_PASS
+import com.ancientlore.intercom.ui.auth.email.login.EmailLoginViewModel.Companion.ERROR_EMPTY_FIELDS
+import com.ancientlore.intercom.ui.auth.email.login.EmailLoginViewModel.Companion.ERROR_NO_EMAIL
+import com.ancientlore.intercom.ui.auth.email.login.EmailLoginViewModel.Companion.ERROR_NO_PASS
+import java.lang.RuntimeException
 
 class EmailLoginFragment : AuthFragment<EmailLoginViewModel, EmailLoginUiBinding>() {
 
@@ -36,15 +37,15 @@ class EmailLoginFragment : AuthFragment<EmailLoginViewModel, EmailLoginUiBinding
 			.subscribe { params -> login(params) })
 
 		subscriptions.add(viewModel.observeAlertRequest()
-			.subscribe { alertCode -> showAlert(getAlertMessage(alertCode)) })
+			.subscribe { alertCode -> showAlert(alertCode) })
 	}
 
 	override fun getAlertMessage(alertCode: Int): String {
 		return when (alertCode) {
-			VALIDITY_EMPTY_FIELDS -> getString(R.string.auth_alert_no_creds_msg)
-			VALIDITY_EMPTY_ID -> getString(R.string.auth_alert_no_login_msg)
-			VALIDITY_EMPTY_PASS -> getString(R.string.auth_alert_no_pass_msg)
-			else -> getString(R.string.auth_failure_msg)
+			ERROR_EMPTY_FIELDS -> getString(R.string.auth_alert_no_creds_msg)
+			ERROR_NO_EMAIL -> getString(R.string.auth_alert_no_login_msg)
+			ERROR_NO_PASS -> getString(R.string.auth_alert_no_pass_msg)
+			else -> throw RuntimeException("Error! Unknown alert code!")
 		}
 	}
 

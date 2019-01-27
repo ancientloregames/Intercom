@@ -11,9 +11,9 @@ class EmailLoginViewModel: BasicViewModel() {
 
 	companion object {
 		const val VALIDITY_OK = 0
-		const val VALIDITY_EMPTY_FIELDS = 1
-		const val VALIDITY_EMPTY_ID = 2
-		const val VALIDITY_EMPTY_PASS = 3
+		const val ERROR_EMPTY_FIELDS = 1
+		const val ERROR_NO_EMAIL = 2
+		const val ERROR_NO_PASS = 3
 	}
 
 	val emailField = ObservableField<String>("")
@@ -51,9 +51,9 @@ class EmailLoginViewModel: BasicViewModel() {
 
 	private fun checkValidity(): Int {
 		return when {
-			userEmail.isEmpty() && userPass.isEmpty() -> VALIDITY_EMPTY_FIELDS
-			userEmail.isEmpty() -> VALIDITY_EMPTY_ID
-			userPass.isEmpty() -> VALIDITY_EMPTY_PASS
+			userEmail.isEmpty() && userPass.isEmpty() -> ERROR_EMPTY_FIELDS
+			userEmail.isEmpty() -> ERROR_NO_EMAIL
+			userPass.isEmpty() -> ERROR_NO_PASS
 			else -> VALIDITY_OK
 		}
 	}
