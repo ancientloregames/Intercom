@@ -62,4 +62,8 @@ abstract class BasicFragment<VM : ViewModel, B : ViewDataBinding> : Fragment() {
 		subscriptions.clear()
 		super.onDestroyView()
 	}
+
+	protected fun runOnUiThread(action: Runnable) {
+		activity?.runOnUiThread(action)
+	}
 }

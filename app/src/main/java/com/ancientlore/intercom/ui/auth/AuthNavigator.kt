@@ -6,6 +6,7 @@ import com.ancientlore.intercom.backend.auth.User
 interface AuthNavigator {
 	fun openLoginForm()
 	fun openSignupForm()
+	fun openPhoneAuthForm()
 	fun openContactList()
 	fun onSuccessfullAuth(user: User)
 }

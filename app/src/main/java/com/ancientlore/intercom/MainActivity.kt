@@ -13,6 +13,7 @@ import com.ancientlore.intercom.data.source.MessageRepository
 import com.ancientlore.intercom.ui.auth.AuthNavigator
 import com.ancientlore.intercom.ui.auth.email.login.EmailLoginFragment
 import com.ancientlore.intercom.ui.auth.email.signup.EmailSignupFragment
+import com.ancientlore.intercom.ui.auth.phone.login.PhoneLoginFragment
 import com.ancientlore.intercom.ui.chat.list.ChatListFragment
 import com.ancientlore.intercom.ui.contact.list.ContactListFragment
 import com.ancientlore.intercom.utils.PermissionManager
@@ -28,12 +29,19 @@ class MainActivity : AppCompatActivity(), AuthNavigator, BackendManager, Permiss
 
 	private var permRequestCallback: Runnable1<Boolean>? = null
 
+	override fun getBackend() = FirebaseFactory
+
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		setContentView(R.layout.main_activity)
 
 		if (savedInstanceState == null)
 			onFirstStart()
+	}
+
+	private fun onFirstStart() {
+		user?.let { onSuccessfullAuth(it) }
+			?: openPhoneAuthForm()
 	}
 
 	override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -43,16 +51,15 @@ class MainActivity : AppCompatActivity(), AuthNavigator, BackendManager, Permiss
 		permRequestCallback?.run(result)
 	}
 
-	override fun getBackend() = FirebaseFactory
-
-	private fun onFirstStart() {
-		user?.let { onSuccessfullAuth(it) }
-			?: openLoginForm()
-	}
-
 	private fun openChatList() {
 		supportFragmentManager.beginTransaction()
 			.replace(R.id.container, ChatListFragment.newInstance())
+			.commitNow()
+	}
+
+	override fun openContactList() {
+		supportFragmentManager.beginTransaction()
+			.add(R.id.container, ContactListFragment.newInstance())
 			.commitNow()
 	}
 
@@ -68,9 +75,9 @@ class MainActivity : AppCompatActivity(), AuthNavigator, BackendManager, Permiss
 			.commitNow()
 	}
 
-	override fun openContactList() {
+	override fun openPhoneAuthForm() {
 		supportFragmentManager.beginTransaction()
-			.add(R.id.container, ContactListFragment.newInstance())
+			.replace(R.id.container, PhoneLoginFragment.newInstance())
 			.commitNow()
 	}
 
