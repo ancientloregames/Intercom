@@ -7,6 +7,7 @@ abstract class AuthManager {
 	abstract fun loginViaEmail(params: EmailAuthParams, callback: RequestCallback<User>)
 
 	abstract fun loginViaPhone(params: PhoneAuthParams, callback: RequestCallback<User>)
+	abstract fun isNeedPhoneCheck() : Boolean
 
 	abstract fun getCurrentUser() : User?
 }

@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.core.app.ActivityCompat
 import com.ancientlore.intercom.backend.BackendManager
+import com.ancientlore.intercom.backend.auth.PhoneAuthParams
 import com.ancientlore.intercom.backend.auth.User
 import com.ancientlore.intercom.backend.firebase.FirebaseFactory
 import com.ancientlore.intercom.data.source.ChatRepository
@@ -14,6 +15,7 @@ import com.ancientlore.intercom.ui.auth.AuthNavigator
 import com.ancientlore.intercom.ui.auth.email.login.EmailLoginFragment
 import com.ancientlore.intercom.ui.auth.email.signup.EmailSignupFragment
 import com.ancientlore.intercom.ui.auth.phone.login.PhoneLoginFragment
+import com.ancientlore.intercom.ui.auth.phone.check.PhoneCheckFragment
 import com.ancientlore.intercom.ui.chat.list.ChatListFragment
 import com.ancientlore.intercom.ui.contact.list.ContactListFragment
 import com.ancientlore.intercom.utils.PermissionManager
@@ -78,6 +80,12 @@ class MainActivity : AppCompatActivity(), AuthNavigator, BackendManager, Permiss
 	override fun openPhoneAuthForm() {
 		supportFragmentManager.beginTransaction()
 			.replace(R.id.container, PhoneLoginFragment.newInstance())
+			.commitNow()
+	}
+
+	override fun openPhoneCheckForm(params: PhoneAuthParams) {
+		supportFragmentManager.beginTransaction()
+			.replace(R.id.container, PhoneCheckFragment.newInstance(params))
 			.commitNow()
 	}
 
