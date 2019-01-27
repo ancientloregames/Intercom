@@ -11,16 +11,21 @@ class EmailSignupViewModel: BasicViewModel() {
 
 	companion object {
 		const val VALIDITY_OK = 0
-		const val ERROR_EMPTY_FIELDS = 1
+		const val ERROR_NO_NAME = 1
 		const val ERROR_NO_EMAIL = 2
 		const val ERROR_NO_PASS = 3
+		const val ERROR_PASS2 = 4
 	}
 
+	val nameField = ObservableField<String>("")
 	val emailField = ObservableField<String>("")
 	val passField = ObservableField<String>("")
+	val confirmField = ObservableField<String>("")
 
+	private val userName get() = emailField.get()!!
 	private val userEmail get() = emailField.get()!!
 	private val userPass get() = passField.get()!!
+	private val userPass2 get() = emailField.get()!!
 
 	private val alertRequestEvent = PublishSubject.create<Int>()
 	private val signupRequest = PublishSubject.create<EmailAuthParams>()
@@ -45,9 +50,10 @@ class EmailSignupViewModel: BasicViewModel() {
 
 	private fun getFieldsValidityCode(): Int {
 		return when {
-			userEmail.isEmpty() && userPass.isEmpty() -> ERROR_EMPTY_FIELDS
+			userName.isEmpty() -> ERROR_NO_NAME
 			userEmail.isEmpty() -> ERROR_NO_EMAIL
 			userPass.isEmpty() -> ERROR_NO_PASS
+			userPass2 != userPass -> ERROR_PASS2
 			else -> VALIDITY_OK
 		}
 	}

@@ -7,9 +7,10 @@ import com.ancientlore.intercom.backend.auth.EmailAuthParams
 import com.ancientlore.intercom.backend.auth.User
 import com.ancientlore.intercom.databinding.EmailSignupUiBinding
 import com.ancientlore.intercom.ui.auth.AuthFragment
-import com.ancientlore.intercom.ui.auth.email.signup.EmailSignupViewModel.Companion.ERROR_EMPTY_FIELDS
 import com.ancientlore.intercom.ui.auth.email.signup.EmailSignupViewModel.Companion.ERROR_NO_EMAIL
+import com.ancientlore.intercom.ui.auth.email.signup.EmailSignupViewModel.Companion.ERROR_NO_NAME
 import com.ancientlore.intercom.ui.auth.email.signup.EmailSignupViewModel.Companion.ERROR_NO_PASS
+import com.ancientlore.intercom.ui.auth.email.signup.EmailSignupViewModel.Companion.ERROR_PASS2
 import java.lang.RuntimeException
 
 class EmailSignupFragment : AuthFragment<EmailSignupViewModel, EmailSignupUiBinding>() {
@@ -42,9 +43,10 @@ class EmailSignupFragment : AuthFragment<EmailSignupViewModel, EmailSignupUiBind
 
 	override fun getAlertMessage(alertCode: Int): String {
 		return when (alertCode) {
-			ERROR_EMPTY_FIELDS -> getString(R.string.auth_alert_no_creds_msg)
+			ERROR_NO_NAME -> getString(R.string.auth_alert_no_name_msg)
 			ERROR_NO_EMAIL -> getString(R.string.auth_alert_no_login_msg)
 			ERROR_NO_PASS -> getString(R.string.auth_alert_no_pass_msg)
+			ERROR_PASS2 -> getString(R.string.auth_alert_pass2_not_match_msg)
 			else -> throw RuntimeException("Error! Unknown alert code!")
 		}
 	}
