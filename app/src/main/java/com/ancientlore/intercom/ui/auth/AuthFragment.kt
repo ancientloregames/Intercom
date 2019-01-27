@@ -30,5 +30,9 @@ abstract class AuthFragment<VM : ViewModel, B : ViewDataBinding> : BasicFragment
 		showAlert(getString(R.string.auth_failure_msg))
 	}
 
+	protected fun showAlert(alertCode: Int) {
+		showAlert(getAlertMessage(alertCode))
+	}
+
 	protected fun showAlert(message: String) = Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
 }
