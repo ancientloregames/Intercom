@@ -9,7 +9,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
-import com.ancientlore.intercom.backend.BackendManager
 import com.ancientlore.intercom.ui.auth.AuthNavigator
 import com.ancientlore.intercom.utils.PermissionManager
 import io.reactivex.internal.disposables.ListCompositeDisposable
@@ -23,8 +22,6 @@ abstract class BasicFragment<VM : ViewModel, B : ViewDataBinding> : Fragment() {
 	protected val subscriptions = ListCompositeDisposable()
 
 	protected val navigator get() = activity as AuthNavigator?
-
-	protected val backend get() = (context as BackendManager).getBackend()
 
 	protected val permissionManager get() = activity as PermissionManager?
 
@@ -44,8 +41,8 @@ abstract class BasicFragment<VM : ViewModel, B : ViewDataBinding> : Fragment() {
 	}
 
 	override fun onAttach(context: Context) {
-		if (context !is BackendManager)
-			RuntimeException("Context must implement the BackendManager interface")
+		if (context !is AuthNavigator)
+			RuntimeException("Context must implement the AuthNavigator interface")
 		super.onAttach(context)
 	}
 

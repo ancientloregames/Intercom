@@ -5,10 +5,8 @@ import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.core.app.ActivityCompat
-import com.ancientlore.intercom.backend.BackendManager
 import com.ancientlore.intercom.backend.auth.PhoneAuthParams
 import com.ancientlore.intercom.backend.auth.User
-import com.ancientlore.intercom.backend.firebase.FirebaseFactory
 import com.ancientlore.intercom.data.source.ChatRepository
 import com.ancientlore.intercom.data.source.MessageRepository
 import com.ancientlore.intercom.ui.auth.AuthNavigator
@@ -21,17 +19,15 @@ import com.ancientlore.intercom.ui.contact.list.ContactListFragment
 import com.ancientlore.intercom.utils.PermissionManager
 import com.ancientlore.intercom.utils.Runnable1
 
-class MainActivity : AppCompatActivity(), AuthNavigator, BackendManager, PermissionManager {
+class MainActivity : AppCompatActivity(), AuthNavigator, PermissionManager {
 
 	companion object {
 		private const val PERM_CONTACTS = 101
 	}
 
-	private val user get() = getBackend().getAuthManager().getCurrentUser()
+	private val user get() = App.backend.getAuthManager().getCurrentUser()
 
 	private var permRequestCallback: Runnable1<Boolean>? = null
-
-	override fun getBackend() = FirebaseFactory
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -100,7 +96,7 @@ class MainActivity : AppCompatActivity(), AuthNavigator, BackendManager, Permiss
 	}
 
 	private fun initRepositories(userId: String) {
-		val dataSourceProvider = getBackend().getDataSourceProvider(userId)
+		val dataSourceProvider = App.backend.getDataSourceProvider(userId)
 		ChatRepository.setRemoteSource(dataSourceProvider.getChatSource())
 		MessageRepository.setRemoteSource(dataSourceProvider.getMessageSource())
 	}

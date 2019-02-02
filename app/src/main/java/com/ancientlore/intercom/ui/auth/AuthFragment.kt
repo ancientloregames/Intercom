@@ -4,6 +4,7 @@ import android.content.Context
 import android.widget.Toast
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.ViewModel
+import com.ancientlore.intercom.App
 import com.ancientlore.intercom.R
 import com.ancientlore.intercom.backend.auth.User
 import com.ancientlore.intercom.ui.BasicFragment
@@ -11,7 +12,7 @@ import java.lang.RuntimeException
 
 abstract class AuthFragment<VM : ViewModel, B : ViewDataBinding> : BasicFragment<VM, B>() {
 
-	protected val auth get() = backend.getAuthManager()
+	protected val auth get() = App.backend.getAuthManager()
 
 	abstract fun getAlertMessage(alertCode: Int): String
 
