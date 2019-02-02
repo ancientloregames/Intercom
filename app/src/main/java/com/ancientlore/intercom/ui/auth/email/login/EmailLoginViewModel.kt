@@ -3,11 +3,11 @@ package com.ancientlore.intercom.ui.auth.email.login
 import androidx.databinding.ObservableField
 import com.ancientlore.intercom.EmptyObject
 import com.ancientlore.intercom.backend.auth.EmailAuthParams
-import com.ancientlore.intercom.ui.BasicViewModel
+import com.ancientlore.intercom.ui.auth.AuthViewModel
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 
-class EmailLoginViewModel: BasicViewModel() {
+class EmailLoginViewModel: AuthViewModel() {
 
 	companion object {
 		const val VALIDITY_OK = 0

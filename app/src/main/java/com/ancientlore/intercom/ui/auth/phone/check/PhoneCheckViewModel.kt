@@ -1,11 +1,11 @@
 package com.ancientlore.intercom.ui.auth.phone.check
 
 import androidx.databinding.ObservableField
-import com.ancientlore.intercom.ui.BasicViewModel
+import com.ancientlore.intercom.ui.auth.AuthViewModel
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 
-class PhoneCheckViewModel : BasicViewModel() {
+class PhoneCheckViewModel : AuthViewModel() {
 
 	val codeField = ObservableField<String>("")
 

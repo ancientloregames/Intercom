@@ -2,11 +2,11 @@ package com.ancientlore.intercom.ui.auth.phone.login
 
 import androidx.databinding.ObservableField
 import com.ancientlore.intercom.data.model.Phone
-import com.ancientlore.intercom.ui.BasicViewModel
+import com.ancientlore.intercom.ui.auth.AuthViewModel
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 
-class PhoneLoginViewModel : BasicViewModel() {
+class PhoneLoginViewModel : AuthViewModel() {
 
 	companion object {
 		const val VALIDITY_OK = 0
