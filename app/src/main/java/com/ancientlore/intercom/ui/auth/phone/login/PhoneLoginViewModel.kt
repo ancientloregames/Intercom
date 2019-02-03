@@ -22,6 +22,7 @@ class PhoneLoginViewModel : AuthViewModel() {
 	private val userPhone get() = phoneField.get()!!
 
 	private val loginSuccessEvent = PublishSubject.create<User>()
+	private val validationRequestEvent = PublishSubject.create<PhoneAuthParams>()
 	private val alertRequestEvent = PublishSubject.create<Int>()
 
 	fun onEnterClicked() {
@@ -32,6 +33,8 @@ class PhoneLoginViewModel : AuthViewModel() {
 	}
 
 	fun observeLoginSuccessEvent() = loginSuccessEvent as Observable<User>
+
+	fun observeValidationRequestEvent() = validationRequestEvent as Observable<PhoneAuthParams>
 
 	fun observeAlertRequestEvent() = alertRequestEvent as Observable<Int>
 
@@ -49,8 +52,14 @@ class PhoneLoginViewModel : AuthViewModel() {
 	}
 
 	private fun login() {
-		authManager.loginViaPhone(PhoneAuthParams(userPhone), object : RequestCallback<User> {
-			override fun onSuccess(result: User) = loginSuccessEvent.onNext(result)
+		val number = userPhone
+		authManager.loginViaPhone(PhoneAuthParams(number), object : RequestCallback<User> {
+			override fun onSuccess(result: User) {
+				if (authManager.isNeedPhoneCheck())
+					validationRequestEvent.onNext(PhoneAuthParams(number))
+				else
+					loginSuccessEvent.onNext(result)
+			}
 			override fun onFailure(error: Throwable) = alertRequestEvent.onNext(ERROR_AUTH_FAILED)
 		})
 	}
