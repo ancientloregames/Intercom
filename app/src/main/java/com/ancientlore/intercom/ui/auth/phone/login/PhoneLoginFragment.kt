@@ -2,7 +2,6 @@ package com.ancientlore.intercom.ui.auth.phone.login
 
 import android.view.View
 import com.ancientlore.intercom.R
-import com.ancientlore.intercom.data.model.Phone
 import com.ancientlore.intercom.databinding.PhoneLoginUiBinding
 import com.ancientlore.intercom.ui.auth.AuthFragment
 import com.ancientlore.intercom.ui.auth.phone.login.PhoneLoginViewModel.Companion.ERROR_NO_PHONE
@@ -35,12 +34,9 @@ class PhoneLoginFragment
 	}
 
 	override fun observeViewModel(viewModel: PhoneLoginViewModel) {
-		subscriptions.add(viewModel.observePhoneEnteredEvent()
-			.subscribe { onPhoneNumberEntered(it) })
+		subscriptions.add(viewModel.observeLoginSuccessEvent()
+			.subscribe {  })
 		subscriptions.add(viewModel.observeAlertRequestEvent()
 			.subscribe { showAlert(it) })
-	}
-
-	private fun onPhoneNumberEntered(number: Phone) {
 	}
 }
