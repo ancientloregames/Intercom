@@ -19,13 +19,7 @@ class ChatListAdapter(context: Context, items: MutableList<Chat>)
 
 	private var listener: Listener? = null
 
-	override fun getDiffCallback(newItems: List<Chat>): DiffUtil.Callback {
-		TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-	}
-
-	override fun deleteItem(id: Long): Boolean {
-		TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-	}
+	override fun getDiffCallback(newItems: List<Chat>) = DiffCallback(getItems(), newItems)
 
 	override fun createItemViewDataBinding(parent: ViewGroup): ChatListItemBinding =
 		ChatListItemBinding.inflate(layoutInflater, parent, false)
@@ -70,5 +64,18 @@ class ChatListAdapter(context: Context, items: MutableList<Chat>)
 		}
 
 		fun onClick() = listener?.onItemClicked()
+	}
+
+	class DiffCallback(private val oldItems: List<Chat>,
+	                   private val newItems: List<Chat>)
+		: DiffUtil.Callback() {
+
+		override fun getOldListSize() = oldItems.size
+
+		override fun getNewListSize() = newItems.size
+
+		override fun areItemsTheSame(oldPos: Int, newPos: Int) = oldItems[oldPos].id == newItems[newPos].id
+
+		override fun areContentsTheSame(oldPos: Int, newPos: Int) = oldItems[oldPos] == newItems[newPos]
 	}
 }

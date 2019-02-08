@@ -7,5 +7,4 @@ interface MutableAdapter<T> {
 	fun appendItem(newItem: T): Boolean
 	fun updateItem(updatedItem: T): Boolean
 	fun deleteItem(itemToDelete: T): Boolean
-	fun deleteItem(id: Long): Boolean
 }
