@@ -5,7 +5,7 @@
 	<data>
 		<import type="android.view.View" />
 		<variable
-				name="viewModel"
+				name="chat"
 				type="com.ancientlore.intercom.ui.chat.list.ChatListAdapter.ViewHolder"/>
 	</data>
 	<androidx.constraintlayout.widget.ConstraintLayout
@@ -33,6 +33,7 @@
 				android:id="@+id/titleView"
 				android:layout_width="0dp"
 				android:layout_height="wrap_content"
+				android:text="@{chat.titleField}"
 				app:layout_constraintStart_toEndOf="@+id/iconView"
 				app:layout_constraintBottom_toTopOf="@+id/subtitleView"
 				app:layout_constraintTop_toTopOf="parent"

@@ -1,6 +1,8 @@
 package com.ancientlore.intercom.data.model
 
-data class Chat(val timestamp: Long = 0,
+data class Chat(val id: Long = 0,
+								val timestamp: Long = 0,
+                val title: String? = null,
                 val participants: Array<String> = emptyArray()) {
 
 	override fun equals(other: Any?): Boolean {
