@@ -4,6 +4,7 @@ import android.view.View
 import com.ancientlore.intercom.R
 import com.ancientlore.intercom.databinding.ChatListUiBinding
 import com.ancientlore.intercom.ui.BasicFragment
+import kotlinx.android.synthetic.main.chat_list_ui.*
 
 class ChatListFragment : BasicFragment<ChatListViewModel, ChatListUiBinding>() {
 
@@ -20,11 +21,17 @@ class ChatListFragment : BasicFragment<ChatListViewModel, ChatListUiBinding>() {
 		dataBinding.ui = viewModel
 	}
 
-	override fun initViewModel(viewModel: ChatListViewModel) {}
+	override fun initViewModel(viewModel: ChatListViewModel) {
+		val listAdapter = ChatListAdapter(context!!, mutableListOf())
+		listView.adapter = listAdapter
+		viewModel.setListadapter(listAdapter)
+	}
 
 	override fun observeViewModel(viewModel: ChatListViewModel) {
 		subscriptions.add(viewModel.observeContactListRequest()
 			.subscribe { openContactList() })
+		subscriptions.add(viewModel.observeChatSelectedEvent()
+			.subscribe { TODO() })
 	}
 
 	private fun openContactList() = navigator?.openContactList()
