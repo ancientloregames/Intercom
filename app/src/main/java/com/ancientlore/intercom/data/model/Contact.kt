@@ -1,8 +1,5 @@
 package com.ancientlore.intercom.data.model
 
-import android.net.Uri
-
-data class Contact(val id: String = "",
+data class Contact(val uid: String = "",
                    val phone: String = "",
-                   val name: String = "",
-                   val photoUri: Uri = Uri.EMPTY)
+                   val name: String = "")

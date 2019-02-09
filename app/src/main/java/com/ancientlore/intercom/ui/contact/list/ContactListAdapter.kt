@@ -35,9 +35,9 @@ class ContactListAdapter(context: Context, items: List<Contact>)
 
 	override fun getViewHolder(binding: ContactListItemBinding) = ViewHolder(binding)
 
-	override fun isTheSame(first: Contact, second: Contact) = first.id == second.id
+	override fun isTheSame(first: Contact, second: Contact) = first.uid == second.uid
 
-	override fun isUnique(item: Contact) = getItems().none { it.id == item.id }
+	override fun isUnique(item: Contact) = getItems().none { it.uid == item.uid }
 
 	fun setListener(listener: Listener) { this.listener = listener }
 
@@ -60,7 +60,6 @@ class ContactListAdapter(context: Context, items: List<Contact>)
 		override fun bind(data: Contact) {
 			nameField.set(data.name)
 			phoneField.set(data.phone)
-			photoUri.set(data.photoUri)
 		}
 
 		fun onClick() = listener?.onItemClicked()
