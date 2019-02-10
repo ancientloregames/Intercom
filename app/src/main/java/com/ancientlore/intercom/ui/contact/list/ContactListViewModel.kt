@@ -7,9 +7,12 @@ import io.reactivex.subjects.PublishSubject
 
 class ContactListViewModel : BasicViewModel() {
 
+	private var listAdapter: ContactListAdapter? = null
+
 	private val contactSelectedEvent = PublishSubject.create<Contact>()
 
 	fun init(listAdapter: ContactListAdapter) {
+		this.listAdapter = listAdapter
 		listAdapter.setListener(object : ContactListAdapter.Listener {
 			override fun onContactSelected(contact: Contact) = contactSelectedEvent.onNext(contact)
 		})
