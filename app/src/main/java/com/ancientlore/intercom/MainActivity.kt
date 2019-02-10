@@ -1,13 +1,16 @@
 package com.ancientlore.intercom
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.annotation.RequiresPermission
 import androidx.core.app.ActivityCompat
 import com.ancientlore.intercom.backend.auth.PhoneAuthParams
 import com.ancientlore.intercom.backend.auth.User
 import com.ancientlore.intercom.data.source.ChatRepository
+import com.ancientlore.intercom.data.source.ContactRepository
 import com.ancientlore.intercom.data.source.MessageRepository
 import com.ancientlore.intercom.ui.auth.AuthNavigator
 import com.ancientlore.intercom.ui.auth.email.login.EmailLoginFragment
@@ -16,8 +19,8 @@ import com.ancientlore.intercom.ui.auth.phone.login.PhoneLoginFragment
 import com.ancientlore.intercom.ui.auth.phone.check.PhoneCheckFragment
 import com.ancientlore.intercom.ui.chat.list.ChatListFragment
 import com.ancientlore.intercom.ui.contact.list.ContactListFragment
-import com.ancientlore.intercom.utils.PermissionManager
-import com.ancientlore.intercom.utils.Runnable1
+import com.ancientlore.intercom.utils.*
+import java.util.concurrent.Executors
 
 class MainActivity : AppCompatActivity(), AuthNavigator, PermissionManager {
 
@@ -87,6 +90,7 @@ class MainActivity : AppCompatActivity(), AuthNavigator, PermissionManager {
 
 	override fun onSuccessfullAuth(user: User) {
 		initRepositories(user.id)
+		trySyncContacts()
 		openChatList()
 	}
 
@@ -99,5 +103,31 @@ class MainActivity : AppCompatActivity(), AuthNavigator, PermissionManager {
 		val dataSourceProvider = App.backend.getDataSourceProvider(userId)
 		ChatRepository.setRemoteSource(dataSourceProvider.getChatSource())
 		MessageRepository.setRemoteSource(dataSourceProvider.getMessageSource())
+		ContactRepository.setRemoteSource(dataSourceProvider.getContactSource())
 	}
+
+	private fun trySyncContacts() {
+		if (isContactsSynced().not()) {
+			if (checkPermission(Manifest.permission.READ_CONTACTS))
+				syncContacts()
+			else requestContacts(Runnable1 { granted ->
+				if (granted) syncContacts()
+			})
+		}
+	}
+
+	@RequiresPermission(Manifest.permission.READ_CONTACTS)
+	private fun syncContacts() {
+		Executors.newSingleThreadExecutor().submit {
+			contentResolver.getContacts()
+				.takeIf { it.isNotEmpty() }
+				?.let { contacts -> ContactRepository.addAll(contacts) }
+
+			runOnUiThread {
+				getPreferences(MODE_PRIVATE).edit().putBoolean(C.PREF_CONTACTS_SYNCED, true).apply()
+			}
+		}
+	}
+
+	private fun isContactsSynced() = getPreferences(Context.MODE_PRIVATE).getBoolean(C.PREF_CONTACTS_SYNCED, false)
 }
