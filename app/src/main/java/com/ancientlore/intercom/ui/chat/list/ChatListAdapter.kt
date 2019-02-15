@@ -14,7 +14,7 @@ class ChatListAdapter(context: Context, items: MutableList<Chat>)
 	: MutableRecyclerAdapter<Chat, ChatListAdapter.ViewHolder, ChatListItemBinding>(context, items) {
 
 	interface Listener {
-		fun onChatSelected(contact: Chat)
+		fun onChatSelected(chat: Chat)
 	}
 
 	private var listener: Listener? = null

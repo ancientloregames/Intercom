@@ -12,6 +12,9 @@ class ChatListViewModel : BasicViewModel() {
 
 	private lateinit var listAdapter: ChatListAdapter
 
+	private val contactListRequest = PublishSubject.create<Any>()
+	private val chatSelectedEvent = PublishSubject.create<Chat>()
+
 	fun setListadapter(listAdapter: ChatListAdapter) {
 		this.listAdapter = listAdapter
 		listAdapter.setListener(object : ChatListAdapter.Listener {
@@ -19,9 +22,6 @@ class ChatListViewModel : BasicViewModel() {
 		})
 		loadChatList()
 	}
-
-	private val contactListRequest = PublishSubject.create<Any>()
-	private val chatSelectedEvent = PublishSubject.create<Chat>()
 
 	fun onShowContactListClicked() = contactListRequest.onNext(EmptyObject)
 
