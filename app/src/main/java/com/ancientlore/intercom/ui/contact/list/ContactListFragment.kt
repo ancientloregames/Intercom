@@ -5,6 +5,7 @@ import com.ancientlore.intercom.R
 import com.ancientlore.intercom.data.model.Contact
 import com.ancientlore.intercom.databinding.ContactListUiBinding
 import com.ancientlore.intercom.ui.BasicFragment
+import kotlinx.android.synthetic.main.contact_list_ui.*
 
 class ContactListFragment : BasicFragment<ContactListViewModel, ContactListUiBinding>() {
 
@@ -22,6 +23,9 @@ class ContactListFragment : BasicFragment<ContactListViewModel, ContactListUiBin
 	}
 
 	override fun initViewModel(viewModel: ContactListViewModel) {
+		val listAdapter = ContactListAdapter(context!!, mutableListOf())
+		listView.adapter = listAdapter
+		viewModel.setListAdapter(listAdapter)
 	}
 
 	override fun observeViewModel(viewModel: ContactListViewModel) {
