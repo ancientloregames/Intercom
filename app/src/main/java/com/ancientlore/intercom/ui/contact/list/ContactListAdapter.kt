@@ -4,19 +4,23 @@ import android.content.Context
 import android.net.Uri
 import android.view.ViewGroup
 import androidx.databinding.ObservableField
+import androidx.recyclerview.widget.DiffUtil
 import com.ancientlore.intercom.BR
 import com.ancientlore.intercom.ui.BasicRecyclerAdapter
 import com.ancientlore.intercom.data.model.Contact
 import com.ancientlore.intercom.databinding.ContactListItemBinding
+import com.ancientlore.intercom.ui.MutableRecyclerAdapter
 
-class ContactListAdapter(context: Context, items: List<Contact>)
-	: BasicRecyclerAdapter<Contact, ContactListAdapter.ViewHolder, ContactListItemBinding>(context, items) {
+class ContactListAdapter(context: Context, items: MutableList<Contact>)
+	: MutableRecyclerAdapter<Contact, ContactListAdapter.ViewHolder, ContactListItemBinding>(context, items) {
 
 	interface Listener {
 		fun onContactSelected(contact: Contact)
 	}
 
 	private var listener: Listener? = null
+
+	override fun getDiffCallback(newItems: List<Contact>) = DiffCallback(getItems(), newItems)
 
 	override fun createItemViewDataBinding(parent: ViewGroup): ContactListItemBinding =
 		ContactListItemBinding.inflate(layoutInflater, parent, false)
@@ -63,5 +67,18 @@ class ContactListAdapter(context: Context, items: List<Contact>)
 		}
 
 		fun onClick() = listener?.onItemClicked()
+	}
+
+	class DiffCallback(private val oldItems: List<Contact>,
+	                   private val newItems: List<Contact>)
+		: DiffUtil.Callback() {
+
+		override fun getOldListSize() = oldItems.size
+
+		override fun getNewListSize() = newItems.size
+
+		override fun areItemsTheSame(oldPos: Int, newPos: Int) = oldItems[oldPos].uid == newItems[newPos].uid
+
+		override fun areContentsTheSame(oldPos: Int, newPos: Int) = oldItems[oldPos] == newItems[newPos]
 	}
 }
