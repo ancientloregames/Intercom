@@ -11,7 +11,6 @@ import com.ancientlore.intercom.backend.auth.PhoneAuthParams
 import com.ancientlore.intercom.backend.auth.User
 import com.ancientlore.intercom.data.source.ChatRepository
 import com.ancientlore.intercom.data.source.ContactRepository
-import com.ancientlore.intercom.data.source.MessageRepository
 import com.ancientlore.intercom.ui.auth.AuthNavigator
 import com.ancientlore.intercom.ui.auth.email.login.EmailLoginFragment
 import com.ancientlore.intercom.ui.auth.email.signup.EmailSignupFragment
@@ -100,10 +99,9 @@ class MainActivity : AppCompatActivity(), AuthNavigator, PermissionManager {
 	}
 
 	private fun initRepositories(userId: String) {
-		val dataSourceProvider = App.backend.getDataSourceProvider(userId)
-		ChatRepository.setRemoteSource(dataSourceProvider.getChatSource())
-		MessageRepository.setRemoteSource(dataSourceProvider.getMessageSource())
-		ContactRepository.setRemoteSource(dataSourceProvider.getContactSource())
+		val dataSourceProvider = App.backend.getDataSourceProvider()
+		ChatRepository.setRemoteSource(dataSourceProvider.getChatSource(userId))
+		ContactRepository.setRemoteSource(dataSourceProvider.getContactSource(userId))
 	}
 
 	private fun trySyncContacts() {

@@ -6,8 +6,8 @@ import com.ancientlore.intercom.data.source.MessageSource
 
 interface DataSourceProvider {
 
-	fun getChatSource(): ChatSource
-	fun getMessageSource(): MessageSource
-	fun getContactSource(): ContactSource
+	fun getChatSource(userId: String): ChatSource
+	fun getMessageSource(chatId: String): MessageSource
+	fun getContactSource(userId: String): ContactSource
 
 }
