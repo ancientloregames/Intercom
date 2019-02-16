@@ -25,6 +25,7 @@ class FirestoreContactSource private constructor(private val userId: String)
 		contactsCollection.get()
 			.addOnSuccessListener { snapshot ->
 				deserialize(snapshot).takeIf { it.isNotEmpty() }
+					?.filter { contact -> contact.uid.isNotEmpty() }
 					?.let { callback.onSuccess(it) }
 					?: callback.onFailure(EmptyResultException("$TAG: empty"))
 			}
