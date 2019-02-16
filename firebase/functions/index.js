@@ -7,7 +7,7 @@ admin.initializeApp(functions.config().firebase);
 
 exports.onNewUser = functions.auth.user().onCreate((user) => {
   return admin.firestore().ref('users/${user.uid}').set({
-    phoneNumber: user.phoneNumber
+    phone: user.phone
   });
 });
 
