@@ -3,29 +3,49 @@ package com.ancientlore.intercom.ui.chat.detail
 import android.content.Context
 import android.view.ViewGroup
 import androidx.databinding.ObservableField
+import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.DiffUtil
 import com.ancientlore.intercom.BR
 import com.ancientlore.intercom.data.model.Message
-import com.ancientlore.intercom.databinding.ChatListItemBinding
+import com.ancientlore.intercom.databinding.ChatDetailItemOtherBinding
+import com.ancientlore.intercom.databinding.ChatDetailItemUserBinding
 import com.ancientlore.intercom.ui.BasicRecyclerAdapter
 import com.ancientlore.intercom.ui.MutableRecyclerAdapter
 
-class ChatDetailAdapter(context: Context, items: MutableList<Message>)
-	: MutableRecyclerAdapter<Message, ChatDetailAdapter.ViewHolder, ChatListItemBinding>(context, items) {
+class ChatDetailAdapter(private val userId: String,
+                        context: Context, items: MutableList<Message>)
+	: MutableRecyclerAdapter<Message, ChatDetailAdapter.ViewHolder, ViewDataBinding>(context, items) {
+
+	private companion object {
+		private const val VIEW_TYPE_USER = 0
+		private const val VIEW_TYPE_OTHER = 1
+	}
 
 	override fun getDiffCallback(newItems: List<Message>) = DiffCallback(getItems(), newItems)
 
-	override fun createItemViewDataBinding(parent: ViewGroup): ChatListItemBinding =
-		ChatListItemBinding.inflate(layoutInflater, parent, false)
+	override fun getItemViewType(position: Int): Int {
+		val message = getItem(position)!!
+		return when (message.senderId) {
+			userId -> VIEW_TYPE_USER
+			else -> VIEW_TYPE_OTHER
+		}
+	}
 
-	override fun getViewHolder(binding: ChatListItemBinding) = ViewHolder(binding)
+	override fun createItemViewDataBinding(parent: ViewGroup, viewType: Int): ViewDataBinding {
+		return when (viewType) {
+			VIEW_TYPE_USER -> ChatDetailItemUserBinding.inflate(layoutInflater, parent, false)
+			else -> ChatDetailItemOtherBinding.inflate(layoutInflater, parent, false)
+		}
+	}
+
+	override fun getViewHolder(binding: ViewDataBinding, viewType: Int) = ViewHolder(binding)
 
 	override fun isTheSame(first: Message, second: Message) = first.timestamp == second.timestamp
 
 	override fun isUnique(item: Message) = getItems().none { it.timestamp == item.timestamp }
 
-	class ViewHolder(binding: ChatListItemBinding)
-		: BasicRecyclerAdapter.ViewHolder<Message, ChatListItemBinding>(binding) {
+	class ViewHolder(binding: ViewDataBinding)
+		: BasicRecyclerAdapter.ViewHolder<Message, ViewDataBinding>(binding) {
 
 		interface Listener {
 			fun onItemClicked()

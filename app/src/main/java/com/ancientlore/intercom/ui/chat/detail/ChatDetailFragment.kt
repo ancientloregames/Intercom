@@ -2,6 +2,7 @@ package com.ancientlore.intercom.ui.chat.detail
 
 import android.os.Bundle
 import android.view.View
+import com.ancientlore.intercom.App
 import com.ancientlore.intercom.R
 import com.ancientlore.intercom.databinding.ChatDetailUiBinding
 import com.ancientlore.intercom.ui.BasicFragment
@@ -24,6 +25,9 @@ class ChatDetailFragment : BasicFragment<ChatDetailViewModel, ChatDetailUiBindin
 	private val chatId get() = arguments?.getString(ARG_CHAT_ID)
 		?: throw RuntimeException("Chat id is a mandotory arg")
 
+	private val userId get() = App.backend.getAuthManager().getCurrentUser()?.id
+		?: throw RuntimeException("This fragment may be created only after successful authorization")
+
 	override fun getLayoutResId() = R.layout.chat_list_ui
 
 	override fun createViewModel() = ChatDetailViewModel(chatId)
@@ -34,7 +38,7 @@ class ChatDetailFragment : BasicFragment<ChatDetailViewModel, ChatDetailUiBindin
 	}
 
 	override fun initViewModel(viewModel: ChatDetailViewModel) {
-		val listAdapter = ChatDetailAdapter(context!!, mutableListOf())
+		val listAdapter = ChatDetailAdapter(userId, context!!, mutableListOf())
 		listView.adapter = listAdapter
 		viewModel.setListAdapter(listAdapter)
 	}
