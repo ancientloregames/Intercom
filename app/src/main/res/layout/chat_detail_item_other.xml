@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools">
+	<data>
+		<import type="android.view.View"/>
+		<variable
+				name="message"
+				type="com.ancientlore.intercom.ui.chat.detail.ChatDetailAdapter.ViewHolder"/>
+	</data>
+	<androidx.constraintlayout.widget.ConstraintLayout
+			android:id="@+id/content"
+			android:layout_width="match_parent"
+			android:layout_height="65dp"
+			android:padding="8dp"
+			android:orientation="vertical"
+	>
+
+		<androidx.appcompat.widget.AppCompatTextView
+				android:id="@+id/textView"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:text="@{message.textField}"
+				app:layout_constraintStart_toStartOf="parent"
+				app:layout_constraintTop_toTopOf="parent"
+				app:layout_constraintBottom_toBottomOf="parent"
+				app:layout_constraintEnd_toStartOf="@+id/timestampView"
+				tools:text="Title"
+		/>
+
+		<androidx.appcompat.widget.AppCompatTextView
+				android:id="@+id/timestampView"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="@{message.timestampField}"
+				app:layout_constraintStart_toEndOf="@+id/textView"
+				app:layout_constraintEnd_toEndOf="parent"
+				app:layout_constraintBottom_toBottomOf="parent"
+				app:layout_constraintTop_toTopOf="parent"
+				tools:text="08/08/2018"
+		/>
+	</androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
