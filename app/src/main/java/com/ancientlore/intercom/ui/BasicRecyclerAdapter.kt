@@ -17,17 +17,17 @@ abstract class BasicRecyclerAdapter<I, H: BasicRecyclerAdapter.ViewHolder<I, B>,
 
 	protected val layoutInflater: LayoutInflater = LayoutInflater.from(context)
 
-	abstract fun createItemViewDataBinding(parent: ViewGroup): B
+	abstract fun createItemViewDataBinding(parent: ViewGroup, viewType: Int): B
 
-	abstract fun getViewHolder(binding: B): H
+	abstract fun getViewHolder(binding: B, viewType: Int): H
 
 	override fun getItemCount() = items.count()
 
 	override fun getItemViewType(position: Int) = VIEW_TYPE_ITEM
 
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): H {
-		val binding = createItemViewDataBinding(parent)
-		return getViewHolder(binding)
+		val binding = createItemViewDataBinding(parent, viewType)
+		return getViewHolder(binding, viewType)
 	}
 
 	override fun onBindViewHolder(holder: H, position: Int) = holder.bind(items[position])

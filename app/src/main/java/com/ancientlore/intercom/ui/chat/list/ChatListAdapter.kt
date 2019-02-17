@@ -21,7 +21,7 @@ class ChatListAdapter(context: Context, items: MutableList<Chat>)
 
 	override fun getDiffCallback(newItems: List<Chat>) = DiffCallback(getItems(), newItems)
 
-	override fun createItemViewDataBinding(parent: ViewGroup): ChatListItemBinding =
+	override fun createItemViewDataBinding(parent: ViewGroup, viewType: Int): ChatListItemBinding =
 		ChatListItemBinding.inflate(layoutInflater, parent, false)
 
 	override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -36,7 +36,7 @@ class ChatListAdapter(context: Context, items: MutableList<Chat>)
 		}
 	}
 
-	override fun getViewHolder(binding: ChatListItemBinding) = ViewHolder(binding)
+	override fun getViewHolder(binding: ChatListItemBinding, viewType: Int) = ViewHolder(binding)
 
 	override fun isTheSame(first: Chat, second: Chat) = first.id == second.id
 

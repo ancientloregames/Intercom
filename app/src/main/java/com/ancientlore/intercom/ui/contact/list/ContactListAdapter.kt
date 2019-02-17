@@ -22,7 +22,7 @@ class ContactListAdapter(context: Context, items: MutableList<Contact>)
 
 	override fun getDiffCallback(newItems: List<Contact>) = DiffCallback(getItems(), newItems)
 
-	override fun createItemViewDataBinding(parent: ViewGroup): ContactListItemBinding =
+	override fun createItemViewDataBinding(parent: ViewGroup, viewType: Int): ContactListItemBinding =
 		ContactListItemBinding.inflate(layoutInflater, parent, false)
 
 	override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -37,7 +37,7 @@ class ContactListAdapter(context: Context, items: MutableList<Contact>)
 		}
 	}
 
-	override fun getViewHolder(binding: ContactListItemBinding) = ViewHolder(binding)
+	override fun getViewHolder(binding: ContactListItemBinding, viewType: Int) = ViewHolder(binding)
 
 	override fun isTheSame(first: Contact, second: Contact) = first.uid == second.uid
 
