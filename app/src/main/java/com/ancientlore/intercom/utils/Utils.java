@@ -13,4 +13,10 @@ public final class Utils
 	{
 		return uriStr != null ? Uri.parse(uriStr) : Uri.EMPTY;
 	}
+
+	public static void logError(@NotNull Throwable throwable)
+	{
+		// TODO: use fabric crashlytycs logException later
+		throwable.printStackTrace();
+	}
 }
