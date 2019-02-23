@@ -1,9 +1,9 @@
 package com.ancientlore.intercom.data.model
 
-data class Chat(val id: Long = 0,
-								val timestamp: Long = 0,
-                val title: String? = null,
-                val participants: Array<String> = emptyArray()) {
+data class Chat(val timestamp: Long = 0,
+                val title: String = "",
+                val participants: List<String> = emptyList()
+){
 
 	override fun equals(other: Any?): Boolean {
 		if (this === other) return true
@@ -12,12 +12,12 @@ data class Chat(val id: Long = 0,
 		other as Chat
 
 		return timestamp == other.timestamp
-				&& participants.contentEquals(other.participants)
+				&& participants == other.participants
 	}
 
 	override fun hashCode(): Int {
 		var result = timestamp.hashCode()
-		result = 31 * result + participants.contentHashCode()
+		result = 31 * result + participants.hashCode()
 		return result
 	}
 }
