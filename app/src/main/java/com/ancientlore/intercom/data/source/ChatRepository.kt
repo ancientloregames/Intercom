@@ -11,6 +11,14 @@ object ChatRepository : ChatSource {
 		remoteSource?.getAll(callback)
 	}
 
+	override fun getItem(id: String, callback: RequestCallback<Chat>) {
+		remoteSource?.getItem(id, callback)
+	}
+
+	override fun addItem(item: Chat, callback: RequestCallback<String>?) {
+		remoteSource?.addItem(item, callback)
+	}
+
 	fun setRemoteSource(source: ChatSource) {
 		remoteSource = source
 	}

@@ -13,8 +13,10 @@ class FirestoreChatSource private constructor(private val userId: String)
 		{ userId -> FirestoreChatSource(userId) }) {
 		private const val TAG = "FirestoreChatSource"
 
-		private const val USER_CHATS = "chats"
+		private const val CHATS = "chats"
 	}
+
+	private val chatsCollection get() = db.collection(CHATS)
 
 	override fun getObjectClass() = Chat::class.java
 
@@ -28,7 +30,7 @@ class FirestoreChatSource private constructor(private val userId: String)
 			.addOnFailureListener { callback.onFailure(it) }
 	}
 
-	fun getById(id: String, callback: RequestCallback<Chat>) {
+	override fun getItem(id: String, callback: RequestCallback<Chat>) {
 		requestUserChat(id)
 			.addOnSuccessListener { snapshot ->
 				deserialize(snapshot)
@@ -38,7 +40,13 @@ class FirestoreChatSource private constructor(private val userId: String)
 			.addOnFailureListener { callback.onFailure(it) }
 	}
 
-	private fun requestUserChats() = db.collection(USER_CHATS).whereArrayContains("participant", userId).get()
+	override fun addItem(item: Chat, callback: RequestCallback<String>?) {
+		chatsCollection.add(item)
+			.addOnSuccessListener { callback?.onSuccess(it.id) }
+			.addOnFailureListener { callback?.onFailure(it) }
+	}
 
-	private fun requestUserChat(id: String) = db.collection(USER_CHATS).document(id).get()
+	private fun requestUserChats() = chatsCollection.whereArrayContains("participants", userId).get()
+
+	private fun requestUserChat(id: String) = chatsCollection.document(id).get()
 }
