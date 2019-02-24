@@ -11,7 +11,7 @@
 	<androidx.constraintlayout.widget.ConstraintLayout
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
-			tools:context=".ui.chatlist.ChatListFragment"
+			android:background="@android:color/white"
 	>
 
 		<androidx.recyclerview.widget.RecyclerView
@@ -19,7 +19,7 @@
 				android:layout_width="match_parent"
 				android:layout_height="match_parent"
 				app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-				tools:listitem="@layout/chat_list_item"
+				tools:listitem="@layout/chat_detail_item_user"
 		/>
 
 	</androidx.constraintlayout.widget.ConstraintLayout>
