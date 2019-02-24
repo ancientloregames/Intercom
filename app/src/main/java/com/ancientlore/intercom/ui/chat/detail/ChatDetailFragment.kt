@@ -28,7 +28,7 @@ class ChatDetailFragment : BasicFragment<ChatDetailViewModel, ChatDetailUiBindin
 	private val userId get() = App.backend.getAuthManager().getCurrentUser()?.id
 		?: throw RuntimeException("This fragment may be created only after successful authorization")
 
-	override fun getLayoutResId() = R.layout.chat_list_ui
+	override fun getLayoutResId() = R.layout.chat_detail_ui
 
 	override fun createViewModel() = ChatDetailViewModel(chatId)
 
