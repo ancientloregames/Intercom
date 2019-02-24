@@ -21,7 +21,10 @@ class FirestoreChatSource private constructor(private val userId: String)
 	override fun getObjectClass() = Chat::class.java
 
 	override fun getAll(callback: RequestCallback<List<Chat>>) {
-		requestUserChats()
+		db.collection("users")
+			.document(userId)
+			.collection("contacts")
+			.whereGreaterThan("lastMsgTime", 0).get()
 			.addOnSuccessListener { snapshot ->
 				deserialize(snapshot).takeIf { it.isNotEmpty() }
 					?.let { callback.onSuccess(it) }
