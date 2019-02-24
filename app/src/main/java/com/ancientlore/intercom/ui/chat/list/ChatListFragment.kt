@@ -24,7 +24,7 @@ class ChatListFragment : BasicFragment<ChatListViewModel, ChatListUiBinding>() {
 	override fun initViewModel(viewModel: ChatListViewModel) {
 		val listAdapter = ChatListAdapter(context!!, mutableListOf())
 		listView.adapter = listAdapter
-		viewModel.setListadapter(listAdapter)
+		viewModel.setListAdapter(listAdapter)
 	}
 
 	override fun observeViewModel(viewModel: ChatListViewModel) {

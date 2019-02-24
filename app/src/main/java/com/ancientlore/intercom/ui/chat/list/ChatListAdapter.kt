@@ -38,9 +38,9 @@ class ChatListAdapter(context: Context, items: MutableList<Chat>)
 
 	override fun getViewHolder(binding: ChatListItemBinding, viewType: Int) = ViewHolder(binding)
 
-	override fun isTheSame(first: Chat, second: Chat) = first.id == second.id
+	override fun isTheSame(first: Chat, second: Chat) = first.chatId == second.chatId
 
-	override fun isUnique(item: Chat) = getItems().none { it.id == item.id }
+	override fun isUnique(item: Chat) = getItems().none { it.chatId == item.chatId }
 
 	fun setListener(listener: Listener) { this.listener = listener }
 
@@ -54,13 +54,17 @@ class ChatListAdapter(context: Context, items: MutableList<Chat>)
 		var listener: Listener? = null
 
 		val titleField = ObservableField<String>("")
+		val messageField = ObservableField<String>("")
+		val dateField = ObservableField<String>("")
 
 		init {
 			binding.setVariable(BR.chat, this)
 		}
 
 		override fun bind(chat: Chat) {
-			titleField.set(chat.title ?: chat.participants[0])
+			titleField.set(chat.name)
+			messageField.set(chat.lastMsgText)
+			dateField.set(chat.lastMsgDate)
 		}
 
 		fun onClick() = listener?.onItemClicked()
@@ -74,7 +78,7 @@ class ChatListAdapter(context: Context, items: MutableList<Chat>)
 
 		override fun getNewListSize() = newItems.size
 
-		override fun areItemsTheSame(oldPos: Int, newPos: Int) = oldItems[oldPos].id == newItems[newPos].id
+		override fun areItemsTheSame(oldPos: Int, newPos: Int) = oldItems[oldPos].chatId == newItems[newPos].chatId
 
 		override fun areContentsTheSame(oldPos: Int, newPos: Int) = oldItems[oldPos] == newItems[newPos]
 	}
