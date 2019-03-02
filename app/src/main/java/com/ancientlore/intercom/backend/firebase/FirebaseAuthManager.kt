@@ -44,7 +44,7 @@ object FirebaseAuthManager : AuthManager() {
 
 	override fun isNeedPhoneCheck() = false
 
-	override fun getCurrentUser() = auth.currentUser?.let { User(it.uid) }
+	override fun getCurrentUser() = auth.currentUser?.let { User(it.phoneNumber!!) }
 
 	private fun onPhoneAuthCredential(credential: PhoneAuthCredential, callback: RequestCallback<User>) {
 		auth.signInWithCredential(credential)
