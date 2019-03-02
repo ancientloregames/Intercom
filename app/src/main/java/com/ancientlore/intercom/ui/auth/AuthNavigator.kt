@@ -10,5 +10,6 @@ interface AuthNavigator {
 	fun openPhoneAuthForm()
 	fun openPhoneCheckForm(params: PhoneAuthParams)
 	fun openContactList()
+	fun openChatDetail(chatId: String)
 	fun onSuccessfullAuth(user: User)
 }
