@@ -11,8 +11,8 @@ object ContactRepository : ContactSource {
 		remoteSource?.getAll(callback)
 	}
 
-	override fun addAll(contacts: List<Contact>) {
-		remoteSource?.addAll(contacts)
+	override fun addAll(contacts: List<Contact>, callback: RequestCallback<Any>) {
+		remoteSource?.addAll(contacts, callback)
 	}
 
 	fun setRemoteSource(source: ContactSource) {

@@ -1,5 +1,6 @@
 package com.ancientlore.intercom.data.source.remote.firestore
 
+import com.ancientlore.intercom.EmptyObject
 import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.data.model.Contact
 import com.ancientlore.intercom.data.source.ContactSource
@@ -25,16 +26,28 @@ class FirestoreContactSource private constructor(private val userId: String)
 		contactsCollection.get()
 			.addOnSuccessListener { snapshot ->
 				deserialize(snapshot).takeIf { it.isNotEmpty() }
-					?.filter { contact -> contact.uid.isNotEmpty() }
 					?.let { callback.onSuccess(it) }
 					?: callback.onFailure(EmptyResultException("$TAG: empty"))
 			}
 			.addOnFailureListener { callback.onFailure(it) }
 	}
 
-	override fun addAll(contacts: List<Contact>) {
-		contacts.forEach {
-			contactsCollection.add(it)
-		}
+	override fun addAll(contacts: List<Contact>, callback: RequestCallback<Any>) {
+		db.collection(USERS).get()
+			.addOnSuccessListener { users ->
+				val list = contacts.toMutableList()
+				users.forEach { user ->
+					val iter = list.listIterator()
+					while (iter.hasNext()) {
+						val contact = iter.next()
+						if (user.id == contact.phone) {
+							contactsCollection.document(user.id).set(contact)
+							iter.remove()
+						}
+					}
+				}
+				callback.onSuccess(EmptyObject)
+			}
+			.addOnFailureListener { callback.onFailure(it) }
 	}
 }

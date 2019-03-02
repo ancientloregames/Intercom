@@ -5,8 +5,11 @@ import android.content.Context
 import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
 import androidx.annotation.RequiresPermission
+import androidx.annotation.StringRes
 import androidx.core.app.ActivityCompat
+import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.backend.auth.PhoneAuthParams
 import com.ancientlore.intercom.backend.auth.User
 import com.ancientlore.intercom.data.source.ChatRepository
@@ -119,7 +122,13 @@ class MainActivity : AppCompatActivity(), AuthNavigator, PermissionManager {
 		Executors.newSingleThreadExecutor().submit {
 			contentResolver.getContacts()
 				.takeIf { it.isNotEmpty() }
-				?.let { contacts -> ContactRepository.addAll(contacts) }
+				?.let { contacts -> ContactRepository.addAll(contacts, object : RequestCallback<Any> {
+					override fun onSuccess(result: Any) {}
+					override fun onFailure(error: Throwable) {
+						Utils.logError(error)
+						showToast(R.string.alert_error_sync_contacts)
+					}
+				}) }
 
 			runOnUiThread {
 				getPreferences(MODE_PRIVATE).edit().putBoolean(C.PREF_CONTACTS_SYNCED, true).apply()
@@ -128,4 +137,10 @@ class MainActivity : AppCompatActivity(), AuthNavigator, PermissionManager {
 	}
 
 	private fun isContactsSynced() = getPreferences(Context.MODE_PRIVATE).getBoolean(C.PREF_CONTACTS_SYNCED, false)
+
+	private fun showToast(@StringRes textResId: Int) {
+		runOnUiThread {
+			Toast.makeText(this, textResId, Toast.LENGTH_LONG).show()
+		}
+	}
 }
