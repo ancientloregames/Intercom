@@ -49,7 +49,14 @@ class FirestoreChatSource private constructor(private val userId: String)
 			.addOnFailureListener { callback?.onFailure(it) }
 	}
 
-	private fun requestUserChats() = chatsCollection.whereArrayContains("participants", userId).get()
+	override fun createDialog(recipientId: String, callback: RequestCallback<String>) {
+		db.collection("users")
+			.document(userId)
+			.collection("dialogs")
+			.add(mapOf("recipientId" to recipientId))
+			.addOnSuccessListener { callback.onSuccess(it.id) }
+			.addOnFailureListener { callback.onFailure(it) }
+	}
 
 	private fun requestUserChat(id: String) = chatsCollection.document(id).get()
 }

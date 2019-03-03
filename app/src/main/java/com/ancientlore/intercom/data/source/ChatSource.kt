@@ -11,4 +11,6 @@ interface ChatSource : DataSource<Chat> {
 	 * @param callback onSuccess gets created chat server id as the parameter
 	 */
 	fun addItem(item: Chat, callback: RequestCallback<String>?)
+
+	fun createDialog(recipientId: String, callback: RequestCallback<String>)
 }

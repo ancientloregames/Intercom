@@ -1,5 +1,5 @@
 package com.ancientlore.intercom.data.model
 
-data class Contact(val uid: String = "",
-                   val phone: String = "",
-                   val name: String = "")
+data class Contact(val phone: String = "",
+                   val name: String = "",
+                   val chatId: String = "")

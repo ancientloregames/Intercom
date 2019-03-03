@@ -19,6 +19,10 @@ object ChatRepository : ChatSource {
 		remoteSource?.addItem(item, callback)
 	}
 
+	override fun createDialog(recipientId: String, callback: RequestCallback<String>) {
+		remoteSource?.createDialog(recipientId, callback)
+	}
+
 	fun setRemoteSource(source: ChatSource) {
 		remoteSource = source
 	}
