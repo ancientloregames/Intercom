@@ -39,9 +39,9 @@ class ContactListAdapter(context: Context, items: MutableList<Contact>)
 
 	override fun getViewHolder(binding: ContactListItemBinding, viewType: Int) = ViewHolder(binding)
 
-	override fun isTheSame(first: Contact, second: Contact) = first.uid == second.uid
+	override fun isTheSame(first: Contact, second: Contact) = first.phone == second.phone
 
-	override fun isUnique(item: Contact) = getItems().none { it.uid == item.uid }
+	override fun isUnique(item: Contact) = getItems().none { it.phone == item.phone }
 
 	fun setListener(listener: Listener) { this.listener = listener }
 
@@ -77,7 +77,7 @@ class ContactListAdapter(context: Context, items: MutableList<Contact>)
 
 		override fun getNewListSize() = newItems.size
 
-		override fun areItemsTheSame(oldPos: Int, newPos: Int) = oldItems[oldPos].uid == newItems[newPos].uid
+		override fun areItemsTheSame(oldPos: Int, newPos: Int) = oldItems[oldPos].phone == newItems[newPos].phone
 
 		override fun areContentsTheSame(oldPos: Int, newPos: Int) = oldItems[oldPos] == newItems[newPos]
 	}
