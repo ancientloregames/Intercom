@@ -28,5 +28,8 @@
 	<string name="auth_alert_pass2_not_match_msg">Confirmation password doesn\'t match</string>
 	<string name="verification_failure_msg">Verification failure. Check your code</string>
 
+	<string name="alert_error_opening_chat">Failed to open chat. Try again later</string>
+	<string name="alert_error_creating_chat">Failed to create chat. Try again later</string>
+
 	<string name="alert_error_sync_contacts">Failed to sync contact list. Try again later</string>
 </resources>
