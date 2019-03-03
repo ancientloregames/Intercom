@@ -7,8 +7,7 @@ import java.util.*
 data class Chat(val chatId: String = "",
                 val name: String = "",
                 val lastMsgTime: Long = 0,
-                val lastMsgText: String = "",
-                val participants: List<String> = emptyList()) {
+                val lastMsgText: String = "") {
 
   val lastMsgDate: String by lazy { DateFormat.getDateInstance(DateFormat.MEDIUM).format(Date(lastMsgTime)) }
 
@@ -22,7 +21,6 @@ data class Chat(val chatId: String = "",
         && chatId == other.chatId
         && name == other.name
         && lastMsgText == other.lastMsgText
-				&& participants == other.participants
 	}
 
 	override fun hashCode(): Int {
@@ -30,7 +28,6 @@ data class Chat(val chatId: String = "",
 		result = 31 * result + name.hashCode()
     result = 31 * result + lastMsgTime.hashCode()
     result = 31 * result + lastMsgText.hashCode()
-    result = 31 * result + participants.hashCode()
 		return result
 	}
 }
