@@ -5,24 +5,26 @@ const admin = require('firebase-admin');
 
 admin.initializeApp(functions.config().firebase);
 
-exports.onNewUser = functions.auth.user().onCreate((user) => {
-  return admin.firestore().ref('users/${user.uid}').set({
-    phone: user.phone
+exports.onNewUser = functions.auth.user().onCreate(user => {
+  const usersCollection = admin.firestore().collection('users');
+  return usersCollection.doc(user.phoneNumber).set({
+    'phone': user.phoneNumber
   });
 });
 
-exports.onAddContact = functions.firestore
-  .document('users/{userId}/contacts/{contactId}')
-  .onCreate((contact, context) => {
-    const contactRef = contact.ref;
-    const contactPhone = contact.get('phone');
+exports.onCreateDialog = functions.firestore
+  .document('users/{userId}/dialogs/{dialogId}')
+  .onCreate((dialog, context) => {
+    const dialogId = context.params.dialogId;
+    const userId = context.params.userId;
+    const recipientId = dialog.get('recipientId');
     
     const usersCollection = admin.firestore().collection('users');
-    return usersCollection.where('phone', '==', contactPhone).limit(1).get()
-      .then(users => {
-        users.forEach(user => {
-          if (user.exists)
-            contactRef.set({ uid: user.id }, { merge: true });
-        });
-      });
+    usersCollection.doc(`${userId}/contacts/${recipientId}`).set({
+      'chatId': dialogId
+    }, { merge: true });
+    return usersCollection.doc(`${recipientId}/contacts/${userId}`).set({
+      'phone': userId,
+      'chatId': dialogId
+    }, { merge: true });
 });
