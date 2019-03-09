@@ -17,6 +17,8 @@
 	<string name="auth_confirmpass">Confirm password</string>
 	<string name="auth_code">Code</string>
 
+	<string name="chat_textfield_hint">Start typing text…</string>
+
 	<string name="auth_failure_msg">Auth failure. Check your login and password</string>
 	<string name="auth_alert_unknown_msg">Some auth issue has occured</string>
 	<string name="auth_alert_no_creds_msg">Please, enter your login and password</string>

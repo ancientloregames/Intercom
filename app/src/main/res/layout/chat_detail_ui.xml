@@ -16,10 +16,39 @@
 
 		<androidx.recyclerview.widget.RecyclerView
 				android:id="@+id/listView"
-				android:layout_width="match_parent"
-				android:layout_height="match_parent"
+				android:layout_width="0dp"
+				android:layout_height="0dp"
+				app:stackFromEnd="true"
 				app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
 				tools:listitem="@layout/chat_detail_item_user"
+				app:layout_constraintBottom_toTopOf="@+id/textField"
+				app:layout_constraintStart_toStartOf="parent"
+				app:layout_constraintEnd_toEndOf="parent"
+				app:layout_constraintTop_toTopOf="parent"
+		/>
+
+		<EditText
+				android:id="@+id/textField"
+				android:layout_width="0dp"
+				android:layout_height="45dp"
+				android:hint="@string/chat_textfield_hint"
+				android:text="@={ui.textField}"
+				app:layout_constraintTop_toBottomOf="@+id/listView"
+				app:layout_constraintEnd_toStartOf="@+id/sendButton"
+				app:layout_constraintStart_toStartOf="parent"
+				app:layout_constraintBottom_toBottomOf="parent"
+		/>
+
+		<ImageButton
+				android:id="@+id/sendButton"
+				android:layout_width="45dp"
+				android:layout_height="0dp"
+				android:onClick="@{() -> ui.onSendButtonClicked()}"
+				app:srcCompat="@drawable/ic_send"
+				app:layout_constraintTop_toBottomOf="@+id/listView"
+				app:layout_constraintStart_toEndOf="@+id/textField"
+				app:layout_constraintEnd_toEndOf="parent"
+				app:layout_constraintBottom_toBottomOf="parent"
 		/>
 
 	</androidx.constraintlayout.widget.ConstraintLayout>
