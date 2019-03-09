@@ -30,9 +30,11 @@ class ChatListFragment : BasicFragment<ChatListViewModel, ChatListUiBinding>() {
 	override fun observeViewModel(viewModel: ChatListViewModel) {
 		subscriptions.add(viewModel.observeContactListRequest()
 			.subscribe { openContactList() })
-		subscriptions.add(viewModel.observeChatSelectedEvent()
-			.subscribe { TODO() })
+		subscriptions.add(viewModel.observeChatOpenById()
+			.subscribe { openChat(it) })
 	}
 
 	private fun openContactList() = navigator?.openContactList()
+
+	private fun openChat(id: String) = navigator?.openChatDetail(id)
 }
