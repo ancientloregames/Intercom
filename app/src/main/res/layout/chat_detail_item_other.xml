@@ -14,6 +14,7 @@
 			android:layout_height="65dp"
 			android:padding="8dp"
 			android:orientation="vertical"
+			android:background="@android:color/holo_green_light"
 	>
 
 		<androidx.appcompat.widget.AppCompatTextView
