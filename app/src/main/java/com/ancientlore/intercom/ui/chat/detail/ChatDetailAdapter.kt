@@ -62,7 +62,7 @@ class ChatDetailAdapter(private val userId: String,
 
 		override fun bind(message: Message) {
 			textField.set(message.text)
-			timestampField.set(message.timestamp.toString())
+			timestampField.set(message.formatedTime)
 		}
 
 		fun onClick() = listener?.onItemClicked()
