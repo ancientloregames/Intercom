@@ -3,7 +3,6 @@ package com.ancientlore.intercom.ui.contact.list
 import com.ancientlore.intercom.R
 import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.backend.SimpleRequestCallback
-import com.ancientlore.intercom.data.model.Chat
 import com.ancientlore.intercom.data.model.Contact
 import com.ancientlore.intercom.data.source.ChatRepository
 import com.ancientlore.intercom.data.source.ContactRepository
@@ -37,17 +36,8 @@ class ContactListViewModel : BasicViewModel() {
 	}
 
 	private fun openChat(contact: Contact) {
-		if (contact.chatId.isNotEmpty()) {
-			ChatRepository.getItem(contact.chatId, object : RequestCallback<Chat> {
-				override fun onSuccess(result: Chat) {
-					openChatByIdEvent.onNext(result.chatId)
-				}
-				override fun onFailure(error: Throwable) {
-					Utils.logError(error)
-					toastRequest.onNext(R.string.alert_error_opening_chat)
-				}
-			})
-		}
+		if (contact.chatId.isNotEmpty())
+			openChatByIdEvent.onNext(contact.chatId)
 		else createAndOpenChat(contact)
 	}
 
