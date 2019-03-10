@@ -11,6 +11,18 @@ class MessageRepository : MessageSource {
 		remoteSource?.getAll(callback)
 	}
 
+	override fun addMessage(message: Message, callback: RequestCallback<String>?) {
+		remoteSource?.addMessage(message, callback)
+	}
+
+	override fun attachListener(callback: RequestCallback<List<Message>>) {
+		remoteSource?.attachListener(callback)
+	}
+
+	override fun detachListener() {
+		remoteSource?.detachListener()
+	}
+
 	fun setRemoteSource(source: MessageSource) {
 		remoteSource = source
 	}
