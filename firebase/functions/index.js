@@ -28,3 +28,11 @@ exports.onCreateDialog = functions.firestore
       'chatId': dialogId
     }, { merge: true });
 });
+
+exports.onNewMessage = functions.firestore
+  .document('chats/{chatId}/messages/{messageId}')
+  .onCreate((message, context) => {
+    return message.ref.set({
+      'timestamp': Date.now()
+    }, { merge: true })
+});
