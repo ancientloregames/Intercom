@@ -30,7 +30,7 @@ class ChatDetailFragment : BasicFragment<ChatDetailViewModel, ChatDetailUiBindin
 
 	override fun getLayoutResId() = R.layout.chat_detail_ui
 
-	override fun createViewModel() = ChatDetailViewModel(chatId)
+	override fun createViewModel() = ChatDetailViewModel(userId, chatId)
 
 	override fun bind(view: View, viewModel: ChatDetailViewModel) {
 		dataBinding = ChatDetailUiBinding.bind(view)
