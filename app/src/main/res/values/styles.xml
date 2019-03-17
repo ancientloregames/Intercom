@@ -23,4 +23,20 @@
 		<item name="android:gravity">center</item>
 	</style>
 
+	<style name="chatMsgText" parent="@style/TextAppearance.AppCompat.Medium">
+		<item name="android:textColor">@color/defaultTextColor</item>
+		<item name="android:textSize">16sp</item>
+		<item name="android:gravity">start</item>
+		<item name="android:textStyle"></item>
+		<item name="android:paddingBottom">1dp</item>
+	</style>
+
+	<style name="chatMsgTimestamp" parent="@style/TextAppearance.AppCompat.Small">
+		<item name="android:textColor">@color/chatMsgTimestampColor</item>
+		<item name="android:textSize">10sp</item>
+		<item name="android:maxLines">1</item>
+		<item name="android:singleLine">true</item>
+		<item name="android:layout_gravity">bottom</item>
+	</style>
+
 </resources>

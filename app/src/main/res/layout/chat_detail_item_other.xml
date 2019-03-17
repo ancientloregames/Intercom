@@ -8,37 +8,40 @@
 				name="message"
 				type="com.ancientlore.intercom.ui.chat.detail.ChatDetailAdapter.ViewHolder"/>
 	</data>
-	<androidx.constraintlayout.widget.ConstraintLayout
-			android:id="@+id/content"
-			android:layout_width="match_parent"
-			android:layout_height="65dp"
-			android:padding="8dp"
-			android:orientation="vertical"
-			android:background="@android:color/holo_green_light"
-	>
+	<LinearLayout
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal"
+			android:background="@drawable/bg_msg_other"
+			android:layout_gravity="start"
+			android:layout_marginEnd="8dp"
+			android:layout_marginRight="8dp"
+			android:layout_marginBottom="4dp">
 
-		<androidx.appcompat.widget.AppCompatTextView
-				android:id="@+id/textView"
+		<LinearLayout
 				android:layout_width="0dp"
 				android:layout_height="wrap_content"
-				android:text="@{message.textField}"
-				app:layout_constraintStart_toStartOf="parent"
-				app:layout_constraintTop_toTopOf="parent"
-				app:layout_constraintBottom_toBottomOf="parent"
-				app:layout_constraintEnd_toStartOf="@+id/timestampView"
-				tools:text="Title"
-		/>
+				android:layout_weight="1">
 
-		<androidx.appcompat.widget.AppCompatTextView
+			<TextView
+					android:id="@+id/textView"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:text="@{message.textField}"
+					tools:text="Other message text"
+					style="@style/chatMsgText"
+			/>
+		</LinearLayout>
+
+		<TextView
 				android:id="@+id/timestampView"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
+				android:paddingStart="8dp"
+				android:paddingLeft="8dp"
 				android:text="@{message.timestampField}"
-				app:layout_constraintStart_toEndOf="@+id/textView"
-				app:layout_constraintEnd_toEndOf="parent"
-				app:layout_constraintBottom_toBottomOf="parent"
-				app:layout_constraintTop_toTopOf="parent"
-				tools:text="08/08/2018"
+				tools:text="12:00"
+				style="@style/chatMsgTimestamp"
 		/>
-	</androidx.constraintlayout.widget.ConstraintLayout>
+	</LinearLayout>
 </layout>
