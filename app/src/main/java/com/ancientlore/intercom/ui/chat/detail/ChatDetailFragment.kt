@@ -6,6 +6,7 @@ import com.ancientlore.intercom.App
 import com.ancientlore.intercom.R
 import com.ancientlore.intercom.databinding.ChatDetailUiBinding
 import com.ancientlore.intercom.ui.BasicFragment
+import com.ancientlore.intercom.utils.extensions.enableChatBehavior
 import kotlinx.android.synthetic.main.chat_detail_ui.*
 
 class ChatDetailFragment : BasicFragment<ChatDetailViewModel, ChatDetailUiBinding>() {
@@ -40,6 +41,7 @@ class ChatDetailFragment : BasicFragment<ChatDetailViewModel, ChatDetailUiBindin
 	override fun initViewModel(viewModel: ChatDetailViewModel) {
 		val listAdapter = ChatDetailAdapter(userId, context!!, mutableListOf())
 		listView.adapter = listAdapter
+		listView.enableChatBehavior()
 		viewModel.setListAdapter(listAdapter)
 	}
 
