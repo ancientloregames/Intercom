@@ -11,7 +11,7 @@
 	<androidx.constraintlayout.widget.ConstraintLayout
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
-			android:background="@android:color/white"
+			android:background="#EEEEEE"
 	>
 
 		<androidx.recyclerview.widget.RecyclerView
@@ -21,35 +21,46 @@
 				app:stackFromEnd="true"
 				app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
 				tools:listitem="@layout/chat_detail_item_user"
-				app:layout_constraintBottom_toTopOf="@+id/textField"
+				app:layout_constraintBottom_toTopOf="@+id/inputContainer"
 				app:layout_constraintStart_toStartOf="parent"
 				app:layout_constraintEnd_toEndOf="parent"
 				app:layout_constraintTop_toTopOf="parent"
 		/>
 
-		<EditText
-				android:id="@+id/textField"
-				android:layout_width="0dp"
-				android:layout_height="45dp"
-				android:hint="@string/chat_textfield_hint"
-				android:text="@={ui.textField}"
+		<LinearLayout
+				android:id="@+id/inputContainer"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:background="@android:color/white"
 				app:layout_constraintTop_toBottomOf="@+id/listView"
-				app:layout_constraintEnd_toStartOf="@+id/sendButton"
-				app:layout_constraintStart_toStartOf="parent"
-				app:layout_constraintBottom_toBottomOf="parent"
-		/>
-
-		<ImageButton
-				android:id="@+id/sendButton"
-				android:layout_width="45dp"
-				android:layout_height="0dp"
-				android:onClick="@{() -> ui.onSendButtonClicked()}"
-				app:srcCompat="@drawable/ic_send"
-				app:layout_constraintTop_toBottomOf="@+id/listView"
-				app:layout_constraintStart_toEndOf="@+id/textField"
 				app:layout_constraintEnd_toEndOf="parent"
-				app:layout_constraintBottom_toBottomOf="parent"
-		/>
+				app:layout_constraintStart_toStartOf="parent"
+				app:layout_constraintBottom_toBottomOf="parent">
+
+			<EditText
+					android:id="@+id/textField"
+					android:layout_width="0dp"
+					android:layout_height="wrap_content"
+					android:layout_weight="1"
+					android:layout_gravity="center_vertical"
+					android:padding="8dp"
+					android:hint="@string/chat_textfield_hint"
+					android:text="@={ui.textField}"
+					android:inputType="textCapSentences|textMultiLine"
+					android:maxLines="4"
+					android:background="@null"
+			/>
+
+			<ImageButton
+					android:id="@+id/sendButton"
+					android:layout_width="45dp"
+					android:layout_height="45dp"
+					android:layout_gravity="bottom"
+					android:onClick="@{() -> ui.onSendButtonClicked()}"
+					android:background="@drawable/bg_ripple_effect_gray"
+					app:srcCompat="@drawable/ic_send"
+			/>
+		</LinearLayout>
 
 	</androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
