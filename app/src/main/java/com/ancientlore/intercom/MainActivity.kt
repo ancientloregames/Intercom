@@ -19,7 +19,7 @@ import com.ancientlore.intercom.ui.auth.email.login.EmailLoginFragment
 import com.ancientlore.intercom.ui.auth.email.signup.EmailSignupFragment
 import com.ancientlore.intercom.ui.auth.phone.login.PhoneLoginFragment
 import com.ancientlore.intercom.ui.auth.phone.check.PhoneCheckFragment
-import com.ancientlore.intercom.ui.chat.detail.ChatDetailFragment
+import com.ancientlore.intercom.ui.chat.flow.ChatFlowFragment
 import com.ancientlore.intercom.ui.chat.list.ChatListFragment
 import com.ancientlore.intercom.ui.contact.list.ContactListFragment
 import com.ancientlore.intercom.utils.*
@@ -71,7 +71,7 @@ class MainActivity : AppCompatActivity(), AuthNavigator, PermissionManager {
 
 	override fun openChatDetail(chatId: String) {
 		supportFragmentManager.beginTransaction()
-			.add(R.id.container, ChatDetailFragment.newInstance(chatId))
+			.add(R.id.container, ChatFlowFragment.newInstance(chatId))
 			.commitNow()
 	}
 

@@ -6,7 +6,7 @@
 		<import type="android.view.View"/>
 		<variable
 				name="message"
-				type="com.ancientlore.intercom.ui.chat.detail.ChatDetailAdapter.ViewHolder"/>
+				type="com.ancientlore.intercom.ui.chat.flow.ChatFlowAdapter.ViewHolder"/>
 	</data>
 	<FrameLayout android:layout_width="match_parent"
 	             android:layout_height="wrap_content">

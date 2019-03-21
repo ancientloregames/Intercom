@@ -6,7 +6,7 @@
 	<data>
 		<variable
 				name="ui"
-				type="com.ancientlore.intercom.ui.chat.detail.ChatDetailViewModel"/>
+				type="com.ancientlore.intercom.ui.chat.flow.ChatFlowViewModel"/>
 	</data>
 	<androidx.constraintlayout.widget.ConstraintLayout
 			android:layout_width="match_parent"
@@ -20,7 +20,7 @@
 				android:layout_height="0dp"
 				app:stackFromEnd="true"
 				app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-				tools:listitem="@layout/chat_detail_item_user"
+				tools:listitem="@layout/chat_flow_item_user"
 				app:layout_constraintBottom_toTopOf="@+id/inputContainer"
 				app:layout_constraintStart_toStartOf="parent"
 				app:layout_constraintEnd_toEndOf="parent"

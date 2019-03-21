@@ -1,4 +1,4 @@
-package com.ancientlore.intercom.ui.chat.detail
+package com.ancientlore.intercom.ui.chat.flow
 
 import android.content.Context
 import android.view.ViewGroup
@@ -7,14 +7,14 @@ import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.DiffUtil
 import com.ancientlore.intercom.BR
 import com.ancientlore.intercom.data.model.Message
-import com.ancientlore.intercom.databinding.ChatDetailItemOtherBinding
-import com.ancientlore.intercom.databinding.ChatDetailItemUserBinding
+import com.ancientlore.intercom.databinding.ChatFlowItemOtherBinding
+import com.ancientlore.intercom.databinding.ChatFlowItemUserBinding
 import com.ancientlore.intercom.ui.BasicRecyclerAdapter
 import com.ancientlore.intercom.ui.MutableRecyclerAdapter
 
-class ChatDetailAdapter(private val userId: String,
-                        context: Context, items: MutableList<Message>)
-	: MutableRecyclerAdapter<Message, ChatDetailAdapter.ViewHolder, ViewDataBinding>(context, items) {
+class ChatFlowAdapter(private val userId: String,
+                      context: Context, items: MutableList<Message>)
+	: MutableRecyclerAdapter<Message, ChatFlowAdapter.ViewHolder, ViewDataBinding>(context, items) {
 
 	private companion object {
 		private const val VIEW_TYPE_USER = 0
@@ -33,8 +33,8 @@ class ChatDetailAdapter(private val userId: String,
 
 	override fun createItemViewDataBinding(parent: ViewGroup, viewType: Int): ViewDataBinding {
 		return when (viewType) {
-			VIEW_TYPE_USER -> ChatDetailItemUserBinding.inflate(layoutInflater, parent, false)
-			else -> ChatDetailItemOtherBinding.inflate(layoutInflater, parent, false)
+			VIEW_TYPE_USER -> ChatFlowItemUserBinding.inflate(layoutInflater, parent, false)
+			else -> ChatFlowItemOtherBinding.inflate(layoutInflater, parent, false)
 		}
 	}
 

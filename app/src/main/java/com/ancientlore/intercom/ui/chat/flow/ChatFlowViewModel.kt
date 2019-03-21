@@ -1,4 +1,4 @@
-package com.ancientlore.intercom.ui.chat.detail
+package com.ancientlore.intercom.ui.chat.flow
 
 import androidx.databinding.ObservableField
 import com.ancientlore.intercom.App
@@ -8,11 +8,11 @@ import com.ancientlore.intercom.data.source.MessageRepository
 import com.ancientlore.intercom.ui.BasicViewModel
 import com.ancientlore.intercom.utils.Utils
 
-class ChatDetailViewModel(private val userId: String, chatId: String) : BasicViewModel() {
+class ChatFlowViewModel(private val userId: String, chatId: String) : BasicViewModel() {
 
 	val textField = ObservableField<String>("")
 
-	private lateinit var listAdapter: ChatDetailAdapter
+	private lateinit var listAdapter: ChatFlowAdapter
 
 	private val repository = MessageRepository()
 
@@ -28,7 +28,7 @@ class ChatDetailViewModel(private val userId: String, chatId: String) : BasicVie
 		detachDataListener()
 	}
 
-	fun setListAdapter(listAdapter: ChatDetailAdapter) {
+	fun setListAdapter(listAdapter: ChatFlowAdapter) {
 		this.listAdapter = listAdapter
 		attachDataListener()
 	}

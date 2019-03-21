@@ -1,21 +1,21 @@
-package com.ancientlore.intercom.ui.chat.detail
+package com.ancientlore.intercom.ui.chat.flow
 
 import android.os.Bundle
 import android.view.View
 import com.ancientlore.intercom.App
 import com.ancientlore.intercom.R
-import com.ancientlore.intercom.databinding.ChatDetailUiBinding
+import com.ancientlore.intercom.databinding.ChatFlowUiBinding
 import com.ancientlore.intercom.ui.BasicFragment
 import com.ancientlore.intercom.utils.extensions.enableChatBehavior
-import kotlinx.android.synthetic.main.chat_detail_ui.*
+import kotlinx.android.synthetic.main.chat_flow_ui.*
 
-class ChatDetailFragment : BasicFragment<ChatDetailViewModel, ChatDetailUiBinding>() {
+class ChatFlowFragment : BasicFragment<ChatFlowViewModel, ChatFlowUiBinding>() {
 
 	companion object {
 		private const val ARG_CHAT_ID = "chat_id"
 
-		fun newInstance(chatId: String) : ChatDetailFragment {
-			return ChatDetailFragment().apply {
+		fun newInstance(chatId: String) : ChatFlowFragment {
+			return ChatFlowFragment().apply {
 				arguments = Bundle().apply {
 					putString(ARG_CHAT_ID, chatId)
 				}
@@ -29,22 +29,22 @@ class ChatDetailFragment : BasicFragment<ChatDetailViewModel, ChatDetailUiBindin
 	private val userId get() = App.backend.getAuthManager().getCurrentUser()?.id
 		?: throw RuntimeException("This fragment may be created only after successful authorization")
 
-	override fun getLayoutResId() = R.layout.chat_detail_ui
+	override fun getLayoutResId() = R.layout.chat_flow_ui
 
-	override fun createViewModel() = ChatDetailViewModel(userId, chatId)
+	override fun createViewModel() = ChatFlowViewModel(userId, chatId)
 
-	override fun bind(view: View, viewModel: ChatDetailViewModel) {
-		dataBinding = ChatDetailUiBinding.bind(view)
+	override fun bind(view: View, viewModel: ChatFlowViewModel) {
+		dataBinding = ChatFlowUiBinding.bind(view)
 		dataBinding.ui = viewModel
 	}
 
-	override fun initViewModel(viewModel: ChatDetailViewModel) {
-		val listAdapter = ChatDetailAdapter(userId, context!!, mutableListOf())
+	override fun initViewModel(viewModel: ChatFlowViewModel) {
+		val listAdapter = ChatFlowAdapter(userId, context!!, mutableListOf())
 		listView.adapter = listAdapter
 		listView.enableChatBehavior()
 		viewModel.setListAdapter(listAdapter)
 	}
 
-	override fun observeViewModel(viewModel: ChatDetailViewModel) {
+	override fun observeViewModel(viewModel: ChatFlowViewModel) {
 	}
 }
