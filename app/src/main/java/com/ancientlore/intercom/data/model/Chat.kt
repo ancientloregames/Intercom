@@ -1,5 +1,6 @@
 package com.ancientlore.intercom.data.model
 
+import com.google.firebase.firestore.Exclude
 import java.text.DateFormat
 import java.util.*
 
@@ -9,6 +10,7 @@ data class Chat(val chatId: String = "",
                 val lastMsgTime: Long = 0,
                 val lastMsgText: String = "") {
 
+	@delegate:Exclude
   val lastMsgDate: String by lazy { DateFormat.getDateInstance(DateFormat.MEDIUM).format(Date(lastMsgTime)) }
 
 	override fun equals(other: Any?): Boolean {
