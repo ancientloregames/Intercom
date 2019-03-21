@@ -23,6 +23,8 @@ import com.ancientlore.intercom.ui.chat.detail.ChatDetailFragment
 import com.ancientlore.intercom.ui.chat.list.ChatListFragment
 import com.ancientlore.intercom.ui.contact.list.ContactListFragment
 import com.ancientlore.intercom.utils.*
+import com.ancientlore.intercom.utils.extensions.checkPermission
+import com.ancientlore.intercom.utils.extensions.getContacts
 import java.util.concurrent.Executors
 
 class MainActivity : AppCompatActivity(), AuthNavigator, PermissionManager {

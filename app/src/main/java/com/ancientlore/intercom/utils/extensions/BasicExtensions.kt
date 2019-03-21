@@ -1,4 +1,4 @@
-package com.ancientlore.intercom.utils
+package com.ancientlore.intercom.utils.extensions
 
 import android.Manifest
 import android.content.ContentResolver
