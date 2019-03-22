@@ -14,6 +14,8 @@
 			android:layout_height="65dp"
 			android:padding="8dp"
 			android:orientation="vertical"
+			android:background="@drawable/bg_ripple_effect_gray"
+			android:onClick="@{() -> chat.onClick()}"
 	>
 		<androidx.appcompat.widget.AppCompatImageView
 				android:id="@+id/iconView"
@@ -34,11 +36,14 @@
 				android:layout_width="0dp"
 				android:layout_height="wrap_content"
 				android:text="@{chat.titleField}"
+				android:textSize="16sp"
+				android:textColor="@color/defaultTextColor"
 				app:layout_constraintStart_toEndOf="@+id/iconView"
 				app:layout_constraintBottom_toTopOf="@+id/subtitleView"
 				app:layout_constraintTop_toTopOf="parent"
 				app:layout_constraintEnd_toStartOf="@+id/timestampView"
-				tools:text="Title"
+				tools:text="Chat title"
+				style="@style/onelineTextField"
 		/>
 
 		<androidx.appcompat.widget.AppCompatTextView
@@ -46,11 +51,14 @@
 				android:layout_width="0dp"
 				android:layout_height="wrap_content"
 				android:text="@{chat.messageField}"
+				android:textSize="14sp"
+				android:textColor="#868686"
 				app:layout_constraintStart_toStartOf="@+id/titleView"
 				app:layout_constraintBottom_toBottomOf="parent"
 				app:layout_constraintTop_toBottomOf="@+id/titleView"
 				app:layout_constraintEnd_toEndOf="@+id/titleView"
-				tools:text="Subtitle"
+				tools:text="Last message"
+				style="@style/onelineTextField"
 		/>
 
 		<androidx.appcompat.widget.AppCompatTextView
@@ -60,11 +68,14 @@
 				android:layout_marginLeft="8dp"
 				android:layout_marginStart="8dp"
 				android:text="@{chat.dateField}"
-				app:layout_constraintStart_toEndOf="@id/titleView"
+				android:textSize="12sp"
+				android:textColor="#6D6D6D"
+				app:layout_constraintStart_toEndOf="@+id/titleView"
 				app:layout_constraintEnd_toEndOf="parent"
-				app:layout_constraintBottom_toBottomOf="parent"
-				app:layout_constraintTop_toTopOf="parent"
-				tools:text="08/08/2018"
+				app:layout_constraintBottom_toBottomOf="@+id/titleView"
+				app:layout_constraintTop_toTopOf="@+id/titleView"
+				tools:text="Jun 06"
+				style="@style/onelineTextField"
 		/>
 	</androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

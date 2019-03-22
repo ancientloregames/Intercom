@@ -39,4 +39,10 @@
 		<item name="android:layout_gravity">bottom</item>
 	</style>
 
+	<style name="onelineTextField" parent="@style/TextAppearance.AppCompat">
+		<item name="android:maxLines">1</item>
+		<item name="android:singleLine">true</item>
+		<item name="android:ellipsize">end</item>
+	</style>
+
 </resources>
