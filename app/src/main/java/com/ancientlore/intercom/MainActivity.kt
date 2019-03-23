@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.annotation.RequiresPermission
 import androidx.annotation.StringRes
 import androidx.core.app.ActivityCompat
+import androidx.fragment.app.Fragment
 import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.backend.auth.PhoneAuthParams
 import com.ancientlore.intercom.backend.auth.User
@@ -33,6 +34,10 @@ class MainActivity : AppCompatActivity(), AuthNavigator, PermissionManager {
 		private const val PERM_CONTACTS = 101
 	}
 
+	interface BackButtonHandler {
+		fun onBackPressed(): Boolean
+	}
+
 	private val user get() = App.backend.getAuthManager().getCurrentUser()
 
 	private var permRequestCallback: Runnable1<Boolean>? = null
@@ -48,6 +53,14 @@ class MainActivity : AppCompatActivity(), AuthNavigator, PermissionManager {
 	private fun onFirstStart() {
 		user?.let { onSuccessfullAuth(it) }
 			?: openPhoneAuthForm()
+	}
+
+	override fun onBackPressed() {
+		for (fragment in supportFragmentManager.fragments.reversed())
+			if(fragment is BackButtonHandler && fragment.onBackPressed())
+				return
+
+		super.onBackPressed()
 	}
 
 	override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -96,6 +109,12 @@ class MainActivity : AppCompatActivity(), AuthNavigator, PermissionManager {
 	override fun openPhoneCheckForm(params: PhoneAuthParams) {
 		supportFragmentManager.beginTransaction()
 			.replace(R.id.container, PhoneCheckFragment.newInstance(params))
+			.commitNow()
+	}
+
+	override fun closeFragment(fragment: Fragment) {
+		supportFragmentManager.beginTransaction()
+			.remove(fragment)
 			.commitNow()
 	}
 

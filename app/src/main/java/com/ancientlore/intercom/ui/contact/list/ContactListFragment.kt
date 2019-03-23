@@ -12,6 +12,11 @@ class ContactListFragment : BasicFragment<ContactListViewModel, ContactListUiBin
 		fun newInstance() = ContactListFragment()
 	}
 
+	override fun onBackPressed(): Boolean {
+		navigator?.closeFragment(this)
+		return true
+	}
+
 	override fun getLayoutResId() = R.layout.contact_list_ui
 
 	override fun createViewModel() = ContactListViewModel()
@@ -31,6 +36,9 @@ class ContactListFragment : BasicFragment<ContactListViewModel, ContactListUiBin
 		subscriptions.add(viewModel.observeToastRequest()
 			.subscribe { showToast(it) })
 		subscriptions.add(viewModel.observeChatOpenById()
-			.subscribe { navigator?.openChatDetail(it) })
+			.subscribe { chatId ->
+				navigator?.closeFragment(this)
+				navigator?.openChatDetail(chatId)
+			})
 	}
 }

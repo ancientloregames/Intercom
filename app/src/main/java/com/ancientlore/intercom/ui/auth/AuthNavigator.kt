@@ -1,5 +1,6 @@
 package com.ancientlore.intercom.ui.auth
 
+import androidx.fragment.app.Fragment
 import com.ancientlore.intercom.backend.auth.PhoneAuthParams
 import com.ancientlore.intercom.backend.auth.User
 
@@ -12,4 +13,5 @@ interface AuthNavigator {
 	fun openContactList()
 	fun openChatDetail(chatId: String)
 	fun onSuccessfullAuth(user: User)
+	fun closeFragment(fragment: Fragment)
 }

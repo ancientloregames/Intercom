@@ -11,12 +11,15 @@ import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
+import com.ancientlore.intercom.MainActivity
 import com.ancientlore.intercom.ui.auth.AuthNavigator
 import com.ancientlore.intercom.utils.PermissionManager
 import io.reactivex.internal.disposables.ListCompositeDisposable
 import java.lang.RuntimeException
 
-abstract class BasicFragment<VM : ViewModel, B : ViewDataBinding> : Fragment() {
+abstract class BasicFragment<VM : ViewModel, B : ViewDataBinding> : Fragment(), MainActivity.BackButtonHandler {
+
+	override fun onBackPressed() = false
 
 	protected lateinit var viewModel: VM
 	protected lateinit var dataBinding: B

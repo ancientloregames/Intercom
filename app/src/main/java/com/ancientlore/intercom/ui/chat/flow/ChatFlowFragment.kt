@@ -29,6 +29,11 @@ class ChatFlowFragment : BasicFragment<ChatFlowViewModel, ChatFlowUiBinding>() {
 	private val userId get() = App.backend.getAuthManager().getCurrentUser()?.id
 		?: throw RuntimeException("This fragment may be created only after successful authorization")
 
+	override fun onBackPressed(): Boolean {
+		navigator?.closeFragment(this)
+		return true
+	}
+
 	override fun getLayoutResId() = R.layout.chat_flow_ui
 
 	override fun createViewModel() = ChatFlowViewModel(userId, chatId)
