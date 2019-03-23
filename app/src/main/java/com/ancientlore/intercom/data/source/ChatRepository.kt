@@ -23,6 +23,14 @@ object ChatRepository : ChatSource {
 		remoteSource?.createDialog(recipientId, callback)
 	}
 
+	override fun attachListener(callback: RequestCallback<List<Chat>>) {
+		remoteSource?.attachListener(callback)
+	}
+
+	override fun detachListener() {
+		remoteSource?.detachListener()
+	}
+
 	fun setRemoteSource(source: ChatSource) {
 		remoteSource = source
 	}

@@ -5,6 +5,7 @@ import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.data.model.Chat
 import com.ancientlore.intercom.data.source.ChatSource
 import com.ancientlore.intercom.utils.SingletonHolder
+import com.google.firebase.firestore.ListenerRegistration
 
 class FirestoreChatSource private constructor(private val userId: String)
 	: FirestoreSource<Chat>(), ChatSource {
@@ -17,6 +18,8 @@ class FirestoreChatSource private constructor(private val userId: String)
 	}
 
 	private val chatsCollection get() = db.collection(CHATS)
+
+	private var changeListener: ListenerRegistration? = null
 
 	override fun getObjectClass() = Chat::class.java
 
@@ -56,6 +59,29 @@ class FirestoreChatSource private constructor(private val userId: String)
 			.add(mapOf("recipientId" to recipientId))
 			.addOnSuccessListener { callback.onSuccess(it.id) }
 			.addOnFailureListener { callback.onFailure(it) }
+	}
+
+	override fun attachListener(callback: RequestCallback<List<Chat>>) {
+		changeListener = db.collection("users")
+			.document(userId)
+			.collection("contacts")
+			.whereGreaterThan("lastMsgTime", 0)
+			.orderBy("lastMsgTime")
+			.addSnapshotListener { snapshot, error ->
+				if (error != null) {
+					callback.onFailure(error)
+					return@addSnapshotListener
+				}
+				else if (snapshot != null) {
+					deserialize(snapshot)
+						.takeIf { it.isNotEmpty() }
+						?.let { callback.onSuccess(it)  }
+				}
+			}
+	}
+
+	override fun detachListener() {
+		changeListener?.remove()
 	}
 
 	private fun requestUserChat(id: String) = chatsCollection.document(id).get()
