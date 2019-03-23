@@ -38,7 +38,7 @@ class ContactListFragment : BasicFragment<ContactListViewModel, ContactListUiBin
 		subscriptions.add(viewModel.observeChatOpenById()
 			.subscribe { chatId ->
 				navigator?.closeFragment(this)
-				navigator?.openChatDetail(chatId)
+				navigator?.openChatFlow(chatId)
 			})
 	}
 }

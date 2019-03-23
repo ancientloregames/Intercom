@@ -36,5 +36,5 @@ class ChatListFragment : BasicFragment<ChatListViewModel, ChatListUiBinding>() {
 
 	private fun openContactList() = navigator?.openContactList()
 
-	private fun openChat(id: String) = navigator?.openChatDetail(id)
+	private fun openChat(id: String) = navigator?.openChatFlow(id)
 }

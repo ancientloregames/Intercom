@@ -82,7 +82,7 @@ class MainActivity : AppCompatActivity(), AuthNavigator, PermissionManager {
 			.commitNow()
 	}
 
-	override fun openChatDetail(chatId: String) {
+	override fun openChatFlow(chatId: String) {
 		supportFragmentManager.beginTransaction()
 			.add(R.id.container, ChatFlowFragment.newInstance(chatId))
 			.commitNow()
