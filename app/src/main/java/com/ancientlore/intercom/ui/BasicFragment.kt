@@ -52,6 +52,8 @@ abstract class BasicFragment<VM : ViewModel, B : ViewDataBinding> : Fragment(), 
 	}
 
 	final override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+		initView(view, savedInstanceState)
+
 		val viewModel = createViewModel()
 
 		bind(view, viewModel)
@@ -59,6 +61,8 @@ abstract class BasicFragment<VM : ViewModel, B : ViewDataBinding> : Fragment(), 
 		initViewModel(viewModel)
 		observeViewModel(viewModel)
 	}
+
+	protected open fun initView(view: View, savedInstanceState: Bundle?) {}
 
 	override fun onDestroyView() {
 		subscriptions.clear()
@@ -73,5 +77,9 @@ abstract class BasicFragment<VM : ViewModel, B : ViewDataBinding> : Fragment(), 
 		runOnUiThread(Runnable {
 			Toast.makeText(context, textResId, Toast.LENGTH_LONG).show()
 		})
+	}
+
+	protected fun close() {
+		navigator?.closeFragment(this)
 	}
 }

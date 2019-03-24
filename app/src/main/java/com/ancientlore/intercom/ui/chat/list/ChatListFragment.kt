@@ -1,5 +1,6 @@
 package com.ancientlore.intercom.ui.chat.list
 
+import android.os.Bundle
 import android.view.View
 import com.ancientlore.intercom.R
 import com.ancientlore.intercom.databinding.ChatListUiBinding
@@ -21,10 +22,12 @@ class ChatListFragment : BasicFragment<ChatListViewModel, ChatListUiBinding>() {
 		dataBinding.ui = viewModel
 	}
 
+	override fun initView(view: View, savedInstanceState: Bundle?) {
+		listView.adapter = ChatListAdapter(context!!, mutableListOf())
+	}
+
 	override fun initViewModel(viewModel: ChatListViewModel) {
-		val listAdapter = ChatListAdapter(context!!, mutableListOf())
-		listView.adapter = listAdapter
-		viewModel.setListAdapter(listAdapter)
+		viewModel.setListAdapter(listView.adapter as ChatListAdapter)
 	}
 
 	override fun observeViewModel(viewModel: ChatListViewModel) {
