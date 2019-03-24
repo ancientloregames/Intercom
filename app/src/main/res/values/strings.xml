@@ -1,6 +1,8 @@
 <resources>
 	<string name="app_name">Intercom</string>
 
+	<string name="contactlist_title">New Message</string>
+
 	<string name="login_form_title">Authorization</string>
 	<string name="signup_form_title">Registration</string>
 	<string name="verification_form_title">Verification</string>

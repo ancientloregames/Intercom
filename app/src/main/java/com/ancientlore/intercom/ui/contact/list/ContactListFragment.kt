@@ -1,10 +1,14 @@
 package com.ancientlore.intercom.ui.contact.list
 
+import android.os.Bundle
 import android.view.View
+import androidx.appcompat.widget.Toolbar
 import com.ancientlore.intercom.R
 import com.ancientlore.intercom.databinding.ContactListUiBinding
 import com.ancientlore.intercom.ui.BasicFragment
-import kotlinx.android.synthetic.main.contact_list_ui.*
+import com.ancientlore.intercom.utils.ToolbarManager
+import kotlinx.android.synthetic.main.contact_list_ui.listView
+import kotlinx.android.synthetic.main.contact_list_ui.toolbar
 
 class ContactListFragment : BasicFragment<ContactListViewModel, ContactListUiBinding>() {
 
@@ -13,7 +17,7 @@ class ContactListFragment : BasicFragment<ContactListViewModel, ContactListUiBin
 	}
 
 	override fun onBackPressed(): Boolean {
-		navigator?.closeFragment(this)
+		close()
 		return true
 	}
 
@@ -26,10 +30,18 @@ class ContactListFragment : BasicFragment<ContactListViewModel, ContactListUiBin
 		dataBinding.ui = viewModel
 	}
 
+	override fun initView(view: View, savedInstanceState: Bundle?) {
+		ToolbarManager(toolbar as Toolbar).apply {
+			enableBackButton(View.OnClickListener {
+				close()
+			})
+		}
+
+		listView.adapter = ContactListAdapter(context!!, mutableListOf())
+	}
+
 	override fun initViewModel(viewModel: ContactListViewModel) {
-		val listAdapter = ContactListAdapter(context!!, mutableListOf())
-		listView.adapter = listAdapter
-		viewModel.setListAdapter(listAdapter)
+		viewModel.setListAdapter(listView.adapter as ContactListAdapter)
 	}
 
 	override fun observeViewModel(viewModel: ContactListViewModel) {
