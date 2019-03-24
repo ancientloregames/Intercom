@@ -2,12 +2,15 @@ package com.ancientlore.intercom.ui.chat.flow
 
 import android.os.Bundle
 import android.view.View
+import androidx.appcompat.widget.Toolbar
 import com.ancientlore.intercom.App
 import com.ancientlore.intercom.R
 import com.ancientlore.intercom.databinding.ChatFlowUiBinding
 import com.ancientlore.intercom.ui.BasicFragment
+import com.ancientlore.intercom.utils.ToolbarManager
 import com.ancientlore.intercom.utils.extensions.enableChatBehavior
-import kotlinx.android.synthetic.main.chat_flow_ui.*
+import kotlinx.android.synthetic.main.chat_flow_ui.listView
+import kotlinx.android.synthetic.main.chat_flow_ui.toolbar
 
 class ChatFlowFragment : BasicFragment<ChatFlowViewModel, ChatFlowUiBinding>() {
 
@@ -30,7 +33,7 @@ class ChatFlowFragment : BasicFragment<ChatFlowViewModel, ChatFlowUiBinding>() {
 		?: throw RuntimeException("This fragment may be created only after successful authorization")
 
 	override fun onBackPressed(): Boolean {
-		navigator?.closeFragment(this)
+		close()
 		return true
 	}
 
@@ -43,11 +46,23 @@ class ChatFlowFragment : BasicFragment<ChatFlowViewModel, ChatFlowUiBinding>() {
 		dataBinding.ui = viewModel
 	}
 
+	override fun initView(view: View, savedInstanceState: Bundle?) {
+		ToolbarManager(toolbar as Toolbar).apply {
+			setTitle("Contact name")
+			setSubtitle("Last visit")
+			enableBackButton(View.OnClickListener {
+				close()
+			})
+		}
+
+		with(listView) {
+			adapter = ChatFlowAdapter(userId, context!!, mutableListOf())
+			enableChatBehavior()
+		}
+	}
+
 	override fun initViewModel(viewModel: ChatFlowViewModel) {
-		val listAdapter = ChatFlowAdapter(userId, context!!, mutableListOf())
-		listView.adapter = listAdapter
-		listView.enableChatBehavior()
-		viewModel.setListAdapter(listAdapter)
+		viewModel.setListAdapter(listView.adapter as ChatFlowAdapter)
 	}
 
 	override fun observeViewModel(viewModel: ChatFlowViewModel) {
