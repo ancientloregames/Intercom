@@ -7,8 +7,7 @@ import com.ancientlore.intercom.R
 import com.ancientlore.intercom.databinding.ContactListUiBinding
 import com.ancientlore.intercom.ui.BasicFragment
 import com.ancientlore.intercom.utils.ToolbarManager
-import kotlinx.android.synthetic.main.contact_list_ui.listView
-import kotlinx.android.synthetic.main.contact_list_ui.toolbar
+import kotlinx.android.synthetic.main.contact_list_ui.*
 
 class ContactListFragment : BasicFragment<ContactListViewModel, ContactListUiBinding>() {
 
@@ -36,6 +35,8 @@ class ContactListFragment : BasicFragment<ContactListViewModel, ContactListUiBin
 				close()
 			})
 		}
+
+		swipableLayout.setListener { close() }
 
 		listView.adapter = ContactListAdapter(context!!, mutableListOf())
 	}
