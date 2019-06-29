@@ -9,8 +9,7 @@ import com.ancientlore.intercom.databinding.ChatFlowUiBinding
 import com.ancientlore.intercom.ui.BasicFragment
 import com.ancientlore.intercom.utils.ToolbarManager
 import com.ancientlore.intercom.utils.extensions.enableChatBehavior
-import kotlinx.android.synthetic.main.chat_flow_ui.listView
-import kotlinx.android.synthetic.main.chat_flow_ui.toolbar
+import kotlinx.android.synthetic.main.chat_flow_ui.*
 
 class ChatFlowFragment : BasicFragment<ChatFlowViewModel, ChatFlowUiBinding>() {
 
@@ -54,6 +53,8 @@ class ChatFlowFragment : BasicFragment<ChatFlowViewModel, ChatFlowUiBinding>() {
 				close()
 			})
 		}
+
+		swipableLayout.setListener { close() }
 
 		with(listView) {
 			adapter = ChatFlowAdapter(userId, context!!, mutableListOf())
