@@ -11,7 +11,7 @@ data class Chat(val chatId: String = "",
                 val lastMsgText: String = "") {
 
 	companion object {
-		private val dateFormat = SimpleDateFormat("MMM dd")
+		private val dateFormat = SimpleDateFormat("MMM dd", Locale.getDefault())
 	}
 
 	@delegate:Exclude
