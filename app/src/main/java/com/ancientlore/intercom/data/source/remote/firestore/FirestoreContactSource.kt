@@ -6,6 +6,7 @@ import com.ancientlore.intercom.data.model.Contact
 import com.ancientlore.intercom.data.source.ContactSource
 import com.ancientlore.intercom.data.source.EmptyResultException
 import com.ancientlore.intercom.utils.SingletonHolder
+import com.google.firebase.firestore.ListenerRegistration
 
 class FirestoreContactSource private constructor(private val userId: String)
 : FirestoreSource<Contact>(), ContactSource {
@@ -19,6 +20,8 @@ class FirestoreContactSource private constructor(private val userId: String)
 	}
 
 	private val contactsCollection get() = db.collection(USERS).document(userId).collection(CONTACTS)
+
+	private var contactChangesListener: ListenerRegistration? = null
 
 	override fun getObjectClass() = Contact::class.java
 
@@ -49,5 +52,23 @@ class FirestoreContactSource private constructor(private val userId: String)
 				callback.onSuccess(EmptyObject)
 			}
 			.addOnFailureListener { callback.onFailure(it) }
+	}
+
+	override fun attachContactListener(id: String, callback: RequestCallback<Contact>) {
+		contactChangesListener = contactsCollection.document(id)
+			.addSnapshotListener { snapshot, error ->
+				if (error != null) {
+					callback.onFailure(error)
+					return@addSnapshotListener
+				}
+				else if (snapshot != null) {
+					deserialize(snapshot)
+						?.let { callback.onSuccess(it)  }
+				}
+			}
+	}
+
+	override fun detachListeners() {
+		contactChangesListener?.remove()
 	}
 }

@@ -15,8 +15,15 @@ object ContactRepository : ContactSource {
 		remoteSource?.addAll(contacts, callback)
 	}
 
+	override fun attachContactListener(id: String, callback: RequestCallback<Contact>) {
+		remoteSource?.attachContactListener(id, callback)
+	}
+
+	override fun detachListeners() {
+		remoteSource?.detachListeners()
+	}
+
 	fun setRemoteSource(source: ContactSource) {
 		remoteSource = source
 	}
-
 }
