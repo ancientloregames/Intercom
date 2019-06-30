@@ -54,7 +54,7 @@ class ContactListAdapter(context: Context, items: MutableList<Contact>)
 		var listener: Listener? = null
 
 		val nameField = ObservableField<String>("")
-		val phoneField = ObservableField<String>("")
+		val subtitleField = ObservableField<String>("")
 		val photoUri = ObservableField<Uri>(Uri.EMPTY)
 
 		init {
@@ -63,7 +63,7 @@ class ContactListAdapter(context: Context, items: MutableList<Contact>)
 
 		override fun bind(data: Contact) {
 			nameField.set(data.name)
-			phoneField.set(data.phone)
+			subtitleField.set(data.lastSeenDate)
 		}
 
 		fun onClick() = listener?.onItemClicked()

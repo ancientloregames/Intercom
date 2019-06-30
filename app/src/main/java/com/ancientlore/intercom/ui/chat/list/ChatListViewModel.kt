@@ -5,6 +5,7 @@ import com.ancientlore.intercom.backend.SimpleRequestCallback
 import com.ancientlore.intercom.data.model.Chat
 import com.ancientlore.intercom.data.source.ChatRepository
 import com.ancientlore.intercom.ui.BasicViewModel
+import com.ancientlore.intercom.ui.chat.flow.ChatFlowFragment
 import com.ancientlore.intercom.utils.Utils
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
@@ -14,7 +15,7 @@ class ChatListViewModel : BasicViewModel() {
 	private lateinit var listAdapter: ChatListAdapter
 
 	private val contactListRequest = PublishSubject.create<Any>()
-	private val openChatByIdEvent = PublishSubject.create<String>() // Chat Id
+	private val openChatOpenSubj = PublishSubject.create<ChatFlowFragment.Params>()
 
 	override fun onCleared() {
 		super.onCleared()
@@ -24,7 +25,9 @@ class ChatListViewModel : BasicViewModel() {
 	fun setListAdapter(listAdapter: ChatListAdapter) {
 		this.listAdapter = listAdapter
 		listAdapter.setListener(object : ChatListAdapter.Listener {
-			override fun onChatSelected(chat: Chat) = openChatByIdEvent.onNext(chat.chatId)
+			override fun onChatSelected(chat: Chat) {
+				openChatOpenSubj.onNext(ChatFlowFragment.Params(chat.chatId, chat.name))
+			}
 		})
 		attachDataListener()
 	}
@@ -32,7 +35,7 @@ class ChatListViewModel : BasicViewModel() {
 	fun onShowContactListClicked() = contactListRequest.onNext(EmptyObject)
 
 	fun observeContactListRequest() = contactListRequest as Observable<*>
-	fun observeChatOpenById() = openChatByIdEvent as Observable<String>
+	fun observeChatOpen() = openChatOpenSubj as Observable<ChatFlowFragment.Params>
 
 	private fun attachDataListener() {
 		ChatRepository.attachListener(object : SimpleRequestCallback<List<Chat>>() {

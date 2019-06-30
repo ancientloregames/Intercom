@@ -15,18 +15,25 @@ class ChatFlowFragment : BasicFragment<ChatFlowViewModel, ChatFlowUiBinding>() {
 
 	companion object {
 		private const val ARG_CHAT_ID = "chat_id"
+		private const val ARG_CHAT_TITLE = "chat_title"
 
-		fun newInstance(chatId: String) : ChatFlowFragment {
+		fun newInstance(params: Params) : ChatFlowFragment {
 			return ChatFlowFragment().apply {
 				arguments = Bundle().apply {
-					putString(ARG_CHAT_ID, chatId)
+					putString(ARG_CHAT_ID, params.chatId)
+					putString(ARG_CHAT_TITLE, params.title)
 				}
 			}
 		}
 	}
 
+	data class Params(val chatId: String, val title: String)
+
 	private val chatId get() = arguments?.getString(ARG_CHAT_ID)
 		?: throw RuntimeException("Chat id is a mandotory arg")
+
+	private val title get() = arguments?.getString(ARG_CHAT_TITLE)
+		?: throw RuntimeException("Chat title is a mandotory arg")
 
 	private val userId get() = App.backend.getAuthManager().getCurrentUser()?.id
 		?: throw RuntimeException("This fragment may be created only after successful authorization")
@@ -47,8 +54,7 @@ class ChatFlowFragment : BasicFragment<ChatFlowViewModel, ChatFlowUiBinding>() {
 
 	override fun initView(view: View, savedInstanceState: Bundle?) {
 		ToolbarManager(toolbar as Toolbar).apply {
-			setTitle("Contact name")
-			setSubtitle("Last visit")
+			setTitle(title)
 			enableBackButton(View.OnClickListener {
 				close()
 			})

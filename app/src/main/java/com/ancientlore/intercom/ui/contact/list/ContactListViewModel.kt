@@ -7,6 +7,7 @@ import com.ancientlore.intercom.data.model.Contact
 import com.ancientlore.intercom.data.source.ChatRepository
 import com.ancientlore.intercom.data.source.ContactRepository
 import com.ancientlore.intercom.ui.BasicViewModel
+import com.ancientlore.intercom.ui.chat.flow.ChatFlowFragment
 import com.ancientlore.intercom.utils.Utils
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
@@ -15,7 +16,7 @@ class ContactListViewModel : BasicViewModel() {
 
 	private lateinit var listAdapter: ContactListAdapter
 
-	private val openChatByIdEvent = PublishSubject.create<String>() // ChatId
+	private val openChatSubj = PublishSubject.create<ChatFlowFragment.Params>() // ChatId
 
 	fun setListAdapter(listAdapter: ContactListAdapter) {
 		this.listAdapter = listAdapter
@@ -25,7 +26,7 @@ class ContactListViewModel : BasicViewModel() {
 		loadContactList()
 	}
 
-	fun observeChatOpenById() = openChatByIdEvent as Observable<String>
+	fun observeChatOpen() = openChatSubj as Observable<ChatFlowFragment.Params>
 
 	private fun loadContactList() {
 		ContactRepository.getAll(object : SimpleRequestCallback<List<Contact>>() {
@@ -37,14 +38,14 @@ class ContactListViewModel : BasicViewModel() {
 
 	private fun openChat(contact: Contact) {
 		if (contact.chatId.isNotEmpty())
-			openChatByIdEvent.onNext(contact.chatId)
+			openChatSubj.onNext(ChatFlowFragment.Params(contact.chatId, contact.name))
 		else createAndOpenChat(contact)
 	}
 
 	private fun createAndOpenChat(contact: Contact) {
 		ChatRepository.createDialog(contact.phone, object : RequestCallback<String> {
 			override fun onSuccess(result: String) {
-				openChatByIdEvent.onNext(result)
+				openChatSubj.onNext(ChatFlowFragment.Params(result, contact.name))
 			}
 			override fun onFailure(error: Throwable) {
 				Utils.logError(error)
