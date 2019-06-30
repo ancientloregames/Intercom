@@ -50,7 +50,7 @@
 				app:layout_constraintBottom_toBottomOf="@+id/iconView"
 				app:layout_constraintTop_toBottomOf="@+id/titleView"
 				app:layout_constraintEnd_toEndOf="parent"
-				android:text="@={contact.phoneField}"
+				android:text="@={contact.subtitleField}"
 				tools:text="Subtitle"
 		/>
 
