@@ -8,7 +8,8 @@ import java.util.*
 data class Chat(val chatId: String = "",
                 val name: String = "",
                 val lastMsgTime: Long = 0,
-                val lastMsgText: String = "") {
+                val lastMsgText: String = "")
+	: Comparable<Chat> {
 
 	companion object {
 		private val dateFormat = SimpleDateFormat("MMM dd", Locale.getDefault())
@@ -36,4 +37,8 @@ data class Chat(val chatId: String = "",
 		result = 31 * result + lastMsgText.hashCode()
 		return result
 	}
+
+	override fun compareTo(other: Chat) = lastMsgTime.compareTo(other.lastMsgTime)
+
+	fun assignId(id: String) = Chat(id, name, lastMsgTime, lastMsgText)
 }
