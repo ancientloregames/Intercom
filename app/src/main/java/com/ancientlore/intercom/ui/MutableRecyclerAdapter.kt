@@ -5,21 +5,27 @@ import androidx.annotation.UiThread
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.DiffUtil
 
-abstract class MutableRecyclerAdapter<I, H: BasicRecyclerAdapter.ViewHolder<I, B>, B: ViewDataBinding>(
+abstract class MutableRecyclerAdapter<I: Comparable<I>, H: BasicRecyclerAdapter.ViewHolder<I, B>, B: ViewDataBinding>(
 	context: Context,
 	items: MutableList<I>)
 	: BasicRecyclerAdapter<I, H, B>(context, items), MutableAdapter<I> {
 
 	protected val mutableList get() = getItems() as MutableList<I>
 
+	protected var autoSort = true
+
 	abstract fun getDiffCallback(newItems: List<I>): DiffUtil.Callback
 
 	@UiThread
 	override fun setItems(newItems: List<I>) {
-		val diffResult = DiffUtil.calculateDiff(getDiffCallback(newItems))
+		val items =
+			if (autoSort) newItems.sorted()
+			else newItems
+
+		val diffResult = DiffUtil.calculateDiff(getDiffCallback(items))
 
 		mutableList.clear()
-		mutableList.addAll(newItems)
+		mutableList.addAll(items)
 
 		diffResult.dispatchUpdatesTo(this)
 	}
