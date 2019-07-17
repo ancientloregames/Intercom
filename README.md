@@ -27,10 +27,10 @@ For now I consider to add Google Firebase, AWS and Microsoft Azure as a backend 
 ## Diagrams
 
 ### General class diagram
-<img src="https://user-images.githubusercontent.com/19228006/61355465-23696980-a87d-11e9-96ae-e86108ec9afe.png" />
+<img src="https://user-images.githubusercontent.com/19228006/61358819-d3da6c00-a883-11e9-9224-27e502232eaf.png" />
 
 ### Backend bridge class diagram
-<img src="https://user-images.githubusercontent.com/19228006/61355469-26645a00-a87d-11e9-8e2e-b52c7aa6febe.png" />
+<img src="https://user-images.githubusercontent.com/19228006/61358826-d50b9900-a883-11e9-89d2-3d58d5358380.png" />
 
 ### Sequence diagram
 <img src="https://user-images.githubusercontent.com/19228006/61355471-282e1d80-a87d-11e9-9fd0-5960ad981e63.png" />
