@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+>
+	<data>
+		<variable
+				name="viewModel"
+				type="com.ancientlore.intercom.widget.list.simple.SimpleListItemViewModel"/>
+	</data>
+	<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal"
+			android:gravity="center_vertical"
+			android:background="@drawable/bg_ripple_effect_gray"
+			android:padding="16dp"
+			android:onClick="@{() -> viewModel.onClick()}"
+	>
+		<ImageView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:paddingEnd="8dp"
+				android:paddingRight="8dp"
+				app:srcCompat="@{viewModel.item.icon}"
+				app:tint="@android:color/black"
+				tools:srcCompat="@drawable/ic_edit"
+		/>
+
+		<TextView
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:text="@{viewModel.item.title}"
+				android:textColor="@color/defaultTextColor"
+				android:textSize="16sp"
+				tools:text="Title"
+		/>
+	</LinearLayout>
+</layout>
