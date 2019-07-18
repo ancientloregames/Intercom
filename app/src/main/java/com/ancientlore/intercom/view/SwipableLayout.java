@@ -286,7 +286,7 @@ public class SwipableLayout extends ViewGroup
 	private void checkChildCount()
 	{
 		if (getChildCount() > 0)
-			throw new IllegalStateException("FlickableLayout can host only one direct child");
+			throw new IllegalStateException("SwipableLayout can host only one direct child");
 	}
 
 	private void setContentView(View view)
