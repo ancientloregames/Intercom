@@ -54,7 +54,7 @@ abstract class BasicFragment<VM : ViewModel, B : ViewDataBinding> : Fragment(), 
 	final override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		initView(view, savedInstanceState)
 
-		val viewModel = createViewModel()
+		viewModel = createViewModel()
 
 		bind(view, viewModel)
 
