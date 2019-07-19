@@ -4,6 +4,8 @@ import android.net.Uri;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.Closeable;
+
 public final class Utils
 {
 	private Utils() {}
@@ -18,5 +20,16 @@ public final class Utils
 	{
 		// TODO: use fabric crashlytycs logException later
 		throwable.printStackTrace();
+	}
+
+	public static void closeQuietly(Closeable closeable)
+	{
+		if (closeable == null) return;
+
+		try {
+			closeable.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }
