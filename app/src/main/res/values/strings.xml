@@ -34,6 +34,8 @@
 
 	<string name="alert_error_opening_chat">Failed to open chat. Try again later</string>
 	<string name="alert_error_creating_chat">Failed to create chat. Try again later</string>
-
 	<string name="alert_error_sync_contacts">Failed to sync contact list. Try again later</string>
+	<string name="alert_error_attach_file">Failed to attach file</string>
+
+	<string name="document">Document</string>
 </resources>

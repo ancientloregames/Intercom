@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<item name="im_attach_picture" type="id"/>
+	<item name="im_attach_camera" type="id"/>
+	<item name="im_attach_file" type="id"/>
+</resources>
