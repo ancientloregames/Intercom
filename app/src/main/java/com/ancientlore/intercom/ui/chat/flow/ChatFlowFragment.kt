@@ -130,6 +130,13 @@ class ChatFlowFragment : BasicFragment<ChatFlowViewModel, ChatFlowUiBinding>() {
 	}
 
 	private fun openFilePicker() {
-		// TODO open file picker
+		permissionManager?.requestPermissionReadStorage(Runnable1 { granted ->
+			if (granted) {
+				val intent = Intent(Intent.ACTION_GET_CONTENT)
+					.setType("*/*")
+				// TODO multiple selection .putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+				startActivityForResult(intent, INTENT_GET_CONTENT)
+			}
+		})
 	}
 }
