@@ -97,7 +97,7 @@ class ChatFlowFragment : BasicFragment<ChatFlowViewModel, ChatFlowUiBinding>() {
 						RESULT_OK -> {
 							val uri = getIntentResult(result)
 							val localFile = uri.getFileData(context!!.contentResolver)
-							// TODO send file
+							viewModel.handleAttachedFile(localFile)
 						}
 						else -> showToast(R.string.alert_error_attach_file)
 					}

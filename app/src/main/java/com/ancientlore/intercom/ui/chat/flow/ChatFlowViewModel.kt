@@ -1,9 +1,11 @@
 package com.ancientlore.intercom.ui.chat.flow
 
+import android.net.Uri
 import androidx.databinding.ObservableField
 import com.ancientlore.intercom.App
 import com.ancientlore.intercom.EmptyObject
 import com.ancientlore.intercom.backend.RequestCallback
+import com.ancientlore.intercom.data.model.FileData
 import com.ancientlore.intercom.data.model.Message
 import com.ancientlore.intercom.data.source.MessageRepository
 import com.ancientlore.intercom.ui.BasicViewModel
@@ -11,7 +13,9 @@ import com.ancientlore.intercom.utils.Utils
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 
-class ChatFlowViewModel(private val userId: String, chatId: String) : BasicViewModel() {
+class ChatFlowViewModel(private val userId: String,
+                        private val chatId: String)
+	: BasicViewModel() {
 
 	val textField = ObservableField<String>("")
 
@@ -65,6 +69,16 @@ class ChatFlowViewModel(private val userId: String, chatId: String) : BasicViewM
 
 	private fun sendMessage(text: String) {
 		repository.addMessage(Message(senderId = userId, text = text), null)
+	}
+
+	fun handleAttachedFile(fileData: FileData) {
+		App.backend.getStorageManager().uploadFile(fileData, chatId, object : RequestCallback<Uri> {
+			override fun onSuccess(result: Uri) {
+			}
+			override fun onFailure(error: Throwable) {
+				Utils.logError(error)
+			}
+		})
 	}
 
 	fun observeAttachMenuOpen() = openAttachMenuSubj as Observable<Any>
