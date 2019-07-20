@@ -6,4 +6,5 @@ import com.ancientlore.intercom.backend.data.DataSourceProvider
 abstract class BackendFactory {
 	abstract fun getAuthManager(): AuthManager
 	abstract fun getDataSourceProvider(): DataSourceProvider
+	abstract fun getStorageManager(): StorageManager
 }

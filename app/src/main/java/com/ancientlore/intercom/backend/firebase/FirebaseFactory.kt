@@ -7,4 +7,6 @@ object FirebaseFactory : BackendFactory() {
 	override fun getAuthManager() = FirebaseAuthManager
 
 	override fun getDataSourceProvider() = FirestoreDataSourceProvider
+
+	override fun getStorageManager() = FirebaseStorageManager
 }
