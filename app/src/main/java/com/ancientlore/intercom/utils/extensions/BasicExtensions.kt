@@ -4,12 +4,16 @@ import android.Manifest
 import android.content.ContentResolver
 import android.content.Context
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.provider.ContactsContract
+import android.provider.MediaStore
 import androidx.annotation.RequiresPermission
 import androidx.core.app.ActivityCompat
 import com.ancientlore.intercom.data.model.Contact
+import com.ancientlore.intercom.data.model.FileData
 import java.io.Closeable
 import java.io.IOException
+
 
 fun Context.checkPermission(permission: String) = ActivityCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED
 
@@ -66,4 +70,25 @@ fun Closeable.safeClose() {
 	try {
 		close()
 	} catch (ignore: IOException) { }
+}
+
+fun Uri.getFileData(contentResolver: ContentResolver) : FileData {
+	val projection = arrayOf(
+		MediaStore.Files.FileColumns._ID,
+		MediaStore.Files.FileColumns.DISPLAY_NAME)
+
+	val cursor = contentResolver.query(this,
+		projection, null, null, null)
+
+	if (cursor != null) {
+		try {
+			cursor.moveToFirst()
+			val id = cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns._ID))
+			val name = cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.DISPLAY_NAME)) ?: ""
+			return FileData(id, name, this)
+		} finally {
+			cursor.safeClose()
+		}
+	}
+	return FileData("", "", this)
 }
