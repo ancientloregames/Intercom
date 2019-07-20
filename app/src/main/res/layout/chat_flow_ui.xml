@@ -64,6 +64,15 @@
 					app:layout_constraintStart_toStartOf="parent"
 					app:layout_constraintBottom_toBottomOf="parent">
 
+				<ImageButton
+						android:layout_width="45dp"
+						android:layout_height="45dp"
+						android:layout_gravity="bottom"
+						android:onClick="@{() -> ui.onAttachButtonCliked()}"
+						android:background="@drawable/bg_ripple_effect_gray"
+						app:srcCompat="@drawable/ic_clip"
+				/>
+
 				<EditText
 						android:id="@+id/textField"
 						android:layout_width="0dp"

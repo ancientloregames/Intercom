@@ -2,11 +2,14 @@ package com.ancientlore.intercom.ui.chat.flow
 
 import androidx.databinding.ObservableField
 import com.ancientlore.intercom.App
+import com.ancientlore.intercom.EmptyObject
 import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.data.model.Message
 import com.ancientlore.intercom.data.source.MessageRepository
 import com.ancientlore.intercom.ui.BasicViewModel
 import com.ancientlore.intercom.utils.Utils
+import io.reactivex.Observable
+import io.reactivex.subjects.PublishSubject
 
 class ChatFlowViewModel(private val userId: String, chatId: String) : BasicViewModel() {
 
@@ -17,6 +20,8 @@ class ChatFlowViewModel(private val userId: String, chatId: String) : BasicViewM
 	private val repository = MessageRepository()
 
 	private val messageText get() = textField.get()!!
+
+	private val openAttachMenuSubj = PublishSubject.create<Any>()
 
 	init {
 		val dataSourceProvider = App.backend.getDataSourceProvider()
@@ -31,14 +36,6 @@ class ChatFlowViewModel(private val userId: String, chatId: String) : BasicViewM
 	fun setListAdapter(listAdapter: ChatFlowAdapter) {
 		this.listAdapter = listAdapter
 		attachDataListener()
-	}
-
-	fun onSendButtonClicked() {
-		messageText.takeIf { it.isNotBlank() }
-			?.let {
-				sendMessage(it)
-				textField.set("")
-			}
 	}
 
 	private fun attachDataListener() {
@@ -56,7 +53,19 @@ class ChatFlowViewModel(private val userId: String, chatId: String) : BasicViewM
 		repository.detachListener()
 	}
 
+	fun onAttachButtonCliked() = openAttachMenuSubj.onNext(EmptyObject)
+
+	fun onSendButtonClicked() {
+		messageText.takeIf { it.isNotBlank() }
+			?.let {
+				sendMessage(it)
+				textField.set("")
+			}
+	}
+
 	private fun sendMessage(text: String) {
 		repository.addMessage(Message(senderId = userId, text = text), null)
 	}
+
+	fun observeAttachMenuOpen() = openAttachMenuSubj as Observable<Any>
 }

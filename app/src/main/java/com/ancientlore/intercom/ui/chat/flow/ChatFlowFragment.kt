@@ -1,19 +1,29 @@
 package com.ancientlore.intercom.ui.chat.flow
 
+import android.app.Activity.RESULT_OK
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.widget.Toolbar
 import com.ancientlore.intercom.App
 import com.ancientlore.intercom.R
 import com.ancientlore.intercom.databinding.ChatFlowUiBinding
+import com.ancientlore.intercom.dialog.bottomsheet.list.ListBottomSheetDialog
 import com.ancientlore.intercom.ui.BasicFragment
+import com.ancientlore.intercom.ui.dialog.attach.AttachBottomSheetDialog
+import com.ancientlore.intercom.utils.Runnable1
 import com.ancientlore.intercom.utils.ToolbarManager
 import com.ancientlore.intercom.utils.extensions.enableChatBehavior
+import com.ancientlore.intercom.utils.extensions.getFileData
+import com.ancientlore.intercom.widget.list.simple.SimpleListItem
 import kotlinx.android.synthetic.main.chat_flow_ui.*
 
 class ChatFlowFragment : BasicFragment<ChatFlowViewModel, ChatFlowUiBinding>() {
 
 	companion object {
+		const val INTENT_GET_CONTENT = 101
+
 		private const val ARG_CHAT_ID = "chat_id"
 		private const val ARG_CHAT_TITLE = "chat_title"
 
@@ -73,5 +83,53 @@ class ChatFlowFragment : BasicFragment<ChatFlowViewModel, ChatFlowUiBinding>() {
 	}
 
 	override fun observeViewModel(viewModel: ChatFlowViewModel) {
+		subscriptions.add(viewModel.observeToastRequest()
+			.subscribe { showToast(it) })
+		subscriptions.add(viewModel.observeAttachMenuOpen()
+			.subscribe { openAttachMenu() })
+	}
+
+	override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+		data?.let { result ->
+			when (requestCode) {
+				INTENT_GET_CONTENT -> {
+					when (resultCode) {
+						RESULT_OK -> {
+							val uri = getIntentResult(result)
+							val localFile = uri.getFileData(context!!.contentResolver)
+							// TODO send file
+						}
+						else -> showToast(R.string.alert_error_attach_file)
+					}
+				}
+				else -> super.onActivityResult(requestCode, resultCode, data)
+			}
+		}
+	}
+
+	private fun getIntentResult(intent: Intent) : Uri {
+		// TODO multiple selection case (clipData)
+		return intent.data ?: Uri.EMPTY
+	}
+
+	private fun openAttachMenu() {
+		AttachBottomSheetDialog.newInstance().apply {
+			setListener(object : ListBottomSheetDialog.Listener {
+				override fun onItemSelected(item: SimpleListItem) {
+					onAttachMenuItemSelected(item.id)
+				}
+			})
+		}.show(fragmentManager!!)
+	}
+
+	private fun onAttachMenuItemSelected(id: Int) {
+		when (id) {
+			R.id.im_attach_file -> openFilePicker()
+			else -> throw RuntimeException("Error! Unknown attach source")
+		}
+	}
+
+	private fun openFilePicker() {
+		// TODO open file picker
 	}
 }
