@@ -33,6 +33,7 @@ class MainActivity : AppCompatActivity(), AuthNavigator, PermissionManager {
 	companion object {
 		private const val PERM_READ_CONTACTS = 101
 		private const val PERM_READ_STORAGE = 102
+		private const val PERM_WRITE_STORAGE = 103
 	}
 
 	interface BackButtonHandler {
@@ -140,6 +141,15 @@ class MainActivity : AppCompatActivity(), AuthNavigator, PermissionManager {
 		else {
 			permRequestCallback = onResult
 			ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), PERM_READ_STORAGE)
+		}
+	}
+
+	override fun requestPermissionWriteStorage(onResult: Runnable1<Boolean>) {
+		if (checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE))
+			onResult.run(true)
+		else {
+			permRequestCallback = onResult
+			ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), PERM_WRITE_STORAGE)
 		}
 	}
 

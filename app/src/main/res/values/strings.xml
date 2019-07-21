@@ -11,6 +11,7 @@
 	<string name="login">Login</string>
 	<string name="signup">Signup</string>
 	<string name="enter">Enter</string>
+	<string name="error">Error</string>
 	
 	<string name="auth_name">Name</string>
 	<string name="auth_email">Email</string>
@@ -38,4 +39,5 @@
 	<string name="alert_error_attach_file">Failed to attach file</string>
 
 	<string name="document">Document</string>
+	<string name="gallery">Gallery</string>
 </resources>
