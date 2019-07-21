@@ -1,6 +1,6 @@
 package com.ancientlore.intercom.backend.firebase
 
-import com.ancientlore.intercom.backend.data.DataSourceProvider
+import com.ancientlore.intercom.backend.DataSourceProvider
 import com.ancientlore.intercom.data.source.remote.firestore.FirestoreChatSource
 import com.ancientlore.intercom.data.source.remote.firestore.FirestoreContactSource
 import com.ancientlore.intercom.data.source.remote.firestore.FirestoreMessageSource

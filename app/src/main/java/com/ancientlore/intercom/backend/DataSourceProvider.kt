@@ -1,4 +1,4 @@
-package com.ancientlore.intercom.backend.data
+package com.ancientlore.intercom.backend
 
 import com.ancientlore.intercom.data.source.ChatSource
 import com.ancientlore.intercom.data.source.ContactSource
