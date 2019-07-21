@@ -1,10 +1,11 @@
-package com.ancientlore.intercom.ui
+package com.ancientlore.intercom.widget.recycler
 
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
+import com.ancientlore.intercom.ui.Bindable
 
 abstract class BasicRecyclerAdapter<I, H: BasicRecyclerAdapter.ViewHolder<I, B>, B: ViewDataBinding>(
 	context: Context,
@@ -23,7 +24,8 @@ abstract class BasicRecyclerAdapter<I, H: BasicRecyclerAdapter.ViewHolder<I, B>,
 
 	override fun getItemCount() = items.count()
 
-	override fun getItemViewType(position: Int) = VIEW_TYPE_ITEM
+	override fun getItemViewType(position: Int) =
+		VIEW_TYPE_ITEM
 
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): H {
 		val binding = createItemViewDataBinding(parent, viewType)
@@ -46,5 +48,6 @@ abstract class BasicRecyclerAdapter<I, H: BasicRecyclerAdapter.ViewHolder<I, B>,
 
 	protected open fun isUnique(item: I) = items.none { it == item }
 
-	abstract class ViewHolder<T, B: ViewDataBinding>(protected val binding: B) : RecyclerView.ViewHolder(binding.root), Bindable<T>
+	abstract class ViewHolder<T, B: ViewDataBinding>(protected val binding: B) : RecyclerView.ViewHolder(binding.root),
+		Bindable<T>
 }

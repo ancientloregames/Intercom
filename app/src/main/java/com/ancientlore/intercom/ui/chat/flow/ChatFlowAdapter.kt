@@ -9,8 +9,8 @@ import com.ancientlore.intercom.BR
 import com.ancientlore.intercom.data.model.Message
 import com.ancientlore.intercom.databinding.ChatFlowItemOtherBinding
 import com.ancientlore.intercom.databinding.ChatFlowItemUserBinding
-import com.ancientlore.intercom.ui.BasicRecyclerAdapter
-import com.ancientlore.intercom.ui.MutableRecyclerAdapter
+import com.ancientlore.intercom.widget.recycler.BasicRecyclerAdapter
+import com.ancientlore.intercom.widget.recycler.MutableRecyclerAdapter
 
 class ChatFlowAdapter(private val userId: String,
                       context: Context, items: MutableList<Message>)

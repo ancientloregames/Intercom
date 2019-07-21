@@ -5,8 +5,8 @@ import android.view.ViewGroup
 import androidx.databinding.ObservableField
 import androidx.recyclerview.widget.DiffUtil
 import com.ancientlore.intercom.BR
-import com.ancientlore.intercom.ui.BasicRecyclerAdapter
-import com.ancientlore.intercom.ui.MutableRecyclerAdapter
+import com.ancientlore.intercom.widget.recycler.BasicRecyclerAdapter
+import com.ancientlore.intercom.widget.recycler.MutableRecyclerAdapter
 import com.ancientlore.intercom.data.model.Chat
 import com.ancientlore.intercom.databinding.ChatListItemBinding
 

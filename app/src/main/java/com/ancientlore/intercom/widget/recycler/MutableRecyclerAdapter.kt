@@ -1,14 +1,16 @@
-package com.ancientlore.intercom.ui
+package com.ancientlore.intercom.widget.recycler
 
 import android.content.Context
 import androidx.annotation.UiThread
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.DiffUtil
+import com.ancientlore.intercom.widget.MutableAdapter
 
 abstract class MutableRecyclerAdapter<I: Comparable<I>, H: BasicRecyclerAdapter.ViewHolder<I, B>, B: ViewDataBinding>(
 	context: Context,
 	items: MutableList<I>)
-	: BasicRecyclerAdapter<I, H, B>(context, items), MutableAdapter<I> {
+	: BasicRecyclerAdapter<I, H, B>(context, items),
+	MutableAdapter<I> {
 
 	protected val mutableList get() = getItems() as MutableList<I>
 

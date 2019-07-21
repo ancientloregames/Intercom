@@ -1,4 +1,4 @@
-package com.ancientlore.intercom.ui
+package com.ancientlore.intercom.widget
 
 interface MutableAdapter<T> {
 	fun setItems(newItems: List<T>)

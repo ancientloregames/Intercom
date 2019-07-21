@@ -6,10 +6,10 @@ import android.view.ViewGroup
 import androidx.databinding.ObservableField
 import androidx.recyclerview.widget.DiffUtil
 import com.ancientlore.intercom.BR
-import com.ancientlore.intercom.ui.BasicRecyclerAdapter
+import com.ancientlore.intercom.widget.recycler.BasicRecyclerAdapter
 import com.ancientlore.intercom.data.model.Contact
 import com.ancientlore.intercom.databinding.ContactListItemBinding
-import com.ancientlore.intercom.ui.MutableRecyclerAdapter
+import com.ancientlore.intercom.widget.recycler.MutableRecyclerAdapter
 
 class ContactListAdapter(context: Context, items: MutableList<Contact>)
 	: MutableRecyclerAdapter<Contact, ContactListAdapter.ViewHolder, ContactListItemBinding>(context, items) {
