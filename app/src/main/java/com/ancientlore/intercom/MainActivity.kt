@@ -31,7 +31,7 @@ import java.util.concurrent.Executors
 class MainActivity : AppCompatActivity(), AuthNavigator, PermissionManager {
 
 	companion object {
-		private const val PERM_CONTACTS = 101
+		private const val PERM_READ_CONTACTS = 101
 		private const val PERM_READ_STORAGE = 102
 	}
 
@@ -125,9 +125,13 @@ class MainActivity : AppCompatActivity(), AuthNavigator, PermissionManager {
 		openChatList()
 	}
 
-	override fun requestContacts(onResult: Runnable1<Boolean>) {
-		permRequestCallback = onResult
-		ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_CONTACTS), PERM_CONTACTS)
+	override fun requestPermissionReadContacts(onResult: Runnable1<Boolean>) {
+		if (checkPermission(Manifest.permission.READ_CONTACTS))
+			onResult.run(true)
+		else {
+			permRequestCallback = onResult
+			ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_CONTACTS), PERM_READ_CONTACTS)
+		}
 	}
 
 	override fun requestPermissionReadStorage(onResult: Runnable1<Boolean>) {
@@ -149,7 +153,7 @@ class MainActivity : AppCompatActivity(), AuthNavigator, PermissionManager {
 		if (isContactsSynced().not()) {
 			if (checkPermission(Manifest.permission.READ_CONTACTS))
 				syncContacts()
-			else requestContacts(Runnable1 { granted ->
+			else requestPermissionReadContacts(Runnable1 { granted ->
 				if (granted) syncContacts()
 			})
 		}
