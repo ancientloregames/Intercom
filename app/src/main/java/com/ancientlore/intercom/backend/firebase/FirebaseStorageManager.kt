@@ -7,16 +7,25 @@ import com.ancientlore.intercom.data.model.FileData
 import com.google.android.gms.tasks.Continuation
 import com.google.android.gms.tasks.Task
 import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
 
 object FirebaseStorageManager : StorageManager {
 
 	private val storage: FirebaseStorage by lazy { FirebaseStorage.getInstance() }
 
-	override fun uploadFile(file: FileData, path: String, callback: RequestCallback<Uri>) {
-		val fileRef = storage.getReference("files/$path/${file.name}")
+	override fun uploadImage(data: FileData, path: String, callback: RequestCallback<Uri>) {
+		val fileRef = storage.getReference("images/$path/${data.name}")
+		upload(data.uri, fileRef, callback)
+	}
 
-		fileRef.putFile(file.uri)
+	override fun uploadFile(data: FileData, path: String, callback: RequestCallback<Uri>) {
+		val fileRef = storage.getReference("files/$path/${data.name}")
+		upload(data.uri, fileRef, callback)
+	}
+
+	private fun upload(uri: Uri, fileRef: StorageReference, callback: RequestCallback<Uri>) {
+		fileRef.putFile(uri)
 			.continueWithTask( Continuation<UploadTask.TaskSnapshot, Task<Uri>> { task ->
 				if (!task.isSuccessful)
 					task.exception?.let {
