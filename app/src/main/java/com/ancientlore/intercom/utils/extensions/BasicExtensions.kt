@@ -5,15 +5,38 @@ import android.content.ContentResolver
 import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Environment
 import android.provider.ContactsContract
 import android.provider.MediaStore
 import androidx.annotation.RequiresPermission
 import androidx.core.app.ActivityCompat
 import com.ancientlore.intercom.data.model.Contact
 import com.ancientlore.intercom.data.model.FileData
+import com.ancientlore.intercom.utils.Utils
 import java.io.Closeable
+import java.io.File
 import java.io.IOException
 
+
+fun Context.getAppCacheDir(): File {
+	var state: String? = null
+	try {
+		state = Environment.getExternalStorageState()
+	} catch (e: Exception) {
+		Utils.logError(e)
+	}
+
+	var file: File? = null
+	if (state == null || state.startsWith(Environment.MEDIA_MOUNTED)) {
+		try {
+			file = externalCacheDir
+		} catch (e: Exception) {
+			Utils.logError(e)
+		}
+	}
+
+	return file ?: cacheDir ?: Environment.getDownloadCacheDirectory()
+}
 
 fun Context.checkPermission(permission: String) = ActivityCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED
 
