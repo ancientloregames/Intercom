@@ -1,6 +1,7 @@
 package com.ancientlore.intercom.ui.chat.flow
 
 import android.net.Uri
+import android.os.Environment
 import androidx.databinding.ObservableField
 import com.ancientlore.intercom.App
 import com.ancientlore.intercom.EmptyObject
@@ -12,6 +13,7 @@ import com.ancientlore.intercom.ui.BasicViewModel
 import com.ancientlore.intercom.utils.Utils
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
+import java.io.File
 
 class ChatFlowViewModel(private val userId: String,
                         private val chatId: String)
@@ -69,6 +71,16 @@ class ChatFlowViewModel(private val userId: String,
 
 	private fun sendMessage(text: String) {
 		repository.addMessage(Message(senderId = userId, text = text), null)
+	}
+
+	fun handleAttachedImage(fileData: FileData) {
+		App.backend.getStorageManager().uploadImage(fileData, chatId, object : RequestCallback<Uri> {
+			override fun onSuccess(result: Uri) {
+			}
+			override fun onFailure(error: Throwable) {
+				Utils.logError(error)
+			}
+		})
 	}
 
 	fun handleAttachedFile(fileData: FileData) {

@@ -19,6 +19,7 @@ class AttachBottomSheetDialog : ListBottomSheetDialog() {
 
 	private fun createItemList() : ArrayList<SimpleListItem> {
 		return arrayListOf<SimpleListItem>().apply {
+			add(SimpleListItem(R.id.im_attach_picture, R.string.gallery, R.drawable.ic_picture))
 			add(SimpleListItem(R.id.im_attach_file, R.string.document, R.drawable.ic_file))
 		}
 	}
