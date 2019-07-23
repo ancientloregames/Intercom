@@ -5,7 +5,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 
-data class Chat(val chatId: String = "",
+data class Chat(val id: String = "",
                 val name: String = "",
                 val lastMsgTime: Long = 0,
                 val lastMsgText: String = "")
@@ -25,13 +25,13 @@ data class Chat(val chatId: String = "",
 		other as Chat
 
 		return lastMsgTime == other.lastMsgTime
-				&& chatId == other.chatId
+				&& id == other.id
 				&& name == other.name
 				&& lastMsgText == other.lastMsgText
 	}
 
 	override fun hashCode(): Int {
-		var result = chatId.hashCode()
+		var result = id.hashCode()
 		result = 31 * result + name.hashCode()
 		result = 31 * result + lastMsgTime.hashCode()
 		result = 31 * result + lastMsgText.hashCode()
@@ -39,6 +39,4 @@ data class Chat(val chatId: String = "",
 	}
 
 	override fun compareTo(other: Chat) = lastMsgTime.compareTo(other.lastMsgTime)
-
-	fun assignId(id: String) = Chat(id, name, lastMsgTime, lastMsgText)
 }

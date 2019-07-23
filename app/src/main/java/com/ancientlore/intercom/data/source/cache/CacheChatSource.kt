@@ -12,12 +12,12 @@ object CacheChatSource {
 
 	fun getItem(id: String) = cache[id]
 
-	fun addItem(item: Chat) = cache.put(item.chatId, item)
+	fun addItem(item: Chat) = cache.put(item.id, item)
 
 	fun reset(newChats: List<Chat>) {
 		cache.clear()
 		newChats.forEach {
-			cache[it.chatId] = it
+			cache[it.id] = it
 		}
 	}
 }

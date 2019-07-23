@@ -26,7 +26,7 @@ class ChatListViewModel : BasicViewModel() {
 		this.listAdapter = listAdapter
 		listAdapter.setListener(object : ChatListAdapter.Listener {
 			override fun onChatSelected(chat: Chat) {
-				openChatOpenSubj.onNext(ChatFlowFragment.Params(chat.chatId, chat.name))
+				openChatOpenSubj.onNext(ChatFlowFragment.Params(chat.id, chat.name))
 			}
 		})
 		attachDataListener()
