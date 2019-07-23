@@ -106,12 +106,12 @@ fun Uri.getFileData(contentResolver: ContentResolver) : FileData {
 	if (cursor != null) {
 		try {
 			cursor.moveToFirst()
-			val id = cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns._ID))
-			val name = cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.DISPLAY_NAME)) ?: ""
-			return FileData(id, name, this)
+			val id = cursor.getLong(cursor.getColumnIndex(MediaStore.Files.FileColumns._ID))
+			val name = cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.DISPLAY_NAME)) ?: lastPathSegment
+			return FileData("$id", name, this)
 		} finally {
 			cursor.safeClose()
 		}
 	}
-	return FileData("", "", this)
+	return FileData("", lastPathSegment!!, this)
 }
