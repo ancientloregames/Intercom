@@ -15,7 +15,7 @@ class FirestoreChatSource private constructor(private val userId: String)
 		private const val TAG = "FirestoreChatSource"
 	}
 
-	private val userChats get() = db.collection("users").document(userId).collection("userChats")
+	private val userChats get() = db.collection("users").document(userId).collection("chats")
 
 	private var changeListener: ListenerRegistration? = null
 
@@ -42,7 +42,7 @@ class FirestoreChatSource private constructor(private val userId: String)
 	}
 
 	override fun addItem(item: Chat, callback: RequestCallback<String>?) {
-		db.collection("userChats").add(item)
+		db.collection("chats").add(item)
 			.addOnSuccessListener { callback?.onSuccess(it.id) }
 			.addOnFailureListener { callback?.onFailure(it) }
 	}
