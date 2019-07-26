@@ -14,6 +14,8 @@ data class Contact(val phone: String = "",
     private val dateFormat = DateFormat.getTimeInstance(DateFormat.SHORT)
   }
 
+  val id: String get() = phone
+
   @delegate:Exclude
   val lastSeenDate: String by lazy { dateFormat.format(Date(lastSeenTime)) }
 

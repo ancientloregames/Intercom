@@ -1,8 +1,10 @@
 package com.ancientlore.intercom.ui.contact.list
 
+import com.ancientlore.intercom.App
 import com.ancientlore.intercom.R
 import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.backend.SimpleRequestCallback
+import com.ancientlore.intercom.data.model.Chat
 import com.ancientlore.intercom.data.model.Contact
 import com.ancientlore.intercom.data.source.ChatRepository
 import com.ancientlore.intercom.data.source.ContactRepository
@@ -43,9 +45,11 @@ class ContactListViewModel : BasicViewModel() {
 	}
 
 	private fun createAndOpenChat(contact: Contact) {
-		ChatRepository.createDialog(contact.phone, object : RequestCallback<String> {
-			override fun onSuccess(result: String) {
-				openChatSubj.onNext(ChatFlowFragment.Params(result, contact.name))
+		val userId = App.backend.getAuthManager().getCurrentUser()!!.id
+		val chat = Chat(initiatorId = userId, participants = arrayOf(userId, contact.id))
+		ChatRepository.addItem(chat, object : RequestCallback<String> {
+			override fun onSuccess(chatId: String) {
+				openChatSubj.onNext(ChatFlowFragment.Params(chatId, contact.name))
 			}
 			override fun onFailure(error: Throwable) {
 				Utils.logError(error)

@@ -7,6 +7,8 @@ import java.util.*
 
 data class Chat(val id: String = "",
                 val name: String = "",
+                val initiatorId: String = "",
+                val participants: Array<String> = emptyArray(),
                 val lastMsgTime: Long = 0,
                 val lastMsgText: String = "")
 	: Comparable<Chat> {
@@ -27,12 +29,16 @@ data class Chat(val id: String = "",
 		return lastMsgTime == other.lastMsgTime
 				&& id == other.id
 				&& name == other.name
+				&& initiatorId == other.initiatorId
+				&& participants == other.participants
 				&& lastMsgText == other.lastMsgText
 	}
 
 	override fun hashCode(): Int {
 		var result = id.hashCode()
 		result = 31 * result + name.hashCode()
+		result = 31 * result + initiatorId.hashCode()
+		result = 31 * result + participants.hashCode()
 		result = 31 * result + lastMsgTime.hashCode()
 		result = 31 * result + lastMsgText.hashCode()
 		return result

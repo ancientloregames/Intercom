@@ -45,10 +45,6 @@ object ChatRepository : ChatSource {
 		remoteSource?.addItem(item, callback)
 	}
 
-	override fun createDialog(recipientId: String, callback: RequestCallback<String>) {
-		remoteSource?.createDialog(recipientId, callback)
-	}
-
 	override fun attachListener(callback: RequestCallback<List<Chat>>) {
 		if (cacheSource.isNotEmpty())
 			callback.onSuccess(cacheSource.getAll())

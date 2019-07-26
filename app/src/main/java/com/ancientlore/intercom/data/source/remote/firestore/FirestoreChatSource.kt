@@ -13,21 +13,16 @@ class FirestoreChatSource private constructor(private val userId: String)
 	internal companion object : SingletonHolder<FirestoreChatSource, String>(
 		{ userId -> FirestoreChatSource(userId) }) {
 		private const val TAG = "FirestoreChatSource"
-
-		private const val CHATS = "chats"
 	}
 
-	private val chatsCollection get() = db.collection(CHATS)
+	private val userChats get() = db.collection("users").document(userId).collection("userChats")
 
 	private var changeListener: ListenerRegistration? = null
 
 	override fun getObjectClass() = Chat::class.java
 
 	override fun getAll(callback: RequestCallback<List<Chat>>) {
-		db.collection("users")
-			.document(userId)
-			.collection("contacts")
-			.whereGreaterThan("lastMsgTime", 0).get()
+		userChats.get()
 			.addOnSuccessListener { snapshot ->
 				deserialize(snapshot).takeIf { it.isNotEmpty() }
 					?.let { callback.onSuccess(it) }
@@ -37,7 +32,7 @@ class FirestoreChatSource private constructor(private val userId: String)
 	}
 
 	override fun getItem(id: String, callback: RequestCallback<Chat>) {
-		requestUserChat(id)
+		userChats.document(id).get()
 			.addOnSuccessListener { snapshot ->
 				deserialize(snapshot)
 					?.let { callback.onSuccess(it) }
@@ -47,25 +42,13 @@ class FirestoreChatSource private constructor(private val userId: String)
 	}
 
 	override fun addItem(item: Chat, callback: RequestCallback<String>?) {
-		chatsCollection.add(item)
+		db.collection("userChats").add(item)
 			.addOnSuccessListener { callback?.onSuccess(it.id) }
 			.addOnFailureListener { callback?.onFailure(it) }
 	}
 
-	override fun createDialog(recipientId: String, callback: RequestCallback<String>) {
-		db.collection("users")
-			.document(userId)
-			.collection("dialogs")
-			.add(mapOf("recipientId" to recipientId))
-			.addOnSuccessListener { callback.onSuccess(it.id) }
-			.addOnFailureListener { callback.onFailure(it) }
-	}
-
 	override fun attachListener(callback: RequestCallback<List<Chat>>) {
-		changeListener = db.collection("users")
-			.document(userId)
-			.collection("contacts")
-			.whereGreaterThan("lastMsgTime", 0)
+		changeListener = userChats
 			.orderBy("lastMsgTime")
 			.addSnapshotListener { snapshot, error ->
 				if (error != null) {
@@ -83,6 +66,4 @@ class FirestoreChatSource private constructor(private val userId: String)
 	override fun detachListener() {
 		changeListener?.remove()
 	}
-
-	private fun requestUserChat(id: String) = chatsCollection.document(id).get()
 }
