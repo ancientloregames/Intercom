@@ -95,6 +95,8 @@ fun Closeable.safeClose() {
 	} catch (ignore: IOException) { }
 }
 
+fun Uri.isNotEmpty() = this != Uri.EMPTY
+
 fun Uri.getFileData(contentResolver: ContentResolver) : FileData {
 	val projection = arrayOf(
 		MediaStore.Files.FileColumns._ID,
