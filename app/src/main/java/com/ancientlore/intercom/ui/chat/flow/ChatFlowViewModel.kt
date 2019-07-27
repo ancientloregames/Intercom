@@ -1,10 +1,10 @@
 package com.ancientlore.intercom.ui.chat.flow
 
 import android.net.Uri
-import android.os.Environment
 import androidx.databinding.ObservableField
 import com.ancientlore.intercom.App
 import com.ancientlore.intercom.EmptyObject
+import com.ancientlore.intercom.R
 import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.data.model.FileData
 import com.ancientlore.intercom.data.model.Message
@@ -13,7 +13,6 @@ import com.ancientlore.intercom.ui.BasicViewModel
 import com.ancientlore.intercom.utils.Utils
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
-import java.io.File
 
 class ChatFlowViewModel(private val userId: String,
                         private val chatId: String)
@@ -74,8 +73,26 @@ class ChatFlowViewModel(private val userId: String,
 	}
 
 	fun handleAttachedImage(fileData: FileData) {
-		App.backend.getStorageManager().uploadImage(fileData, chatId, object : RequestCallback<Uri> {
-			override fun onSuccess(result: Uri) {
+		val message = Message(senderId = userId, attachUrl = fileData.uri.toString(), type = Message.TYPE_IMAGE)
+		repository.addMessage(message, object : RequestCallback<String> {
+			override fun onSuccess(result: String) {
+				val messageId = result
+				App.backend.getStorageManager().uploadImage(fileData, chatId, object : RequestCallback<Uri> {
+					override fun onSuccess(result: Uri) {
+						repository.updateMessageUri(messageId, result, object : RequestCallback<Any> {
+							override fun onSuccess(result: Any) {
+								toastRequest.onNext(R.string.success) // TODO remove this callback on release
+							}
+							override fun onFailure(error: Throwable) {
+								toastRequest.onNext(R.string.error)
+								Utils.logError(error)
+							}
+						})
+					}
+					override fun onFailure(error: Throwable) {
+						Utils.logError(error)
+					}
+				})
 			}
 			override fun onFailure(error: Throwable) {
 				Utils.logError(error)

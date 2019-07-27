@@ -1,5 +1,6 @@
 package com.ancientlore.intercom.data.source
 
+import android.net.Uri
 import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.data.model.Message
 import com.ancientlore.intercom.data.source.cache.CacheMessageSource
@@ -25,6 +26,10 @@ class MessageRepository : MessageSource {
 
 	override fun addMessage(message: Message, callback: RequestCallback<String>?) {
 		remoteSource?.addMessage(message, callback)
+	}
+
+	override fun updateMessageUri(messageId: String, uri: Uri, callback: RequestCallback<Any>?) {
+		remoteSource?.updateMessageUri(messageId, uri, callback)
 	}
 
 	override fun attachListener(callback: RequestCallback<List<Message>>) {

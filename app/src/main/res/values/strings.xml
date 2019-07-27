@@ -12,6 +12,7 @@
 	<string name="signup">Signup</string>
 	<string name="enter">Enter</string>
 	<string name="error">Error</string>
+	<string name="success">Success</string>
 	
 	<string name="auth_name">Name</string>
 	<string name="auth_email">Email</string>

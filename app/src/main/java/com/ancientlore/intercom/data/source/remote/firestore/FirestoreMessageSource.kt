@@ -1,5 +1,7 @@
 package com.ancientlore.intercom.data.source.remote.firestore
 
+import android.net.Uri
+import com.ancientlore.intercom.EmptyObject
 import com.ancientlore.intercom.data.source.EmptyResultException
 import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.data.model.Message
@@ -8,6 +10,7 @@ import com.google.firebase.firestore.ListenerRegistration
 
 class FirestoreMessageSource(private val chatId: String)
 	: FirestoreSource<Message>(), MessageSource {
+
 	internal companion object  {
 		private const val TAG = "FirestoreMessageSource"
 
@@ -15,14 +18,14 @@ class FirestoreMessageSource(private val chatId: String)
 		private const val MESSAGES = "messages"
 	}
 
-	private val messagesCollection get() = db.collection(CHATS).document(chatId).collection(MESSAGES)
+	private val chatMessages get() = db.collection(CHATS).document(chatId).collection(MESSAGES)
 
 	private var changeListener: ListenerRegistration? = null
 
 	override fun getObjectClass() = Message::class.java
 
 	override fun getAll(callback: RequestCallback<List<Message>>) {
-		messagesCollection.get()
+		chatMessages.get()
 			.addOnSuccessListener { snapshot ->
 				deserialize(snapshot).takeIf { it.isNotEmpty() }
 					?.let { callback.onSuccess(it) }
@@ -32,13 +35,19 @@ class FirestoreMessageSource(private val chatId: String)
 	}
 
 	override fun addMessage(message: Message, callback: RequestCallback<String>?) {
-		messagesCollection.add(message)
+		chatMessages.add(message)
 			.addOnSuccessListener { callback?.onSuccess(it.id) }
 			.addOnFailureListener { callback?.onFailure(it) }
 	}
 
+	override fun updateMessageUri(messageId: String, uri: Uri, callback: RequestCallback<Any>?) {
+		chatMessages.document(messageId).update("attachUrl", uri.toString())
+			.addOnSuccessListener { callback?.onSuccess(EmptyObject) }
+			.addOnFailureListener { callback?.onFailure(it) }
+	}
+
 	override fun attachListener(callback: RequestCallback<List<Message>>) {
-		changeListener = messagesCollection
+		changeListener = chatMessages
 			.orderBy("timestamp")
 			.addSnapshotListener { snapshot, e ->
 				if (e != null) {
