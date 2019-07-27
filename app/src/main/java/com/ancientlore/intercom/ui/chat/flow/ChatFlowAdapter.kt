@@ -1,7 +1,9 @@
 package com.ancientlore.intercom.ui.chat.flow
 
 import android.content.Context
+import android.net.Uri
 import android.view.ViewGroup
+import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableField
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.DiffUtil
@@ -9,6 +11,7 @@ import com.ancientlore.intercom.BR
 import com.ancientlore.intercom.data.model.Message
 import com.ancientlore.intercom.databinding.ChatFlowItemOtherBinding
 import com.ancientlore.intercom.databinding.ChatFlowItemUserBinding
+import com.ancientlore.intercom.utils.extensions.isNotEmpty
 import com.ancientlore.intercom.widget.recycler.BasicRecyclerAdapter
 import com.ancientlore.intercom.widget.recycler.MutableRecyclerAdapter
 
@@ -53,6 +56,8 @@ class ChatFlowAdapter(private val userId: String,
 
 		var listener: Listener? = null
 
+		val imageUri = ObservableField<Uri>(Uri.EMPTY)
+		val imageVisibility = ObservableBoolean()
 		val textField = ObservableField<String>("")
 		val timestampField = ObservableField<String>("")
 
@@ -61,6 +66,8 @@ class ChatFlowAdapter(private val userId: String,
 		}
 
 		override fun bind(message: Message) {
+			imageVisibility.set(message.attachUri.isNotEmpty())
+			imageUri.set(message.attachUri)
 			textField.set(message.text)
 			timestampField.set(message.formatedTime)
 		}
