@@ -97,10 +97,18 @@ fun Closeable.safeClose() {
 
 fun Uri.isNotEmpty() = this != Uri.EMPTY
 
+fun Uri.getExtension(): String {
+	val filename =  lastPathSegment
+	val strLength = filename.lastIndexOf(".")
+	return if (strLength > 0) filename.substring(strLength + 1).toLowerCase() else ""
+}
+
 fun Uri.getFileData(contentResolver: ContentResolver) : FileData {
 	val projection = arrayOf(
 		MediaStore.Files.FileColumns._ID,
-		MediaStore.Files.FileColumns.DISPLAY_NAME)
+		MediaStore.Files.FileColumns.DISPLAY_NAME,
+		MediaStore.Files.FileColumns.SIZE,
+		MediaStore.Files.FileColumns.MEDIA_TYPE)
 
 	val cursor = contentResolver.query(this,
 		projection, null, null, null)
@@ -110,10 +118,12 @@ fun Uri.getFileData(contentResolver: ContentResolver) : FileData {
 			cursor.moveToFirst()
 			val id = cursor.getLong(cursor.getColumnIndex(MediaStore.Files.FileColumns._ID))
 			val name = cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.DISPLAY_NAME)) ?: lastPathSegment
-			return FileData("$id", name, this)
+			val size = cursor.getLong(cursor.getColumnIndex(MediaStore.Files.FileColumns.SIZE))
+			val type = getExtension()
+			return FileData(id, name, this, size, type)
 		} finally {
 			cursor.safeClose()
 		}
 	}
-	return FileData("", lastPathSegment!!, this)
+	return FileData()
 }
