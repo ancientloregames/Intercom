@@ -9,6 +9,7 @@ import java.text.DateFormat.SHORT
 data class Message(val timestamp: Long = 0,
                    val senderId: String = "",
                    val text: String = "",
+                   val info: String = "",
                    val attachUrl: String = "",
                    @Type val type: String = TYPE_TEXT)
 	: Comparable<Message> {
@@ -16,7 +17,11 @@ data class Message(val timestamp: Long = 0,
   companion object {
     const val TYPE_TEXT = "text"
     const val TYPE_IMAGE = "image"
+    const val TYPE_FILE = "file"
   }
+
+  constructor(senderId: String, fileData: FileData) : this(
+    0, senderId, fileData.name, fileData.getInfo(), fileData.uri.toString(), TYPE_FILE)
 
   @StringDef(TYPE_TEXT, TYPE_IMAGE)
   @Retention(AnnotationRetention.SOURCE)

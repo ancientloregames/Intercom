@@ -12,10 +12,10 @@ data class FileData(val id: Long = 0,
 
 	constructor(parcel: Parcel) : this(
 		parcel.readLong(),
-		parcel.readString(),
-		parcel.readParcelable(Uri::class.java.classLoader),
+		parcel.readString()!!,
+		parcel.readParcelable(Uri::class.java.classLoader)!!,
 		parcel.readLong(),
-		parcel.readString())
+		parcel.readString()!!)
 
 	override fun writeToParcel(parcel: Parcel, flags: Int) {
 		parcel.writeLong(id)
@@ -26,6 +26,10 @@ data class FileData(val id: Long = 0,
 	}
 
 	override fun describeContents() = 0
+
+	fun getInfo() = "${getSizeMb()} MB ${extension.toUpperCase()}"
+
+	private fun getSizeMb() = String.format("%.2f", size / 1048576f)
 
 	companion object CREATOR : Parcelable.Creator<FileData> {
 		override fun createFromParcel(parcel: Parcel) = FileData(parcel)
