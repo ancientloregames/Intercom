@@ -3,10 +3,14 @@ package com.ancientlore.intercom.utils;
 import android.content.ContentResolver;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Build;
+import androidx.annotation.ColorInt;
+import androidx.annotation.Px;
 import androidx.exifinterface.media.ExifInterface;
+import com.ancientlore.intercom.view.TextDrawable;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -84,5 +88,41 @@ public class ImageUtils
 		else result = img;
 
 		return result;
+	}
+
+	@NotNull
+	public static TextDrawable createAbbreviationDrawable(@NotNull String text, @ColorInt int backgroundColor, @Px int textSize)
+	{
+		return TextDrawable.builder()
+				.beginConfig()
+				.toUpperCase()
+				.textColor(Color.WHITE)
+				.fontSize(textSize)
+				.bold()
+				.endConfig()
+				.buildRound(createAbbreviation(text), backgroundColor);
+	}
+
+	@NotNull
+	private static String createAbbreviation(@NotNull String rawText)
+	{
+		StringBuilder abbreviation = new StringBuilder();
+
+		String[] names = rawText.split(" ");
+		int length = Math.min(names.length, 2);
+
+		for (int i = 0; i < length; i++)
+		{
+			for (int j = 0; j < names[i].length(); j++)
+			{
+				if (Character.isLetterOrDigit(names[i].charAt(j)))
+				{
+					abbreviation.append(names[i].charAt(j));
+					break;
+				}
+			}
+		}
+
+		return abbreviation.toString();
 	}
 }
