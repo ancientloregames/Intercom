@@ -13,19 +13,16 @@
 			android:layout_width="match_parent"
 			android:layout_height="match_parent">
 
-		<androidx.constraintlayout.widget.ConstraintLayout
+		<RelativeLayout
 				android:layout_width="match_parent"
 				android:layout_height="match_parent"
 				android:background="#EEEEEE">
 
 			<com.google.android.material.appbar.AppBarLayout
 					android:id="@+id/appbar"
-					android:layout_width="0dp"
+					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					app:layout_constraintStart_toStartOf="parent"
-					app:layout_constraintEnd_toEndOf="parent"
-					app:layout_constraintTop_toTopOf="parent"
-					app:layout_constraintBottom_toTopOf="@+id/listView"
+					android:layout_alignParentTop="true"
 					android:theme="@style/AppTheme.AppBarOverlay">
 
 				<androidx.appcompat.widget.Toolbar
@@ -43,15 +40,13 @@
 
 			<androidx.recyclerview.widget.RecyclerView
 					android:id="@+id/listView"
-					android:layout_width="0dp"
-					android:layout_height="0dp"
+					android:layout_width="match_parent"
+					android:layout_height="match_parent"
 					app:stackFromEnd="true"
 					app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
 					tools:listitem="@layout/chat_flow_item_user"
-					app:layout_constraintBottom_toTopOf="@+id/inputContainer"
-					app:layout_constraintStart_toStartOf="parent"
-					app:layout_constraintEnd_toEndOf="parent"
-					app:layout_constraintTop_toBottomOf="@+id/appbar"
+					android:layout_below="@+id/appbar"
+					android:layout_above="@+id/inputContainer"
 			/>
 
 			<LinearLayout
@@ -59,10 +54,7 @@
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
 					android:background="@android:color/white"
-					app:layout_constraintTop_toBottomOf="@+id/listView"
-					app:layout_constraintEnd_toEndOf="parent"
-					app:layout_constraintStart_toStartOf="parent"
-					app:layout_constraintBottom_toBottomOf="parent">
+					android:layout_alignParentBottom="true">
 
 				<ImageButton
 						android:layout_width="45dp"
@@ -71,7 +63,8 @@
 						android:onClick="@{() -> ui.onAttachButtonCliked()}"
 						android:background="@drawable/bg_ripple_effect_gray"
 						app:srcCompat="@drawable/ic_clip"
-						android:contentDescription="@string/attachment"/>
+						android:contentDescription="@string/attachment"
+				/>
 
 				<EditText
 						android:id="@+id/textField"
@@ -84,7 +77,8 @@
 						android:text="@={ui.textField}"
 						android:inputType="textCapSentences|textMultiLine"
 						android:maxLines="4"
-						android:background="@null"/>
+						android:background="@null"
+				/>
 
 				<ImageButton
 						android:id="@+id/sendButton"
@@ -94,9 +88,10 @@
 						android:onClick="@{() -> ui.onSendButtonClicked()}"
 						android:background="@drawable/bg_ripple_effect_gray"
 						app:srcCompat="@drawable/ic_send"
-						android:contentDescription="@string/send"/>
+						android:contentDescription="@string/send"
+				/>
 			</LinearLayout>
 
-		</androidx.constraintlayout.widget.ConstraintLayout>
+		</RelativeLayout>
 	</com.ancientlore.intercom.view.SwipableLayout>
 </layout>
