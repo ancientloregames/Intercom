@@ -71,7 +71,7 @@
 						android:onClick="@{() -> ui.onAttachButtonCliked()}"
 						android:background="@drawable/bg_ripple_effect_gray"
 						app:srcCompat="@drawable/ic_clip"
-				/>
+						android:contentDescription="@string/attachment"/>
 
 				<EditText
 						android:id="@+id/textField"
@@ -84,8 +84,7 @@
 						android:text="@={ui.textField}"
 						android:inputType="textCapSentences|textMultiLine"
 						android:maxLines="4"
-						android:background="@null"
-				/>
+						android:background="@null"/>
 
 				<ImageButton
 						android:id="@+id/sendButton"
@@ -95,7 +94,7 @@
 						android:onClick="@{() -> ui.onSendButtonClicked()}"
 						android:background="@drawable/bg_ripple_effect_gray"
 						app:srcCompat="@drawable/ic_send"
-				/>
+						android:contentDescription="@string/send"/>
 			</LinearLayout>
 
 		</androidx.constraintlayout.widget.ConstraintLayout>

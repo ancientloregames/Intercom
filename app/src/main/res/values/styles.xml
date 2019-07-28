@@ -31,7 +31,23 @@
 		<item name="android:textColor">@color/defaultTextColor</item>
 		<item name="android:textSize">16sp</item>
 		<item name="android:gravity">start</item>
-		<item name="android:textStyle"></item>
+		<item name="android:paddingBottom">1dp</item>
+	</style>
+
+	<style name="chatMsgFileTitle" parent="chatMsgText">
+		<item name="android:textStyle">bold</item>
+		<item name="android:maxLines">1</item>
+		<item name="android:singleLine">true</item>
+		<item name="android:ellipsize">end</item>
+	</style>
+
+	<style name="chatMsgFileInfo" parent="@style/TextAppearance.AppCompat.Medium">
+		<item name="android:textColor">@color/defaultSubtitleColor</item>
+		<item name="android:textSize">12sp</item>
+		<item name="android:gravity">start</item>
+		<item name="android:maxLines">1</item>
+		<item name="android:singleLine">true</item>
+		<item name="android:ellipsize">end</item>
 		<item name="android:paddingBottom">1dp</item>
 	</style>
 

@@ -5,5 +5,7 @@
 	<color name="colorAccent">#D81B60</color>
 
 	<color name="defaultTextColor">#333</color>
+	<color name="defaultSubtitleColor">#777</color>
 	<color name="chatMsgTimestampColor">#666</color>
+	<color name="chatFileIconBg">#2FB3C9</color>
 </resources>

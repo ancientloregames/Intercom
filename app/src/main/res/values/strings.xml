@@ -39,6 +39,8 @@
 	<string name="alert_error_sync_contacts">Failed to sync contact list. Try again later</string>
 	<string name="alert_error_attach_file">Failed to attach file</string>
 
+	<string name="send">Send</string>
+	<string name="attachment">Attachment</string>
 	<string name="document">Document</string>
 	<string name="gallery">Gallery</string>
 </resources>
