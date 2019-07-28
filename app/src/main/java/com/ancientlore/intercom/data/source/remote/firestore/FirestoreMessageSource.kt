@@ -52,13 +52,8 @@ class FirestoreMessageSource(private val chatId: String)
 			.addSnapshotListener { snapshot, e ->
 				if (e != null) {
 					callback.onFailure(e)
-					return@addSnapshotListener
-				}
-				else if (snapshot != null) {
-					deserialize(snapshot)
-						.takeIf { it.all { msg -> msg.hasTimestamp() } }
-						?.let { callback.onSuccess(it)  }
-						?: callback.onFailure(EmptyResultException("$TAG: empty"))
+				} else if (snapshot != null) {
+					callback.onSuccess(deserialize(snapshot))
 				}
 			}
 	}

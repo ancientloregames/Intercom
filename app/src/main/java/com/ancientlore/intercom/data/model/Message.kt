@@ -6,7 +6,7 @@ import com.google.firebase.firestore.Exclude
 import java.text.DateFormat
 import java.text.DateFormat.SHORT
 
-data class Message(val timestamp: Long = 0,
+data class Message(val timestamp: Long = System.currentTimeMillis(),// TODO get server timestamp on app start?
                    val senderId: String = "",
                    val text: String = "",
                    val info: String = "",
@@ -32,8 +32,6 @@ data class Message(val timestamp: Long = 0,
 
   @delegate:Exclude @get:Exclude
   val formatedTime: String by lazy { DateFormat.getTimeInstance(SHORT).format(timestamp) }
-
-  fun hasTimestamp() = timestamp != 0L
 
   override fun compareTo(other: Message) = timestamp.compareTo(other.timestamp)
 }

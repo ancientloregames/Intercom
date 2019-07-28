@@ -60,20 +60,16 @@ exports.onCreateChat = functions.firestore
 exports.onCreateMessage = functions.firestore
   .document('chats/{chatId}/messages/{messageId}')
   .onCreate((message, context) => {
-    const timestamp = Date.now()
+    const timestamp = message.get('timestamp');
+    const text = message.get('text');
 
-    message.ref.set({
-      'timestamp': timestamp
-    }, { merge: true });
-
-    const text = message.get('text')
     const chatId = context.params.chatId;
     return chats.doc(chatId).get().then(snap => {
       snap.get('participants').forEach(userId => {
         users.doc(userId).collection('chats').doc(chatId).set({
           'lastMsgTime': timestamp,
           'lastMsgText': text
-        }, { merge: true })
+        }, { merge: true });
       });
     });
 });
