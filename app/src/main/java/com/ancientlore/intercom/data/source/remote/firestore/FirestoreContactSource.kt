@@ -3,6 +3,7 @@ package com.ancientlore.intercom.data.source.remote.firestore
 import com.ancientlore.intercom.EmptyObject
 import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.data.model.Contact
+import com.ancientlore.intercom.data.model.User
 import com.ancientlore.intercom.data.source.ContactSource
 import com.ancientlore.intercom.data.source.EmptyResultException
 import com.ancientlore.intercom.utils.SingletonHolder
@@ -37,14 +38,15 @@ class FirestoreContactSource private constructor(private val userId: String)
 
 	override fun addAll(contacts: List<Contact>, callback: RequestCallback<Any>) {
 		db.collection(USERS).get()
-			.addOnSuccessListener { users ->
+			.addOnSuccessListener { snapshot ->
 				val list = contacts.toMutableList()
-				users.forEach { user ->
+				snapshot.toObjects(User::class.java).forEach { user ->
 					val iter = list.listIterator()
 					while (iter.hasNext()) {
 						val contact = iter.next()
-						if (user.id == contact.phone) {
-							userContacts.document(user.id).set(contact)
+						if (user.phone == contact.phone) {
+							contact.iconUrl = user.iconUrl
+							userContacts.document(user.phone).set(contact)
 							iter.remove()
 						}
 					}

@@ -7,6 +7,7 @@ import java.util.*
 data class Contact(val phone: String = "",
                    val name: String = "",
                    val chatId: String = "",
+                   var iconUrl: String = "",
                    val lastSeenTime: Long = 0)
   : Comparable<Contact> {
 
