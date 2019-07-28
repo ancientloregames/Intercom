@@ -1,5 +1,6 @@
 package com.ancientlore.intercom.utils
 
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.view.View
 import android.widget.ImageView
@@ -28,6 +29,21 @@ fun setImageResource(imageView: ImageView, uri: Uri) {
 			.into(imageView)
 	} else {
 		imageView.setImageURI(null)
+	}
+}
+
+@BindingAdapter("android:src")
+fun setImageResource(imageView: ImageView, data: Any) {
+	when (data) {
+		is Uri -> Glide.with(imageView.context)
+			.load(data)
+			.into(imageView)
+		is String -> Glide.with(imageView.context)
+			.load(Uri.parse(data))
+			.into(imageView)
+		is Drawable -> imageView.setImageDrawable(data)
+		is Int -> imageView.setImageResource(data)
+		else -> imageView.setImageURI(null)
 	}
 }
 

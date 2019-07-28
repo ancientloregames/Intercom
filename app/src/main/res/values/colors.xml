@@ -8,4 +8,7 @@
 	<color name="defaultSubtitleColor">#777</color>
 	<color name="chatMsgTimestampColor">#666</color>
 	<color name="chatFileIconBg">#2FB3C9</color>
+
+	<color name="chatIconBackColor">#3F99DD</color>
+	<color name="chatIconTextColor">@android:color/white</color>
 </resources>

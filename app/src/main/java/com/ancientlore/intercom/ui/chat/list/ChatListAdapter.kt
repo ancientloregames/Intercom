@@ -2,13 +2,17 @@ package com.ancientlore.intercom.ui.chat.list
 
 import android.content.Context
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.databinding.ObservableField
 import androidx.recyclerview.widget.DiffUtil
 import com.ancientlore.intercom.BR
+import com.ancientlore.intercom.EmptyObject
+import com.ancientlore.intercom.R
 import com.ancientlore.intercom.widget.recycler.BasicRecyclerAdapter
 import com.ancientlore.intercom.widget.recycler.MutableRecyclerAdapter
 import com.ancientlore.intercom.data.model.Chat
 import com.ancientlore.intercom.databinding.ChatListItemBinding
+import com.ancientlore.intercom.utils.ImageUtils
 
 class ChatListAdapter(context: Context, items: MutableList<Chat>)
 	: MutableRecyclerAdapter<Chat, ChatListAdapter.ViewHolder, ChatListItemBinding>(context, items) {
@@ -53,18 +57,30 @@ class ChatListAdapter(context: Context, items: MutableList<Chat>)
 
 		var listener: Listener? = null
 
+		val icon = ObservableField<Any>(EmptyObject)
 		val titleField = ObservableField<String>("")
 		val messageField = ObservableField<String>("")
 		val dateField = ObservableField<String>("")
 
+		private val iconColor: Int
+		private val iconTextSize: Int
+
 		init {
 			binding.setVariable(BR.chat, this)
+
+			iconColor = ContextCompat.getColor(context, R.color.chatIconBackColor)
+			iconTextSize = resources.getDimensionPixelSize(R.dimen.chatListIconTextSize)
 		}
 
-		override fun bind(chat: Chat) {
-			titleField.set(chat.name)
-			messageField.set(chat.lastMsgText)
-			dateField.set(chat.lastMsgDate)
+		override fun bind(data: Chat) {
+			titleField.set(data.name)
+			messageField.set(data.lastMsgText)
+			dateField.set(data.lastMsgDate)
+
+			when {
+				data.iconUrl.isNotEmpty() -> icon.set(data.iconUri)
+				else -> icon.set(ImageUtils.createAbbreviationDrawable(data.name, iconColor, iconTextSize))
+			}
 		}
 
 		fun onClick() = listener?.onItemClicked()

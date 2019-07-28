@@ -19,14 +19,14 @@ class FirestoreContactSource private constructor(private val userId: String)
 		private const val CONTACTS = "contacts"
 	}
 
-	private val contactsCollection get() = db.collection(USERS).document(userId).collection(CONTACTS)
+	private val userContacts get() = db.collection(USERS).document(userId).collection(CONTACTS)
 
 	private var contactChangesListener: ListenerRegistration? = null
 
 	override fun getObjectClass() = Contact::class.java
 
 	override fun getAll(callback: RequestCallback<List<Contact>>) {
-		contactsCollection.get()
+		userContacts.get()
 			.addOnSuccessListener { snapshot ->
 				deserialize(snapshot).takeIf { it.isNotEmpty() }
 					?.let { callback.onSuccess(it) }
@@ -44,7 +44,7 @@ class FirestoreContactSource private constructor(private val userId: String)
 					while (iter.hasNext()) {
 						val contact = iter.next()
 						if (user.id == contact.phone) {
-							contactsCollection.document(user.id).set(contact)
+							userContacts.document(user.id).set(contact)
 							iter.remove()
 						}
 					}
@@ -55,7 +55,7 @@ class FirestoreContactSource private constructor(private val userId: String)
 	}
 
 	override fun attachContactListener(id: String, callback: RequestCallback<Contact>) {
-		contactChangesListener = contactsCollection.document(id)
+		contactChangesListener = userContacts.document(id)
 			.addSnapshotListener { snapshot, error ->
 				if (error != null) {
 					callback.onFailure(error)

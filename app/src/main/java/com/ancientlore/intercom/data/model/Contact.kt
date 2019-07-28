@@ -16,7 +16,7 @@ data class Contact(val phone: String = "",
 
   val id: String get() = phone
 
-  @delegate:Exclude
+  @delegate:Exclude @get:Exclude
   val lastSeenDate: String by lazy { dateFormat.format(Date(lastSeenTime)) }
 
   override fun compareTo(other: Contact) = name.compareTo(other.name)

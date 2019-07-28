@@ -1,5 +1,6 @@
 package com.ancientlore.intercom.data.model
 
+import android.net.Uri
 import com.google.firebase.firestore.Exclude
 import java.text.SimpleDateFormat
 import java.util.*
@@ -7,6 +8,7 @@ import java.util.*
 
 data class Chat(val id: String = "",
                 val name: String = "",
+                val iconUrl: String = "",
                 val initiatorId: String = "",
                 val participants: Array<String> = emptyArray(),
                 val lastMsgTime: Long = 0,
@@ -17,7 +19,10 @@ data class Chat(val id: String = "",
 		private val dateFormat = SimpleDateFormat("MMM dd", Locale.getDefault())
 	}
 
-	@delegate:Exclude
+	@delegate:Exclude @get:Exclude
+	val iconUri: Uri by lazy { Uri.parse(iconUrl) }
+
+	@delegate:Exclude @get:Exclude
 	val lastMsgDate: String by lazy { dateFormat.format(Date(lastMsgTime)) }
 
 	override fun equals(other: Any?): Boolean {
