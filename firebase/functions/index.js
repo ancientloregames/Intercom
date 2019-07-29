@@ -60,8 +60,15 @@ exports.onCreateChat = functions.firestore
 exports.onCreateMessage = functions.firestore
   .document('chats/{chatId}/messages/{messageId}')
   .onCreate((message, context) => {
+    const messageId = context.params.messageId;
     const timestamp = message.get('timestamp');
     const text = message.get('text');
+
+    // Set id and status: server received message
+    message.ref.set({
+      'id': messageId,
+      'status': 1
+    }, { merge: true });
 
     const chatId = context.params.chatId;
     return chats.doc(chatId).get().then(snap => {
