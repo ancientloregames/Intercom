@@ -9,6 +9,7 @@ import androidx.databinding.ObservableField
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.DiffUtil
 import com.ancientlore.intercom.BR
+import com.ancientlore.intercom.R
 import com.ancientlore.intercom.data.model.Message
 import com.ancientlore.intercom.databinding.ChatFlowFileItemOtherBinding
 import com.ancientlore.intercom.databinding.ChatFlowFileItemUserBinding
@@ -114,10 +115,18 @@ class ChatFlowAdapter(private val userId: String,
 		var listener: Listener? = null
 
 		val timestampField = ObservableField<String>("")
+		val statusIconRes = ObservableField<Int>()
 
 		@CallSuper
 		override fun bind(data: Message) {
 			timestampField.set(data.formatedTime)
+
+			val statusResId = when (data.status) {
+				Message.STATUS_SENT -> R.drawable.ic_send_check
+				Message.STATUS_RECEIVED -> R.drawable.ic_send_check_all
+				else -> R.drawable.ic_send_wait
+			}
+			statusIconRes.set(statusResId)
 		}
 
 		fun onClick() = listener?.onItemClicked()

@@ -57,6 +57,7 @@
 		<item name="android:maxLines">1</item>
 		<item name="android:singleLine">true</item>
 		<item name="android:layout_gravity">bottom</item>
+		<item name="android:drawablePadding">2dp</item>
 	</style>
 
 	<style name="onelineTextField" parent="@style/TextAppearance.AppCompat">

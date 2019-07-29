@@ -14,29 +14,29 @@
 		<LinearLayout
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:orientation="horizontal"
+				android:orientation="vertical"
 				android:background="@drawable/bg_msg_user"
 				android:layout_gravity="end"
 				android:layout_marginStart="8dp"
 				android:layout_marginLeft="8dp"
 				android:layout_marginBottom="4dp">
 
-			<LinearLayout
-					android:layout_width="0dp"
+			<ImageView
+					android:id="@+id/imageView"
+					android:layout_width="250dp"
 					android:layout_height="wrap_content"
-					android:layout_weight="1"
-					android:orientation="vertical">
+					android:adjustViewBounds="true"
+					android:scaleType="fitCenter"
+					android:src="@{message.imageUri}"
+					android:visibility="@{message.imageVisibility}"
+					tools:src="@mipmap/ic_launcher"
+			/>
 
-				<ImageView
-						android:id="@+id/imageView"
-						android:layout_width="250dp"
-						android:layout_height="wrap_content"
-						android:adjustViewBounds="true"
-						android:scaleType="fitCenter"
-						android:src="@{message.imageUri}"
-						android:visibility="@{message.imageVisibility}"
-						tools:src="@mipmap/ic_launcher"
-				/>
+			<LinearLayout
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_gravity="end"
+					android:orientation="horizontal">
 
 				<TextView
 						android:id="@+id/textView"
@@ -46,18 +46,20 @@
 						tools:text="User message text"
 						style="@style/chatMsgText"
 				/>
-			</LinearLayout>
 
-			<TextView
-					android:id="@+id/timestampView"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:paddingStart="8dp"
-					android:paddingLeft="8dp"
-					android:text="@{message.timestampField}"
-					tools:text="12:00"
-					style="@style/chatMsgTimestamp"
-			/>
+				<com.ancientlore.intercom.view.DrawableCompatTextView
+						android:id="@+id/timestampView"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:paddingStart="8dp"
+						android:paddingLeft="8dp"
+						android:text="@{message.timestampField}"
+						app:drawableEnd="@{message.statusIconRes}"
+						tools:drawableEnd="@drawable/ic_send_check"
+						tools:text="12:00"
+						style="@style/chatMsgTimestamp"
+				/>
+			</LinearLayout>
 		</LinearLayout>
 	</FrameLayout>
 </layout>
