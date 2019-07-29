@@ -4,9 +4,11 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.view.View
 import android.widget.ImageView
+import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.databinding.BindingAdapter
 import com.ancientlore.intercom.utils.extensions.isNotEmpty
+import com.ancientlore.intercom.view.DrawableCompatTextView
 import com.bumptech.glide.Glide
 
 
@@ -61,3 +63,22 @@ fun setImageResource(imageView: ImageView, res: Int) {
 fun setViewVisibility(view: View, visible: Boolean) {
 	view.visibility = if (visible) View.VISIBLE else View.GONE
 }
+
+@BindingAdapter("backgroundTint")
+fun setBackgroundTintCompat(view: DrawableCompatTextView, color: Int) = view.setBackgroundTint(color)
+@BindingAdapter("drawableStart")
+fun setDrawableStart(imageView: DrawableCompatTextView, drawable: Drawable) = imageView.setDrawableStart(drawable)
+@BindingAdapter("drawableTop")
+fun setDrawableTop(imageView: DrawableCompatTextView, drawable: Drawable) = imageView.setDrawableTop(drawable)
+@BindingAdapter("drawableEnd")
+fun setDrawableEnd(imageView: DrawableCompatTextView, drawable: Drawable) = imageView.setDrawableEnd(drawable)
+@BindingAdapter("drawableBottom")
+fun setDrawableBottom(imageView: DrawableCompatTextView, drawable: Drawable) = imageView.setDrawableBottom(drawable)
+@BindingAdapter("drawableStart")
+fun setDrawableStart(imageView: DrawableCompatTextView, @DrawableRes resId: Int) = imageView.setDrawableStart(resId)
+@BindingAdapter("drawableTop")
+fun setDrawableTop(imageView: DrawableCompatTextView, @DrawableRes resId: Int) = imageView.setDrawableTop(resId)
+@BindingAdapter("drawableEnd")
+fun setDrawableEnd(imageView: DrawableCompatTextView, @DrawableRes resId: Int) = imageView.setDrawableEnd(resId)
+@BindingAdapter("drawableBottom")
+fun setDrawableBottom(imageView: DrawableCompatTextView, @DrawableRes resId: Int) = imageView.setDrawableBottom(resId)
