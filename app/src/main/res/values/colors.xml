@@ -7,6 +7,8 @@
 	<color name="defaultTextColor">#333</color>
 	<color name="defaultSubtitleColor">#777</color>
 	<color name="chatMsgTimestampColor">#666</color>
+	<color name="chatMsgStatusColor">@color/chatMsgTimestampColor</color>
+	<color name="chatMsgStatusColorComplete">#2FB3C9</color>
 	<color name="chatFileIconBg">#2FB3C9</color>
 
 	<color name="chatIconBackColor">#3F99DD</color>
