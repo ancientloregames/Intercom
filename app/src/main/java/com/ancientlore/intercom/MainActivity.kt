@@ -73,51 +73,67 @@ class MainActivity : AppCompatActivity(), AuthNavigator, PermissionManager {
 	}
 
 	private fun openChatList() {
-		supportFragmentManager.beginTransaction()
-			.replace(R.id.container, ChatListFragment.newInstance())
-			.commitNow()
+		runOnUiThread {
+			supportFragmentManager.beginTransaction()
+				.replace(R.id.container, ChatListFragment.newInstance())
+				.commitNow()
+		}
 	}
 
 	override fun openContactList() {
-		supportFragmentManager.beginTransaction()
-			.add(R.id.container, ContactListFragment.newInstance())
-			.commitNow()
+		runOnUiThread {
+			supportFragmentManager.beginTransaction()
+				.add(R.id.container, ContactListFragment.newInstance())
+				.commitNow()
+		}
 	}
 
 	override fun openChatFlow(params: ChatFlowFragment.Params) {
-		supportFragmentManager.beginTransaction()
-			.add(R.id.container, ChatFlowFragment.newInstance(params))
-			.commitNow()
+		runOnUiThread {
+			supportFragmentManager.beginTransaction()
+				.add(R.id.container, ChatFlowFragment.newInstance(params))
+				.commitNow()
+		}
 	}
 
 	override fun openLoginForm() {
-		supportFragmentManager.beginTransaction()
-			.replace(R.id.container, EmailLoginFragment.newInstance())
-			.commitNow()
+		runOnUiThread {
+			supportFragmentManager.beginTransaction()
+				.replace(R.id.container, EmailLoginFragment.newInstance())
+				.commitNow()
+		}
 	}
 
 	override fun openSignupForm() {
-		supportFragmentManager.beginTransaction()
-			.replace(R.id.container, EmailSignupFragment.newInstance())
-			.commitNow()
+		runOnUiThread {
+			supportFragmentManager.beginTransaction()
+				.replace(R.id.container, EmailSignupFragment.newInstance())
+				.commitNow()
+		}
 	}
 
 	override fun openPhoneAuthForm() {
-		supportFragmentManager.beginTransaction()
-			.replace(R.id.container, PhoneLoginFragment.newInstance())
-			.commitNow()
+		runOnUiThread {
+			supportFragmentManager.beginTransaction()
+				.replace(R.id.container, PhoneLoginFragment.newInstance())
+				.commitNow()
+		}
 	}
 
 	override fun openPhoneCheckForm(params: PhoneAuthParams) {
-		supportFragmentManager.beginTransaction()
-			.replace(R.id.container, PhoneCheckFragment.newInstance(params))
-			.commitNow()
+		runOnUiThread {
+			supportFragmentManager.beginTransaction()
+				.replace(R.id.container, PhoneCheckFragment.newInstance(params))
+				.commitNow()
+		}
 	}
 
 	override fun closeFragment(fragment: Fragment) {
-		supportFragmentManager.beginTransaction()
-			.remove(fragment)
-			.commitNow()
+		runOnUiThread {
+			supportFragmentManager.beginTransaction()
+				.remove(fragment)
+				.commitNow()
+		}
 	}
 
 	override fun onSuccessfullAuth(user: User) {
