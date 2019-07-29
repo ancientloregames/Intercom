@@ -45,4 +45,26 @@ data class Message(val id: String = "",
   val formatedTime: String by lazy { DateFormat.getTimeInstance(SHORT).format(timestamp) }
 
   override fun compareTo(other: Message) = timestamp.compareTo(other.timestamp)
+
+	override fun equals(other: Any?): Boolean {
+		if (this === other) return true
+		if (javaClass != other?.javaClass) return false
+
+		other as Message
+
+		return timestamp == other.timestamp
+				&& status == other.status
+				&& senderId == other.senderId
+	}
+
+	override fun hashCode(): Int {
+		var result = timestamp.hashCode()
+		result = 31 * result + senderId.hashCode()
+		result = 31 * result + text.hashCode()
+		result = 31 * result + info.hashCode()
+		result = 31 * result + attachUrl.hashCode()
+		result = 31 * result + type.hashCode()
+		result = 31 * result + status
+		return result
+	}
 }
