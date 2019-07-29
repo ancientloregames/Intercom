@@ -17,6 +17,12 @@ object FirebaseAuthManager : AuthManager() {
 
 	private val authExecutor: Executor by lazy { Executors.newSingleThreadExecutor() }
 
+	private var verificationId: String? = null
+
+	override fun isNeedPhoneCheck() = false
+
+	override fun getCurrentUser() = auth.currentUser?.let { User(it.phoneNumber!!) }
+
 	override fun signupViaEmail(params: EmailAuthParams, callback: RequestCallback<User>) {
 		auth.createUserWithEmailAndPassword(params.email, params.pass)
 			.addOnSuccessListener { result -> callback.onSuccess(User(result.user.uid)) }
@@ -34,6 +40,13 @@ object FirebaseAuthManager : AuthManager() {
 			60, TimeUnit.SECONDS,
 			authExecutor,
 			object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
+				override fun onCodeSent(id: String?, token: PhoneAuthProvider.ForceResendingToken) {
+					verificationId = id
+					verificationId?.let {
+						if (params.phone == "+380935719854") // FIXME Test auth, remove on release
+							verifySmsCode("123456", callback)
+					}
+				}
 				override fun onVerificationCompleted(creds: PhoneAuthCredential) =
 					onPhoneAuthCredential(creds, callback)
 				override fun onVerificationFailed(exception: FirebaseException) =
@@ -42,9 +55,12 @@ object FirebaseAuthManager : AuthManager() {
 		)
 	}
 
-	override fun isNeedPhoneCheck() = false
-
-	override fun getCurrentUser() = auth.currentUser?.let { User(it.phoneNumber!!) }
+	override fun verifySmsCode(smsCode: String, callback: RequestCallback<User>) {
+		if (verificationId != null) {
+			val credential = PhoneAuthProvider.getCredential(verificationId!!, "123456")
+			onPhoneAuthCredential(credential, callback)
+		} else callback.onFailure(AuthException("No verification id. Did you forget to request for phone verification?"))
+	}
 
 	private fun onPhoneAuthCredential(credential: PhoneAuthCredential, callback: RequestCallback<User>) {
 		auth.signInWithCredential(credential)
