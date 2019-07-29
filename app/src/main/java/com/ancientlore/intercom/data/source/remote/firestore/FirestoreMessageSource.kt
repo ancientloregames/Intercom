@@ -46,6 +46,12 @@ class FirestoreMessageSource(private val chatId: String)
 			.addOnFailureListener { callback?.onFailure(it) }
 	}
 
+	override fun setMessageStatusReceived(id: String, callback: RequestCallback<Any>?) {
+		chatMessages.document(id).update("status", Message.STATUS_RECEIVED)
+			.addOnSuccessListener { callback?.onSuccess(EmptyObject) }
+			.addOnFailureListener { callback?.onFailure(it) }
+	}
+
 	override fun attachListener(callback: RequestCallback<List<Message>>) {
 		changeListener = chatMessages
 			.orderBy("timestamp")

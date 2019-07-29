@@ -47,11 +47,21 @@ class ChatFlowViewModel(private val userId: String,
 		repository.attachListener(object : RequestCallback<List<Message>>{
 			override fun onSuccess(result: List<Message>) {
 				listAdapter.setItems(result)
+				updateMessagesStatus(result)
 			}
 			override fun onFailure(error: Throwable) {
 				Utils.logError(error)
 			}
 		})
+	}
+
+	private fun updateMessagesStatus(result: List<Message>) {
+		result
+			.filter {  it.status != Message.STATUS_RECEIVED
+							&& it.senderId != userId }
+			.forEach {
+				repository.setMessageStatusReceived(it.id, null)
+			}
 	}
 
 	private fun detachDataListener() {

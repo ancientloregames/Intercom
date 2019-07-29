@@ -32,6 +32,10 @@ class MessageRepository : MessageSource {
 		remoteSource?.updateMessageUri(messageId, uri, callback)
 	}
 
+	override fun setMessageStatusReceived(id: String, callback: RequestCallback<Any>?) {
+		remoteSource?.setMessageStatusReceived(id, callback)
+	}
+
 	override fun attachListener(callback: RequestCallback<List<Message>>) {
 		if (cacheSource.isNotEmpty())
 			callback.onSuccess(cacheSource.getAll())

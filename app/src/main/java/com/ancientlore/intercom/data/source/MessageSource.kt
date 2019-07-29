@@ -13,6 +13,8 @@ interface MessageSource : DataSource<Message> {
 
 	fun updateMessageUri(messageId: String, uri: Uri, callback: RequestCallback<Any>?)
 
+	fun setMessageStatusReceived(id: String, callback: RequestCallback<Any>?)
+
 	fun attachListener(callback: RequestCallback<List<Message>>)
 
 	fun detachListener()
