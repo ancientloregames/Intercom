@@ -2,8 +2,10 @@ package com.ancientlore.intercom.ui.chat.flow
 
 import android.content.Context
 import android.net.Uri
+import android.os.Bundle
 import android.view.ViewGroup
 import androidx.annotation.CallSuper
+import androidx.annotation.DrawableRes
 import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableField
 import androidx.databinding.ViewDataBinding
@@ -65,6 +67,12 @@ class ChatFlowAdapter(private val userId: String,
 		}
 	}
 
+	override fun onBindViewHolder(holder: ViewHolder, position: Int, payloads: MutableList<Any>) {
+		if (payloads.isNotEmpty())
+			holder.bind(payloads[0] as Bundle)
+		else super.onBindViewHolder(holder, position)
+	}
+
 	override fun isTheSame(first: Message, second: Message) = first.timestamp == second.timestamp
 
 	override fun isUnique(item: Message) = getItems().none { it.timestamp == item.timestamp }
@@ -103,6 +111,18 @@ class ChatFlowAdapter(private val userId: String,
 			imageVisibility.set(data.attachUri.isNotEmpty())
 			imageUri.set(data.attachUri)
 		}
+
+		override fun bind(payload: Bundle) {
+			super.bind(payload)
+
+			val newText = payload.getString(DiffCallback.KEY_TEXT)
+			if (newText != null)
+				textField.set(newText)
+
+			val newImageUrl = payload.getString(DiffCallback.KEY_URL)
+			if (newImageUrl != null)
+				imageUri.set(Uri.parse(newImageUrl))
+		}
 	}
 
 	abstract class ViewHolder(binding: ViewDataBinding)
@@ -121,12 +141,23 @@ class ChatFlowAdapter(private val userId: String,
 		override fun bind(data: Message) {
 			timestampField.set(data.formatedTime)
 
-			val statusResId = when (data.status) {
+			statusIconRes.set(getStatusResId(data.status))
+		}
+
+		@CallSuper
+		open fun bind(payload: Bundle) {
+			val newStatus = payload.getInt(DiffCallback.KEY_STATUS, -1)
+			if (newStatus != -1)
+				statusIconRes.set(getStatusResId(newStatus))
+		}
+
+		@DrawableRes
+		private fun getStatusResId(@Message.Status status: Int) : Int {
+			return when (status) {
 				Message.STATUS_SENT -> R.drawable.ic_send_check
 				Message.STATUS_RECEIVED -> R.drawable.ic_send_check_all
 				else -> R.drawable.ic_send_wait
 			}
-			statusIconRes.set(statusResId)
 		}
 
 		fun onClick() = listener?.onItemClicked()
@@ -136,6 +167,12 @@ class ChatFlowAdapter(private val userId: String,
 	                   private val newItems: List<Message>)
 		: DiffUtil.Callback() {
 
+		companion object {
+			const val KEY_URL = "url"
+			const val KEY_TEXT = "text"
+			const val KEY_STATUS = "status"
+		}
+
 		override fun getOldListSize() = oldItems.size
 
 		override fun getNewListSize() = newItems.size
@@ -143,5 +180,21 @@ class ChatFlowAdapter(private val userId: String,
 		override fun areItemsTheSame(oldPos: Int, newPos: Int) = oldItems[oldPos].timestamp == newItems[newPos].timestamp
 
 		override fun areContentsTheSame(oldPos: Int, newPos: Int) = oldItems[oldPos] == newItems[newPos]
+
+		override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any? {
+			val oldMessage = oldItems[oldItemPosition]
+			val newMessage = newItems[newItemPosition]
+
+			val bundle = Bundle().apply {
+				if (newMessage.attachUrl != oldMessage.attachUrl)
+					putString(KEY_URL, newMessage.attachUrl)
+				if (newMessage.text != oldMessage.text)
+					putString(KEY_TEXT, newMessage.text)
+				if (newMessage.status != oldMessage.status)
+					putInt(KEY_STATUS, newMessage.status)
+			}
+
+			return if (bundle.isNotEmpty()) bundle else null
+		}
 	}
 }

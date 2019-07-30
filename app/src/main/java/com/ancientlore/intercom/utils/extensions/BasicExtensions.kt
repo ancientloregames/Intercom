@@ -5,6 +5,7 @@ import android.content.ContentResolver
 import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Bundle
 import android.os.Environment
 import android.provider.ContactsContract
 import android.provider.MediaStore
@@ -94,6 +95,8 @@ fun Closeable.safeClose() {
 		close()
 	} catch (ignore: IOException) { }
 }
+
+fun Bundle.isNotEmpty() = !isEmpty
 
 fun Uri.isNotEmpty() = this != Uri.EMPTY
 
