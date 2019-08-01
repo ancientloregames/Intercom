@@ -77,6 +77,25 @@ class ChatFlowAdapter(private val userId: String,
 
 	override fun isUnique(item: Message) = getItems().none { it.timestamp == item.timestamp }
 
+	@UiThread
+	fun setFileUploadProgress(messageId: String, progress: Int) : Boolean {
+		val index = findItemIndex(messageId)
+		getItem(index)
+			?.takeIf { it.progress != progress }
+			?.let { item ->
+			item.progress = progress
+			notifyItemChanged(index, Bundle().apply {
+				putInt(DiffCallback.KEY_PROGRESS, progress)
+			})
+		}
+
+		return index != -1
+	}
+
+	fun findItemIndex(messageId: String) = getItems().indexOfFirst { it.id == messageId }
+
+	fun findItem(messageId: String) = getItems().find { it.id == messageId }
+
 	class FileItemViewHolder(binding: ViewDataBinding)
 		: ViewHolder(binding) {
 
@@ -171,6 +190,7 @@ class ChatFlowAdapter(private val userId: String,
 			const val KEY_URL = "url"
 			const val KEY_TEXT = "text"
 			const val KEY_STATUS = "status"
+			const val KEY_PROGRESS = "progress"
 		}
 
 		override fun getOldListSize() = oldItems.size

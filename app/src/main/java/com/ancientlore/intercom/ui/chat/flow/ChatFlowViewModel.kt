@@ -5,6 +5,7 @@ import androidx.databinding.ObservableField
 import com.ancientlore.intercom.App
 import com.ancientlore.intercom.EmptyObject
 import com.ancientlore.intercom.R
+import com.ancientlore.intercom.backend.ProgressRequestCallback
 import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.data.model.FileData
 import com.ancientlore.intercom.data.model.Message
@@ -18,7 +19,7 @@ class ChatFlowViewModel(private val userId: String,
                         private val chatId: String)
 	: BasicViewModel() {
 
-	val textField = ObservableField<String>("")
+	val textField = ObservableField("")
 
 	private lateinit var listAdapter: ChatFlowAdapter
 
@@ -85,11 +86,13 @@ class ChatFlowViewModel(private val userId: String,
 	fun handleAttachedImage(fileData: FileData) {
 		val message = Message(senderId = userId, attachUrl = fileData.uri.toString(), type = Message.TYPE_IMAGE)
 		repository.addMessage(message, object : RequestCallback<String> {
-			override fun onSuccess(result: String) {
-				val messageId = result
-				App.backend.getStorageManager().uploadImage(fileData, chatId, object : RequestCallback<Uri> {
-					override fun onSuccess(result: Uri) {
-						repository.updateMessageUri(messageId, result, object : RequestCallback<Any> {
+			override fun onSuccess(messageId: String) {
+				App.backend.getStorageManager().uploadImage(fileData, chatId, object : ProgressRequestCallback<Uri> {
+					override fun onProgress(progress: Int) {
+						listAdapter.setFileUploadProgress(messageId, progress)
+					}
+					override fun onSuccess(uri: Uri) {
+						repository.updateMessageUri(messageId, uri, object : RequestCallback<Any> {
 							override fun onSuccess(result: Any) {
 								toastRequest.onNext(R.string.success) // TODO remove this callback on release
 							}
@@ -113,9 +116,11 @@ class ChatFlowViewModel(private val userId: String,
 	fun handleAttachedFile(fileData: FileData) {
 		val message = Message(userId, fileData)
 		repository.addMessage(message, object : RequestCallback<String> {
-			override fun onSuccess(result: String) {
-				val messageId = result
-				App.backend.getStorageManager().uploadFile(fileData, chatId, object : RequestCallback<Uri> {
+			override fun onSuccess(messageId: String) {
+				App.backend.getStorageManager().uploadFile(fileData, chatId, object : ProgressRequestCallback<Uri> {
+					override fun onProgress(progress: Int) {
+						listAdapter.setFileUploadProgress(messageId, progress)
+					}
 					override fun onSuccess(result: Uri) {
 						repository.updateMessageUri(messageId, result, object : RequestCallback<Any> {
 							override fun onSuccess(result: Any) {
