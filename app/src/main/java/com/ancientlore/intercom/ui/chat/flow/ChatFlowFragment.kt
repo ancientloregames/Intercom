@@ -9,7 +9,6 @@ import androidx.appcompat.widget.Toolbar
 import com.ancientlore.intercom.App
 import com.ancientlore.intercom.C
 import com.ancientlore.intercom.R
-import com.ancientlore.intercom.data.model.FileData
 import com.ancientlore.intercom.databinding.ChatFlowUiBinding
 import com.ancientlore.intercom.dialog.bottomsheet.list.ListBottomSheetDialog
 import com.ancientlore.intercom.ui.BasicFragment
@@ -119,8 +118,7 @@ class ChatFlowFragment : BasicFragment<ChatFlowViewModel, ChatFlowUiBinding>() {
 					ImageUtils.compressImage(context!!.contentResolver, uri, C.MAX_ATTACH_IMG_SIZE_PX, file)
 
 				if (file.exists()) {
-					val compressed = FileData(fileData.id, fileData.name, Uri.fromFile(file))
-					viewModel.handleAttachedImage(compressed)
+					viewModel.handleAttachedImage(fileData, Uri.fromFile(file))
 				} else Utils.logError(RuntimeException("Failed to create"))
 				true
 			}

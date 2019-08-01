@@ -83,8 +83,8 @@ class ChatFlowViewModel(private val userId: String,
 		repository.addMessage(Message(senderId = userId, text = text), null)
 	}
 
-	fun handleAttachedImage(fileData: FileData) {
-		val message = Message(senderId = userId, attachUrl = fileData.uri.toString(), type = Message.TYPE_IMAGE)
+	fun handleAttachedImage(fileData: FileData, conpressed: Uri) {
+		val message = Message(senderId = userId, attachUrl = conpressed.toString(), type = Message.TYPE_IMAGE)
 		repository.addMessage(message, object : RequestCallback<String> {
 			override fun onSuccess(messageId: String) {
 				App.backend.getStorageManager().uploadImage(fileData, chatId, object : ProgressRequestCallback<Uri> {
