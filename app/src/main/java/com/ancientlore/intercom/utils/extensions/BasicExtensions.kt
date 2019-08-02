@@ -4,18 +4,23 @@ import android.Manifest
 import android.content.ContentResolver
 import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.provider.ContactsContract
 import android.provider.MediaStore
+import android.webkit.MimeTypeMap
 import androidx.annotation.RequiresPermission
 import androidx.core.app.ActivityCompat
+import com.ancientlore.intercom.C
 import com.ancientlore.intercom.data.model.Contact
 import com.ancientlore.intercom.data.model.FileData
+import com.ancientlore.intercom.utils.ImageUtils
 import com.ancientlore.intercom.utils.Utils
 import java.io.Closeable
 import java.io.File
+import java.io.FileOutputStream
 import java.io.IOException
 
 
@@ -129,4 +134,47 @@ fun Uri.getFileData(contentResolver: ContentResolver) : FileData {
 		}
 	}
 	return FileData()
+}
+
+fun Uri.getMimeType(): String {
+	return MimeTypeMap.getSingleton().getMimeTypeFromExtension(getExtension().toLowerCase())
+}
+
+fun Uri.isImage(): Boolean {
+	val mimeType = getMimeType()
+	return mimeType != null && mimeType.startsWith("image")
+}
+
+fun Uri.isVideo(): Boolean {
+	val mimeType = getMimeType()
+	return mimeType != null && mimeType.startsWith("video")
+}
+
+fun Uri.isVisual() : Boolean {
+	val mimeType = getMimeType()
+	return mimeType != null && (mimeType.startsWith("image") || mimeType.startsWith("video"))
+}
+
+fun Uri.createThumbnail(context: Context) : Uri {
+	if (isVisual()) {
+		val maxSize = Utils.toDp(C.THUMBNAIL_SIZE)
+		val thumbnail = ImageUtils.getThumbnail(path.toString(), maxSize, maxSize)
+
+		if (thumbnail != null) {
+			val file = File(context.getAppCacheDir(), lastPathSegment)
+			if (file.createNewFile()) {
+				var output: FileOutputStream? = null
+				try {
+					output = FileOutputStream(file)
+					thumbnail.compress(Bitmap.CompressFormat.JPEG, 80, output)
+					return Uri.fromFile(file)
+				} finally {
+					output?.safeClose()
+					thumbnail.recycle()
+				}
+			}
+		}
+	}
+
+	return Uri.EMPTY
 }
