@@ -59,7 +59,10 @@ class FirestoreMessageSource(private val chatId: String)
 				if (e != null) {
 					callback.onFailure(e)
 				} else if (snapshot != null) {
-					callback.onSuccess(deserialize(snapshot))
+					deserialize(snapshot)
+						.takeIf { it.all { msg -> msg.id.isNotEmpty() } }
+						?.let { callback.onSuccess(it)  }
+						?: callback.onFailure(EmptyResultException("$TAG: empty"))
 				}
 			}
 	}
