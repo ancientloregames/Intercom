@@ -14,7 +14,8 @@ data class Message(val id: String = "",
                    val info: String = "",
                    val attachUrl: String = "",
                    @Type val type: String = TYPE_TEXT,
-                   @Status val status: Int = STATUS_WAIT)
+                   @Status val status: Int = STATUS_WAIT,
+                   @get:Exclude var progress: Int = -1)
 	: Comparable<Message> {
 
 	companion object {
@@ -28,7 +29,7 @@ data class Message(val id: String = "",
   }
 
   constructor(senderId: String, fileData: FileData) : this(
-	  "", 0, senderId, fileData.name, fileData.getInfo(), fileData.uri.toString(), TYPE_FILE)
+	  "", System.currentTimeMillis(), senderId, fileData.name, fileData.getInfo(), fileData.uri.toString(), TYPE_FILE)
 
 	@StringDef(TYPE_TEXT, TYPE_IMAGE)
   @Retention(AnnotationRetention.SOURCE)
@@ -55,6 +56,8 @@ data class Message(val id: String = "",
 		return timestamp == other.timestamp
 				&& status == other.status
 				&& senderId == other.senderId
+				&& attachUrl == other.attachUrl
+				&& progress == other.progress
 	}
 
 	override fun hashCode(): Int {
