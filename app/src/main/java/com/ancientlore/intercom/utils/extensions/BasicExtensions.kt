@@ -3,6 +3,7 @@ package com.ancientlore.intercom.utils.extensions
 import android.Manifest
 import android.content.ContentResolver
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -49,6 +50,22 @@ fun Context.getAppCacheDir(): File {
 }
 
 fun Context.checkPermission(permission: String) = ActivityCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED
+
+fun Context.openFile(uri: Uri) : Boolean {
+	val openFile = Intent(Intent.ACTION_VIEW)
+	openFile.flags = (Intent.FLAG_ACTIVITY_NEW_TASK
+			or Intent.FLAG_ACTIVITY_NO_HISTORY
+			or Intent.FLAG_GRANT_READ_URI_PERMISSION
+			or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+
+	openFile.setDataAndType(uri, uri.getMimeType())
+
+	val isOpenable = openFile.resolveActivity(packageManager) != null
+	if (isOpenable)
+		startActivity(openFile)
+
+	return isOpenable
+}
 
 @RequiresPermission(Manifest.permission.READ_CONTACTS)
 fun ContentResolver.getContacts(): List<Contact> {
@@ -141,7 +158,7 @@ fun Uri.getFileData(contentResolver: ContentResolver) : FileData {
 }
 
 fun Uri.getMimeType(): String {
-	return MimeTypeMap.getSingleton().getMimeTypeFromExtension(getExtension().toLowerCase())
+	return MimeTypeMap.getSingleton().getMimeTypeFromExtension(getExtension().toLowerCase()) ?: "*/*"
 }
 
 fun Uri.isImage(): Boolean {
