@@ -8,6 +8,7 @@ import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.databinding.BindingAdapter
 import com.ancientlore.intercom.utils.extensions.isNotEmpty
+import com.ancientlore.intercom.view.ChatImageView
 import com.ancientlore.intercom.view.DrawableCompatTextView
 import com.bumptech.glide.Glide
 
@@ -32,6 +33,11 @@ fun setImageResource(imageView: ImageView, uri: Uri) {
 	} else {
 		imageView.setImageURI(null)
 	}
+}
+
+@BindingAdapter("android:src")
+fun setImageResource(imageView: ChatImageView, uri: Uri) {
+	imageView.setImageURI(uri)
 }
 
 @BindingAdapter("android:src")

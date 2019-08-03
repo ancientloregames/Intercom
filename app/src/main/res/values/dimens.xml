@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<dimen name="chatListIconTextSize">16sp</dimen>
+
+	<dimen name="chatImageProgressRadius">15dp</dimen>
+	<dimen name="chatImageProgressWidth">3dp</dimen>
+	<dimen name="chatImageCornerRadius">7dp</dimen>
 </resources>

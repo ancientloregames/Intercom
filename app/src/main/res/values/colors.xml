@@ -13,4 +13,7 @@
 
 	<color name="chatIconBackColor">#3F99DD</color>
 	<color name="chatIconTextColor">@android:color/white</color>
+
+	<color name="chatImageBgColor">#252A3A</color>
+	<color name="chatImageProgressColor">@android:color/white</color>
 </resources>

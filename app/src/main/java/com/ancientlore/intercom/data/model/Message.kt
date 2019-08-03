@@ -40,7 +40,7 @@ data class Message(val id: String = "",
 	annotation class Status
 
   @delegate:Exclude @get:Exclude
-  val attachUri: Uri by lazy { Uri.parse(attachUrl) }
+  val attachUri: Uri by lazy { if (attachUrl.isNotEmpty()) Uri.parse(attachUrl) else Uri.EMPTY }
 
   @delegate:Exclude @get:Exclude
   val formatedTime: String by lazy { DateFormat.getTimeInstance(SHORT).format(timestamp) }
