@@ -18,7 +18,8 @@
 				android:layout_marginLeft="8dp"
 				android:layout_marginBottom="4dp"
 				android:layout_gravity="end"
-				android:background="@drawable/bg_msg_user">
+				android:background="@drawable/bg_msg_user"
+				android:onClick="@{() -> message.onItemClick()}">
 
 			<com.ancientlore.intercom.view.CircleImageView
 					android:id="@+id/imageView"
@@ -33,7 +34,8 @@
 					app:layout_constraintStart_toStartOf="parent"
 					app:layout_constraintTop_toTopOf="parent"
 					app:layout_constraintBottom_toBottomOf="parent"
-					app:layout_constraintEnd_toEndOf="@+id/barrier"/>
+					app:layout_constraintEnd_toEndOf="@+id/barrier"
+			/>
 
 			<TextView
 					android:id="@+id/titleField"
@@ -46,7 +48,8 @@
 					app:layout_constraintTop_toTopOf="parent"
 					app:layout_constraintBottom_toTopOf="@+id/subtitleField"
 					app:layout_constraintEnd_toEndOf="parent"
-					app:layout_constraintStart_toEndOf="@+id/barrier"/>
+					app:layout_constraintStart_toEndOf="@+id/barrier"
+			/>
 
 			<TextView
 					android:id="@+id/subtitleField"
@@ -59,6 +62,7 @@
 					app:layout_constraintStart_toStartOf="@+id/titleField"
 					app:layout_constraintBottom_toBottomOf="parent"
 					app:layout_constraintEnd_toStartOf="@+id/timestampView"
+					app:layout_constraintHorizontal_bias="0.0"
 			/>
 
 			<com.ancientlore.intercom.view.DrawableCompatTextView
@@ -70,19 +74,22 @@
 					android:text="@{message.timestampField}"
 					app:drawableEnd="@{message.statusIconRes}"
 					tools:drawableEnd="@drawable/ic_send_check"
-					tools:text="12:00"
-					style="@style/chatMsgTimestamp"
+					app:layout_constraintHorizontal_chainStyle="spread_inside"
 					app:layout_constraintEnd_toEndOf="parent"
 					app:layout_constraintBottom_toBottomOf="parent"
-					app:layout_constraintStart_toEndOf="@+id/subtitleField"
+					tools:text="12:00"
+					style="@style/chatMsgTimestamp"
 			/>
-			<androidx.constraintlayout.widget.Barrier android:layout_width="wrap_content"
-			                                          android:layout_height="wrap_content"
-			                                          android:id="@+id/barrier"
-			                                          app:barrierDirection="left"
-			                                          app:constraint_referenced_ids="titleField,subtitleField,timestampView"
-			                                          tools:layout_editor_absoluteY="9dp"
-			                                          tools:layout_editor_absoluteX="186dp"/>
+
+			<androidx.constraintlayout.widget.Barrier
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:id="@+id/barrier"
+					app:barrierDirection="left"
+					app:constraint_referenced_ids="titleField,subtitleField,timestampView"
+					tools:layout_editor_absoluteY="9dp"
+					tools:layout_editor_absoluteX="186dp"
+			/>
 
 		</androidx.constraintlayout.widget.ConstraintLayout>
 	</FrameLayout>

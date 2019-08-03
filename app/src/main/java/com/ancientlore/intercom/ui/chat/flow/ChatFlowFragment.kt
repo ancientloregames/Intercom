@@ -20,6 +20,7 @@ import com.ancientlore.intercom.utils.Utils
 import com.ancientlore.intercom.utils.extensions.enableChatBehavior
 import com.ancientlore.intercom.utils.extensions.getAppCacheDir
 import com.ancientlore.intercom.utils.extensions.getFileData
+import com.ancientlore.intercom.utils.extensions.openFile
 import com.ancientlore.intercom.widget.list.simple.SimpleListItem
 import kotlinx.android.synthetic.main.chat_flow_ui.*
 import java.io.File
@@ -85,7 +86,17 @@ class ChatFlowFragment : BasicFragment<ChatFlowViewModel, ChatFlowUiBinding>() {
 	}
 
 	override fun initViewModel(viewModel: ChatFlowViewModel) {
-		viewModel.setListAdapter(listView.adapter as ChatFlowAdapter)
+		val listAdapter = listView.adapter as ChatFlowAdapter
+		subscriptions.add(listAdapter.observeFileOpen()
+			.subscribe {
+				context?.openFile(it)
+			})
+		subscriptions.add(listAdapter.observeImageOpen()
+			.subscribe {
+				// TODO create custom image viewer fragment
+				context?.openFile(it)
+			})
+		viewModel.setListAdapter(listAdapter)
 	}
 
 	override fun observeViewModel(viewModel: ChatFlowViewModel) {

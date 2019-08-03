@@ -5,9 +5,11 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.ViewGroup
 import androidx.annotation.CallSuper
+import androidx.annotation.UiThread
 import androidx.annotation.DrawableRes
 import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableField
+import androidx.databinding.ObservableInt
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.DiffUtil
 import com.ancientlore.intercom.BR
@@ -20,6 +22,8 @@ import com.ancientlore.intercom.databinding.ChatFlowItemUserBinding
 import com.ancientlore.intercom.utils.extensions.isNotEmpty
 import com.ancientlore.intercom.widget.recycler.BasicRecyclerAdapter
 import com.ancientlore.intercom.widget.recycler.MutableRecyclerAdapter
+import io.reactivex.Observable
+import io.reactivex.subjects.PublishSubject
 import java.lang.RuntimeException
 
 class ChatFlowAdapter(private val userId: String,
@@ -32,6 +36,14 @@ class ChatFlowAdapter(private val userId: String,
 		private const val VIEW_TYPE_FILE_USER = 2
 		private const val VIEW_TYPE_FILE_OTHER = 3
 	}
+
+	private val openFile = PublishSubject.create<Uri>()
+
+	private val openImage = PublishSubject.create<Uri>()
+
+	fun observeFileOpen() = openFile as Observable<Uri>
+
+	fun observeImageOpen() = openImage as Observable<Uri>
 
 	override fun getDiffCallback(newItems: List<Message>) = DiffCallback(getItems(), newItems)
 
@@ -68,6 +80,20 @@ class ChatFlowAdapter(private val userId: String,
 	}
 
 	override fun onBindViewHolder(holder: ViewHolder, position: Int, payloads: MutableList<Any>) {
+		val item = getItem(position)!!
+		when (holder) {
+			is ItemViewHolder -> holder.listener = object : ItemViewHolder.Listener {
+				override fun onImageClick(uri: Uri) {
+					openImage.onNext(uri)
+				}
+			}
+			is FileItemViewHolder -> holder.listener = object : FileItemViewHolder.Listener {
+				override fun onItemClick() {
+					openFile.onNext(item.attachUri)
+				}
+			}
+		}
+
 		if (payloads.isNotEmpty())
 			holder.bind(payloads[0] as Bundle)
 		else super.onBindViewHolder(holder, position)
@@ -99,8 +125,14 @@ class ChatFlowAdapter(private val userId: String,
 	class FileItemViewHolder(binding: ViewDataBinding)
 		: ViewHolder(binding) {
 
-		val titleField = ObservableField<String>("")
-		val subtitleField = ObservableField<String>("")
+		interface Listener {
+			fun onItemClick()
+		}
+
+		var listener: Listener? = null
+
+		val titleField = ObservableField("")
+		val subtitleField = ObservableField("")
 
 		init {
 			binding.setVariable(BR.message, this)
@@ -111,14 +143,21 @@ class ChatFlowAdapter(private val userId: String,
 			titleField.set(data.text)
 			subtitleField.set(data.info)
 		}
+
+		fun onItemClick() = listener?.onItemClick()
 	}
 
 	class ItemViewHolder(binding: ViewDataBinding)
 		: ViewHolder(binding) {
 
-		val textField = ObservableField<String>("")
-		val imageUri = ObservableField<Uri>(Uri.EMPTY)
-		val imageVisibility = ObservableBoolean()
+		interface Listener {
+			fun onImageClick(uri: Uri)
+		}
+
+		var listener: Listener? = null
+
+		val textField = ObservableField("")
+		val imageUri = ObservableField(Uri.EMPTY)
 
 		init {
 			binding.setVariable(BR.message, this)
@@ -127,7 +166,6 @@ class ChatFlowAdapter(private val userId: String,
 		override fun bind(data: Message) {
 			super.bind(data)
 			textField.set(data.text)
-			imageVisibility.set(data.attachUri.isNotEmpty())
 			imageUri.set(data.attachUri)
 		}
 
@@ -142,25 +180,26 @@ class ChatFlowAdapter(private val userId: String,
 			if (newImageUrl != null)
 				imageUri.set(Uri.parse(newImageUrl))
 		}
+
+		fun onImageClick() = listener?.onImageClick(imageUri.get()!!)
 	}
 
 	abstract class ViewHolder(binding: ViewDataBinding)
 		: BasicRecyclerAdapter.ViewHolder<Message, ViewDataBinding>(binding) {
 
-		interface Listener {
-			fun onItemClicked()
-		}
-
-		var listener: Listener? = null
-
-		val timestampField = ObservableField<String>("")
-		val statusIconRes = ObservableField<Int>()
+		val timestampField = ObservableField("")
+		val statusIconRes = ObservableInt()
+		val uploadProgress = ObservableInt()
+		val progressVisibility = ObservableBoolean()
 
 		@CallSuper
 		override fun bind(data: Message) {
 			timestampField.set(data.formatedTime)
 
 			statusIconRes.set(getStatusResId(data.status))
+
+			progressVisibility.set(data.progress >= 0)
+			uploadProgress.set(data.progress)
 		}
 
 		@CallSuper
@@ -168,6 +207,10 @@ class ChatFlowAdapter(private val userId: String,
 			val newStatus = payload.getInt(DiffCallback.KEY_STATUS, -1)
 			if (newStatus != -1)
 				statusIconRes.set(getStatusResId(newStatus))
+
+			val progress = payload.getInt(DiffCallback.KEY_PROGRESS, -1)
+			if (progress != -1)
+				uploadProgress.set(progress)
 		}
 
 		@DrawableRes
@@ -178,8 +221,6 @@ class ChatFlowAdapter(private val userId: String,
 				else -> R.drawable.ic_send_wait
 			}
 		}
-
-		fun onClick() = listener?.onItemClicked()
 	}
 
 	class DiffCallback(private val oldItems: List<Message>,
