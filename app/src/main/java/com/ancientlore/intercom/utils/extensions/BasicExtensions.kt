@@ -5,6 +5,9 @@ import android.content.ContentResolver
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -22,6 +25,7 @@ import java.io.Closeable
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import kotlin.math.max
 
 
 fun Context.getAppCacheDir(): File {
@@ -177,4 +181,23 @@ fun Uri.createThumbnail(context: Context) : Uri {
 	}
 
 	return Uri.EMPTY
+}
+
+fun Drawable.toBitmap(): Bitmap? {
+	if (this is BitmapDrawable)
+		return bitmap
+
+	var bitmap: Bitmap? = null
+	val width = max(intrinsicWidth, 2)
+	val height = max(intrinsicHeight, 2)
+	try {
+		bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+		val canvas = Canvas(bitmap!!)
+		setBounds(0, 0, canvas.width, canvas.height)
+		draw(canvas)
+	} catch (e: Throwable) {
+		e.printStackTrace()
+	}
+
+	return bitmap
 }
