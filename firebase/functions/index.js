@@ -63,6 +63,7 @@ exports.onCreateMessage = functions.firestore
     const messageId = context.params.messageId;
     const timestamp = message.get('timestamp');
     const text = message.get('text');
+    const senderId = message.get('senderId');
 
     // Set id and status: server received message
     message.ref.set({
@@ -71,12 +72,41 @@ exports.onCreateMessage = functions.firestore
     }, { merge: true });
 
     const chatId = context.params.chatId;
-    return chats.doc(chatId).get().then(snap => {
-      snap.get('participants').forEach(userId => {
+    return chats.doc(chatId).get().then(chat => {
+
+      const chatName = chat.get('name');
+
+      chat.get('participants').forEach(userId => {
+
         users.doc(userId).collection('chats').doc(chatId).set({
           'lastMsgTime': timestamp,
           'lastMsgText': text
         }, { merge: true });
+
+        if (userId != senderId) {
+          users.doc(userId).get().then(user => {
+
+            const token = user.get('token');
+
+            user.ref.collection('contacts').doc(senderId).get().then(sender => {
+
+              const senderName = sender.get('name');
+
+              const payload = {
+                data: {
+                  'title': chatName ? chatName : senderName,
+                  'body': chatName ? senderName + ': ' + text : text,
+                  'chatId': chatId,
+                  'type': 1
+                }
+              };
+
+              admin.messaging().sendToDevice(token, payload)
+                .then(response => console.log('Notification sent to ', userId))
+                .catch(error => console.error(error));
+            });
+          });
+        }
       });
     });
 });
