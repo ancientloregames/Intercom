@@ -7,7 +7,6 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.annotation.RequiresPermission
@@ -19,6 +18,7 @@ import com.ancientlore.intercom.backend.auth.PhoneAuthParams
 import com.ancientlore.intercom.backend.auth.User
 import com.ancientlore.intercom.data.source.ChatRepository
 import com.ancientlore.intercom.data.source.ContactRepository
+import com.ancientlore.intercom.data.source.UserRepository
 import com.ancientlore.intercom.ui.auth.AuthNavigator
 import com.ancientlore.intercom.ui.auth.email.login.EmailLoginFragment
 import com.ancientlore.intercom.ui.auth.email.signup.EmailSignupFragment
@@ -189,6 +189,7 @@ class MainActivity : AppCompatActivity(), AuthNavigator, PermissionManager {
 
 	private fun initRepositories(userId: String) {
 		val dataSourceProvider = App.backend.getDataSourceProvider()
+		UserRepository.setRemoteSource(dataSourceProvider.getUserSource(userId))
 		ChatRepository.setRemoteSource(dataSourceProvider.getChatSource(userId))
 		ContactRepository.setRemoteSource(dataSourceProvider.getContactSource(userId))
 	}
