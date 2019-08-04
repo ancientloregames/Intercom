@@ -1,11 +1,15 @@
 package com.ancientlore.intercom
 
 import android.Manifest
+import android.app.NotificationManager
 import android.content.Context
 import android.content.pm.PackageManager
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.annotation.RequiresPermission
 import androidx.annotation.StringRes
 import androidx.core.app.ActivityCompat
@@ -25,6 +29,7 @@ import com.ancientlore.intercom.ui.chat.list.ChatListFragment
 import com.ancientlore.intercom.ui.contact.list.ContactListFragment
 import com.ancientlore.intercom.utils.*
 import com.ancientlore.intercom.utils.extensions.checkPermission
+import com.ancientlore.intercom.utils.extensions.createChannel
 import com.ancientlore.intercom.utils.extensions.getContacts
 import java.util.concurrent.Executors
 
@@ -48,8 +53,21 @@ class MainActivity : AppCompatActivity(), AuthNavigator, PermissionManager {
 		super.onCreate(savedInstanceState)
 		setContentView(R.layout.main_activity)
 
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+			createNotificationChannels()
+
 		if (savedInstanceState == null)
 			onFirstStart()
+	}
+
+	@RequiresApi(Build.VERSION_CODES.O)
+	private fun createNotificationChannels() {
+		getSystemService(NotificationManager::class.java)
+			?.let {
+				it.createChannel(getString(R.string.chat_notification_channel_id),
+					getString(R.string.chat_notification_channel_name),
+					NotificationManager.IMPORTANCE_HIGH)
+		}
 	}
 
 	private fun onFirstStart() {

@@ -1,6 +1,13 @@
 <resources>
 	<string name="app_name">Intercom</string>
 
+
+	<string name="basic_notification_channel_id" translatable="false">basic_channel</string>
+	<string name="chat_notification_channel_id" translatable="false">chat_channel</string>
+
+	<string name="default_notification_channel_name">Notifications</string>
+	<string name="chat_notification_channel_name">Chat messages</string>
+
 	<string name="contactlist_title">New Message</string>
 
 	<string name="login_form_title">Authorization</string>
