@@ -14,6 +14,7 @@ import androidx.annotation.StringRes
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import com.ancientlore.intercom.backend.RequestCallback
+import com.ancientlore.intercom.backend.SimpleRequestCallback
 import com.ancientlore.intercom.backend.auth.PhoneAuthParams
 import com.ancientlore.intercom.backend.auth.User
 import com.ancientlore.intercom.data.source.ChatRepository
@@ -156,8 +157,17 @@ class MainActivity : AppCompatActivity(), AuthNavigator, PermissionManager {
 
 	override fun onSuccessfullAuth(user: User) {
 		initRepositories(user.id)
+		updateNotificationToken()
 		trySyncContacts()
 		openChatList()
+	}
+
+	private fun updateNotificationToken() {
+		App.backend.getNotificationManager().getToken(object : SimpleRequestCallback<String>() {
+			override fun onSuccess(token: String) {
+				UserRepository.updateNotificationToken(token, object : SimpleRequestCallback<Any>() {})
+			}
+		})
 	}
 
 	override fun requestPermissionReadContacts(onResult: Runnable1<Boolean>) {
