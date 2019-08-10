@@ -163,7 +163,7 @@ class MainActivity : AppCompatActivity(), AuthNavigator, PermissionManager {
 	}
 
 	private fun updateNotificationToken() {
-		App.backend.getNotificationManager().getToken(object : SimpleRequestCallback<String>() {
+		App.backend.getMessagingManager().getToken(object : SimpleRequestCallback<String>() {
 			override fun onSuccess(token: String) {
 				UserRepository.updateNotificationToken(token, object : SimpleRequestCallback<Any>() {})
 			}

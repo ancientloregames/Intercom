@@ -9,4 +9,6 @@ object FirebaseFactory : BackendFactory() {
 	override fun getDataSourceProvider() = FirestoreDataSourceProvider
 
 	override fun getStorageManager() = FirebaseStorageManager
+
+	override fun getMessagingManager() = FirebaseMessagingManager
 }

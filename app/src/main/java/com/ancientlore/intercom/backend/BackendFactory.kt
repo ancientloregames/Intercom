@@ -6,4 +6,5 @@ abstract class BackendFactory {
 	abstract fun getAuthManager(): AuthManager
 	abstract fun getDataSourceProvider(): DataSourceProvider
 	abstract fun getStorageManager(): StorageManager
+	abstract fun getMessagingManager(): MessagingManager
 }
