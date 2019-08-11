@@ -2,7 +2,7 @@ package com.ancientlore.intercom.data.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import androidx.annotation.IntDef;
+import androidx.annotation.StringDef;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.annotation.Retention;
@@ -10,10 +10,10 @@ import java.lang.annotation.RetentionPolicy;
 
 public class PushMessage implements Parcelable
 {
-	public static final int TYPE_UNKNOWN = 0;
-	public static final int TYPE_CHAT_MESSAGE = 1;
+	public static final String TYPE_UNKNOWN = "";
+	public static final String TYPE_CHAT_MESSAGE = "chat-message";
 
-	@IntDef({ TYPE_UNKNOWN, TYPE_CHAT_MESSAGE })
+	@StringDef({ TYPE_UNKNOWN, TYPE_CHAT_MESSAGE })
 	@Retention(RetentionPolicy.SOURCE)
 	@interface Type {}
 
@@ -22,7 +22,7 @@ public class PushMessage implements Parcelable
 	public String chatId = "";
 
 	@Type
-	public int type = TYPE_UNKNOWN;
+	public String type = TYPE_UNKNOWN;
 
 	public PushMessage() { }
 
@@ -31,7 +31,7 @@ public class PushMessage implements Parcelable
 		title = in.readString();
 		body = in.readString();
 		chatId = in.readString();
-		type = in.readInt();
+		type = in.readString();
 	}
 
 	@Override
@@ -40,13 +40,18 @@ public class PushMessage implements Parcelable
 		dest.writeString(title);
 		dest.writeString(body);
 		dest.writeString(chatId);
-		dest.writeInt(type);
+		dest.writeString(type);
 	}
 
 	@Override
 	public int describeContents()
 	{
 		return 0;
+	}
+
+	public boolean isReplyable()
+	{
+		return type.equals(TYPE_CHAT_MESSAGE);
 	}
 
 	public static final Creator<PushMessage> CREATOR = new Creator<PushMessage>()
