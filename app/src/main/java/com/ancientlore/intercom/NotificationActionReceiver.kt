@@ -14,30 +14,19 @@ import java.lang.RuntimeException
 class NotificationActionReceiver: BroadcastReceiver() {
 
 	companion object {
-		private val PACKAGE = NotificationActionReceiver::class.java.getPackage()!!.toString()
-		val ACTION_REPLY = "$PACKAGE.action.REPLY"
-		val RESULT_REPLY = "$PACKAGE.result.REPLY"
+		const val ACTION_REPLY = "com.ancientlore.intercom.action.REPLY"
+		const val RESULT_REPLY = "replyText"
 	}
 
 	override fun onReceive(context: Context, intent: Intent) {
 		when (intent.action) {
 			ACTION_REPLY -> {
-				intent.getParcelableExtra<PushMessage>(NotificationManager.EXTRA_MESSAGE)
-					?.let { message ->
-						val replyText = getReplyText(intent)
+				val message = getMessage(intent)
 
-						sendReply(message, replyText)
+				sendReply(message.chatId, getReplyText(intent))
 
-						val notificationId = intent.getIntExtra(NotificationManager.EXTRA_NOTIFICATION_ID, 0)
-
-						val replyMessage = PushMessage().apply {
-							title = context.getString(R.string.you)
-							body = replyText
-							chatId = message.chatId
-						}
-						NotificationManager.getInstance(context)
-							.updateNotification(notificationId, replyMessage)
-					} ?: throw RuntimeException("Error! No message to reply on.")
+				NotificationManager.getInstance(context)
+					.cancelNotification(getNotificationId(intent))
 			}
 		}
 	}
@@ -47,12 +36,20 @@ class NotificationActionReceiver: BroadcastReceiver() {
 			?.let { remoteInput ->
 				remoteInput.getCharSequence(RESULT_REPLY)?.toString()
 					?: throw RuntimeException("Error! No reply text.")
-			} ?: throw RuntimeException("Error! No reply text.")
+			}
+			?: intent.getStringExtra(RESULT_REPLY)
+			?: throw RuntimeException("Error! No reply text.")
 	}
 
-	private fun sendReply(message: PushMessage, replyText: String) {
+	private fun getMessage(intent: Intent) = intent.getParcelableExtra<PushMessage>(NotificationManager.EXTRA_MESSAGE)
+		?: throw RuntimeException("Message mandatory!")
+
+	private fun getNotificationId(intent: Intent) = intent.getIntExtra(NotificationManager.EXTRA_NOTIFICATION_ID, -1)
+		.takeIf { it != -1 } ?: throw RuntimeException("Error! Notification Id in extras is mandatory.")
+
+	private fun sendReply(chatId: String, replyText: String) {
 		MessageRepository().apply {
-			setRemoteSource(App.backend.getDataSourceProvider().getMessageSource(message.chatId))
+			setRemoteSource(App.backend.getDataSourceProvider().getMessageSource(chatId))
 
 			val user = App.backend.getAuthManager().getCurrentUser()!!
 			val replyMessage = Message(senderId = user.id, text = replyText)
