@@ -63,6 +63,7 @@
 		<receiver android:name=".NotificationActionReceiver"
 		          android:exported="false">
 			<intent-filter>
+				<action android:name="com.ancientlore.intercom.action.READ"/>
 				<action android:name="com.ancientlore.intercom.action.REPLY"/>
 			</intent-filter>
 		</receiver>

@@ -26,6 +26,8 @@ class NotificationManager private constructor(private val context: Context) {
 
 		const val EXTRA_NOTIFICATION_ID = "not_id"
 		const val EXTRA_MESSAGE = "message"
+		const val EXTRA_CHAT_ID = "chat_id"
+		const val EXTRA_MESSAGE_ID = "message_id"
 
 		private var currentId = 0
 		private var idCounter = -1
@@ -67,8 +69,10 @@ class NotificationManager private constructor(private val context: Context) {
 			.setShowWhen(true)
 			.setAutoCancel(true)
 
-		if (message.isReplyable)
+		if (message.isReplyable) {
 			builder.addReplyActions(message)
+			builder.addAction(createReadAction(message))
+		}
 
 		return builder.build()
 	}
@@ -109,6 +113,20 @@ class NotificationManager private constructor(private val context: Context) {
 		}
 	}
 
+	private fun createReadAction(message: PushMessage): NotificationCompat.Action {
+		val intent = Intent(context, NotificationActionReceiver::class.java).apply {
+			action = NotificationActionReceiver.ACTION_READ
+			putExtras(Bundle().apply {
+				putString(EXTRA_MESSAGE_ID, message.id)
+				putString(EXTRA_CHAT_ID, message.chatId)
+				putInt(EXTRA_NOTIFICATION_ID, currentId)
+			})
+		}
+
+		val pendingIntent = PendingIntent.getBroadcast(context, currentId, intent, PendingIntent.FLAG_CANCEL_CURRENT)
+		return NotificationCompat.Action(0, resources.getString(R.string.mark_as_read), pendingIntent)
+	}
+
 	private fun createReplyAction(pendingIntent: PendingIntent): NotificationCompat.Action {
 		return NotificationCompat.Action.Builder(
 			R.drawable.ic_reply, context.getString(R.string.reply), pendingIntent)
@@ -125,6 +143,7 @@ class NotificationManager private constructor(private val context: Context) {
 
 	private fun NotificationCompat.Builder.addReplyActions(message: PushMessage) {
 		val replyParams = Bundle().apply {
+			putString(EXTRA_MESSAGE_ID, message.id)
 			putParcelable(EXTRA_MESSAGE, message)
 			putInt(EXTRA_NOTIFICATION_ID, currentId)
 		}

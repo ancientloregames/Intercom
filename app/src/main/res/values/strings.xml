@@ -53,6 +53,7 @@
 
 	<string name="reply">Reply</string>
 	<string name="cancel">Cancel</string>
+	<string name="mark_as_read">Mark as Read</string>
 
 	<string name="yes">Yes</string>
 	<string name="no">No</string>
