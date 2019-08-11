@@ -5,6 +5,8 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Build
 import android.os.Bundle
 import androidx.core.app.NotificationCompat
@@ -49,6 +51,7 @@ class NotificationManager private constructor(private val context: Context) {
 			.setDefaults(NotificationCompat.DEFAULT_ALL)
 			.setColor(ResourcesCompat.getColor(resources, R.color.colorPrimary, null))
 			.setSmallIcon(R.drawable.ic_notification)
+			.setLargeIcon(getIcon(message))
 			.setWhen(System.currentTimeMillis())
 			.setShowWhen(true)
 			.setAutoCancel(true)
@@ -57,6 +60,11 @@ class NotificationManager private constructor(private val context: Context) {
 			builder.addReplyActions(message)
 
 		return builder.build()
+	}
+
+	private fun getIcon(message: PushMessage): Bitmap {
+		// TODO download image, if message has icon url
+		return BitmapFactory.decodeResource(resources, R.drawable.ic_avatar_placeholder)
 	}
 
 	private fun getNotificationChannelId(messageType: String) : String {
