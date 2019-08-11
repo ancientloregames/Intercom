@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string-array name="quick_reply_choices">
+		<item>@string/yes</item>
+		<item>@string/no</item>
+		<item>@string/maybe</item>
+	</string-array>
+</resources>
