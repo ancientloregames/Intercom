@@ -17,6 +17,7 @@ import com.ancientlore.intercom.ui.notification.NotificationAnswerActivity
 import com.ancientlore.intercom.NotificationActionReceiver
 import com.ancientlore.intercom.R
 import com.ancientlore.intercom.data.model.PushMessage
+import kotlin.math.abs
 
 class NotificationManager private constructor(private val context: Context) {
 
@@ -26,7 +27,8 @@ class NotificationManager private constructor(private val context: Context) {
 		const val EXTRA_NOTIFICATION_ID = "not_id"
 		const val EXTRA_MESSAGE = "message"
 
-		private var idCounter = 0
+		private var currentId = 0
+		private var idCounter = -1
 	}
 
 	private val manager: NotificationManagerCompat by lazy { NotificationManagerCompat.from(context) }
@@ -34,12 +36,21 @@ class NotificationManager private constructor(private val context: Context) {
 	private val resources: Resources get() = context.resources
 
 	fun showNotification(message: PushMessage) {
-		manager.notify(idCounter, createNotification(message))
-		idCounter++
+		currentId = getNotificationId(message)
+		manager.notify(currentId, createNotification(message))
 	}
 
 	fun cancelNotification(id: Int) {
 		manager.cancel(id)
+	}
+
+	private fun getNotificationId(message: PushMessage) : Int {
+		return if (message.hasChatId()) {
+			abs(message.chatId.hashCode())
+		} else {
+			idCounter++
+			idCounter
+		}
 	}
 
 	private fun createNotification(message: PushMessage): Notification {
@@ -115,7 +126,7 @@ class NotificationManager private constructor(private val context: Context) {
 	private fun NotificationCompat.Builder.addReplyActions(message: PushMessage) {
 		val replyParams = Bundle().apply {
 			putParcelable(EXTRA_MESSAGE, message)
-			putInt(EXTRA_NOTIFICATION_ID, idCounter)
+			putInt(EXTRA_NOTIFICATION_ID, currentId)
 		}
 		val pendingIntent = createPendingIntent(replyParams)
 		val replyAction = createReplyAction(pendingIntent)
