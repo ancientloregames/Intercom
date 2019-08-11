@@ -17,6 +17,7 @@ public class PushMessage implements Parcelable
 	@Retention(RetentionPolicy.SOURCE)
 	@interface Type {}
 
+	public String id = "";
 	public String title = "";
 	public String body = "";
 	public String chatId = "";
@@ -28,6 +29,7 @@ public class PushMessage implements Parcelable
 
 	protected PushMessage(@NotNull Parcel in)
 	{
+		id = in.readString();
 		title = in.readString();
 		body = in.readString();
 		chatId = in.readString();
@@ -37,6 +39,7 @@ public class PushMessage implements Parcelable
 	@Override
 	public void writeToParcel(Parcel dest, int flags)
 	{
+		dest.writeString(id);
 		dest.writeString(title);
 		dest.writeString(body);
 		dest.writeString(chatId);
@@ -52,6 +55,11 @@ public class PushMessage implements Parcelable
 	public boolean isReplyable()
 	{
 		return type.equals(TYPE_CHAT_MESSAGE);
+	}
+
+	public boolean hasChatId()
+	{
+		return !chatId.isEmpty();
 	}
 
 	public static final Creator<PushMessage> CREATOR = new Creator<PushMessage>()

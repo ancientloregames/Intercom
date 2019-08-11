@@ -94,6 +94,7 @@ exports.onCreateMessage = functions.firestore
 
               const payload = {
                 data: {
+                  'id': messageId,
                   'type': "chat-message",
                   'title': chatName ? chatName : senderName,
                   'body': chatName ? senderName + ': ' + text : text,
