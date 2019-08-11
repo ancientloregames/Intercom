@@ -3,6 +3,7 @@ package com.ancientlore.intercom
 import android.Manifest
 import android.app.NotificationManager
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
@@ -29,6 +30,9 @@ import com.ancientlore.intercom.ui.chat.flow.ChatFlowFragment
 import com.ancientlore.intercom.ui.chat.list.ChatListFragment
 import com.ancientlore.intercom.ui.contact.list.ContactListFragment
 import com.ancientlore.intercom.utils.*
+import com.ancientlore.intercom.utils.NotificationManager.Companion.ACTION_OPEN_FROM_PUSH
+import com.ancientlore.intercom.utils.NotificationManager.Companion.EXTRA_CHAT_ID
+import com.ancientlore.intercom.utils.NotificationManager.Companion.EXTRA_CHAT_TITLE
 import com.ancientlore.intercom.utils.extensions.checkPermission
 import com.ancientlore.intercom.utils.extensions.createChannel
 import com.ancientlore.intercom.utils.extensions.getContacts
@@ -61,22 +65,23 @@ class MainActivity : AppCompatActivity(), AuthNavigator, PermissionManager {
 			onFirstStart()
 	}
 
-	@RequiresApi(Build.VERSION_CODES.O)
-	private fun createNotificationChannels() {
-		getSystemService(NotificationManager::class.java)
-			?.let {
-				it.createChannel(getString(R.string.chat_notification_channel_id),
-					getString(R.string.chat_notification_channel_name),
-					NotificationManager.IMPORTANCE_DEFAULT)
-				it.createChannel(getString(R.string.basic_notification_channel_id),
-					getString(R.string.default_notification_channel_name),
-					NotificationManager.IMPORTANCE_DEFAULT)
-		}
-	}
-
 	private fun onFirstStart() {
 		user?.let { onSuccessfullAuth(it) }
 			?: openPhoneAuthForm()
+	}
+
+	override fun onNewIntent(intent: Intent?) {
+		when (intent?.action ?: "") {
+			ACTION_OPEN_FROM_PUSH -> {
+				intent!!.extras?.run {
+					val chatId = getString(EXTRA_CHAT_ID)
+					val chatTitle = getString(EXTRA_CHAT_TITLE)
+					if (chatId != null && chatTitle != null)
+						openChatFlow(ChatFlowFragment.Params(chatId, chatTitle))
+				}
+			}
+			else -> super.onNewIntent(intent)
+		}
 	}
 
 	override fun onBackPressed() {
@@ -92,6 +97,19 @@ class MainActivity : AppCompatActivity(), AuthNavigator, PermissionManager {
 
 		val result = grantResults.all { it == PackageManager.PERMISSION_GRANTED }
 		permRequestCallback?.run(result)
+	}
+
+	@RequiresApi(Build.VERSION_CODES.O)
+	private fun createNotificationChannels() {
+		getSystemService(NotificationManager::class.java)
+			?.let {
+				it.createChannel(getString(R.string.chat_notification_channel_id),
+					getString(R.string.chat_notification_channel_name),
+					NotificationManager.IMPORTANCE_DEFAULT)
+				it.createChannel(getString(R.string.basic_notification_channel_id),
+					getString(R.string.default_notification_channel_name),
+					NotificationManager.IMPORTANCE_DEFAULT)
+			}
 	}
 
 	private fun openChatList() {
@@ -114,7 +132,7 @@ class MainActivity : AppCompatActivity(), AuthNavigator, PermissionManager {
 		runOnUiThread {
 			supportFragmentManager.beginTransaction()
 				.add(R.id.container, ChatFlowFragment.newInstance(params))
-				.commitNow()
+				.commitNowAllowingStateLoss()
 		}
 	}
 

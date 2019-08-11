@@ -13,6 +13,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.RemoteInput
 import androidx.core.content.res.ResourcesCompat
+import com.ancientlore.intercom.MainActivity
 import com.ancientlore.intercom.ui.notification.NotificationAnswerActivity
 import com.ancientlore.intercom.NotificationActionReceiver
 import com.ancientlore.intercom.R
@@ -24,10 +25,13 @@ class NotificationManager private constructor(private val context: Context) {
 	internal companion object : SingletonHolder<NotificationManager, Context>(
 		{ context -> NotificationManager(context) }) {
 
+		const val ACTION_OPEN_FROM_PUSH = "com.ancientlore.intercom.action.OPEN_FROM_PUSH"
+
 		const val EXTRA_NOTIFICATION_ID = "not_id"
 		const val EXTRA_MESSAGE = "message"
 		const val EXTRA_CHAT_ID = "chat_id"
 		const val EXTRA_MESSAGE_ID = "message_id"
+		const val EXTRA_CHAT_TITLE = "chat_title"
 
 		private var currentId = 0
 		private var idCounter = -1
@@ -71,7 +75,8 @@ class NotificationManager private constructor(private val context: Context) {
 
 		if (message.isReplyable) {
 			builder.addReplyActions(message)
-			builder.addAction(createReadAction(message))
+				.addAction(createReadAction(message))
+				.setContentIntent(createContentIntent(message))
 		}
 
 		return builder.build()
@@ -96,20 +101,43 @@ class NotificationManager private constructor(private val context: Context) {
 		}
 	}
 
+	private fun createContentIntent(message: PushMessage) : PendingIntent {
+		val intent = when (message.type) {
+			PushMessage.TYPE_CHAT_MESSAGE -> {
+				Intent(context, MainActivity::class.java).apply {
+					action = ACTION_OPEN_FROM_PUSH
+					flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+					putExtras(Bundle().apply {
+						putString(EXTRA_CHAT_ID, message.chatId)
+						putString(EXTRA_CHAT_TITLE, message.title)
+					})
+				}
+			}
+			else -> {
+				Intent(context, MainActivity::class.java).apply {
+					action = Intent.ACTION_MAIN
+					addCategory(Intent.CATEGORY_LAUNCHER)
+					flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+				}
+			}
+		}
+		return PendingIntent.getActivity(context, currentId, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+	}
+
 	private fun createPendingIntent(extras: Bundle): PendingIntent {
 		return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 			val intent = Intent(context, NotificationActionReceiver::class.java).apply {
 				action = NotificationActionReceiver.ACTION_REPLY
 				putExtras(extras)
 			}
-			PendingIntent.getBroadcast(context, idCounter, intent, PendingIntent.FLAG_CANCEL_CURRENT)
+			PendingIntent.getBroadcast(context, currentId, intent, PendingIntent.FLAG_CANCEL_CURRENT)
 		} else {
 			val intent = Intent(context, NotificationAnswerActivity::class.java).apply {
 				action = NotificationActionReceiver.ACTION_REPLY
 				flags = Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS
 				putExtras(extras)
 			}
-			PendingIntent.getActivity(context, idCounter, intent, PendingIntent.FLAG_CANCEL_CURRENT)
+			PendingIntent.getActivity(context, currentId, intent, PendingIntent.FLAG_CANCEL_CURRENT)
 		}
 	}
 
@@ -141,7 +169,7 @@ class NotificationManager private constructor(private val context: Context) {
 			.build()
 	}
 
-	private fun NotificationCompat.Builder.addReplyActions(message: PushMessage) {
+	private fun NotificationCompat.Builder.addReplyActions(message: PushMessage): NotificationCompat.Builder {
 		val replyParams = Bundle().apply {
 			putString(EXTRA_MESSAGE_ID, message.id)
 			putParcelable(EXTRA_MESSAGE, message)
@@ -152,5 +180,6 @@ class NotificationManager private constructor(private val context: Context) {
 
 		addAction(replyAction)
 		extend(NotificationCompat.WearableExtender().addAction(replyAction))
+		return this
 	}
 }

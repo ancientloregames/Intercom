@@ -37,6 +37,8 @@
 				<action android:name="android.intent.action.MAIN"/>
 
 				<category android:name="android.intent.category.LAUNCHER"/>
+
+				<action android:name="com.ancientlore.intercom.action.OPEN_FROM_PUSH"/>
 			</intent-filter>
 		</activity>
 
