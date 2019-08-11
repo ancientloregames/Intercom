@@ -40,7 +40,16 @@
 			</intent-filter>
 		</activity>
 
-		<activity android:name=".MessageAnswerActivity"/>
+		<activity android:name="com.ancientlore.intercom.ui.notification.NotificationAnswerActivity"
+		          android:theme="@style/AnswerDialog"
+		          android:launchMode="singleInstance"
+		          android:windowSoftInputMode="stateAlwaysVisible|adjustResize">
+			<intent-filter>
+				<action android:name="android.intent.action.ANSWER"/>
+
+				<category android:name="CATEGORY_APP_MESSAGING"/>
+			</intent-filter>
+		</activity>
 
 		<service
 				android:name=".MessagingService"
