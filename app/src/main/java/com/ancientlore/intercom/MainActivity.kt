@@ -67,7 +67,10 @@ class MainActivity : AppCompatActivity(), AuthNavigator, PermissionManager {
 			?.let {
 				it.createChannel(getString(R.string.chat_notification_channel_id),
 					getString(R.string.chat_notification_channel_name),
-					NotificationManager.IMPORTANCE_HIGH)
+					NotificationManager.IMPORTANCE_DEFAULT)
+				it.createChannel(getString(R.string.basic_notification_channel_id),
+					getString(R.string.default_notification_channel_name),
+					NotificationManager.IMPORTANCE_DEFAULT)
 		}
 	}
 
