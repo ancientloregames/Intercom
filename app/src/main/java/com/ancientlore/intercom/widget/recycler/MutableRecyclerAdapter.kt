@@ -27,8 +27,12 @@ abstract class MutableRecyclerAdapter<I: Comparable<I>, H: BasicRecyclerAdapter.
 		val diffResult = DiffUtil.calculateDiff(getDiffCallback(items))
 		diffResult.dispatchUpdatesTo(this)
 
+		resetItems(items)
+	}
+
+	protected fun resetItems(newItems: List<I>) {
 		mutableList.clear()
-		mutableList.addAll(items)
+		mutableList.addAll(newItems)
 	}
 
 	@UiThread
