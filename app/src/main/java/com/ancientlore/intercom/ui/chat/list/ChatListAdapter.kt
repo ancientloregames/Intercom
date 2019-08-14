@@ -9,13 +9,13 @@ import com.ancientlore.intercom.BR
 import com.ancientlore.intercom.EmptyObject
 import com.ancientlore.intercom.R
 import com.ancientlore.intercom.widget.recycler.BasicRecyclerAdapter
-import com.ancientlore.intercom.widget.recycler.MutableRecyclerAdapter
 import com.ancientlore.intercom.data.model.Chat
 import com.ancientlore.intercom.databinding.ChatListItemBinding
 import com.ancientlore.intercom.utils.ImageUtils
+import com.ancientlore.intercom.widget.recycler.FilterableRecyclerAdapter
 
 class ChatListAdapter(context: Context, items: MutableList<Chat>)
-	: MutableRecyclerAdapter<Chat, ChatListAdapter.ViewHolder, ChatListItemBinding>(context, items) {
+	: FilterableRecyclerAdapter<Chat, ChatListAdapter.ViewHolder, ChatListItemBinding>(context, items) {
 
 	interface Listener {
 		fun onChatSelected(chat: Chat)
@@ -45,6 +45,8 @@ class ChatListAdapter(context: Context, items: MutableList<Chat>)
 	override fun isTheSame(first: Chat, second: Chat) = first.id == second.id
 
 	override fun isUnique(item: Chat) = getItems().none { it.id == item.id }
+
+	override fun createFilter() = Filter()
 
 	fun setListener(listener: Listener) { this.listener = listener }
 
@@ -97,5 +99,9 @@ class ChatListAdapter(context: Context, items: MutableList<Chat>)
 		override fun areItemsTheSame(oldPos: Int, newPos: Int) = oldItems[oldPos].id == newItems[newPos].id
 
 		override fun areContentsTheSame(oldPos: Int, newPos: Int) = oldItems[oldPos] == newItems[newPos]
+	}
+
+	inner class Filter: ListFilter() {
+		override fun satisfy(item: Chat, candidate: String) = item.contains(candidate)
 	}
 }

@@ -50,4 +50,9 @@ data class Chat(val id: String = "",
 	}
 
 	override fun compareTo(other: Chat) = lastMsgTime.compareTo(other.lastMsgTime)
+
+	fun contains(text: String): Boolean {
+		return name.contains(text, true)
+				|| lastMsgText.contains(text, true)
+	}
 }
