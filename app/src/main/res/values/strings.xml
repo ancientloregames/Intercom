@@ -61,4 +61,6 @@
 
 	<string name="you">You</string>
 	<string name="chat_notification_ticker">New message from %1$s</string>
+
+	<string name="search">Search</string>
 </resources>
