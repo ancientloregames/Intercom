@@ -65,6 +65,7 @@ class MainActivity : AppCompatActivity(), AuthNavigator, PermissionManager {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
 			createNotificationChannels()
 
+
 		if (savedInstanceState == null)
 			onFirstStart()
 	}
@@ -75,16 +76,23 @@ class MainActivity : AppCompatActivity(), AuthNavigator, PermissionManager {
 	}
 
 	override fun onNewIntent(intent: Intent?) {
-		when (intent?.action ?: "") {
+		if (intent == null || !handleIntent(intent)) {
+			super.onNewIntent(intent)
+		}
+	}
+
+	private fun handleIntent(intent: Intent) : Boolean {
+		return when (intent.action) {
 			ACTION_OPEN_FROM_PUSH -> {
-				intent!!.extras?.run {
+				intent.extras!!.run {
 					val chatId = getString(EXTRA_CHAT_ID)
 					val chatTitle = getString(EXTRA_CHAT_TITLE)
 					if (chatId != null && chatTitle != null)
 						openChatFlow(ChatFlowFragment.Params(chatId, chatTitle))
 				}
+				true
 			}
-			else -> super.onNewIntent(intent)
+			else -> false
 		}
 	}
 
@@ -196,6 +204,7 @@ class MainActivity : AppCompatActivity(), AuthNavigator, PermissionManager {
 		updateNotificationToken()
 		trySyncContacts()
 		openChatList()
+		handleIntent(intent)
 	}
 
 	private fun updateNotificationToken() {
