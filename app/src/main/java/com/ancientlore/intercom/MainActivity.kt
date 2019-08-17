@@ -8,10 +8,12 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.Menu
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.annotation.RequiresPermission
 import androidx.annotation.StringRes
+import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import com.ancientlore.intercom.backend.RequestCallback
@@ -54,6 +56,8 @@ class MainActivity : AppCompatActivity(), AuthNavigator, PermissionManager {
 
 	private var permRequestCallback: Runnable1<Boolean>? = null
 
+	private var toolbarMenuCallback: Runnable1<Menu>? = null
+
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		setContentView(R.layout.main_activity)
@@ -90,6 +94,17 @@ class MainActivity : AppCompatActivity(), AuthNavigator, PermissionManager {
 				return
 
 		super.onBackPressed()
+	}
+
+	override fun createToolbarMenu(toolbar: Toolbar, callback: Runnable1<Menu>) {
+		toolbarMenuCallback = callback
+		setSupportActionBar(toolbar)
+	}
+
+	override fun onCreateOptionsMenu(menu: Menu): Boolean {
+		toolbarMenuCallback?.run(menu)
+
+		return true
 	}
 
 	override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
