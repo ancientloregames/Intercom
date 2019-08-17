@@ -12,7 +12,6 @@ import androidx.annotation.StringRes
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
 import com.ancientlore.intercom.MainActivity
-import com.ancientlore.intercom.ui.auth.AuthNavigator
 import com.ancientlore.intercom.utils.PermissionManager
 import io.reactivex.internal.disposables.ListCompositeDisposable
 import java.lang.RuntimeException
@@ -26,7 +25,7 @@ abstract class BasicFragment<VM : ViewModel, B : ViewDataBinding> : Fragment(), 
 
 	protected val subscriptions = ListCompositeDisposable()
 
-	protected val navigator get() = activity as AuthNavigator?
+	protected val navigator get() = activity as Navigator?
 
 	protected val permissionManager get() = activity as PermissionManager?
 
@@ -46,8 +45,8 @@ abstract class BasicFragment<VM : ViewModel, B : ViewDataBinding> : Fragment(), 
 	}
 
 	override fun onAttach(context: Context) {
-		if (context !is AuthNavigator)
-			RuntimeException("Context must implement the AuthNavigator interface")
+		if (context !is Navigator)
+			RuntimeException("Context must implement the Navigator interface")
 		super.onAttach(context)
 	}
 

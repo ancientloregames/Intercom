@@ -23,7 +23,7 @@ import com.ancientlore.intercom.backend.auth.User
 import com.ancientlore.intercom.data.source.ChatRepository
 import com.ancientlore.intercom.data.source.ContactRepository
 import com.ancientlore.intercom.data.source.UserRepository
-import com.ancientlore.intercom.ui.auth.AuthNavigator
+import com.ancientlore.intercom.ui.Navigator
 import com.ancientlore.intercom.ui.auth.email.login.EmailLoginFragment
 import com.ancientlore.intercom.ui.auth.email.signup.EmailSignupFragment
 import com.ancientlore.intercom.ui.auth.phone.login.PhoneLoginFragment
@@ -40,7 +40,7 @@ import com.ancientlore.intercom.utils.extensions.createChannel
 import com.ancientlore.intercom.utils.extensions.getContacts
 import java.util.concurrent.Executors
 
-class MainActivity : AppCompatActivity(), AuthNavigator, PermissionManager {
+class MainActivity : AppCompatActivity(), Navigator, PermissionManager {
 
 	companion object {
 		private const val PERM_READ_CONTACTS = 101

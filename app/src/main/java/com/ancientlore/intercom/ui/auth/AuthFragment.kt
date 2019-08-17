@@ -1,6 +1,5 @@
 package com.ancientlore.intercom.ui.auth
 
-import android.content.Context
 import android.widget.Toast
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.ViewModel
@@ -8,7 +7,6 @@ import com.ancientlore.intercom.App
 import com.ancientlore.intercom.R
 import com.ancientlore.intercom.backend.auth.User
 import com.ancientlore.intercom.ui.BasicFragment
-import java.lang.RuntimeException
 
 abstract class AuthFragment<VM : ViewModel, B : ViewDataBinding> : BasicFragment<VM, B>() {
 
@@ -18,12 +16,6 @@ abstract class AuthFragment<VM : ViewModel, B : ViewDataBinding> : BasicFragment
 
 	protected fun onSuccessfulAuth(user: User) {
 		navigator?.onSuccessfullAuth(user)
-	}
-
-	override fun onAttach(context: Context) {
-		if (context !is AuthNavigator)
-			RuntimeException("Context must implement the AuthNavigator interface!")
-		super.onAttach(context)
 	}
 
 	protected fun onFailedAuth(error: Throwable) {

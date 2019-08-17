@@ -1,4 +1,4 @@
-package com.ancientlore.intercom.ui.auth
+package com.ancientlore.intercom.ui
 
 import android.view.Menu
 import androidx.appcompat.widget.Toolbar
@@ -9,7 +9,7 @@ import com.ancientlore.intercom.ui.chat.flow.ChatFlowFragment
 import com.ancientlore.intercom.utils.Runnable1
 
 
-interface AuthNavigator {
+interface Navigator {
 	fun openLoginForm()
 	fun openSignupForm()
 	fun openPhoneAuthForm()
