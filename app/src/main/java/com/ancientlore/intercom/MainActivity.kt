@@ -146,6 +146,7 @@ class MainActivity : AppCompatActivity(), Navigator, PermissionManager {
 	override fun openContactList() {
 		runOnUiThread {
 			supportFragmentManager.beginTransaction()
+				.setCustomAnimations(R.anim.slide_in_bottom, R.anim.slide_out_bottom)
 				.add(R.id.container, ContactListFragment.newInstance())
 				.commitNow()
 		}
@@ -154,6 +155,7 @@ class MainActivity : AppCompatActivity(), Navigator, PermissionManager {
 	override fun openChatFlow(params: ChatFlowFragment.Params) {
 		runOnUiThread {
 			supportFragmentManager.beginTransaction()
+				.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_right)
 				.add(R.id.container, ChatFlowFragment.newInstance(params))
 				.commitNowAllowingStateLoss()
 		}
