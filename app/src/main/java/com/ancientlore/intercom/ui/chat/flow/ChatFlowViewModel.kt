@@ -143,5 +143,9 @@ class ChatFlowViewModel(private val userId: String,
 		})
 	}
 
+	fun filter(text: String) {
+		listAdapter.filter(text)
+	}
+
 	fun observeAttachMenuOpen() = openAttachMenuSubj as Observable<Any>
 }

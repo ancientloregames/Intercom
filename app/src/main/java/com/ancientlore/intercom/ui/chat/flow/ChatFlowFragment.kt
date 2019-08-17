@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import android.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import com.ancientlore.intercom.App
 import com.ancientlore.intercom.C
@@ -23,6 +24,8 @@ import com.ancientlore.intercom.utils.extensions.getFileData
 import com.ancientlore.intercom.utils.extensions.openFile
 import com.ancientlore.intercom.widget.list.simple.SimpleListItem
 import kotlinx.android.synthetic.main.chat_flow_ui.*
+import kotlinx.android.synthetic.main.chat_flow_ui.listView
+import kotlinx.android.synthetic.main.chat_flow_ui.toolbar
 import java.io.File
 
 class ChatFlowFragment : BasicFragment<ChatFlowViewModel, ChatFlowUiBinding>() {
@@ -70,6 +73,7 @@ class ChatFlowFragment : BasicFragment<ChatFlowViewModel, ChatFlowUiBinding>() {
 	}
 
 	override fun initView(view: View, savedInstanceState: Bundle?) {
+		initToolbarMenu()
 		ToolbarManager(toolbar as Toolbar).apply {
 			setTitle(title)
 			enableBackButton(View.OnClickListener {
@@ -83,6 +87,28 @@ class ChatFlowFragment : BasicFragment<ChatFlowViewModel, ChatFlowUiBinding>() {
 			adapter = ChatFlowAdapter(userId, context!!, mutableListOf())
 			enableChatBehavior()
 		}
+	}
+
+	private fun initToolbarMenu() {
+		navigator?.createToolbarMenu(toolbar, Runnable1 { menu ->
+			activity?.menuInflater?.inflate(R.menu.chat_flow_menu, menu)
+			val search = menu.findItem(R.id.search).actionView as SearchView
+			search.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+				override fun onQueryTextSubmit(query: String?): Boolean {
+					query?.let { constraint ->
+						viewModel.filter(constraint)
+					}
+					return true
+				}
+				override fun onQueryTextChange(newText: String?): Boolean {
+					newText
+						?.takeIf { it.length > 1 }
+						?.let { viewModel.filter(it) }
+						?:run { viewModel.filter("") }
+					return true
+				}
+			})
+		})
 	}
 
 	override fun initViewModel(viewModel: ChatFlowViewModel) {

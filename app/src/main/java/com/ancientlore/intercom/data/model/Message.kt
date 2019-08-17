@@ -70,4 +70,6 @@ data class Message(val id: String = "",
 		result = 31 * result + status
 		return result
 	}
+
+	fun contains(text: String) = this.text.contains(text, true)
 }

@@ -21,14 +21,14 @@ import com.ancientlore.intercom.databinding.ChatFlowItemOtherBinding
 import com.ancientlore.intercom.databinding.ChatFlowItemUserBinding
 import com.ancientlore.intercom.utils.extensions.isNotEmpty
 import com.ancientlore.intercom.widget.recycler.BasicRecyclerAdapter
-import com.ancientlore.intercom.widget.recycler.MutableRecyclerAdapter
+import com.ancientlore.intercom.widget.recycler.FilterableRecyclerAdapter
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import java.lang.RuntimeException
 
 class ChatFlowAdapter(private val userId: String,
                       context: Context, items: MutableList<Message>)
-	: MutableRecyclerAdapter<Message, ChatFlowAdapter.ViewHolder, ViewDataBinding>(context, items) {
+	: FilterableRecyclerAdapter<Message, ChatFlowAdapter.ViewHolder, ViewDataBinding>(context, items) {
 
 	private companion object {
 		private const val VIEW_TYPE_USER = 0
@@ -40,10 +40,6 @@ class ChatFlowAdapter(private val userId: String,
 	private val openFile = PublishSubject.create<Uri>()
 
 	private val openImage = PublishSubject.create<Uri>()
-
-	fun observeFileOpen() = openFile as Observable<Uri>
-
-	fun observeImageOpen() = openImage as Observable<Uri>
 
 	override fun getDiffCallback(newItems: List<Message>) = DiffCallback(getItems(), newItems)
 
@@ -102,6 +98,8 @@ class ChatFlowAdapter(private val userId: String,
 	override fun isTheSame(first: Message, second: Message) = first.timestamp == second.timestamp
 
 	override fun isUnique(item: Message) = getItems().none { it.timestamp == item.timestamp }
+
+	override fun createFilter() = Filter()
 
 	@UiThread
 	fun setFileUploadProgress(messageId: String, progress: Int) : Boolean {
@@ -257,5 +255,13 @@ class ChatFlowAdapter(private val userId: String,
 
 			return if (bundle.isNotEmpty()) bundle else null
 		}
+	}
+
+	fun observeFileOpen() = openFile as Observable<Uri>
+
+	fun observeImageOpen() = openImage as Observable<Uri>
+
+	inner class Filter: ListFilter() {
+		override fun satisfy(item: Message, candidate: String) = item.contains(candidate)
 	}
 }
