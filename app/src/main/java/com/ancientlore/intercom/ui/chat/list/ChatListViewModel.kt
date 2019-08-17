@@ -51,4 +51,8 @@ class ChatListViewModel : BasicViewModel() {
 	private fun detachDataListener() {
 		ChatRepository.detachListener()
 	}
+
+	fun filter(text: String) {
+		listAdapter.filter(text)
+	}
 }
