@@ -16,4 +16,6 @@
 
 	<color name="chatImageBgColor">#252A3A</color>
 	<color name="chatImageProgressColor">@android:color/white</color>
+
+	<color name="inputHintColor">#898f9d</color>
 </resources>

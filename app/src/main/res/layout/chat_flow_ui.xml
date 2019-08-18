@@ -53,45 +53,197 @@
 					android:id="@+id/inputContainer"
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:background="@android:color/white"
-					android:layout_alignParentBottom="true">
+					android:layout_margin="@dimen/chatInputIndent"
+					android:layout_alignParentBottom="true"
+					android:minHeight="@dimen/chatInputMinHeight"
+					android:gravity="bottom"
+					android:background="@drawable/shape_message_input">
 
-				<ImageButton
-						android:layout_width="45dp"
-						android:layout_height="45dp"
-						android:layout_gravity="bottom"
+				<ImageView
+						android:id="@+id/attachmentButton"
+						android:layout_width="@dimen/chatInputMinHeight"
+						android:layout_height="@dimen/chatInputMinHeight"
+						android:padding="8dp"
 						android:onClick="@{() -> ui.onAttachButtonCliked()}"
-						android:background="@drawable/bg_ripple_effect_gray"
-						app:srcCompat="@drawable/ic_clip"
 						android:contentDescription="@string/attachment"
+						app:srcCompat="@drawable/ic_clip"
+						android:tint="@color/inputHintColor"
 				/>
 
 				<EditText
-						android:id="@+id/textField"
+						android:id="@+id/textInput"
 						android:layout_width="0dp"
 						android:layout_height="wrap_content"
-						android:layout_weight="1"
 						android:layout_gravity="center_vertical"
-						android:padding="8dp"
+						android:layout_weight="1"
+						android:paddingTop="8dp"
+						android:paddingBottom="8dp"
+						android:background="@null"
+						android:ems="10"
 						android:hint="@string/chat_textfield_hint"
-						android:text="@={ui.textField}"
 						android:inputType="textCapSentences|textMultiLine"
 						android:maxLines="4"
-						android:background="@null"
-				/>
-
-				<ImageButton
-						android:id="@+id/sendButton"
-						android:layout_width="45dp"
-						android:layout_height="45dp"
-						android:layout_gravity="bottom"
-						android:onClick="@{() -> ui.onSendButtonClicked()}"
-						android:background="@drawable/bg_ripple_effect_gray"
-						app:srcCompat="@drawable/ic_send"
-						android:contentDescription="@string/send"
+						android:text="@={ui.textField}"
 				/>
 			</LinearLayout>
 
+			<LinearLayout
+					android:id="@+id/lockerContainer"
+					android:layout_width="@dimen/chatInputMinHeight"
+					android:layout_height="180dp"
+					android:layout_gravity="right|bottom"
+					android:layout_margin="@dimen/chatInputIndent"
+					android:layout_marginTop="@dimen/chatInputIndent"
+					android:layout_marginBottom="@dimen/chatInputIndent"
+					android:layout_alignParentBottom="true"
+					android:layout_alignParentRight="true"
+					android:background="@drawable/shape_message_input"
+					android:visibility="gone"
+					tools:visibility="visible"
+					android:gravity="center|top"
+					android:orientation="vertical">
+
+				<ImageView
+						android:id="@+id/lockerImage"
+						android:layout_width="56dp"
+						android:layout_height="56dp"
+						android:padding="18dp"
+						app:srcCompat="@drawable/ic_lock"
+						android:tint="@color/inputHintColor"
+						android:contentDescription="@null"
+				/>
+
+				<ImageView
+						android:id="@+id/lockerArrow"
+						android:layout_width="16dp"
+						android:layout_height="16dp"
+						android:layout_marginTop="-8dp"
+						app:srcCompat="@drawable/ic_arrow_up"
+						android:tint="@color/inputHintColor"
+						android:contentDescription="@null"
+				/>
+			</LinearLayout>
+
+			<ImageView
+					android:id="@+id/microphoneImage"
+					android:layout_width="@dimen/chatInputMinHeight"
+					android:layout_height="@dimen/chatInputMinHeight"
+					android:layout_margin="@dimen/chatInputIndent"
+					android:layout_alignParentBottom="true"
+					android:padding="8dp"
+					app:srcCompat="@drawable/ic_mic"
+					android:tint="#DD0000"
+					android:visibility="gone"
+					tools:visibility="visible"
+					android:contentDescription="@null"
+			/>
+
+			<TextView
+					android:id="@+id/cancelLabel"
+					android:layout_width="wrap_content"
+					android:layout_height="@dimen/chatInputMinHeight"
+					android:layout_marginEnd="88dp"
+					android:layout_marginRight="88dp"
+					android:layout_marginBottom="@dimen/chatInputIndent"
+					android:layout_alignParentBottom="true"
+					android:layout_alignParentRight="true"
+					android:gravity="center_vertical"
+					android:fontFamily="sans-serif-light"
+					android:text="@string/chat_cancel_audio_hint"
+					android:textColor="@color/inputHintColor"
+					android:textSize="16sp"
+					android:textStyle="normal"
+					android:drawableLeft="@drawable/ic_audio_cancel_arrow"
+					android:contentDescription="@null"
+					android:visibility="gone"
+					tools:visibility="visible"
+			/>
+
+			<Chronometer
+					android:id="@+id/chronometer"
+					android:layout_width="140dp"
+					android:layout_height="@dimen/chatInputMinHeight"
+					android:layout_marginBottom="@dimen/chatInputIndent"
+					android:layout_marginStart="@dimen/chatInputMinHeight"
+					android:layout_marginLeft="@dimen/chatInputMinHeight"
+					android:layout_alignParentBottom="true"
+					android:gravity="center_vertical"
+					android:textSize="20sp"
+					android:textColor="@color/inputHintColor"
+					android:background="@drawable/bg_gradient"
+					android:visibility="gone"
+					tools:visibility="visible"
+			/>
+
+			<TextView
+					android:id="@+id/canelButton"
+					android:layout_width="wrap_content"
+					android:layout_height="@dimen/chatInputMinHeight"
+					android:layout_marginBottom="@dimen/chatInputIndent"
+					android:layout_marginEnd="60dp"
+					android:layout_marginRight="60dp"
+					android:layout_alignParentBottom="true"
+					android:layout_alignParentRight="true"
+					android:gravity="center_vertical"
+					android:textColor="#DD0000"
+					android:textAllCaps="true"
+					android:text="@string/cancel"
+					android:visibility="gone"
+					tools:visibility="visible"
+			/>
+
+			<ImageView
+					android:id="@+id/stopButton"
+					android:layout_width="30dp"
+					android:layout_height="30dp"
+					android:layout_marginTop="11dp"
+					android:layout_marginRight="11dp"
+					android:layout_marginBottom="60dp"
+					android:layout_alignParentBottom="true"
+					android:layout_alignParentRight="true"
+					android:scaleType="center"
+					app:srcCompat="@drawable/ic_stop"
+					android:background="@drawable/shape_circle"
+					app:backgroundTint="#DD0000"
+					android:contentDescription="@string/stop"
+					android:visibility="gone"
+					tools:visibility="visible"
+			/>
+
+			<ImageView
+					android:id="@+id/audioButton"
+					android:layout_width="@dimen/chatInputMinHeight"
+					android:layout_height="@dimen/chatInputMinHeight"
+					android:layout_marginTop="@dimen/chatInputIndent"
+					android:layout_marginRight="@dimen/chatInputIndent"
+					android:layout_marginBottom="@dimen/chatInputIndent"
+					android:layout_alignParentBottom="true"
+					android:layout_alignParentRight="true"
+					android:scaleType="centerInside"
+					app:srcCompat="@drawable/ic_mic"
+					android:background="@drawable/shape_circle"
+					app:backgroundTint="@color/colorPrimary"
+					android:contentDescription="@string/record"
+			/>
+
+			<ImageView
+					android:id="@+id/sendButton"
+					android:layout_width="@dimen/chatInputMinHeight"
+					android:layout_height="@dimen/chatInputMinHeight"
+					android:layout_marginTop="@dimen/chatInputIndent"
+					android:layout_marginRight="@dimen/chatInputIndent"
+					android:layout_marginBottom="@dimen/chatInputIndent"
+					android:layout_alignParentBottom="true"
+					android:layout_alignParentRight="true"
+					android:scaleType="centerInside"
+					android:onClick="@{() -> ui.onSendButtonClicked()}"
+					app:srcCompat="@drawable/ic_send"
+					android:background="@drawable/shape_circle"
+					app:backgroundTint="@color/colorPrimary"
+					android:visibility="gone"
+					android:contentDescription="@string/send"
+					tools:visibility="visible"
+			/>
 		</RelativeLayout>
 	</com.ancientlore.intercom.view.SwipableLayout>
 </layout>

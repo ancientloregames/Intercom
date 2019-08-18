@@ -5,4 +5,7 @@
 	<dimen name="chatImageProgressRadius">15dp</dimen>
 	<dimen name="chatImageProgressWidth">3dp</dimen>
 	<dimen name="chatImageCornerRadius">7dp</dimen>
+
+	<dimen name="chatInputMinHeight">45dp</dimen>
+	<dimen name="chatInputIndent">4dp</dimen>
 </resources>

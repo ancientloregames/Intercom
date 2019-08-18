@@ -29,6 +29,7 @@
 	<string name="auth_code">Code</string>
 
 	<string name="chat_textfield_hint">Start typing text…</string>
+	<string name="chat_cancel_audio_hint">Slide to cancel</string>
 
 	<string name="auth_failure_msg">Auth failure. Check your login and password</string>
 	<string name="auth_alert_unknown_msg">Some auth issue has occurred</string>
@@ -46,6 +47,8 @@
 	<string name="alert_error_sync_contacts">Failed to sync contact list. Try again later</string>
 	<string name="alert_error_attach_file">Failed to attach file</string>
 
+	<string name="record">Record</string>
+	<string name="stop">Stop</string>
 	<string name="send">Send</string>
 	<string name="attachment">Attachment</string>
 	<string name="document">Document</string>
