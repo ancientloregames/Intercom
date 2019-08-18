@@ -22,6 +22,7 @@ import com.ancientlore.intercom.utils.extensions.enableChatBehavior
 import com.ancientlore.intercom.utils.extensions.getAppCacheDir
 import com.ancientlore.intercom.utils.extensions.getFileData
 import com.ancientlore.intercom.utils.extensions.openFile
+import com.ancientlore.intercom.view.MessageInputManager
 import com.ancientlore.intercom.widget.list.simple.SimpleListItem
 import kotlinx.android.synthetic.main.chat_flow_ui.*
 import kotlinx.android.synthetic.main.chat_flow_ui.listView
@@ -74,6 +75,7 @@ class ChatFlowFragment : BasicFragment<ChatFlowViewModel, ChatFlowUiBinding>() {
 
 	override fun initView(view: View, savedInstanceState: Bundle?) {
 		initToolbarMenu()
+		MessageInputManager(view)
 		ToolbarManager(toolbar as Toolbar).apply {
 			setTitle(title)
 			enableBackButton(View.OnClickListener {
