@@ -20,7 +20,7 @@ fun RecyclerView.enableChatBehavior() {
 			if (lastVisiblePosition == -1
 				|| positionStart >= a.itemCount - 1
 				&& lastVisiblePosition == positionStart - 1)
-				scrollToPosition(positionStart)
+				scrollToPosition(positionStart + itemCount - 1)
 		}
 	})
 }
