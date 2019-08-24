@@ -46,6 +46,10 @@ class MainActivity : AppCompatActivity(), Navigator, PermissionManager {
 		private const val PERM_READ_CONTACTS = 101
 		private const val PERM_READ_STORAGE = 102
 		private const val PERM_WRITE_STORAGE = 103
+		private const val PERM_AUDIO_MESSAGES = 104
+
+		var isInBackground = false
+			private set
 	}
 
 	interface BackButtonHandler {
@@ -68,6 +72,18 @@ class MainActivity : AppCompatActivity(), Navigator, PermissionManager {
 
 		if (savedInstanceState == null)
 			onFirstStart()
+	}
+
+	override fun onResume() {
+		isInBackground = false
+
+		super.onResume()
+	}
+
+	override fun onPause() {
+		isInBackground = true
+
+		super.onPause()
 	}
 
 	private fun onFirstStart() {

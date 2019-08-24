@@ -15,8 +15,8 @@ class MessagingService: FirebaseMessagingService() {
 	override fun onMessageReceived(remoteMessage: RemoteMessage?) {
 		super.onMessageReceived(remoteMessage)
 
-		remoteMessage?.data?.let { data ->
-			val message = JsonUtils.deserialize(data, PushMessage::class.java)
+		if (MainActivity.isInBackground && remoteMessage?.data != null) {
+			val message = JsonUtils.deserialize(remoteMessage.data, PushMessage::class.java)
 			manager.showNotification(message)
 		}
 	}
