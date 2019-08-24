@@ -260,6 +260,17 @@ class MainActivity : AppCompatActivity(), Navigator, PermissionManager {
 		}
 	}
 
+	override fun requestPermissionAudioMessage(onResult: Runnable1<Boolean>) {
+		if (checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+			&& checkPermission(Manifest.permission.RECORD_AUDIO))
+			onResult.run(true)
+		else {
+			permRequestCallback = onResult
+			val permissions = arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.RECORD_AUDIO)
+			ActivityCompat.requestPermissions(this, permissions, PERM_AUDIO_MESSAGES)
+		}
+	}
+
 	private fun initRepositories(userId: String) {
 		val dataSourceProvider = App.backend.getDataSourceProvider()
 		UserRepository.setRemoteSource(dataSourceProvider.getUserSource(userId))
