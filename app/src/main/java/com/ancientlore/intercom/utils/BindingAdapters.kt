@@ -4,6 +4,7 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.view.View
 import android.widget.ImageView
+import android.widget.SeekBar
 import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.databinding.BindingAdapter
@@ -88,3 +89,15 @@ fun setDrawableTop(imageView: DrawableCompatTextView, @DrawableRes resId: Int) =
 fun setDrawableEnd(imageView: DrawableCompatTextView, @DrawableRes resId: Int) = imageView.setDrawableEnd(resId)
 @BindingAdapter("drawableBottom")
 fun setDrawableBottom(imageView: DrawableCompatTextView, @DrawableRes resId: Int) = imageView.setDrawableBottom(resId)
+
+@BindingAdapter("android:onProgressChanged")
+fun onProgressChanged(view: SeekBar, action: Runnable) {
+	view.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+		override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+			if (fromUser)
+				action.run()
+		}
+		override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+		override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+	})
+}
