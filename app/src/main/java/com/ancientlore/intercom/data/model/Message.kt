@@ -22,10 +22,15 @@ data class Message(val id: String = "",
     const val TYPE_TEXT = "text"
     const val TYPE_IMAGE = "image"
     const val TYPE_FILE = "file"
+		const val TYPE_AUDIO = "audio"
 
 	  const val STATUS_WAIT = 0
 	  const val STATUS_SENT = 1
 	  const val STATUS_RECEIVED = 2
+
+		fun createFromAudio(senderId: String, filePath: String) : Message {
+			return Message(senderId = senderId, attachUrl = filePath, type = TYPE_AUDIO)
+		}
   }
 
   constructor(senderId: String, fileData: FileData) : this(
