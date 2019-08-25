@@ -1,6 +1,7 @@
 package com.ancientlore.intercom.backend.firebase
 
 import android.net.Uri
+import com.ancientlore.intercom.EmptyObject
 import com.ancientlore.intercom.backend.ProgressRequestCallback
 import com.ancientlore.intercom.backend.StorageManager
 import com.ancientlore.intercom.data.model.FileData
@@ -9,10 +10,21 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
+import java.io.File
 
 object FirebaseStorageManager : StorageManager {
 
 	private val storage: FirebaseStorage by lazy { FirebaseStorage.getInstance() }
+
+	override fun download(url: String, outFile: File, callback: ProgressRequestCallback<Any>) {
+		storage.getReferenceFromUrl(url).getFile(outFile)
+			.addOnProgressListener {
+				val progress = it.bytesTransferred / it.totalByteCount.toFloat() * 100
+				callback.onProgress(progress.toInt())
+			}
+			.addOnSuccessListener { callback.onSuccess(EmptyObject) }
+			.addOnFailureListener { exception -> callback.onFailure(exception) }
+	}
 
 	override fun uploadImage(data: FileData, path: String, callback: ProgressRequestCallback<Uri>) {
 		val fileRef = storage.getReference("images/$path/${data.name}")
