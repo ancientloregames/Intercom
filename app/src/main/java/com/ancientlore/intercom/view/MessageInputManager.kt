@@ -20,7 +20,6 @@ class MessageInputManager(view: View) {
 	interface Listener {
 		fun onStarted()
 		fun onCompleted()
-		fun onLocked()
 		fun onCanceled()
 	}
 
@@ -52,14 +51,6 @@ class MessageInputManager(view: View) {
 	private var listener: Listener? = null
 
 	init {
-		stopButton.setOnClickListener {
-			onStop()
-		}
-
-		cancelButton.setOnClickListener {
-			onCancel()
-		}
-
 		textInput.addTextChangedListener(object : SimpleTextWatcher() {
 			override fun afterTextChanged(s: Editable) {
 				if (s.toString().isEmpty() && sendButton.visibility != View.GONE) {
@@ -96,8 +87,12 @@ class MessageInputManager(view: View) {
 				}
 				MotionEvent.ACTION_UP -> {
 					reset()
-					if (!isLocked)
-						onComplete()
+					val elapsed = SystemClock.elapsedRealtime() - chronometer.base
+					if (!isLocked) {
+						if (elapsed < 1000)
+							onCancel()
+						else onComplete()
+					}
 				}
 				MotionEvent.ACTION_MOVE -> {
 					if (dontTrackMoves)
@@ -170,13 +165,12 @@ class MessageInputManager(view: View) {
 		} else onLock()
 	}
 
-	private fun onStop() {
+	fun onStop() {
 		reset()
-		onComplete()
 		isLocked = false
 	}
 
-	private fun onCancel() {
+	fun onCancel() {
 		reset()
 		isLocked = false
 
@@ -204,11 +198,10 @@ class MessageInputManager(view: View) {
 		cancelButton.visibility = View.VISIBLE
 
 		audioButton.translationY = 0f
-
-		listener?.onLocked()
 	}
 
 	private fun onComplete() {
+		reset()
 		microphoneImage.visibility = View.INVISIBLE
 		switchTextInput(true)
 		stopButton.visibility = View.GONE
