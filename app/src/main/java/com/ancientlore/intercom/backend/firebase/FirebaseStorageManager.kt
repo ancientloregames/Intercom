@@ -24,6 +24,11 @@ object FirebaseStorageManager : StorageManager {
 		upload(data.uri, fileRef, callback)
 	}
 
+	override fun uploadAudioMessage(uri: Uri, path: String, callback: ProgressRequestCallback<Uri>) {
+		val fileRef = storage.getReference("files/$path/${uri.lastPathSegment}")
+		upload(uri, fileRef, callback)
+	}
+
 	private fun upload(uri: Uri, fileRef: StorageReference, callback: ProgressRequestCallback<Uri>) {
 		fileRef.putFile(uri)
 			.addOnProgressListener {
