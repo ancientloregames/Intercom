@@ -5,4 +5,6 @@ interface PermissionManager {
 	fun requestPermissionReadStorage(onResult: Runnable1<Boolean>)
 	fun requestPermissionWriteStorage(onResult: Runnable1<Boolean>)
 	fun requestPermissionAudioMessage(onResult: Runnable1<Boolean>)
+
+	fun allowedAudioMessage() : Boolean
 }
