@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+		xmlns:android="http://schemas.android.com/apk/res/android"
+		xmlns:tools="http://schemas.android.com/tools">
+	<data>
+		<import type="android.view.View"/>
+		<variable
+				name="message"
+				type="com.ancientlore.intercom.ui.chat.flow.ChatFlowAdapter.AudioItemViewHolder"/>
+	</data>
+	<FrameLayout android:layout_width="match_parent"
+			android:layout_height="wrap_content">
+
+		<androidx.constraintlayout.widget.ConstraintLayout
+				android:layout_width="300dp"
+				android:layout_height="wrap_content"
+				android:layout_gravity="start"
+				android:layout_marginEnd="8dp"
+				android:layout_marginRight="8dp"
+				android:layout_marginBottom="4dp"
+				android:background="@drawable/bg_msg_other">
+
+			<com.ancientlore.intercom.view.CircleImageView
+					android:id="@+id/imageView"
+					android:layout_width="50dp"
+					android:layout_height="50dp"
+					android:layout_marginEnd="8dp"
+					android:layout_marginRight="8dp"
+					android:scaleType="centerInside"
+					android:onClick="@{() -> message.onItemClick()}"
+					app:tint="@android:color/white"
+					app:srcCompat="@{message.iconRes}"
+					app:backgroundColor="@color/chatFileIconBg"
+					app:layout_constraintStart_toStartOf="parent"
+					app:layout_constraintTop_toTopOf="parent"
+					app:layout_constraintBottom_toBottomOf="parent"
+					tools:srcCompat="@drawable/ic_play"
+					/>
+
+			<ProgressBar
+					android:id="@+id/progressView"
+					android:layout_width="50dp"
+					android:layout_height="50dp"
+					android:max="100"
+					android:progress="@{message.uploadProgress}"
+					android:visibility="@{message.progressVisibility}"
+					android:clickable="true"
+					android:focusable="true"
+					tools:visibility="visible"
+					app:layout_constraintStart_toStartOf="parent"
+					app:layout_constraintTop_toTopOf="parent"
+					app:layout_constraintBottom_toBottomOf="parent"
+					/>
+
+			<SeekBar
+					android:id="@+id/progressBar"
+					android:layout_width="0dp"
+					android:layout_height="wrap_content"
+					app:layout_constraintStart_toEndOf="@+id/imageView"
+					app:layout_constraintEnd_toEndOf="parent"
+					android:layout_marginTop="8dp"
+					app:layout_constraintTop_toTopOf="parent"
+					android:layout_marginBottom="8dp"
+					app:layout_constraintBottom_toTopOf="@+id/durationField"
+					android:max="@{message.seekBarMax}"
+					android:progress="@={message.seekBarValue}"
+					android:onProgressChanged="@{message.seekBarListener}"
+					/>
+
+			<TextView
+					android:id="@+id/durationField"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:text="@{message.durationField}"
+					tools:text="00:00"
+					style="@style/chatMsgFileInfo"
+					app:layout_constraintStart_toEndOf="@+id/imageView"
+					app:layout_constraintBottom_toBottomOf="parent"
+					app:layout_constraintEnd_toStartOf="@+id/timestampView"
+					app:layout_constraintTop_toBottomOf="@+id/progressBar"
+					app:layout_constraintHorizontal_bias="0.0"
+					android:layout_marginLeft="8dp"
+					android:layout_marginStart="8dp"
+					/>
+
+			<com.ancientlore.intercom.view.DrawableCompatTextView
+					android:id="@+id/timestampView"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:paddingStart="8dp"
+					android:paddingLeft="8dp"
+					android:text="@{message.timestampField}"
+					app:drawableEnd="@{message.statusIconRes}"
+					tools:drawableEnd="@drawable/ic_send_check"
+					app:layout_constraintHorizontal_chainStyle="spread_inside"
+					app:layout_constraintEnd_toEndOf="parent"
+					app:layout_constraintBottom_toBottomOf="parent"
+					tools:text="12:00"
+					style="@style/chatMsgTimestamp"
+					/>
+
+		</androidx.constraintlayout.widget.ConstraintLayout>
+	</FrameLayout>
+</layout>

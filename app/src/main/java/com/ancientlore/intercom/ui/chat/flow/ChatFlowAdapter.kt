@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import android.view.ViewGroup
+import android.widget.SeekBar
 import androidx.annotation.CallSuper
 import androidx.annotation.UiThread
 import androidx.annotation.DrawableRes
@@ -12,18 +13,24 @@ import androidx.databinding.ObservableField
 import androidx.databinding.ObservableInt
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.DiffUtil
+import com.ancientlore.intercom.App
 import com.ancientlore.intercom.BR
 import com.ancientlore.intercom.R
+import com.ancientlore.intercom.backend.ProgressRequestCallback
 import com.ancientlore.intercom.data.model.Message
-import com.ancientlore.intercom.databinding.ChatFlowFileItemOtherBinding
-import com.ancientlore.intercom.databinding.ChatFlowFileItemUserBinding
-import com.ancientlore.intercom.databinding.ChatFlowItemOtherBinding
-import com.ancientlore.intercom.databinding.ChatFlowItemUserBinding
+import com.ancientlore.intercom.databinding.*
+import com.ancientlore.intercom.manager.MediaPlayerManager
+import com.ancientlore.intercom.manager.MediaPlayerManager.STATUS_PAUSED
+import com.ancientlore.intercom.manager.MediaPlayerManager.STATUS_PLAYING
+import com.ancientlore.intercom.manager.MediaPlayerManager.STATUS_RELEASED
+import com.ancientlore.intercom.utils.Utils
+import com.ancientlore.intercom.utils.extensions.getAudioMessagesDir
 import com.ancientlore.intercom.utils.extensions.isNotEmpty
 import com.ancientlore.intercom.widget.recycler.BasicRecyclerAdapter
 import com.ancientlore.intercom.widget.recycler.FilterableRecyclerAdapter
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
+import java.io.File
 import java.lang.RuntimeException
 
 class ChatFlowAdapter(private val userId: String,
@@ -35,6 +42,8 @@ class ChatFlowAdapter(private val userId: String,
 		private const val VIEW_TYPE_OTHER = 1
 		private const val VIEW_TYPE_FILE_USER = 2
 		private const val VIEW_TYPE_FILE_OTHER = 3
+		private const val VIEW_TYPE_AUDIO_USER = 4
+		private const val VIEW_TYPE_AUDIO_OTHER = 5
 	}
 
 	private val openFile = PublishSubject.create<Uri>()
@@ -48,10 +57,12 @@ class ChatFlowAdapter(private val userId: String,
 		return when (message.senderId) {
 			userId -> when (message.type) {
 				Message.TYPE_FILE -> VIEW_TYPE_FILE_USER
+				Message.TYPE_AUDIO -> VIEW_TYPE_AUDIO_USER
 				else -> VIEW_TYPE_USER
 			}
 			else ->  when (message.type) {
 				Message.TYPE_FILE -> VIEW_TYPE_FILE_OTHER
+				Message.TYPE_AUDIO -> VIEW_TYPE_AUDIO_OTHER
 				else -> VIEW_TYPE_OTHER
 			}
 		}
@@ -63,6 +74,8 @@ class ChatFlowAdapter(private val userId: String,
 			VIEW_TYPE_OTHER -> ChatFlowItemOtherBinding.inflate(layoutInflater, parent, false)
 			VIEW_TYPE_FILE_USER -> ChatFlowFileItemUserBinding.inflate(layoutInflater, parent, false)
 			VIEW_TYPE_FILE_OTHER -> ChatFlowFileItemOtherBinding.inflate(layoutInflater, parent, false)
+			VIEW_TYPE_AUDIO_USER -> ChatFlowAudioUserBinding.inflate(layoutInflater, parent, false)
+			VIEW_TYPE_AUDIO_OTHER -> ChatFlowAudioOtherBinding.inflate(layoutInflater, parent, false)
 			else -> throw RuntimeException("Error! Unknown view extension. Check getItemViewType method")
 		}
 	}
@@ -71,6 +84,7 @@ class ChatFlowAdapter(private val userId: String,
 		return when (viewType) {
 			VIEW_TYPE_USER, VIEW_TYPE_OTHER -> ItemViewHolder(binding)
 			VIEW_TYPE_FILE_USER, VIEW_TYPE_FILE_OTHER -> FileItemViewHolder(binding)
+			VIEW_TYPE_AUDIO_USER, VIEW_TYPE_AUDIO_OTHER -> AudioItemViewHolder(binding)
 			else -> throw RuntimeException("Error! Unknown view extension. Check getItemViewType method")
 		}
 	}
@@ -119,6 +133,95 @@ class ChatFlowAdapter(private val userId: String,
 	fun findItemIndex(messageId: String) = getItems().indexOfFirst { it.id == messageId }
 
 	fun findItem(messageId: String) = getItems().find { it.id == messageId }
+
+	class AudioItemViewHolder(binding: ViewDataBinding)
+		: ViewHolder(binding), MediaPlayerManager.Listener {
+
+		val iconRes = ObservableInt(R.drawable.ic_play)
+		val durationField = ObservableField("")
+		val seekBarMax = ObservableInt()
+		val seekBarValue = ObservableInt()
+
+		private val player = MediaPlayerManager
+
+		private lateinit var filePath: String
+
+		init {
+			binding.setVariable(BR.message, this)
+		}
+
+		override fun bind(data: Message) {
+			super.bind(data)
+
+			val filename = Utils.getFileName(data.attachUrl)
+			val dir = itemView.context.getAudioMessagesDir()
+			val file = File(dir, filename)
+			filePath = file.absolutePath
+
+			if (!file.exists()) {
+				if (file.createNewFile()) {
+					progressVisibility.set(true)
+
+					App.backend.getStorageManager().download(data.attachUrl, file, object : ProgressRequestCallback<Any> {
+						override fun onProgress(progress: Int) {
+							uploadProgress.set(progress)
+						}
+						override fun onSuccess(result: Any) {
+							onFileReady(file)
+						}
+						override fun onFailure(error: Throwable) {
+							Utils.logError(error)
+						}
+					})
+				}
+			} else onFileReady(file)
+		}
+
+		override fun onComplete() {
+			seekBarValue.set(0)
+			iconRes.set(R.drawable.ic_play)
+		}
+
+		override fun onProgress(progress: Int) {
+			seekBarValue.set(progress)
+			durationField.set(Utils.getFormatedDuration(progress.toLong()))
+		}
+
+		fun onItemClick() {
+			when (player.getStatus()) {
+				STATUS_RELEASED -> {
+					player.prepare(filePath)
+					player.setProgress(seekBarValue.get())
+					player.setListener(this)
+					player.play()
+					iconRes.set(R.drawable.ic_pause)
+				}
+				STATUS_PLAYING -> {
+					player.pause()
+					iconRes.set(R.drawable.ic_play)
+				}
+				STATUS_PAUSED -> {
+					player.play()
+					iconRes.set(R.drawable.ic_pause)
+				}
+			}
+		}
+
+		fun seekBarListener(seekBar: SeekBar, progresValue: Int, fromUser: Boolean) {
+			if (fromUser) {
+				player.setProgress(progresValue)
+			}
+		}
+
+		private fun onFileReady(file: File) {
+			val duration = Utils.getDuration(file)
+			seekBarMax.set(duration.toInt())
+
+			durationField.set(Utils.getFormatedDuration(duration))
+
+			progressVisibility.set(false)
+		}
+	}
 
 	class FileItemViewHolder(binding: ViewDataBinding)
 		: ViewHolder(binding) {
@@ -187,7 +290,7 @@ class ChatFlowAdapter(private val userId: String,
 
 		val timestampField = ObservableField("")
 		val statusIconRes = ObservableInt()
-		val uploadProgress = ObservableInt()
+		val uploadProgress = ObservableInt(100)
 		val progressVisibility = ObservableBoolean()
 
 		@CallSuper
