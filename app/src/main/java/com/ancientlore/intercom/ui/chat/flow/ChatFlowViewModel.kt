@@ -66,6 +66,7 @@ class ChatFlowViewModel(private val userId: String,
 			override fun onCompleted() {
 				outFile?.let { file ->
 					releaseRecorder()
+					handleAudioMessage(file)
 				}
 			}
 
@@ -187,8 +188,25 @@ class ChatFlowViewModel(private val userId: String,
 					}
 				})
 			}
-			override fun onFailure(error: Throwable) {
-				Utils.logError(error)
+		})
+	}
+
+	fun handleAudioMessage(file: File) {
+		val uri = Uri.fromFile(file)
+		val message = Message.createFromAudio(userId, uri.toString())
+		repository.addMessage(message, object : SimpleRequestCallback<String>() {
+			override fun onSuccess(messageId: String) {
+				App.backend.getStorageManager().uploadAudioMessage(uri, chatId, object : ProgressRequestCallback<Uri> {
+					override fun onProgress(progress: Int) {
+						listAdapter.setFileUploadProgress(messageId, progress)
+					}
+					override fun onSuccess(result: Uri) {
+						repository.updateMessageUri(messageId, result, object : SimpleRequestCallback<Any>() {})
+					}
+					override fun onFailure(error: Throwable) {
+						Utils.logError(error)
+					}
+				})
 			}
 		})
 	}
