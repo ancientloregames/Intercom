@@ -75,7 +75,6 @@ class ChatFlowFragment : BasicFragment<ChatFlowViewModel, ChatFlowUiBinding>() {
 
 	override fun initView(view: View, savedInstanceState: Bundle?) {
 		initToolbarMenu()
-		MessageInputManager(view)
 		ToolbarManager(toolbar as Toolbar).apply {
 			setTitle(title)
 			enableBackButton(View.OnClickListener {
@@ -125,6 +124,9 @@ class ChatFlowFragment : BasicFragment<ChatFlowViewModel, ChatFlowUiBinding>() {
 				context?.openFile(it)
 			})
 		viewModel.setListAdapter(listAdapter)
+
+		if (permissionManager!!.allowedAudioMessage())
+			viewModel.attachInputPanelManager(MessageInputManager(view!!))
 	}
 
 	override fun observeViewModel(viewModel: ChatFlowViewModel) {
@@ -132,6 +134,8 @@ class ChatFlowFragment : BasicFragment<ChatFlowViewModel, ChatFlowUiBinding>() {
 			.subscribe { showToast(it) })
 		subscriptions.add(viewModel.observeAttachMenuOpen()
 			.subscribe { openAttachMenu() })
+		subscriptions.add(viewModel.observeAudioRecord()
+			.subscribe { recordAudio() })
 	}
 
 	override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -216,6 +220,14 @@ class ChatFlowFragment : BasicFragment<ChatFlowViewModel, ChatFlowUiBinding>() {
 					.setType("*/*")
 				// TODO multiple selection .putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
 				startActivityForResult(intent, INTENT_GET_FILES)
+			}
+		})
+	}
+
+	private fun recordAudio() {
+		permissionManager?.requestPermissionAudioMessage(Runnable1 { granted ->
+			if (granted) {
+				viewModel.attachInputPanelManager(MessageInputManager(view!!))
 			}
 		})
 	}
