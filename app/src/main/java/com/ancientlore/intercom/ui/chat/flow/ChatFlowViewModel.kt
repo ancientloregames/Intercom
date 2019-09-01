@@ -193,7 +193,7 @@ class ChatFlowViewModel(private val userId: String,
 
 	fun handleAudioMessage(file: File) {
 		val uri = Uri.fromFile(file)
-		val message = Message.createFromAudio(userId, uri.toString())
+		val message = Message.createFromAudio(userId, file.name)
 		repository.addMessage(message, object : SimpleRequestCallback<String>() {
 			override fun onSuccess(messageId: String) {
 				App.backend.getStorageManager().uploadAudioMessage(uri, chatId, object : ProgressRequestCallback<Uri> {

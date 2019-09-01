@@ -153,28 +153,43 @@ class ChatFlowAdapter(private val userId: String,
 		override fun bind(data: Message) {
 			super.bind(data)
 
-			val filename = Utils.getFileName(data.attachUrl)
-			val dir = itemView.context.getAudioMessagesDir()
-			val file = File(dir, filename)
-			filePath = file.absolutePath
+			manageAttachAudio(data.attachUrl)
+		}
 
-			if (!file.exists()) {
-				if (file.createNewFile()) {
-					progressVisibility.set(true)
+		override fun bind(payload: Bundle) {
+			super.bind(payload)
 
-					App.backend.getStorageManager().download(data.attachUrl, file, object : ProgressRequestCallback<Any> {
-						override fun onProgress(progress: Int) {
-							uploadProgress.set(progress)
-						}
-						override fun onSuccess(result: Any) {
-							onFileReady(file)
-						}
-						override fun onFailure(error: Throwable) {
-							Utils.logError(error)
-						}
-					})
-				}
-			} else onFileReady(file)
+			val newAudioUrl = payload.getString(DiffCallback.KEY_URL)
+			if (newAudioUrl != null)
+				manageAttachAudio(newAudioUrl)
+		}
+
+		private fun manageAttachAudio(url: String) {
+			if (Utils.isExternalUrl(url)) {
+				val filename = Utils.getFileName(url)
+				val dir = itemView.context.getAudioMessagesDir()
+				val file = File(dir, filename)
+				filePath = file.absolutePath
+
+				if (!file.exists()) {
+					if (file.createNewFile()) {
+						progressVisibility.set(true)
+
+						App.backend.getStorageManager().download(url, file, object : ProgressRequestCallback<Any> {
+							override fun onProgress(progress: Int) {
+								uploadProgress.set(progress)
+							}
+							override fun onSuccess(result: Any) {
+								onFileReady(file)
+							}
+							override fun onFailure(error: Throwable) {
+								Utils.logError(error)
+							}
+						})
+					}
+				} else onFileReady(file)
+			} else
+				progressVisibility.set(true)
 		}
 
 		override fun onComplete() {

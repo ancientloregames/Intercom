@@ -57,6 +57,11 @@ public final class Utils
 		return mimeType != null && mimeType.startsWith("video");
 	}
 
+	public static boolean isExternalUrl(String url)
+	{
+		return url != null && !url.isEmpty() && (url.startsWith("https://") || url.startsWith("http://") || url.startsWith("ftp://"));
+	}
+
 	@NotNull
 	public static String getExtension(String filePath)
 	{
