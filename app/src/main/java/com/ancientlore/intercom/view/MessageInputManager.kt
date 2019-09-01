@@ -43,7 +43,7 @@ class MessageInputManager(view: View) {
 	private var lockOffset = 0f
 
 	private var isLocked = false
-	private var isDeleting = false
+	private var isCanceled = false
 	private var dontTrackMoves = false
 
 	private var slideDirection = Direction.NONE
@@ -53,7 +53,7 @@ class MessageInputManager(view: View) {
 	init {
 		textInput.addTextChangedListener(object : SimpleTextWatcher() {
 			override fun afterTextChanged(s: Editable) {
-				if (s.toString().isEmpty() && sendButton.visibility != View.GONE) {
+				if (s.isEmpty() && sendButton.visibility != View.GONE) {
 					sendButton.visibility = View.GONE
 					sendButton.animate()
 						.scaleX(0f).scaleY(0f)
@@ -70,9 +70,6 @@ class MessageInputManager(view: View) {
 		})
 
 		audioButton.setOnTouchListener { button, motionEvent ->
-			if (isDeleting)
-				return@setOnTouchListener true
-
 			when (motionEvent.action) {
 				MotionEvent.ACTION_DOWN -> {
 					startX = motionEvent.rawX
@@ -87,9 +84,9 @@ class MessageInputManager(view: View) {
 				}
 				MotionEvent.ACTION_UP -> {
 					reset()
-					val elapsed = SystemClock.elapsedRealtime() - chronometer.base
 					if (!isLocked) {
-						if (elapsed < 1000)
+						val elapsed = SystemClock.elapsedRealtime() - chronometer.base
+						if (elapsed < 1000 || isCanceled)
 							onCancel()
 						else onComplete()
 					}
@@ -171,8 +168,8 @@ class MessageInputManager(view: View) {
 	}
 
 	fun onCancel() {
+		isCanceled = true
 		reset()
-		isLocked = false
 
 		stopButton.visibility = View.GONE
 		cancelButton.visibility = View.GONE
@@ -181,7 +178,6 @@ class MessageInputManager(view: View) {
 		chronometer.stop()
 
 		microphoneImage.visibility = View.INVISIBLE
-		isDeleting = false
 		audioButton.isEnabled = true
 		switchTextInput(true)
 
@@ -215,6 +211,7 @@ class MessageInputManager(view: View) {
 
 	private fun onStart() {
 		dontTrackMoves = false
+		isCanceled = false
 
 		audioButton.animate()
 			.scaleXBy(1f).scaleYBy(1f)
