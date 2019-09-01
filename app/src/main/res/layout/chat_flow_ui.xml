@@ -138,7 +138,7 @@
 					android:contentDescription="@null"
 			/>
 
-			<TextView
+			<com.ancientlore.intercom.view.DrawableCompatTextView
 					android:id="@+id/cancelLabel"
 					android:layout_width="wrap_content"
 					android:layout_height="@dimen/chatInputMinHeight"
@@ -153,7 +153,7 @@
 					android:textColor="@color/inputHintColor"
 					android:textSize="16sp"
 					android:textStyle="normal"
-					android:drawableLeft="@drawable/ic_audio_cancel_arrow"
+					app:drawableStart="@drawable/ic_audio_cancel_arrow"
 					android:contentDescription="@null"
 					android:visibility="gone"
 					tools:visibility="visible"
