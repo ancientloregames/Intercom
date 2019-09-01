@@ -81,7 +81,7 @@ class ChatFlowViewModel(private val userId: String,
 						recorder!!.stop()
 						recorder!!.release()
 						recorder = null
-					} catch (e: IllegalStateException) {
+					} catch (e: RuntimeException) {
 						e.printStackTrace()
 					}
 				}
