@@ -3,6 +3,8 @@ package com.ancientlore.intercom.utils;
 import android.content.res.Resources;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
 import android.webkit.MimeTypeMap;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
@@ -16,6 +18,29 @@ import java.io.IOException;
 public final class Utils
 {
 	private Utils() {}
+
+	private static final Handler UI_HANDLER = new Handler(Looper.getMainLooper());
+
+	public static void runOnUiThread(Runnable runnable)
+	{
+		if (Looper.myLooper() == Looper.getMainLooper())
+			runnable.run();
+		else
+			UI_HANDLER.post(runnable);
+	}
+
+	public static void runOnUiThread(Runnable runnable, long delay)
+	{
+		if (delay > 0)
+			UI_HANDLER.postDelayed(runnable, delay);
+		else
+			runOnUiThread(runnable);
+	}
+
+	public static void cancelUiTask(Runnable runnable)
+	{
+		UI_HANDLER.removeCallbacks(runnable);
+	}
 
 	@NotNull
 	public static Uri parseUri(@Nullable String uriStr)
