@@ -50,6 +50,8 @@ fun Context.getAppCacheDir(): File {
 }
 
 fun Context.checkPermission(permission: String) = ActivityCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED
+fun Context.isPermissionGranted(permission: String) = checkPermission(permission)
+fun Context.isNotPermissionGranted(permission: String) = isPermissionGranted(permission).not()
 
 fun Context.openFile(uri: Uri) : Boolean {
 	val openFile = Intent(Intent.ACTION_VIEW)
