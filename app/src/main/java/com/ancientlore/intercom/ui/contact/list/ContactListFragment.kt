@@ -5,6 +5,7 @@ import android.view.View
 import androidx.appcompat.widget.Toolbar
 import com.ancientlore.intercom.R
 import com.ancientlore.intercom.databinding.ContactListUiBinding
+import com.ancientlore.intercom.manager.DeviceContactsManager
 import com.ancientlore.intercom.ui.BasicFragment
 import com.ancientlore.intercom.utils.ToolbarManager
 import kotlinx.android.synthetic.main.contact_list_ui.*
@@ -42,7 +43,16 @@ class ContactListFragment : BasicFragment<ContactListViewModel, ContactListUiBin
 	}
 
 	override fun initViewModel(viewModel: ContactListViewModel) {
-		viewModel.setListAdapter(listView.adapter as ContactListAdapter)
+		permissionManager?.requestPermissionReadContacts { granted ->
+			if (granted) {
+				DeviceContactsManager.enableObserver(context!!)
+				viewModel.init(listView.adapter as ContactListAdapter)
+			}
+			else {
+				//TODO show notification that permission is required
+				close()
+			}
+		}
 	}
 
 	override fun observeViewModel(viewModel: ContactListViewModel) {

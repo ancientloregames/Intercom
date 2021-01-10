@@ -7,20 +7,20 @@ import androidx.databinding.ObservableField
 import androidx.recyclerview.widget.DiffUtil
 import com.ancientlore.intercom.BR
 import com.ancientlore.intercom.widget.recycler.BasicRecyclerAdapter
-import com.ancientlore.intercom.data.model.Contact
 import com.ancientlore.intercom.databinding.ContactListItemBinding
+import com.ancientlore.intercom.manager.DeviceContactsManager
 import com.ancientlore.intercom.widget.recycler.MutableRecyclerAdapter
 
-class ContactListAdapter(context: Context, items: MutableList<Contact>)
-	: MutableRecyclerAdapter<Contact, ContactListAdapter.ViewHolder, ContactListItemBinding>(context, items) {
+class ContactListAdapter(context: Context, items: MutableList<DeviceContactsManager.Item>)
+	: MutableRecyclerAdapter<DeviceContactsManager.Item, ContactListAdapter.ViewHolder, ContactListItemBinding>(context, items) {
 
 	interface Listener {
-		fun onContactSelected(contact: Contact)
+		fun onContactSelected(contact: DeviceContactsManager.Item)
 	}
 
 	private var listener: Listener? = null
 
-	override fun getDiffCallback(newItems: List<Contact>) = DiffCallback(getItems(), newItems)
+	override fun getDiffCallback(newItems: List<DeviceContactsManager.Item>) = DiffCallback(getItems(), newItems)
 
 	override fun createItemViewDataBinding(parent: ViewGroup, viewType: Int): ContactListItemBinding =
 		ContactListItemBinding.inflate(layoutInflater, parent, false)
@@ -39,14 +39,14 @@ class ContactListAdapter(context: Context, items: MutableList<Contact>)
 
 	override fun getViewHolder(binding: ContactListItemBinding, viewType: Int) = ViewHolder(binding)
 
-	override fun isTheSame(first: Contact, second: Contact) = first.phone == second.phone
+	override fun isTheSame(first: DeviceContactsManager.Item, second: DeviceContactsManager.Item) = first.id == second.id
 
-	override fun isUnique(item: Contact) = getItems().none { it.phone == item.phone }
+	override fun isUnique(item: DeviceContactsManager.Item) = getItems().none { it.id == item.id }
 
 	fun setListener(listener: Listener) { this.listener = listener }
 
 	class ViewHolder(binding: ContactListItemBinding)
-		: BasicRecyclerAdapter.ViewHolder<Contact, ContactListItemBinding>(binding) {
+		: BasicRecyclerAdapter.ViewHolder<DeviceContactsManager.Item, ContactListItemBinding>(binding) {
 
 		interface Listener {
 			fun onItemClicked()
@@ -61,23 +61,23 @@ class ContactListAdapter(context: Context, items: MutableList<Contact>)
 			binding.setVariable(BR.contact, this)
 		}
 
-		override fun bind(data: Contact) {
+		override fun bind(data: DeviceContactsManager.Item) {
 			nameField.set(data.name)
-			subtitleField.set(data.lastSeenDate)
+			subtitleField.set(data.id)
 		}
 
 		fun onClick() = listener?.onItemClicked()
 	}
 
-	class DiffCallback(private val oldItems: List<Contact>,
-	                   private val newItems: List<Contact>)
+	class DiffCallback(private val oldItems: List<DeviceContactsManager.Item>,
+	                   private val newItems: List<DeviceContactsManager.Item>)
 		: DiffUtil.Callback() {
 
 		override fun getOldListSize() = oldItems.size
 
 		override fun getNewListSize() = newItems.size
 
-		override fun areItemsTheSame(oldPos: Int, newPos: Int) = oldItems[oldPos].phone == newItems[newPos].phone
+		override fun areItemsTheSame(oldPos: Int, newPos: Int) = oldItems[oldPos].id == newItems[newPos].id
 
 		override fun areContentsTheSame(oldPos: Int, newPos: Int) = oldItems[oldPos] == newItems[newPos]
 	}
