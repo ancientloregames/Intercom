@@ -23,6 +23,7 @@ import com.ancientlore.intercom.backend.auth.User
 import com.ancientlore.intercom.data.source.ChatRepository
 import com.ancientlore.intercom.data.source.ContactRepository
 import com.ancientlore.intercom.data.source.UserRepository
+import com.ancientlore.intercom.manager.DeviceContactsManager
 import com.ancientlore.intercom.ui.Navigator
 import com.ancientlore.intercom.ui.auth.email.login.EmailLoginFragment
 import com.ancientlore.intercom.ui.auth.email.signup.EmailSignupFragment
@@ -83,12 +84,20 @@ class MainActivity : AppCompatActivity(), Navigator, PermissionManager {
 	override fun onPause() {
 		isInBackground = true
 
+		DeviceContactsManager.disableObserver(this)
+
 		super.onPause()
 	}
 
 	private fun onFirstStart() {
 		user?.let { onSuccessfullAuth(it) }
 			?: openPhoneAuthForm()
+
+		requestPermissionReadContacts { granted ->
+			if (granted) {
+				DeviceContactsManager.enableObserver(this)
+			}
+		}
 	}
 
 	override fun onNewIntent(intent: Intent?) {
