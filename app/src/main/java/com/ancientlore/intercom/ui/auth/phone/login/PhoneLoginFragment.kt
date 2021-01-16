@@ -7,6 +7,7 @@ import com.ancientlore.intercom.backend.auth.PhoneAuthParams
 import com.ancientlore.intercom.backend.auth.User
 import com.ancientlore.intercom.databinding.PhoneLoginUiBinding
 import com.ancientlore.intercom.ui.auth.AuthFragment
+import com.ancientlore.intercom.ui.auth.phone.login.PhoneLoginViewModel.Companion.ERROR_AUTH_FAILED
 import com.ancientlore.intercom.ui.auth.phone.login.PhoneLoginViewModel.Companion.ERROR_INVALID_PHONE
 import com.ancientlore.intercom.ui.auth.phone.login.PhoneLoginViewModel.Companion.ERROR_NO_PHONE
 import java.lang.RuntimeException
@@ -22,10 +23,11 @@ class PhoneLoginFragment
 		return when (alertCode) {
 			ERROR_NO_PHONE -> getString(R.string.auth_alert_no_phone_msg)
 			ERROR_INVALID_PHONE -> getString(R.string.auth_alert_invalid_phone_msg)
+			ERROR_AUTH_FAILED -> getString(R.string.auth_failed_msg)
 			else -> {
 				if (BuildConfig.DEBUG)
-					throw RuntimeException("Error! Unknown alert code!")
-				else getString(R.string.auth_alert_unknown_msg)
+					throw RuntimeException("Error! Unknown alert code: $alertCode")
+				else getString(R.string.auth_alert_unknown_msg) + ": $alertCode"
 			}
 		}
 	}

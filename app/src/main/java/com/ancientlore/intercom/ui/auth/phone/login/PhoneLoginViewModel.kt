@@ -60,7 +60,10 @@ class PhoneLoginViewModel : AuthViewModel() {
 				else
 					loginSuccessEvent.onNext(result)
 			}
-			override fun onFailure(error: Throwable) = alertRequestEvent.onNext(ERROR_AUTH_FAILED)
+			override fun onFailure(error: Throwable) {
+				error.printStackTrace()
+				alertRequestEvent.onNext(ERROR_AUTH_FAILED)
+			}
 		})
 	}
 }
