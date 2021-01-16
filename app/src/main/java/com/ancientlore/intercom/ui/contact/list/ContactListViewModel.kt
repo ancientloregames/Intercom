@@ -29,6 +29,12 @@ class ContactListViewModel : BasicViewModel(), DeviceContactsManager.UpdateListe
 		DeviceContactsManager.registerUpdateListener(this)
 	}
 
+	override fun clean() {
+		DeviceContactsManager.unregisterUpdateListener(this)
+
+		super.clean()
+	}
+
 	override fun onContactListUpdate(contacts: List<DeviceContactsManager.Item>) {
 		listAdapter?.setItems(contacts)
 	}

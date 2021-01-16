@@ -1,13 +1,13 @@
 package com.ancientlore.intercom.ui
 
 import android.content.Context
-import androidx.lifecycle.ViewModel
 import android.os.Bundle
 import androidx.annotation.LayoutRes
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.annotation.CallSuper
 import androidx.annotation.StringRes
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
@@ -16,7 +16,7 @@ import com.ancientlore.intercom.utils.PermissionManager
 import io.reactivex.internal.disposables.ListCompositeDisposable
 import java.lang.RuntimeException
 
-abstract class BasicFragment<VM : ViewModel, B : ViewDataBinding> : Fragment(), MainActivity.BackButtonHandler {
+abstract class BasicFragment<VM : BasicViewModel, B : ViewDataBinding> : Fragment(), MainActivity.BackButtonHandler {
 
 	override fun onBackPressed() = false
 
@@ -78,7 +78,9 @@ abstract class BasicFragment<VM : ViewModel, B : ViewDataBinding> : Fragment(), 
 		})
 	}
 
-	protected fun close() {
+	@CallSuper
+	protected open fun close() {
+		viewModel.clean()
 		navigator?.closeFragment(this)
 	}
 }
