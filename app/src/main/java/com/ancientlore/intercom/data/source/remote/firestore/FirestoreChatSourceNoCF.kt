@@ -1,17 +1,17 @@
 package com.ancientlore.intercom.data.source.remote.firestore
 
-import com.ancientlore.intercom.data.source.EmptyResultException
 import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.data.model.Chat
 import com.ancientlore.intercom.data.source.ChatSource
+import com.ancientlore.intercom.data.source.EmptyResultException
 import com.ancientlore.intercom.utils.SingletonHolder
 import com.google.firebase.firestore.ListenerRegistration
 
-open class FirestoreChatSource protected constructor(private val userId: String)
-	: FirestoreSource<Chat>(), ChatSource {
+class FirestoreChatSourceNoCF private constructor(private val userId: String)
+	: FirestoreChatSource(userId), ChatSource {
 
-	internal companion object : SingletonHolder<FirestoreChatSource, String>(
-		{ userId -> FirestoreChatSource(userId) }) {
+	internal companion object : SingletonHolder<FirestoreChatSourceNoCF, String>(
+		{ userId -> FirestoreChatSourceNoCF(userId) }) {
 		private const val TAG = "FirestoreChatSource"
 	}
 
@@ -43,7 +43,36 @@ open class FirestoreChatSource protected constructor(private val userId: String)
 
 	override fun addItem(item: Chat, callback: RequestCallback<String>?) {
 		db.collection("chats").add(item)
-			.addOnSuccessListener { callback?.onSuccess(it.id) }
+			.addOnSuccessListener {
+
+				if (item.name.isEmpty()) { // Personal chat
+					db.collection("users")
+						.document(item.participants[0])
+						.collection("chats")
+						.document(item.participants[1])
+						.set(hashMapOf(
+							"id" to it.id,
+							"lastMsgText" to "",
+							"lastMsgTime" to 0,
+							"name" to item.initiatorId
+						))
+					db.collection("users")
+						.document(item.participants[1])
+						.collection("chats")
+						.document(item.participants[0])
+						.set(hashMapOf(
+							"id" to it.id,
+							"lastMsgText" to "",
+							"lastMsgTime" to 0,
+							"name" to item.initiatorId
+						))
+				}
+				else {
+					//TODO group chat
+				}
+
+				callback?.onSuccess(it.id)
+			}
 			.addOnFailureListener { callback?.onFailure(it) }
 	}
 
