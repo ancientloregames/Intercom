@@ -15,6 +15,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+import kotlin.text.Regex;
+
 public final class Utils
 {
 	private Utils() {}
@@ -146,5 +148,12 @@ public final class Utils
 	public static int toDp(int px)
 	{
 		return (int) (px * Resources.getSystem().getDisplayMetrics().density);
+	}
+
+	public static String formatPhoneNumber(String phoneNumber)
+	{
+		return phoneNumber != null
+				? new Regex(" |-").replace(phoneNumber, "")
+				: null;
 	}
 }

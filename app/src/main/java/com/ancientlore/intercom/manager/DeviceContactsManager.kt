@@ -29,6 +29,8 @@ object DeviceContactsManager {
 
 		val mainNumber: String
 		 get() = numbers[0]
+
+		val formatedMainNumber: String by lazy { Utils.formatPhoneNumber(mainNumber) }
 	}
 
 	class PhoneContactsObserver(val context: Context) : ContentObserver(null) {
