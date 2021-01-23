@@ -117,7 +117,7 @@ object DeviceContactsManager {
 	private fun getDeviceContacts(context: Context) : List<Item> {
 
 		val cursor = context.contentResolver.query(CONTENT_URI,
-			contactsProjection, null, null, null)
+			contactsProjection, null, null, ContactsContract.Contacts.DISPLAY_NAME + " ASC")
 			?: return emptyList()
 
 		val contacts = arrayListOf<Item>()
