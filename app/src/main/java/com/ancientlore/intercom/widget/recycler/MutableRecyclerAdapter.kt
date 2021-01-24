@@ -14,7 +14,7 @@ abstract class MutableRecyclerAdapter<I: Comparable<I>, H: BasicRecyclerAdapter.
 
 	protected val mutableList get() = getItems() as MutableList<I>
 
-	protected var autoSort = true
+	protected var autoSort = false
 
 	abstract fun getDiffCallback(newItems: List<I>): DiffUtil.Callback
 
