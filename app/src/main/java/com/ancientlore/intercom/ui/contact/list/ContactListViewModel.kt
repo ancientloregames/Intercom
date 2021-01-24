@@ -54,7 +54,8 @@ class ContactListViewModel : BasicViewModel(), DeviceContactsManager.UpdateListe
 
 	private fun createAndOpenChat(contact: DeviceContactsManager.Item) {
 		val userId = App.backend.getAuthManager().getCurrentUser()!!.id
-		val chat = Chat(initiatorId = userId, participants = arrayOf(userId, contact.id))
+		val chat = Chat(initiatorId = userId,
+			participants = listOf(userId, contact.formatedMainNumber))
 		ChatRepository.addItem(chat, object : RequestCallback<String> {
 			override fun onSuccess(chatId: String) {
 				openChatSubj.onNext(ChatFlowFragment.Params(chatId, contact.name))

@@ -75,7 +75,7 @@ class ChatListAdapter(context: Context, items: MutableList<Chat>)
 		}
 
 		override fun bind(data: Chat) {
-			titleField.set(data.name)
+			titleField.set(data.localName ?: data.name)
 			messageField.set(data.lastMsgText)
 			dateField.set(data.lastMsgDate)
 

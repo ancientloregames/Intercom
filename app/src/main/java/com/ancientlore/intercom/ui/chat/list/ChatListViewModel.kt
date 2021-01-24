@@ -4,6 +4,7 @@ import com.ancientlore.intercom.EmptyObject
 import com.ancientlore.intercom.backend.SimpleRequestCallback
 import com.ancientlore.intercom.data.model.Chat
 import com.ancientlore.intercom.data.source.ChatRepository
+import com.ancientlore.intercom.manager.DeviceContactsManager
 import com.ancientlore.intercom.ui.BasicViewModel
 import com.ancientlore.intercom.ui.chat.flow.ChatFlowFragment
 import com.ancientlore.intercom.utils.Utils
@@ -26,7 +27,7 @@ class ChatListViewModel : BasicViewModel() {
 		this.listAdapter = listAdapter
 		listAdapter.setListener(object : ChatListAdapter.Listener {
 			override fun onChatSelected(chat: Chat) {
-				openChatOpenSubj.onNext(ChatFlowFragment.Params(chat.id, chat.name))
+				openChatOpenSubj.onNext(ChatFlowFragment.Params(chat.id, chat.localName ?: chat.name))
 			}
 		})
 		attachDataListener()
@@ -40,12 +41,27 @@ class ChatListViewModel : BasicViewModel() {
 	private fun attachDataListener() {
 		ChatRepository.attachListener(object : SimpleRequestCallback<List<Chat>>() {
 			override fun onSuccess(result: List<Chat>) {
+				assignPrivateChatLocalNames(result)
 				listAdapter.setItems(result)
 			}
 			override fun onFailure(error: Throwable) {
 				Utils.logError(error)
 			}
 		})
+	}
+
+	private fun assignPrivateChatLocalNames(chats: List<Chat>) {
+		val deviceContacts = DeviceContactsManager.getContactsCache()
+		if (deviceContacts.isNotEmpty()) {
+			for (chat in chats) {
+				for (contact in deviceContacts) {
+					if (chat.name == contact.formatedMainNumber) {
+						chat.localName = contact.name
+						break
+					}
+				}
+			}
+		}
 	}
 
 	private fun detachDataListener() {
