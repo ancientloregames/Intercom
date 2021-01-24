@@ -39,6 +39,7 @@ import com.ancientlore.intercom.utils.NotificationManager.Companion.EXTRA_CHAT_T
 import com.ancientlore.intercom.utils.extensions.checkPermission
 import com.ancientlore.intercom.utils.extensions.createChannel
 import com.ancientlore.intercom.utils.extensions.getContacts
+import com.google.firebase.firestore.FirebaseFirestore
 import java.util.concurrent.Executors
 
 class MainActivity : AppCompatActivity(), Navigator, PermissionManager {
@@ -70,6 +71,11 @@ class MainActivity : AppCompatActivity(), Navigator, PermissionManager {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
 			createNotificationChannels()
 
+		requestPermissionReadContacts { granted ->
+			if (granted) {
+				DeviceContactsManager.enableObserver(this)
+			}
+		}
 
 		if (savedInstanceState == null)
 			onFirstStart()
@@ -92,12 +98,6 @@ class MainActivity : AppCompatActivity(), Navigator, PermissionManager {
 	private fun onFirstStart() {
 		user?.let { onSuccessfullAuth(it) }
 			?: openPhoneAuthForm()
-
-		requestPermissionReadContacts { granted ->
-			if (granted) {
-				DeviceContactsManager.enableObserver(this)
-			}
-		}
 	}
 
 	override fun onNewIntent(intent: Intent?) {
