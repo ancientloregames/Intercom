@@ -1,18 +1,20 @@
 package com.ancientlore.intercom.data.source.remote.firestore
 
+import android.util.Log
 import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.data.model.Chat
 import com.ancientlore.intercom.data.source.ChatSource
 import com.ancientlore.intercom.data.source.EmptyResultException
 import com.ancientlore.intercom.utils.SingletonHolder
 import com.google.firebase.firestore.ListenerRegistration
+import java.util.*
 
 class FirestoreChatSourceNoCF private constructor(private val userId: String)
 	: FirestoreChatSource(userId), ChatSource {
 
 	internal companion object : SingletonHolder<FirestoreChatSourceNoCF, String>(
 		{ userId -> FirestoreChatSourceNoCF(userId) }) {
-		private const val TAG = "FirestoreChatSource"
+		private const val TAG = "FirestoreChatSourceNoCF"
 	}
 
 	private val userChats get() = db.collection("users").document(userId).collection("chats")
@@ -44,6 +46,7 @@ class FirestoreChatSourceNoCF private constructor(private val userId: String)
 	override fun addItem(item: Chat, callback: RequestCallback<String>?) {
 		db.collection("chats").add(item)
 			.addOnSuccessListener {
+				val initialDate = Date(0)
 
 				if (item.name.isEmpty()) { // Personal chat
 					db.collection("users")
@@ -53,9 +56,10 @@ class FirestoreChatSourceNoCF private constructor(private val userId: String)
 						.set(hashMapOf(
 							"id" to it.id,
 							"lastMsgText" to "",
-							"lastMsgTime" to 0,
-							"name" to item.initiatorId
+							"lastMsgTime" to initialDate,
+							"name" to item.participants[1]
 						))
+						.addOnFailureListener { error -> Log.d(TAG, "Failure 1: ${error.message}") }
 					db.collection("users")
 						.document(item.participants[1])
 						.collection("chats")
@@ -63,12 +67,24 @@ class FirestoreChatSourceNoCF private constructor(private val userId: String)
 						.set(hashMapOf(
 							"id" to it.id,
 							"lastMsgText" to "",
-							"lastMsgTime" to 0,
-							"name" to item.initiatorId
+							"lastMsgTime" to initialDate,
+							"name" to item.participants[0]
 						))
+						.addOnFailureListener { error -> Log.d(TAG, "Failure 2: ${error.message}") }
 				}
 				else {
-					//TODO group chat
+					for (participant in item.participants) {
+						db.collection("users")
+							.document(participant)
+							.collection("chats")
+							.document(it.id)
+							.set(hashMapOf(
+								"id" to it.id,
+								"lastMsgText" to "",
+								"lastMsgTime" to initialDate,
+								"name" to item.name
+							))
+					}
 				}
 
 				callback?.onSuccess(it.id)

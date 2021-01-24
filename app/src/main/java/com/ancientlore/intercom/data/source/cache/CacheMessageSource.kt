@@ -12,12 +12,12 @@ object CacheMessageSource {
 
 	fun getItem(id: Long) = cache[id]
 
-	fun addItem(item: Message) = cache.put(item.timestamp, item)
+	fun addItem(item: Message) = cache.put(item.timestamp.time, item)
 
 	fun reset(newChats: List<Message>) {
 		cache.clear()
 		newChats.forEach {
-			cache[it.timestamp] = it
+			cache[it.timestamp.time] = it
 		}
 	}
 }

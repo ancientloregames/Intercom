@@ -8,7 +8,7 @@ import com.ancientlore.intercom.data.model.Message
 import com.ancientlore.intercom.data.source.MessageSource
 import com.google.firebase.firestore.ListenerRegistration
 
-class FirestoreMessageSource(private val chatId: String)
+open class FirestoreMessageSource(private val chatId: String)
 	: FirestoreSource<Message>(), MessageSource {
 
 	internal companion object  {
@@ -18,7 +18,7 @@ class FirestoreMessageSource(private val chatId: String)
 		private const val MESSAGES = "messages"
 	}
 
-	private val chatMessages get() = db.collection(CHATS).document(chatId).collection(MESSAGES)
+	protected val chatMessages get() = db.collection(CHATS).document(chatId).collection(MESSAGES)
 
 	private var changeListener: ListenerRegistration? = null
 

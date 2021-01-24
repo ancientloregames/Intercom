@@ -10,8 +10,8 @@ data class Chat(val id: String = "",
                 val name: String = "",
                 val iconUrl: String = "",
                 val initiatorId: String = "",
-                val participants: Array<String> = emptyArray(),
-                val lastMsgTime: Long = 0,
+                val participants: List<String> = emptyList(),
+                val lastMsgTime: Date = Date(0),
                 val lastMsgText: String = "")
 	: Comparable<Chat> {
 
@@ -23,7 +23,10 @@ data class Chat(val id: String = "",
 	val iconUri: Uri by lazy { Uri.parse(iconUrl) }
 
 	@delegate:Exclude @get:Exclude
-	val lastMsgDate: String by lazy { dateFormat.format(Date(lastMsgTime)) }
+	val lastMsgDate: String by lazy { if (lastMsgTime != null) dateFormat.format(lastMsgTime) else "" }
+
+	@set:Exclude @get:Exclude
+	var localName: String? = null
 
 	override fun equals(other: Any?): Boolean {
 		if (this === other) return true

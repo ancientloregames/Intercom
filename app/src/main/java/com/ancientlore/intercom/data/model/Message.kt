@@ -4,11 +4,13 @@ import android.net.Uri
 import androidx.annotation.IntDef
 import androidx.annotation.StringDef
 import com.google.firebase.firestore.Exclude
+import com.google.firebase.firestore.ServerTimestamp
 import java.text.DateFormat
 import java.text.DateFormat.SHORT
+import java.util.*
 
 data class Message(val id: String = "",
-                   val timestamp: Long = System.currentTimeMillis(),// TODO get server timestamp on app start?
+                   @ServerTimestamp val timestamp: Date = Date(System.currentTimeMillis()),
                    val senderId: String = "",
                    val text: String = "",
                    val info: String = "",
@@ -34,7 +36,7 @@ data class Message(val id: String = "",
   }
 
   constructor(senderId: String, fileData: FileData) : this(
-	  "", System.currentTimeMillis(), senderId, fileData.name, fileData.getInfo(), fileData.uri.toString(), TYPE_FILE)
+	  "", Date(System.currentTimeMillis()), senderId, fileData.name, fileData.getInfo(), fileData.uri.toString(), TYPE_FILE)
 
 	@StringDef(TYPE_TEXT, TYPE_IMAGE)
   @Retention(AnnotationRetention.SOURCE)
