@@ -43,7 +43,7 @@ object FirebaseAuthManager : AuthManager() {
 				override fun onCodeSent(id: String?, token: PhoneAuthProvider.ForceResendingToken) {
 					verificationId = id
 					verificationId?.let {
-						if (params.phone == "+380935719854") // FIXME Test auth, remove on release
+						if (params.phone.startsWith("+123456789")) // FIXME Test auth, remove on release
 							verifySmsCode("123456", callback)
 					}
 				}
