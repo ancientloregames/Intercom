@@ -1,9 +1,13 @@
 package com.ancientlore.intercom.data.source.remote.firestore
 
+import android.util.Log
+import com.ancientlore.intercom.EmptyObject
 import com.ancientlore.intercom.data.source.EmptyResultException
 import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.data.model.Chat
 import com.ancientlore.intercom.data.source.ChatSource
+import com.ancientlore.intercom.data.source.remote.firestore.C.CHATS
+import com.ancientlore.intercom.data.source.remote.firestore.C.USERS
 import com.ancientlore.intercom.utils.SingletonHolder
 import com.google.firebase.firestore.ListenerRegistration
 
@@ -42,8 +46,32 @@ open class FirestoreChatSource protected constructor(private val userId: String)
 	}
 
 	override fun addItem(item: Chat, callback: RequestCallback<String>?) {
-		db.collection("chats").add(item)
+		db.collection(CHATS).add(item)
 			.addOnSuccessListener { callback?.onSuccess(it.id) }
+			.addOnFailureListener { callback?.onFailure(it) }
+	}
+
+	override fun deleteItem(chatId: String, callback: RequestCallback<Any>?) {
+		db.collection(CHATS)
+			.document(chatId)
+			.get()
+			.addOnSuccessListener { snapshot ->
+				deserialize(snapshot)
+					?.let { chat ->
+						db.collection(USERS)
+							.document(userId)
+							.collection(CHATS)
+							.document(
+								if (chat.name.isNotEmpty())
+									chat.name
+								else
+									chat.participants.first { it != userId })
+							.delete()
+							.addOnSuccessListener { callback?.onSuccess(EmptyObject) }
+							.addOnFailureListener { error -> Log.d(TAG, error.message) }
+					}
+
+			}
 			.addOnFailureListener { callback?.onFailure(it) }
 	}
 

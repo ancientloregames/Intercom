@@ -5,6 +5,8 @@ import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.data.model.Chat
 import com.ancientlore.intercom.data.source.ChatSource
 import com.ancientlore.intercom.data.source.EmptyResultException
+import com.ancientlore.intercom.data.source.remote.firestore.C.CHATS
+import com.ancientlore.intercom.data.source.remote.firestore.C.USERS
 import com.ancientlore.intercom.utils.SingletonHolder
 import com.google.firebase.firestore.ListenerRegistration
 import java.util.*
@@ -44,14 +46,14 @@ class FirestoreChatSourceNoCF private constructor(private val userId: String)
 	}
 
 	override fun addItem(item: Chat, callback: RequestCallback<String>?) {
-		db.collection("chats").add(item)
+		db.collection(CHATS).add(item)
 			.addOnSuccessListener {
 				val initialDate = Date(0)
 
-				if (item.name.isEmpty()) { // Personal chat
-					db.collection("users")
+				if (item.name.isEmpty()) {
+					db.collection(USERS)
 						.document(item.participants[0])
-						.collection("chats")
+						.collection(CHATS)
 						.document(item.participants[1])
 						.set(hashMapOf(
 							"id" to it.id,
@@ -60,9 +62,9 @@ class FirestoreChatSourceNoCF private constructor(private val userId: String)
 							"name" to item.participants[1]
 						))
 						.addOnFailureListener { error -> Log.d(TAG, "Failure 1: ${error.message}") }
-					db.collection("users")
+					db.collection(USERS)
 						.document(item.participants[1])
-						.collection("chats")
+						.collection(CHATS)
 						.document(item.participants[0])
 						.set(hashMapOf(
 							"id" to it.id,
@@ -74,9 +76,9 @@ class FirestoreChatSourceNoCF private constructor(private val userId: String)
 				}
 				else {
 					for (participant in item.participants) {
-						db.collection("users")
+						db.collection(USERS)
 							.document(participant)
-							.collection("chats")
+							.collection(CHATS)
 							.document(it.id)
 							.set(hashMapOf(
 								"id" to it.id,
