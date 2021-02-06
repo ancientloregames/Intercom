@@ -12,6 +12,8 @@ interface ChatSource : DataSource<Chat> {
 	 */
 	fun addItem(item: Chat, callback: RequestCallback<String>?)
 
+	fun deleteItem(chatId: String, callback: RequestCallback<Any>? = null)
+
 	fun attachListener(callback: RequestCallback<List<Chat>>)
 
 	fun detachListener()
