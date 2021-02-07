@@ -66,4 +66,8 @@ class ContactListViewModel : BasicViewModel(), DeviceContactsManager.UpdateListe
 			}
 		})
 	}
+
+	fun filter(text: String) {
+		listAdapter.filter(text)
+	}
 }

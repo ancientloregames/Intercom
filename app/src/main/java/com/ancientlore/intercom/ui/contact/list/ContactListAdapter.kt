@@ -9,10 +9,10 @@ import com.ancientlore.intercom.BR
 import com.ancientlore.intercom.widget.recycler.BasicRecyclerAdapter
 import com.ancientlore.intercom.databinding.ContactListItemBinding
 import com.ancientlore.intercom.manager.DeviceContactsManager
-import com.ancientlore.intercom.widget.recycler.MutableRecyclerAdapter
+import com.ancientlore.intercom.widget.recycler.FilterableRecyclerAdapter
 
 class ContactListAdapter(context: Context, items: MutableList<DeviceContactsManager.Item>)
-	: MutableRecyclerAdapter<DeviceContactsManager.Item, ContactListAdapter.ViewHolder, ContactListItemBinding>(context, items) {
+	: FilterableRecyclerAdapter<DeviceContactsManager.Item, ContactListAdapter.ViewHolder, ContactListItemBinding>(context, items) {
 
 	interface Listener {
 		fun onContactSelected(contact: DeviceContactsManager.Item)
@@ -80,5 +80,12 @@ class ContactListAdapter(context: Context, items: MutableList<DeviceContactsMana
 		override fun areItemsTheSame(oldPos: Int, newPos: Int) = oldItems[oldPos].id == newItems[newPos].id
 
 		override fun areContentsTheSame(oldPos: Int, newPos: Int) = oldItems[oldPos] == newItems[newPos]
+	}
+
+	override fun createFilter() = Filter()
+
+	inner class Filter: ListFilter() {
+		override fun satisfy(item: DeviceContactsManager.Item, candidate: String) =
+			item.name.contains(candidate, true) || item.mainNumber.contains(candidate, true)
 	}
 }
