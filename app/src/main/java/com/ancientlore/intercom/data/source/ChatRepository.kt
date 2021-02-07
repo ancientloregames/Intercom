@@ -45,6 +45,11 @@ object ChatRepository : ChatSource {
 		remoteSource?.addItem(item, callback)
 	}
 
+	override fun deleteItem(chatId: String, callback: RequestCallback<Any>?) {
+		cacheSource.deleteItem(chatId)
+		remoteSource?.deleteItem(chatId, callback)
+	}
+
 	override fun attachListener(callback: RequestCallback<List<Chat>>) {
 		if (cacheSource.isNotEmpty())
 			callback.onSuccess(cacheSource.getAll())

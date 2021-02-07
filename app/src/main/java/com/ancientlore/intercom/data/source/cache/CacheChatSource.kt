@@ -14,6 +14,10 @@ object CacheChatSource {
 
 	fun addItem(item: Chat) = cache.put(item.id, item)
 
+	fun deleteItem(chatId: String) = cache.remove(chatId)
+
+	fun deleteItem(item: Chat) = deleteItem(item.id)
+
 	fun reset(newChats: List<Chat>) {
 		cache.clear()
 		newChats.forEach {
