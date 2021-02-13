@@ -40,9 +40,13 @@ import com.ancientlore.intercom.utils.extensions.checkPermission
 import com.ancientlore.intercom.utils.extensions.createChannel
 import com.ancientlore.intercom.utils.extensions.getContacts
 import com.google.firebase.firestore.FirebaseFirestore
+import java.util.*
 import java.util.concurrent.Executors
 
-class MainActivity : AppCompatActivity(), Navigator, PermissionManager {
+class MainActivity : AppCompatActivity(),
+	Navigator,
+	PermissionManager,
+	DeviceContactsManager.UpdateListener {
 
 	companion object {
 		private const val PERM_READ_CONTACTS = 101
@@ -56,6 +60,10 @@ class MainActivity : AppCompatActivity(), Navigator, PermissionManager {
 
 	interface BackButtonHandler {
 		fun onBackPressed(): Boolean
+	}
+
+	private val userContactExecutor = Executors.newSingleThreadExecutor{
+			run: Runnable? -> Thread(run, "exec_contactUpdate")
 	}
 
 	private val user get() = App.backend.getAuthManager().getCurrentUser()
@@ -228,18 +236,12 @@ class MainActivity : AppCompatActivity(), Navigator, PermissionManager {
 
 	override fun onSuccessfullAuth(user: User) {
 		initRepositories(user.id)
+		observeDeviceContactList()
+		//FirebaseFirestore.getInstance().clearPersistence()
 		updateNotificationToken()
 		trySyncContacts()
 		openChatList()
 		handleIntent(intent)
-	}
-
-	private fun updateNotificationToken() {
-		App.backend.getMessagingManager().getToken(object : SimpleRequestCallback<String>() {
-			override fun onSuccess(token: String) {
-				UserRepository.updateNotificationToken(token, object : SimpleRequestCallback<Any>() {})
-			}
-		})
 	}
 
 	override fun requestPermissionReadContacts(onResult: Runnable1<Boolean>) {
@@ -284,11 +286,64 @@ class MainActivity : AppCompatActivity(), Navigator, PermissionManager {
 				&& checkPermission(Manifest.permission.RECORD_AUDIO)
 	}
 
+	override fun onContactListUpdate(contacts: List<DeviceContactsManager.Item>) {
+		UserRepository.getAll(object : RequestCallback<List<com.ancientlore.intercom.data.model.User>> {
+			override fun onSuccess(appUsers: List<com.ancientlore.intercom.data.model.User>) {
+
+				val validContacts = mutableListOf<DeviceContactsManager.Item>()
+				val appUsersTmp = LinkedList(appUsers)
+
+				//FIXME in real app its better to switch inner and outer iterators because there will be
+				//      much more app users than local contacts. Also, maybe better to
+				//      to use UserRepository.getItem on every contacts if the list is small enough
+				for (contact in contacts) {
+
+					val appUserIter = appUsersTmp.listIterator()
+					while (appUserIter.hasNext()) {
+						val user = appUserIter.next()
+
+						if (contact.formatedMainNumber == user.phone) {
+							validContacts.add(contact)
+							appUserIter.remove()
+							break
+						}
+					}
+				}
+				// TODO update user contact info in repositories
+			}
+			override fun onFailure(error: Throwable) {
+				error.printStackTrace()
+			}
+		})
+	}
+
 	private fun initRepositories(userId: String) {
 		val dataSourceProvider = App.backend.getDataSourceProvider()
 		UserRepository.setRemoteSource(dataSourceProvider.getUserSource(userId))
 		ChatRepository.setRemoteSource(dataSourceProvider.getChatSource(userId))
 		ContactRepository.setRemoteSource(dataSourceProvider.getContactSource(userId))
+	}
+
+	private fun observeDeviceContactList() {
+		requestPermissionReadContacts { granted ->
+			if (granted) {
+				DeviceContactsManager.registerUpdateListener(this) //TODO unregister on logout (multiaccount mode)
+
+				userContactExecutor.execute {
+					DeviceContactsManager.enableObserver(this)
+
+					onContactListUpdate(DeviceContactsManager.getContacts(this))
+				}
+			}
+		}
+	}
+
+	private fun updateNotificationToken() {
+		App.backend.getMessagingManager().getToken(object : SimpleRequestCallback<String>() {
+			override fun onSuccess(token: String) {
+				UserRepository.updateNotificationToken(token, object : SimpleRequestCallback<Any>() {})
+			}
+		})
 	}
 
 	private fun trySyncContacts() {
