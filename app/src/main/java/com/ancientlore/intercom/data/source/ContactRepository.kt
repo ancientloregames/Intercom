@@ -3,7 +3,7 @@ package com.ancientlore.intercom.data.source
 import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.data.model.Contact
 
-object ContactRepository : ContactSource {
+object ContactRepository : ContactSource { //TODO Cache Source usage
 
 	private var remoteSource: ContactSource? = null
 
@@ -13,6 +13,10 @@ object ContactRepository : ContactSource {
 
 	override fun addAll(contacts: List<Contact>, callback: RequestCallback<Any>) {
 		remoteSource?.addAll(contacts, callback)
+	}
+
+	override fun update(contacts: List<Contact>, callback: RequestCallback<Any>?) {
+		remoteSource?.update(contacts, callback)
 	}
 
 	override fun attachContactListener(id: String, callback: RequestCallback<Contact>) {

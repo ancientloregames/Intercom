@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -20,6 +21,7 @@ import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.backend.SimpleRequestCallback
 import com.ancientlore.intercom.backend.auth.PhoneAuthParams
 import com.ancientlore.intercom.backend.auth.User
+import com.ancientlore.intercom.data.model.Contact
 import com.ancientlore.intercom.data.source.ChatRepository
 import com.ancientlore.intercom.data.source.ContactRepository
 import com.ancientlore.intercom.data.source.UserRepository
@@ -290,7 +292,7 @@ class MainActivity : AppCompatActivity(),
 		UserRepository.getAll(object : RequestCallback<List<com.ancientlore.intercom.data.model.User>> {
 			override fun onSuccess(appUsers: List<com.ancientlore.intercom.data.model.User>) {
 
-				val validContacts = mutableListOf<DeviceContactsManager.Item>()
+				val updateCandidates = mutableListOf<Contact>()
 				val appUsersTmp = LinkedList(appUsers)
 
 				//FIXME in real app its better to switch inner and outer iterators because there will be
@@ -298,18 +300,22 @@ class MainActivity : AppCompatActivity(),
 				//      to use UserRepository.getItem on every contacts if the list is small enough
 				for (contact in contacts) {
 
-					val appUserIter = appUsersTmp.listIterator()
+					val appUserIter = appUsersTmp.iterator()
 					while (appUserIter.hasNext()) {
 						val user = appUserIter.next()
 
 						if (contact.formatedMainNumber == user.phone) {
-							validContacts.add(contact)
+							updateCandidates.add(Contact(phone = user.phone, name = contact.name))
 							appUserIter.remove()
 							break
 						}
 					}
 				}
-				// TODO update user contact info in repositories
+
+				ContactRepository.update(updateCandidates, object : RequestCallback<Any> {
+					override fun onSuccess(result: Any) { Log.d("INTERCOM", "Success updating contacts") }
+					override fun onFailure(error: Throwable) { error.printStackTrace() }
+				})
 			}
 			override fun onFailure(error: Throwable) {
 				error.printStackTrace()

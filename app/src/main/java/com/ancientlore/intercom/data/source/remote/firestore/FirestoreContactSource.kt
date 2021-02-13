@@ -6,8 +6,15 @@ import com.ancientlore.intercom.data.model.Contact
 import com.ancientlore.intercom.data.model.User
 import com.ancientlore.intercom.data.source.ContactSource
 import com.ancientlore.intercom.data.source.EmptyResultException
+import com.ancientlore.intercom.data.source.remote.firestore.C.CONTACTS
+import com.ancientlore.intercom.data.source.remote.firestore.C.CONTACT_LAST_SEEN
+import com.ancientlore.intercom.data.source.remote.firestore.C.CONTACT_NAME
+import com.ancientlore.intercom.data.source.remote.firestore.C.CONTACT_PHONE
+import com.ancientlore.intercom.data.source.remote.firestore.C.USERS
 import com.ancientlore.intercom.utils.SingletonHolder
 import com.google.firebase.firestore.ListenerRegistration
+import com.google.firebase.firestore.SetOptions
+import java.lang.RuntimeException
 
 class FirestoreContactSource private constructor(private val userId: String)
 : FirestoreSource<Contact>(), ContactSource {
@@ -15,9 +22,6 @@ class FirestoreContactSource private constructor(private val userId: String)
 	internal companion object : SingletonHolder<FirestoreContactSource, String>(
 		{ userId -> FirestoreContactSource(userId) }) {
 		private const val TAG = "FirestoreMessageSource"
-
-		private const val USERS = "users"
-		private const val CONTACTS = "contacts"
 	}
 
 	private val userContacts get() = db.collection(USERS).document(userId).collection(CONTACTS)
@@ -54,6 +58,34 @@ class FirestoreContactSource private constructor(private val userId: String)
 				callback.onSuccess(EmptyObject)
 			}
 			.addOnFailureListener { callback.onFailure(it) }
+	}
+
+	override fun update(contacts: List<Contact>, callback: RequestCallback<Any>?) {
+
+		var success = true
+
+		for (contact in contacts) {
+			if (contact.phone.isEmpty()) {
+				callback?.onFailure(RuntimeException("Contact phone number shouldn't be empty"))
+				continue
+			}
+
+			userContacts.document(contact.phone)
+				.set(HashMap<String, Any>().apply {
+					put(CONTACT_PHONE, contact.phone)
+					if (contact.name.isNotEmpty())
+						put(CONTACT_NAME, contact.name)
+					if (contact.lastSeenTime != 0L)
+						put(CONTACT_LAST_SEEN, contact.name)
+				}, SetOptions.merge())
+				.addOnFailureListener {
+					callback?.onFailure(it)
+					success = false
+				}
+		}
+
+		if (success)
+			callback?.onSuccess(EmptyObject)
 	}
 
 	override fun attachContactListener(id: String, callback: RequestCallback<Contact>) {
