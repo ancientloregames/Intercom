@@ -1,5 +1,7 @@
 package com.ancientlore.intercom.data.source
 
+import android.util.Log
+import com.ancientlore.intercom.backend.RepositorySubscription
 import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.data.model.Contact
 
@@ -19,12 +21,26 @@ object ContactRepository : ContactSource { //TODO Cache Source usage
 		remoteSource?.update(contacts, callback)
 	}
 
-	override fun attachContactListener(id: String, callback: RequestCallback<Contact>) {
-		remoteSource?.attachContactListener(id, callback)
+	override fun attachListener(callback: RequestCallback<List<Contact>>) : RepositorySubscription {
+		return remoteSource
+			?.attachListener(callback)
+			?: object : RepositorySubscription {
+				override fun remove() {
+					Log.w("ContactRepository",
+						"attachChangeListener(): There were no remoteSource! No subscription to remove")
+				}
+			}
 	}
 
-	override fun detachListeners() {
-		remoteSource?.detachListeners()
+	override fun attachListener(id: String, callback: RequestCallback<Contact>) : RepositorySubscription {
+		return remoteSource
+			?.attachListener(id, callback)
+			?: object : RepositorySubscription {
+				override fun remove() {
+					Log.w("ContactRepository",
+						"attachContactListener(): There were no remoteSource! No subscription to remove")
+				}
+			}
 	}
 
 	fun setRemoteSource(source: ContactSource) {

@@ -6,15 +6,17 @@ import com.ancientlore.intercom.data.model.Contact
 import com.ancientlore.intercom.data.model.User
 import com.ancientlore.intercom.data.source.ContactSource
 import com.ancientlore.intercom.data.source.EmptyResultException
+import com.ancientlore.intercom.backend.RepositorySubscription
 import com.ancientlore.intercom.data.source.remote.firestore.C.CONTACTS
 import com.ancientlore.intercom.data.source.remote.firestore.C.CONTACT_LAST_SEEN
 import com.ancientlore.intercom.data.source.remote.firestore.C.CONTACT_NAME
 import com.ancientlore.intercom.data.source.remote.firestore.C.CONTACT_PHONE
 import com.ancientlore.intercom.data.source.remote.firestore.C.USERS
 import com.ancientlore.intercom.utils.SingletonHolder
-import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.SetOptions
 import java.lang.RuntimeException
+import java.util.*
+import kotlin.collections.HashMap
 
 class FirestoreContactSource private constructor(private val userId: String)
 : FirestoreSource<Contact>(), ContactSource {
@@ -25,8 +27,6 @@ class FirestoreContactSource private constructor(private val userId: String)
 	}
 
 	private val userContacts get() = db.collection(USERS).document(userId).collection(CONTACTS)
-
-	private var contactChangesListener: ListenerRegistration? = null
 
 	override fun getObjectClass() = Contact::class.java
 
@@ -88,21 +88,42 @@ class FirestoreContactSource private constructor(private val userId: String)
 			callback?.onSuccess(EmptyObject)
 	}
 
-	override fun attachContactListener(id: String, callback: RequestCallback<Contact>) {
-		contactChangesListener = userContacts.document(id)
-			.addSnapshotListener { snapshot, error ->
-				if (error != null) {
-					callback.onFailure(error)
-					return@addSnapshotListener
-				}
-				else if (snapshot != null) {
-					deserialize(snapshot)
-						?.let { callback.onSuccess(it)  }
-				}
+	override fun attachListener(callback: RequestCallback<List<Contact>>) : RepositorySubscription {
+
+		val registration = userContacts.addSnapshotListener { snapshot, error ->
+			if (error != null) {
+				callback.onFailure(error)
+				return@addSnapshotListener
 			}
+			else if (snapshot != null) {
+				callback.onSuccess(deserialize(snapshot))
+			}
+		}
+
+		return object : RepositorySubscription {
+			override fun remove() {
+				registration.remove()
+			}
+		}
 	}
 
-	override fun detachListeners() {
-		contactChangesListener?.remove()
+	override fun attachListener(id: String, callback: RequestCallback<Contact>) : RepositorySubscription {
+
+		val registration = userContacts.document(id).addSnapshotListener { snapshot, error ->
+			if (error != null) {
+				callback.onFailure(error)
+				return@addSnapshotListener
+			}
+			else if (snapshot != null) {
+				deserialize(snapshot)
+					?.let { callback.onSuccess(it)  }
+			}
+		}
+
+		return object : RepositorySubscription {
+			override fun remove() {
+				registration.remove()
+			}
+		}
 	}
 }
