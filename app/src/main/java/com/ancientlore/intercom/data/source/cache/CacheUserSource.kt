@@ -12,6 +12,10 @@ object CacheUserSource {
 
 	fun getAll() = cache.values.toList()
 
+	fun getItem(phoneNumber: String) = cache[phoneNumber]
+
+	fun setItem(phoneNumber: String) = cache[phoneNumber]
+
 	fun reset(newChats: List<User>) {
 		cache.clear()
 		newChats.forEach {

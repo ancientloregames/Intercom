@@ -6,6 +6,8 @@ object C {
 	const val MESSAGES = "messages"
 	const val CONTACTS = "contacts"
 
+	const val USER_FCM_TOKEN = "token"
+
 	const val CONTACT_NAME = "name"
 	const val CONTACT_PHONE = "phone"
 	const val CONTACT_LAST_SEEN = "lastSeenTime"

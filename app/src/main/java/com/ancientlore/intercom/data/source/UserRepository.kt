@@ -30,6 +30,24 @@ object UserRepository : UserSource {
 			?: callback.onSuccess(cacheSource.getAll())
 	}
 
+	override fun getItem(phoneNumber: String, callback: RequestCallback<User>) {
+		remoteSource
+			?.run {
+				getItem(phoneNumber, object : RequestCallback<User> {
+					override fun onSuccess(result: User) {
+						cacheSource.setItem(phoneNumber)
+						callback.onSuccess(result)
+					}
+					override fun onFailure(error: Throwable) {
+						error.printStackTrace()
+						cacheSource.getItem(phoneNumber)
+							?.run { callback.onSuccess(this) }
+							?: callback.onFailure(EmptyResultException())
+					}
+				})
+			}
+	}
+
 	fun setRemoteSource(source: UserSource) {
 		remoteSource = source
 	}

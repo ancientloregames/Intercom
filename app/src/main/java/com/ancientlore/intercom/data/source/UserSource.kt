@@ -5,4 +5,5 @@ import com.ancientlore.intercom.data.model.User
 
 interface UserSource : DataSource<User> {
 	fun updateNotificationToken(token: String, callback: RequestCallback<Any>?)
+	fun getItem(phoneNumber: String, callback: RequestCallback<User>)
 }
