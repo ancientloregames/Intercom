@@ -3,6 +3,7 @@ package com.ancientlore.intercom.data.source
 import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.data.model.Chat
 import com.ancientlore.intercom.data.source.cache.CacheChatSource
+import java.lang.RuntimeException
 
 object ChatRepository : ChatSource {
 
@@ -10,10 +11,8 @@ object ChatRepository : ChatSource {
 	private val cacheSource = CacheChatSource
 
 	override fun getAll(callback: RequestCallback<List<Chat>>) {
-		if (cacheSource.isNotEmpty())
-			callback.onSuccess(cacheSource.getAll())
-		else {
-			remoteSource?.getAll(object : RequestCallback<List<Chat>> {
+		remoteSource
+			?.getAll(object : RequestCallback<List<Chat>> {
 				override fun onSuccess(result: List<Chat>) {
 					resetCache(result)
 					callback.onSuccess(result)
@@ -22,23 +21,23 @@ object ChatRepository : ChatSource {
 					callback.onFailure(error)
 				}
 			})
-		}
+			?: callback.onSuccess(cacheSource.getAll())
 	}
 
 	override fun getItem(id: String, callback: RequestCallback<Chat>) {
-		cacheSource.getItem(id)
-			?.let { callback.onSuccess(it) }
-			?:run {
-				remoteSource?.getItem(id, object : RequestCallback<Chat> {
-					override fun onSuccess(result: Chat) {
-						cacheSource.addItem(result)
-						callback.onSuccess(result)
-					}
-					override fun onFailure(error: Throwable) {
-						callback.onFailure(error)
-					}
-				})
-			}
+		remoteSource
+			?.getItem(id, object : RequestCallback<Chat> {
+				override fun onSuccess(result: Chat) {
+					cacheSource.addItem(result)
+					callback.onSuccess(result)
+				}
+				override fun onFailure(error: Throwable) {
+					callback.onFailure(error)
+				}
+			})
+			?: cacheSource.getItem(id)
+				?.let { callback.onSuccess(it) }
+				?: callback.onFailure(EmptyResultException())
 	}
 
 	override fun addItem(item: Chat, callback: RequestCallback<String>?) {
@@ -51,10 +50,8 @@ object ChatRepository : ChatSource {
 	}
 
 	override fun attachListener(callback: RequestCallback<List<Chat>>) {
-		if (cacheSource.isNotEmpty())
-			callback.onSuccess(cacheSource.getAll())
-		else {
-			remoteSource?.attachListener(object : RequestCallback<List<Chat>> {
+		remoteSource
+			?.attachListener(object : RequestCallback<List<Chat>> {
 				override fun onSuccess(result: List<Chat>) {
 					resetCache(result)
 					callback.onSuccess(result)
@@ -63,7 +60,7 @@ object ChatRepository : ChatSource {
 					callback.onFailure(error)
 				}
 			})
-		}
+			?: callback.onFailure(RuntimeException("Error! No remote source in repository"))
 	}
 
 	override fun detachListener() {
