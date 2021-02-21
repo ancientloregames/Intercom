@@ -1,6 +1,7 @@
 package com.ancientlore.intercom.ui.chat.list
 
 import com.ancientlore.intercom.EmptyObject
+import com.ancientlore.intercom.backend.RepositorySubscription
 import com.ancientlore.intercom.backend.SimpleRequestCallback
 import com.ancientlore.intercom.data.model.Chat
 import com.ancientlore.intercom.data.source.ChatRepository
@@ -18,9 +19,12 @@ class ChatListViewModel : BasicViewModel() {
 	private val contactListRequest = PublishSubject.create<Any>()
 	private val openChatOpenSubj = PublishSubject.create<ChatFlowFragment.Params>()
 
+	private var repositorySub: RepositorySubscription? = null
+
 	override fun onCleared() {
+		repositorySub?.remove()
+
 		super.onCleared()
-		detachDataListener()
 	}
 
 	fun setListAdapter(listAdapter: ChatListAdapter) {
@@ -39,7 +43,7 @@ class ChatListViewModel : BasicViewModel() {
 	fun observeChatOpen() = openChatOpenSubj as Observable<ChatFlowFragment.Params>
 
 	private fun attachDataListener() {
-		ChatRepository.attachListener(object : SimpleRequestCallback<List<Chat>>() {
+		repositorySub = ChatRepository.attachListener(object : SimpleRequestCallback<List<Chat>>() {
 			override fun onSuccess(result: List<Chat>) {
 				assignPrivateChatLocalNames(result)
 				listAdapter.setItems(result)
@@ -62,10 +66,6 @@ class ChatListViewModel : BasicViewModel() {
 				}
 			}
 		}
-	}
-
-	private fun detachDataListener() {
-		ChatRepository.detachListener()
 	}
 
 	fun filter(text: String) {

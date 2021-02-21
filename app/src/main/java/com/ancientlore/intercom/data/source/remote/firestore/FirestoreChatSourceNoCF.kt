@@ -4,45 +4,21 @@ import android.util.Log
 import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.data.model.Chat
 import com.ancientlore.intercom.data.source.ChatSource
-import com.ancientlore.intercom.data.source.EmptyResultException
 import com.ancientlore.intercom.data.source.remote.firestore.C.CHATS
+import com.ancientlore.intercom.data.source.remote.firestore.C.CHAT_ID
+import com.ancientlore.intercom.data.source.remote.firestore.C.CHAT_LAST_MSG_TEXT
+import com.ancientlore.intercom.data.source.remote.firestore.C.CHAT_LAST_MSG_TIME
+import com.ancientlore.intercom.data.source.remote.firestore.C.CHAT_NAME
 import com.ancientlore.intercom.data.source.remote.firestore.C.USERS
 import com.ancientlore.intercom.utils.SingletonHolder
-import com.google.firebase.firestore.ListenerRegistration
 import java.util.*
 
-class FirestoreChatSourceNoCF private constructor(private val userId: String)
+class FirestoreChatSourceNoCF private constructor(userId: String)
 	: FirestoreChatSource(userId), ChatSource {
 
 	internal companion object : SingletonHolder<FirestoreChatSourceNoCF, String>(
 		{ userId -> FirestoreChatSourceNoCF(userId) }) {
 		private const val TAG = "FirestoreChatSourceNoCF"
-	}
-
-	private val userChats get() = db.collection("users").document(userId).collection("chats")
-
-	private var changeListener: ListenerRegistration? = null
-
-	override fun getObjectClass() = Chat::class.java
-
-	override fun getAll(callback: RequestCallback<List<Chat>>) {
-		userChats.get()
-			.addOnSuccessListener { snapshot ->
-				deserialize(snapshot).takeIf { it.isNotEmpty() }
-					?.let { callback.onSuccess(it) }
-					?: callback.onFailure(EmptyResultException("$TAG: empty"))
-			}
-			.addOnFailureListener { callback.onFailure(it) }
-	}
-
-	override fun getItem(id: String, callback: RequestCallback<Chat>) {
-		userChats.document(id).get()
-			.addOnSuccessListener { snapshot ->
-				deserialize(snapshot)
-					?.let { callback.onSuccess(it) }
-					?: callback.onFailure(EmptyResultException("$TAG: no chat with id $id"))
-			}
-			.addOnFailureListener { callback.onFailure(it) }
 	}
 
 	override fun addItem(item: Chat, callback: RequestCallback<String>?) {
@@ -56,10 +32,10 @@ class FirestoreChatSourceNoCF private constructor(private val userId: String)
 						.collection(CHATS)
 						.document(item.participants[1])
 						.set(hashMapOf(
-							"id" to it.id,
-							"lastMsgText" to "",
-							"lastMsgTime" to initialDate,
-							"name" to item.participants[1]
+							CHAT_ID to it.id,
+							CHAT_LAST_MSG_TEXT to "",
+							CHAT_LAST_MSG_TIME to initialDate,
+							CHAT_NAME to item.participants[1]
 						))
 						.addOnFailureListener { error -> Log.d(TAG, "Failure 1: ${error.message}") }
 					db.collection(USERS)
@@ -67,10 +43,10 @@ class FirestoreChatSourceNoCF private constructor(private val userId: String)
 						.collection(CHATS)
 						.document(item.participants[0])
 						.set(hashMapOf(
-							"id" to it.id,
-							"lastMsgText" to "",
-							"lastMsgTime" to initialDate,
-							"name" to item.participants[0]
+							CHAT_ID to it.id,
+							CHAT_LAST_MSG_TEXT to "",
+							CHAT_LAST_MSG_TIME to initialDate,
+							CHAT_NAME to item.participants[0]
 						))
 						.addOnFailureListener { error -> Log.d(TAG, "Failure 2: ${error.message}") }
 				}
@@ -81,10 +57,10 @@ class FirestoreChatSourceNoCF private constructor(private val userId: String)
 							.collection(CHATS)
 							.document(it.id)
 							.set(hashMapOf(
-								"id" to it.id,
-								"lastMsgText" to "",
-								"lastMsgTime" to initialDate,
-								"name" to item.name
+								CHAT_ID to it.id,
+								CHAT_LAST_MSG_TEXT to "",
+								CHAT_LAST_MSG_TIME to initialDate,
+								CHAT_NAME to item.name
 							))
 					}
 				}
@@ -92,25 +68,5 @@ class FirestoreChatSourceNoCF private constructor(private val userId: String)
 				callback?.onSuccess(it.id)
 			}
 			.addOnFailureListener { callback?.onFailure(it) }
-	}
-
-	override fun attachListener(callback: RequestCallback<List<Chat>>) {
-		changeListener = userChats
-			.orderBy("lastMsgTime")
-			.addSnapshotListener { snapshot, error ->
-				if (error != null) {
-					callback.onFailure(error)
-					return@addSnapshotListener
-				}
-				else if (snapshot != null) {
-					deserialize(snapshot)
-						.takeIf { it.isNotEmpty() }
-						?.let { callback.onSuccess(it)  }
-				}
-			}
-	}
-
-	override fun detachListener() {
-		changeListener?.remove()
 	}
 }

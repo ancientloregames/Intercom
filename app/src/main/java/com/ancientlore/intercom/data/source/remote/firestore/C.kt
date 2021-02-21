@@ -11,4 +11,9 @@ object C {
 	const val CONTACT_NAME = "name"
 	const val CONTACT_PHONE = "phone"
 	const val CONTACT_LAST_SEEN = "lastSeenTime"
+
+	const val CHAT_ID = "id"
+	const val CHAT_NAME = "name"
+	const val CHAT_LAST_MSG_TEXT = "lastMsgText"
+	const val CHAT_LAST_MSG_TIME = "lastMsgTime"
 }

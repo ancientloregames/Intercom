@@ -1,5 +1,7 @@
 package com.ancientlore.intercom.data.source
 
+import android.util.Log
+import com.ancientlore.intercom.backend.RepositorySubscription
 import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.data.model.Chat
 import com.ancientlore.intercom.data.source.cache.CacheChatSource
@@ -49,8 +51,8 @@ object ChatRepository : ChatSource {
 		remoteSource?.deleteItem(chatId, callback)
 	}
 
-	override fun attachListener(callback: RequestCallback<List<Chat>>) {
-		remoteSource
+	override fun attachListener(callback: RequestCallback<List<Chat>>) : RepositorySubscription {
+		return remoteSource
 			?.attachListener(object : RequestCallback<List<Chat>> {
 				override fun onSuccess(result: List<Chat>) {
 					resetCache(result)
@@ -60,11 +62,16 @@ object ChatRepository : ChatSource {
 					callback.onFailure(error)
 				}
 			})
-			?: callback.onFailure(RuntimeException("Error! No remote source in repository"))
-	}
+			?: run {
+				callback.onFailure(RuntimeException("Error! No remote source to attach to in the chat repository"))
 
-	override fun detachListener() {
-		remoteSource?.detachListener()
+				return object : RepositorySubscription {
+					override fun remove() {
+						Log.w("ChatRepository",
+							"attachListener(): There were no remoteSource! No subscription to remove")
+					}
+				}
+			}
 	}
 
 	fun setRemoteSource(source: ChatSource) {

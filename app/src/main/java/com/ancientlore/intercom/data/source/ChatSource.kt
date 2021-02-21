@@ -1,5 +1,6 @@
 package com.ancientlore.intercom.data.source
 
+import com.ancientlore.intercom.backend.RepositorySubscription
 import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.data.model.Chat
 
@@ -14,7 +15,5 @@ interface ChatSource : DataSource<Chat> {
 
 	fun deleteItem(chatId: String, callback: RequestCallback<Any>? = null)
 
-	fun attachListener(callback: RequestCallback<List<Chat>>)
-
-	fun detachListener()
+	fun attachListener(callback: RequestCallback<List<Chat>>) : RepositorySubscription
 }
