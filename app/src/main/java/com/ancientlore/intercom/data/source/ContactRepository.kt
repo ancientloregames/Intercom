@@ -4,6 +4,7 @@ import android.util.Log
 import com.ancientlore.intercom.backend.RepositorySubscription
 import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.data.model.Contact
+import java.lang.RuntimeException
 
 object ContactRepository : ContactSource { //TODO Cache Source usage
 
@@ -24,10 +25,14 @@ object ContactRepository : ContactSource { //TODO Cache Source usage
 	override fun attachListener(callback: RequestCallback<List<Contact>>) : RepositorySubscription {
 		return remoteSource
 			?.attachListener(callback)
-			?: object : RepositorySubscription {
-				override fun remove() {
-					Log.w("ContactRepository",
-						"attachChangeListener(): There were no remoteSource! No subscription to remove")
+			?: run {
+				callback.onFailure(RuntimeException("Error! No remote source to attach to in the contact repository"))
+
+				return object : RepositorySubscription {
+					override fun remove() {
+						Log.w("ContactRepository",
+							"attachListener(): There were no remoteSource! No subscription to remove")
+					}
 				}
 			}
 	}
@@ -35,10 +40,14 @@ object ContactRepository : ContactSource { //TODO Cache Source usage
 	override fun attachListener(id: String, callback: RequestCallback<Contact>) : RepositorySubscription {
 		return remoteSource
 			?.attachListener(id, callback)
-			?: object : RepositorySubscription {
-				override fun remove() {
-					Log.w("ContactRepository",
-						"attachContactListener(): There were no remoteSource! No subscription to remove")
+			?: run {
+				callback.onFailure(RuntimeException("Error! No remote source to attach to in the contact repository"))
+
+				return object : RepositorySubscription {
+					override fun remove() {
+						Log.w("ContactRepository",
+							"attachListener(): There were no remoteSource! No subscription to remove")
+					}
 				}
 			}
 	}

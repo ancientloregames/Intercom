@@ -8,19 +8,19 @@ import androidx.recyclerview.widget.DiffUtil
 import com.ancientlore.intercom.BR
 import com.ancientlore.intercom.widget.recycler.BasicRecyclerAdapter
 import com.ancientlore.intercom.databinding.ContactListItemBinding
-import com.ancientlore.intercom.manager.DeviceContactsManager
+import com.ancientlore.intercom.data.model.Contact
 import com.ancientlore.intercom.widget.recycler.FilterableRecyclerAdapter
 
-class ContactListAdapter(context: Context, items: MutableList<DeviceContactsManager.Item>)
-	: FilterableRecyclerAdapter<DeviceContactsManager.Item, ContactListAdapter.ViewHolder, ContactListItemBinding>(context, items) {
+class ContactListAdapter(context: Context, items: MutableList<Contact>)
+	: FilterableRecyclerAdapter<Contact, ContactListAdapter.ViewHolder, ContactListItemBinding>(context, items) {
 
 	interface Listener {
-		fun onContactSelected(contact: DeviceContactsManager.Item)
+		fun onContactSelected(contact: Contact)
 	}
 
 	private var listener: Listener? = null
 
-	override fun getDiffCallback(newItems: List<DeviceContactsManager.Item>) = DiffCallback(getItems(), newItems)
+	override fun getDiffCallback(newItems: List<Contact>) = DiffCallback(getItems(), newItems)
 
 	override fun createItemViewDataBinding(parent: ViewGroup, viewType: Int): ContactListItemBinding =
 		ContactListItemBinding.inflate(layoutInflater, parent, false)
@@ -39,45 +39,45 @@ class ContactListAdapter(context: Context, items: MutableList<DeviceContactsMana
 
 	override fun getViewHolder(binding: ContactListItemBinding, viewType: Int) = ViewHolder(binding)
 
-	override fun isTheSame(first: DeviceContactsManager.Item, second: DeviceContactsManager.Item) = first.id == second.id
+	override fun isTheSame(first: Contact, second: Contact) = first.phone == second.phone
 
-	override fun isUnique(item: DeviceContactsManager.Item) = getItems().none { it.id == item.id }
+	override fun isUnique(item: Contact) = getItems().none { it.phone == item.phone }
 
 	fun setListener(listener: Listener) { this.listener = listener }
 
 	class ViewHolder(binding: ContactListItemBinding)
-		: BasicRecyclerAdapter.ViewHolder<DeviceContactsManager.Item, ContactListItemBinding>(binding) {
+		: BasicRecyclerAdapter.ViewHolder<Contact, ContactListItemBinding>(binding) {
 
 		interface Listener {
 			fun onItemClicked()
 		}
 		var listener: Listener? = null
 
-		val nameField = ObservableField<String>("")
-		val subtitleField = ObservableField<String>("")
-		val photoUri = ObservableField<Uri>(Uri.EMPTY)
+		val nameField = ObservableField("")
+		val subtitleField = ObservableField("")
+		val photoUri = ObservableField(Uri.EMPTY)
 
 		init {
 			binding.setVariable(BR.contact, this)
 		}
 
-		override fun bind(data: DeviceContactsManager.Item) {
+		override fun bind(data: Contact) {
 			nameField.set(data.name)
-			subtitleField.set(data.id)
+			subtitleField.set(data.phone)
 		}
 
 		fun onClick() = listener?.onItemClicked()
 	}
 
-	class DiffCallback(private val oldItems: List<DeviceContactsManager.Item>,
-	                   private val newItems: List<DeviceContactsManager.Item>)
+	class DiffCallback(private val oldItems: List<Contact>,
+	                   private val newItems: List<Contact>)
 		: DiffUtil.Callback() {
 
 		override fun getOldListSize() = oldItems.size
 
 		override fun getNewListSize() = newItems.size
 
-		override fun areItemsTheSame(oldPos: Int, newPos: Int) = oldItems[oldPos].id == newItems[newPos].id
+		override fun areItemsTheSame(oldPos: Int, newPos: Int) = oldItems[oldPos].phone == newItems[newPos].phone
 
 		override fun areContentsTheSame(oldPos: Int, newPos: Int) = oldItems[oldPos] == newItems[newPos]
 	}
@@ -85,7 +85,7 @@ class ContactListAdapter(context: Context, items: MutableList<DeviceContactsMana
 	override fun createFilter() = Filter()
 
 	inner class Filter: ListFilter() {
-		override fun satisfy(item: DeviceContactsManager.Item, candidate: String) =
-			item.name.contains(candidate, true) || item.mainNumber.contains(candidate, true)
+		override fun satisfy(item: Contact, candidate: String) =
+			item.name.contains(candidate, true) || item.phone.contains(candidate, true)
 	}
 }
