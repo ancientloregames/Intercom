@@ -53,7 +53,7 @@ class ChatListFragment : BasicFragment<ChatListViewModel, ChatListUiBinding>() {
 	}
 
 	override fun initViewModel(viewModel: ChatListViewModel) {
-		viewModel.setListAdapter(listView.adapter as ChatListAdapter)
+		viewModel.init(listView.adapter as ChatListAdapter)
 	}
 
 	override fun observeViewModel(viewModel: ChatListViewModel) {
