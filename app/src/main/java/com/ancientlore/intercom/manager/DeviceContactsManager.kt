@@ -68,15 +68,12 @@ object DeviceContactsManager {
 		if (contactObserver == null) {
 			contactObserver = PhoneContactsObserver(context)
 			context.contentResolver.registerContentObserver(CONTENT_URI, true, contactObserver)
-
-			if (contactListCache.isEmpty())
-				updateCache(context)
 		}
 	}
 
 	fun disableObserver(context: Context) {
 		if (contactObserver != null) {
-			context.contentResolver.unregisterContentObserver(contactObserver ?: return)
+			context.contentResolver.unregisterContentObserver(contactObserver)
 			contactObserver = null
 		}
 	}
@@ -84,8 +81,6 @@ object DeviceContactsManager {
 	fun registerUpdateListener(listener: UpdateListener) = listeners.add(listener)
 
 	fun unregisterUpdateListener(listener: UpdateListener) = listeners.remove(listener)
-
-	fun getContactsCache(): List<Item> = contactListCache
 
 	fun getContacts(context: Context): List<Item> {
 		if (contactListCache.isEmpty()) {

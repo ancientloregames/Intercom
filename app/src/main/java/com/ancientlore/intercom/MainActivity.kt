@@ -1,8 +1,8 @@
 package com.ancientlore.intercom
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.NotificationManager
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
@@ -40,7 +40,6 @@ import com.ancientlore.intercom.utils.NotificationManager.Companion.EXTRA_CHAT_I
 import com.ancientlore.intercom.utils.NotificationManager.Companion.EXTRA_CHAT_TITLE
 import com.ancientlore.intercom.utils.extensions.checkPermission
 import com.ancientlore.intercom.utils.extensions.createChannel
-import com.ancientlore.intercom.utils.extensions.getContacts
 import com.google.firebase.firestore.FirebaseFirestore
 import java.util.*
 import java.util.concurrent.Executors
@@ -81,12 +80,6 @@ class MainActivity : AppCompatActivity(),
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
 			createNotificationChannels()
 
-		requestPermissionReadContacts { granted ->
-			if (granted) {
-				DeviceContactsManager.enableObserver(this)
-			}
-		}
-
 		if (savedInstanceState == null)
 			onFirstStart()
 	}
@@ -99,8 +92,6 @@ class MainActivity : AppCompatActivity(),
 
 	override fun onPause() {
 		isInBackground = true
-
-		DeviceContactsManager.disableObserver(this)
 
 		super.onPause()
 	}
@@ -179,11 +170,17 @@ class MainActivity : AppCompatActivity(),
 	}
 
 	override fun openContactList() {
-		runOnUiThread {
-			supportFragmentManager.beginTransaction()
-				.setCustomAnimations(R.anim.slide_in_bottom, R.anim.slide_out_bottom)
-				.add(R.id.container, ContactListFragment.newInstance())
-				.commitNow()
+		tryObserveDeviceContacts { success ->
+			if (success) {
+				runOnUiThread {
+					supportFragmentManager.beginTransaction()
+						.setCustomAnimations(R.anim.slide_in_bottom, R.anim.slide_out_bottom)
+						.add(R.id.container, ContactListFragment.newInstance())
+						.commitNow()
+				}
+			} else {
+				//TODO show notification that permission is required
+			}
 		}
 	}
 
@@ -238,10 +235,9 @@ class MainActivity : AppCompatActivity(),
 
 	override fun onSuccessfullAuth(user: User) {
 		initRepositories(user.id)
-		observeDeviceContactList()
+		tryObserveDeviceContacts()
 		//FirebaseFirestore.getInstance().clearPersistence()
 		updateNotificationToken()
-		trySyncContacts()
 		openChatList()
 		handleIntent(intent)
 	}
@@ -313,13 +309,11 @@ class MainActivity : AppCompatActivity(),
 				}
 
 				ContactRepository.update(updateCandidates, object : RequestCallback<Any> {
-					override fun onSuccess(result: Any) { Log.d("INTERCOM", "Success updating contacts") }
-					override fun onFailure(error: Throwable) { error.printStackTrace() }
+					override fun onSuccess(result: Any) { Log.d("Intercom", "Success updating contacts") }
+					override fun onFailure(error: Throwable) { Utils.logError(error) }
 				})
 			}
-			override fun onFailure(error: Throwable) {
-				error.printStackTrace()
-			}
+			override fun onFailure(error: Throwable) { Utils.logError(error) }
 		})
 	}
 
@@ -330,20 +324,6 @@ class MainActivity : AppCompatActivity(),
 		ContactRepository.setRemoteSource(dataSourceProvider.getContactSource(userId))
 	}
 
-	private fun observeDeviceContactList() {
-		requestPermissionReadContacts { granted ->
-			if (granted) {
-				DeviceContactsManager.registerUpdateListener(this) //TODO unregister on logout (multiaccount mode)
-
-				userContactExecutor.execute {
-					DeviceContactsManager.enableObserver(this)
-
-					onContactListUpdate(DeviceContactsManager.getContacts(this))
-				}
-			}
-		}
-	}
-
 	private fun updateNotificationToken() {
 		App.backend.getMessagingManager().getToken(object : SimpleRequestCallback<String>() {
 			override fun onSuccess(token: String) {
@@ -352,36 +332,25 @@ class MainActivity : AppCompatActivity(),
 		})
 	}
 
-	private fun trySyncContacts() {
-		if (isContactsSynced().not()) {
-			if (checkPermission(Manifest.permission.READ_CONTACTS))
-				syncContacts()
-			else requestPermissionReadContacts(Runnable1 { granted ->
-				if (granted) syncContacts()
-			})
+	@SuppressLint("MissingPermission")
+	private fun tryObserveDeviceContacts(onResult: Runnable1<Boolean>? = null) {
+		requestPermissionReadContacts { granted ->
+			if (granted)
+				observeDeviceContacts()
+			onResult?.run(granted)
 		}
 	}
 
 	@RequiresPermission(Manifest.permission.READ_CONTACTS)
-	private fun syncContacts() {
-		Executors.newSingleThreadExecutor().submit {
-			contentResolver.getContacts()
-				.takeIf { it.isNotEmpty() }
-				?.let { contacts -> ContactRepository.addAll(contacts, object : RequestCallback<Any> {
-					override fun onSuccess(result: Any) {}
-					override fun onFailure(error: Throwable) {
-						Utils.logError(error)
-						showToast(R.string.alert_error_sync_contacts)
-					}
-				}) }
+	private fun observeDeviceContacts() {
 
-			runOnUiThread {
-				getPreferences(MODE_PRIVATE).edit().putBoolean(C.PREF_CONTACTS_SYNCED, true).apply()
-			}
+		DeviceContactsManager.registerUpdateListener(this) //TODO unregister on logout (multiaccount mode)
+		DeviceContactsManager.enableObserver(this)
+
+		userContactExecutor.execute { //TODO terminate on logout (multiaccount mode)
+			onContactListUpdate(DeviceContactsManager.getContacts(this))
 		}
 	}
-
-	private fun isContactsSynced() = getPreferences(Context.MODE_PRIVATE).getBoolean(C.PREF_CONTACTS_SYNCED, false)
 
 	private fun showToast(@StringRes textResId: Int) {
 		runOnUiThread {
