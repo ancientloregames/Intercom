@@ -25,7 +25,8 @@ class FirestoreMessageNoCF(chatId: String): FirestoreMessageSource(chatId) {
 	init {
 		db.collection(CHATS).document(chatId).get()
 			.addOnSuccessListener { snapshot ->
-				chat = snapshot.toObject(Chat::class.java)!!
+				snapshot.toObject(Chat::class.java)
+					?.let { chat = it }
 			}
 	}
 
