@@ -34,6 +34,7 @@ import com.ancientlore.intercom.ui.auth.phone.check.PhoneCheckFragment
 import com.ancientlore.intercom.ui.chat.flow.ChatFlowFragment
 import com.ancientlore.intercom.ui.chat.list.ChatListFragment
 import com.ancientlore.intercom.ui.contact.list.ContactListFragment
+import com.ancientlore.intercom.ui.settings.SettingsFragment
 import com.ancientlore.intercom.utils.*
 import com.ancientlore.intercom.utils.NotificationManager.Companion.ACTION_OPEN_FROM_PUSH
 import com.ancientlore.intercom.utils.NotificationManager.Companion.EXTRA_CHAT_ID
@@ -130,7 +131,7 @@ class MainActivity : AppCompatActivity(),
 		super.onBackPressed()
 	}
 
-	override fun createToolbarMenu(toolbar: Toolbar, callback: Runnable1<Menu>) {
+	override fun createToolbarMenu(toolbar: Toolbar, callback: Runnable1<Menu>?) {
 		toolbarMenuCallback = callback
 		setSupportActionBar(toolbar)
 	}
@@ -221,6 +222,14 @@ class MainActivity : AppCompatActivity(),
 		runOnUiThread {
 			supportFragmentManager.beginTransaction()
 				.replace(R.id.container, PhoneCheckFragment.newInstance(params))
+				.commitNow()
+		}
+	}
+
+	override fun openSettings() {
+		runOnUiThread {
+			supportFragmentManager.beginTransaction()
+				.add(R.id.container, SettingsFragment.newInstance())
 				.commitNow()
 		}
 	}

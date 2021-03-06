@@ -18,4 +18,7 @@
 	<color name="chatImageProgressColor">@android:color/white</color>
 
 	<color name="inputHintColor">#898f9d</color>
+
+	<color name="settingsSectionTitleTextColor">@color/colorPrimary</color>
+	<color name="settingsItemTextColor">#757575</color>
 </resources>

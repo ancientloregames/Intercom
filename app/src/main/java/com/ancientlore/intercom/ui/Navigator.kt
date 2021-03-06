@@ -16,8 +16,10 @@ interface Navigator {
 	fun openPhoneCheckForm(params: PhoneAuthParams)
 	fun openContactList()
 	fun openChatFlow(params: ChatFlowFragment.Params)
+	fun openSettings()
+
 	fun onSuccessfullAuth(user: User)
 	fun closeFragment(fragment: Fragment)
 
-	fun createToolbarMenu(toolbar: Toolbar, callback: Runnable1<Menu>)
+	fun createToolbarMenu(toolbar: Toolbar, callback: Runnable1<Menu>? = null)
 }

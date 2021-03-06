@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+		xmlns:app="http://schemas.android.com/apk/res-auto"
+		xmlns:tools="http://schemas.android.com/tools">
+
+	<data>
+		<variable
+				name="ui"
+				type="com.ancientlore.intercom.ui.settings.SettingsViewModel" />
+	</data>
+
+	<com.ancientlore.intercom.view.SwipableLayout
+			android:id="@+id/swipableLayout"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			tools:context=".ui.settings.SettingsFragment">
+
+		<LinearLayout
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:orientation="vertical"
+				android:background="@android:color/white"
+				android:clickable="true">
+
+			<com.google.android.material.appbar.AppBarLayout
+					android:id="@+id/appbar"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:theme="@style/AppTheme.AppBarOverlay">
+
+				<androidx.appcompat.widget.Toolbar
+						android:id="@+id/toolbar"
+						android:layout_width="match_parent"
+						android:layout_height="?attr/actionBarSize"
+						android:background="?attr/colorPrimary"
+						app:popupTheme="@style/AppTheme.PopupOverlay"
+						app:title="@string/settings"
+						tools:navigationIcon="@drawable/ic_nav_back" />
+
+			</com.google.android.material.appbar.AppBarLayout>
+
+			<TextView
+					android:id="@+id/accountSectionTitle"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:text="@string/account"
+					style="@style/settingsSectionTitle" />
+
+			<TextView
+					android:id="@+id/changePhotoButton"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:drawableStart="@drawable/ic_add_photo_24dp"
+					android:drawableLeft="@drawable/ic_add_photo_24dp"
+					android:text="@string/set_profile_photo"
+					android:onClick="@{() -> ui.onSetProfilePhotoClicked()}"
+					style="@style/settingsIconedTextItem" />
+
+		</LinearLayout>
+
+	</com.ancientlore.intercom.view.SwipableLayout>
+</layout>

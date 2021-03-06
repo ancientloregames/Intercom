@@ -75,4 +75,38 @@
 		<item name="android:ellipsize">end</item>
 	</style>
 
+	<style name="settingsIconedTextItem" parent="@style/TextAppearance.AppCompat.Medium">
+		<item name="android:maxLines">1</item>
+		<item name="android:singleLine">true</item>
+		<item name="android:ellipsize">end</item>
+		<item name="android:textColor">@color/settingsItemTextColor</item>
+		<item name="android:textStyle">bold</item>
+		<item name="android:textSize">16sp</item>
+		<item name="android:gravity">start|center_vertical</item>
+		<item name="android:drawablePadding">20dp</item>
+		<item name="android:background">@drawable/bg_ripple_effect_gray</item>
+		<item name="android:paddingStart">20dp</item>
+		<item name="android:paddingLeft">20dp</item>
+		<item name="android:paddingEnd">20dp</item>
+		<item name="android:paddingRight">20dp</item>
+		<item name="android:paddingTop">15dp</item>
+		<item name="android:paddingBottom">15dp</item>
+	</style>
+
+	<style name="settingsSectionTitle" parent="@style/TextAppearance.AppCompat.Title">
+		<item name="android:maxLines">1</item>
+		<item name="android:singleLine">true</item>
+		<item name="android:ellipsize">end</item>
+		<item name="android:textColor">@color/settingsSectionTitleTextColor</item>
+		<item name="android:textStyle">bold</item>
+		<item name="android:textSize">16sp</item>
+		<item name="android:gravity">start|center_vertical</item>
+		<item name="android:paddingStart">20dp</item>
+		<item name="android:paddingLeft">20dp</item>
+		<item name="android:paddingEnd">20dp</item>
+		<item name="android:paddingRight">20dp</item>
+		<item name="android:paddingTop">15dp</item>
+		<item name="android:paddingBottom">10dp</item>
+	</style>
+
 </resources>
