@@ -7,6 +7,7 @@ object C {
 	const val CONTACTS = "contacts"
 
 	const val USER_FCM_TOKEN = "token"
+	const val USER_ICON_URL = "iconUrl"
 
 	const val CONTACT_NAME = "name"
 	const val CONTACT_PHONE = "phone"

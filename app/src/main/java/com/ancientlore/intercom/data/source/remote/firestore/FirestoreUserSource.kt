@@ -1,5 +1,6 @@
 package com.ancientlore.intercom.data.source.remote.firestore
 
+import android.net.Uri
 import com.ancientlore.intercom.EmptyObject
 import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.data.model.User
@@ -7,6 +8,8 @@ import com.ancientlore.intercom.data.source.EmptyResultException
 import com.ancientlore.intercom.data.source.UserSource
 import com.ancientlore.intercom.data.source.remote.firestore.C.USERS
 import com.ancientlore.intercom.data.source.remote.firestore.C.USER_FCM_TOKEN
+import com.ancientlore.intercom.data.source.remote.firestore.C.USER_ICON_URL
+import com.google.firebase.firestore.SetOptions
 
 class FirestoreUserSource(private val userId: String)
 	: FirestoreSource<User>(), UserSource {
@@ -45,5 +48,12 @@ class FirestoreUserSource(private val userId: String)
 					?: callback.onFailure(EmptyResultException())
 			}
 			.addOnFailureListener { callback.onFailure(it) }
+	}
+
+	override fun updateIcon(uri: Uri, callback: RequestCallback<Any>?) {
+		user
+			.set(hashMapOf(USER_ICON_URL to uri.toString()), SetOptions.merge())
+			.addOnSuccessListener { callback?.onSuccess(EmptyObject) }
+			.addOnFailureListener { callback?.onFailure(it) }
 	}
 }

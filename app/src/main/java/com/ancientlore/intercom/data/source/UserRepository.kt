@@ -1,8 +1,10 @@
 package com.ancientlore.intercom.data.source
 
+import android.net.Uri
 import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.data.model.User
 import com.ancientlore.intercom.data.source.cache.CacheUserSource
+import java.lang.RuntimeException
 
 object UserRepository : UserSource {
 
@@ -46,6 +48,14 @@ object UserRepository : UserSource {
 					}
 				})
 			}
+			?: cacheSource.getItem(phoneNumber)
+				?.run { callback.onSuccess(this) }
+				?: callback.onFailure(EmptyResultException())
+	}
+
+	override fun updateIcon(uri: Uri, callback: RequestCallback<Any>?) {
+		remoteSource?.updateIcon(uri, callback)
+			?: callback?.onFailure(RuntimeException("UserRepository.updateImage(): No remote source"))
 	}
 
 	fun setRemoteSource(source: UserSource) {

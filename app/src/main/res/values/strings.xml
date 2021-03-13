@@ -47,6 +47,8 @@
 	<string name="alert_error_creating_chat">Failed to create chat. Try again later</string>
 	<string name="alert_error_sync_contacts">Failed to sync contact list. Try again later</string>
 	<string name="alert_error_attach_file">Failed to attach file</string>
+	<string name="alert_error_set_photo">Failed to set photo</string>
+	<string name="alert_error_no_gallery">Failed to open gallery</string>
 
 	<string name="record">Record</string>
 	<string name="stop">Stop</string>

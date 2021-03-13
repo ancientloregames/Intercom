@@ -56,6 +56,11 @@ public final class Utils
 		throwable.printStackTrace();
 	}
 
+	public static void logError(@NotNull String text)
+	{
+		logError(new RuntimeException(text));
+	}
+
 	public static void closeQuietly(Closeable closeable)
 	{
 		if (closeable == null) return;
