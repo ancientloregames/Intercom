@@ -20,8 +20,8 @@ import androidx.fragment.app.Fragment
 import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.backend.SimpleRequestCallback
 import com.ancientlore.intercom.backend.auth.PhoneAuthParams
-import com.ancientlore.intercom.backend.auth.User
 import com.ancientlore.intercom.data.model.Contact
+import com.ancientlore.intercom.data.model.User
 import com.ancientlore.intercom.data.source.ChatRepository
 import com.ancientlore.intercom.data.source.ContactRepository
 import com.ancientlore.intercom.data.source.UserRepository
@@ -98,7 +98,8 @@ class MainActivity : AppCompatActivity(),
 	}
 
 	private fun onFirstStart() {
-		user?.let { onSuccessfullAuth(it) }
+		user.takeIf { it.dummy.not() }
+			?.let { onSuccessfullAuth(it) }
 			?: openPhoneAuthForm()
 	}
 

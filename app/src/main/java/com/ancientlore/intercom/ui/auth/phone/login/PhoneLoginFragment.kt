@@ -4,7 +4,7 @@ import android.view.View
 import com.ancientlore.intercom.BuildConfig
 import com.ancientlore.intercom.R
 import com.ancientlore.intercom.backend.auth.PhoneAuthParams
-import com.ancientlore.intercom.backend.auth.User
+import com.ancientlore.intercom.data.model.User
 import com.ancientlore.intercom.databinding.PhoneLoginUiBinding
 import com.ancientlore.intercom.ui.auth.AuthFragment
 import com.ancientlore.intercom.ui.auth.phone.login.PhoneLoginViewModel.Companion.ERROR_AUTH_FAILED

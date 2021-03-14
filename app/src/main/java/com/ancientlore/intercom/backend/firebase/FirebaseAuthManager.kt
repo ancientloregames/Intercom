@@ -2,9 +2,10 @@ package com.ancientlore.intercom.backend.firebase
 
 import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.backend.auth.*
-import com.google.android.gms.tasks.OnCompleteListener
+import com.ancientlore.intercom.data.model.User
 import com.google.firebase.FirebaseException
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthProvider
 import java.util.concurrent.Executor
@@ -21,17 +22,21 @@ object FirebaseAuthManager : AuthManager() {
 
 	override fun isNeedPhoneCheck() = false
 
-	override fun getCurrentUser() = auth.currentUser?.let { User(it.phoneNumber!!) }
+	override fun getCurrentUser() : User {
+		return auth.currentUser
+			?.run { toAppUser(this) }
+			?: User(dummy = true)
+	}
 
 	override fun signupViaEmail(params: EmailAuthParams, callback: RequestCallback<User>) {
 		auth.createUserWithEmailAndPassword(params.email, params.pass)
-			.addOnSuccessListener { result -> callback.onSuccess(User(result.user.uid)) }
+			.addOnSuccessListener { result -> callback.onSuccess(toAppUser(result.user)) }
 			.addOnFailureListener { error -> callback.onFailure(error) }
 	}
 
 	override fun loginViaEmail(params: EmailAuthParams, callback: RequestCallback<User>) {
 		auth.signInWithEmailAndPassword(params.email, params.pass)
-			.addOnSuccessListener { result -> callback.onSuccess(User(result.user.uid)) }
+			.addOnSuccessListener { result -> callback.onSuccess(toAppUser(result.user)) }
 			.addOnFailureListener { error -> callback.onFailure(error) }
 	}
 
@@ -64,14 +69,23 @@ object FirebaseAuthManager : AuthManager() {
 
 	private fun onPhoneAuthCredential(credential: PhoneAuthCredential, callback: RequestCallback<User>) {
 		auth.signInWithCredential(credential)
-			.addOnCompleteListener(authExecutor, OnCompleteListener { task ->
+			.addOnCompleteListener(authExecutor) { task ->
 				when {
-					task.isSuccessful -> task.result?.user?.let {
-						callback.onSuccess(User(it.uid))
-					} ?: callback.onFailure(AuthException("Server doesn't return the user credentials"))
+					task.isSuccessful -> task.result?.user
+						?.run { callback.onSuccess(toAppUser(this)) }
+						?: callback.onFailure(AuthException("Server didn't return the user credentials"))
+
 					task.exception != null -> callback.onFailure(task.exception!!)
+
 					else -> callback.onFailure(AuthException())
 				}
-			})
+			}
+	}
+
+	private fun toAppUser(user: FirebaseUser) : User {
+		return User(user.displayName ?: "",
+			user.phoneNumber ?: "",
+			user.email ?: "",
+			user.photoUrl?.toString() ?: "")
 	}
 }

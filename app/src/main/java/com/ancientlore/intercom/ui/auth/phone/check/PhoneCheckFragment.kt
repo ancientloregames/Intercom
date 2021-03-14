@@ -7,7 +7,7 @@ import android.widget.Toast.LENGTH_LONG
 import com.ancientlore.intercom.R
 import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.backend.auth.PhoneAuthParams
-import com.ancientlore.intercom.backend.auth.User
+import com.ancientlore.intercom.data.model.User
 import com.ancientlore.intercom.ui.auth.AuthFragment
 import com.ancientlore.intercom.databinding.PhoneCheckUiBinding
 import java.lang.RuntimeException

@@ -4,7 +4,7 @@ import android.view.Menu
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import com.ancientlore.intercom.backend.auth.PhoneAuthParams
-import com.ancientlore.intercom.backend.auth.User
+import com.ancientlore.intercom.data.model.User
 import com.ancientlore.intercom.ui.chat.flow.ChatFlowFragment
 import com.ancientlore.intercom.utils.Runnable1
 

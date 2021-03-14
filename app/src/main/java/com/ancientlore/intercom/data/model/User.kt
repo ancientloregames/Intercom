@@ -1,7 +1,13 @@
 package com.ancientlore.intercom.data.model
 
-data class User(val alias: String = "",
-                val name: String = "",
+import com.google.firebase.firestore.Exclude
+
+data class User(val name: String = "",
                 val phone: String = "",
+                val email: String = "",
                 val iconUrl: String = "",
-                val chats: Map<String, String> = emptyMap())
+                @get:Exclude val dummy: Boolean = false) {
+
+  @get:Exclude
+  val id get() = phone
+}

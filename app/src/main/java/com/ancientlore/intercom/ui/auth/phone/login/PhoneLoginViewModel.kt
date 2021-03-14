@@ -3,7 +3,7 @@ package com.ancientlore.intercom.ui.auth.phone.login
 import androidx.databinding.ObservableField
 import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.backend.auth.PhoneAuthParams
-import com.ancientlore.intercom.backend.auth.User
+import com.ancientlore.intercom.data.model.User
 import com.ancientlore.intercom.ui.auth.AuthViewModel
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject

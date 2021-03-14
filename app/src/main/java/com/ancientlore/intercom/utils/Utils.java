@@ -50,15 +50,25 @@ public final class Utils
 		return uriStr != null ? Uri.parse(uriStr) : Uri.EMPTY;
 	}
 
-	public static void logError(@NotNull Throwable throwable)
+	public static void logError(Throwable throwable)
 	{
 		// TODO: use fabric crashlytycs logException later
-		throwable.printStackTrace();
+		if (throwable != null)
+			throwable.printStackTrace();
 	}
 
-	public static void logError(@NotNull String text)
+	public static void logError(String text)
 	{
-		logError(new RuntimeException(text));
+		if (text != null)
+			logError(new RuntimeException(text));
+	}
+
+	public static void logError(String text, Throwable throwable)
+	{
+		if (text != null)
+			logError(new RuntimeException(text, throwable));
+		else
+			logError(throwable);
 	}
 
 	public static void closeQuietly(Closeable closeable)
