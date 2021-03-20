@@ -1,5 +1,6 @@
 package com.ancientlore.intercom.backend.auth
 
+import android.net.Uri
 import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.data.model.User
 
@@ -12,4 +13,5 @@ abstract class AuthManager {
 	abstract fun isNeedPhoneCheck() : Boolean
 
 	abstract fun getCurrentUser() : User
+	abstract fun updateUserIconUri(uri: Uri, callback: RequestCallback<Any>? = null)
 }

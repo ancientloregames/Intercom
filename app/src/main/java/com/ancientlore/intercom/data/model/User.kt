@@ -1,5 +1,6 @@
 package com.ancientlore.intercom.data.model
 
+import android.net.Uri
 import com.google.firebase.firestore.Exclude
 
 data class User(val name: String = "",
@@ -10,4 +11,7 @@ data class User(val name: String = "",
 
   @get:Exclude
   val id get() = phone
+
+  @delegate:Exclude @get:Exclude
+  val iconUri: Uri by lazy { Uri.parse(iconUrl) }
 }

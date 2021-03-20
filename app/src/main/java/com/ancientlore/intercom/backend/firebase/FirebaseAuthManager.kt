@@ -1,13 +1,13 @@
 package com.ancientlore.intercom.backend.firebase
 
+import android.net.Uri
+import com.ancientlore.intercom.EmptyObject
 import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.backend.auth.*
 import com.ancientlore.intercom.data.model.User
+import com.ancientlore.intercom.utils.Utils
 import com.google.firebase.FirebaseException
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.PhoneAuthCredential
-import com.google.firebase.auth.PhoneAuthProvider
+import com.google.firebase.auth.*
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -26,6 +26,19 @@ object FirebaseAuthManager : AuthManager() {
 		return auth.currentUser
 			?.run { toAppUser(this) }
 			?: User(dummy = true)
+	}
+
+	override fun updateUserIconUri(uri: Uri, callback: RequestCallback<Any>?) {
+		auth.currentUser
+			?.run {
+				updateProfile(
+					UserProfileChangeRequest.Builder()
+						.setPhotoUri(uri)
+						.build())
+					.addOnSuccessListener { callback?.onSuccess(EmptyObject) }
+					.addOnFailureListener { callback?.onFailure(it) }
+			}
+			?: Utils.logError("FirebaseAuthManager.updateUserIconUri(): No logged user to update")
 	}
 
 	override fun signupViaEmail(params: EmailAuthParams, callback: RequestCallback<User>) {

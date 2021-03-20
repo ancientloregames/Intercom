@@ -26,9 +26,6 @@ class SettingsFragment : BasicFragment<SettingsViewModel, SettingsUiBinding>()  
 		fun newInstance() = SettingsFragment()
 	}
 
-	private val userId get() = App.backend.getAuthManager().getCurrentUser()?.id
-		?: throw RuntimeException("This fragment may be created only after successful authorization")
-
 	override fun onBackPressed(): Boolean {
 		close()
 		return true
@@ -36,7 +33,7 @@ class SettingsFragment : BasicFragment<SettingsViewModel, SettingsUiBinding>()  
 
 	override fun getLayoutResId() = R.layout.settings_ui
 
-	override fun createViewModel() = SettingsViewModel(userId)
+	override fun createViewModel() = SettingsViewModel(App.backend.getAuthManager().getCurrentUser())
 
 	override fun bind(view: View, viewModel: SettingsViewModel) {
 		dataBinding = SettingsUiBinding.bind(view)

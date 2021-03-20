@@ -39,6 +39,20 @@
 
 			</com.google.android.material.appbar.AppBarLayout>
 
+			<com.ancientlore.intercom.view.CircleImageView
+					android:id="@+id/iconView"
+					android:layout_width="100dp"
+					android:layout_height="100dp"
+					android:layout_marginTop="15dp"
+					android:layout_marginBottom="15dp"
+					android:layout_gravity="center"
+					android:scaleType="center"
+					android:src="@{ui.userIcon}"
+					tools:backgroundColor="@color/colorPrimaryDark"
+					tools:tint="@android:color/white"
+					tools:srcCompat="@drawable/ic_avatar"
+					/>
+
 			<TextView
 					android:id="@+id/accountSectionTitle"
 					android:layout_width="match_parent"

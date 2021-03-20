@@ -1,6 +1,7 @@
 package com.ancientlore.intercom.data.source.remote.firestore
 
 import android.net.Uri
+import com.ancientlore.intercom.App
 import com.ancientlore.intercom.EmptyObject
 import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.data.model.User
@@ -53,7 +54,12 @@ class FirestoreUserSource(private val userId: String)
 	override fun updateIcon(uri: Uri, callback: RequestCallback<Any>?) {
 		user
 			.set(hashMapOf(USER_ICON_URL to uri.toString()), SetOptions.merge())
-			.addOnSuccessListener { callback?.onSuccess(EmptyObject) }
+			.addOnSuccessListener {
+				App.backend.getAuthManager().updateUserIconUri(uri, object : RequestCallback<Any> {
+					override fun onSuccess(result: Any) { callback?.onSuccess(result) }
+					override fun onFailure(error: Throwable) { callback?.onFailure(error) }
+				})
+			}
 			.addOnFailureListener { callback?.onFailure(it) }
 	}
 }
