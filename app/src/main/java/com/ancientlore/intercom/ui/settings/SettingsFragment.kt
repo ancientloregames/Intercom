@@ -41,7 +41,9 @@ class SettingsFragment : BasicFragment<SettingsViewModel, SettingsUiBinding>()  
 	}
 
 	override fun initViewModel(viewModel: SettingsViewModel) {
-		//TODO
+		context?.run {
+			viewModel.init(this)
+		}
 	}
 
 	override fun observeViewModel(viewModel: SettingsViewModel) {

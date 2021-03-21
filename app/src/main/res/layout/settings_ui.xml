@@ -44,7 +44,6 @@
 					android:layout_width="100dp"
 					android:layout_height="100dp"
 					android:layout_marginTop="15dp"
-					android:layout_marginBottom="15dp"
 					android:layout_gravity="center"
 					android:scaleType="center"
 					android:src="@{ui.userIcon}"
@@ -52,6 +51,21 @@
 					tools:tint="@android:color/white"
 					tools:srcCompat="@drawable/ic_avatar"
 					/>
+
+			<TextView
+					android:id="@+id/accountUserName"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:padding="10dp"
+					android:gravity="center"
+					android:textSize="20sp"
+					android:textStyle="bold"
+					android:textColor="@color/defaultTextColor"
+					android:maxLines="1"
+					android:singleLine="true"
+					android:ellipsize="end"
+					android:text="@{ui.userName}"
+					tools:text="User Name" />
 
 			<TextView
 					android:id="@+id/accountSectionTitle"
