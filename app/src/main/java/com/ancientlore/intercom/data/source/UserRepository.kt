@@ -58,6 +58,11 @@ object UserRepository : UserSource {
 			?: callback?.onFailure(RuntimeException("UserRepository.updateImage(): No remote source"))
 	}
 
+	override fun updateName(name: String, callback: RequestCallback<Any>?) {
+		remoteSource?.updateName(name, callback)
+			?: callback?.onFailure(RuntimeException("UserRepository.updateName(): No remote source"))
+	}
+
 	fun setRemoteSource(source: UserSource) {
 		remoteSource = source
 	}

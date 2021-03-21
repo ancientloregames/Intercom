@@ -10,6 +10,7 @@ import com.ancientlore.intercom.data.source.UserSource
 import com.ancientlore.intercom.data.source.remote.firestore.C.USERS
 import com.ancientlore.intercom.data.source.remote.firestore.C.USER_FCM_TOKEN
 import com.ancientlore.intercom.data.source.remote.firestore.C.USER_ICON_URL
+import com.ancientlore.intercom.data.source.remote.firestore.C.USER_NAME
 import com.google.firebase.firestore.SetOptions
 
 class FirestoreUserSource(private val userId: String)
@@ -56,6 +57,18 @@ class FirestoreUserSource(private val userId: String)
 			.set(hashMapOf(USER_ICON_URL to uri.toString()), SetOptions.merge())
 			.addOnSuccessListener {
 				App.backend.getAuthManager().updateUserIconUri(uri, object : RequestCallback<Any> {
+					override fun onSuccess(result: Any) { callback?.onSuccess(result) }
+					override fun onFailure(error: Throwable) { callback?.onFailure(error) }
+				})
+			}
+			.addOnFailureListener { callback?.onFailure(it) }
+	}
+
+	override fun updateName(name: String, callback: RequestCallback<Any>?) {
+		user
+			.set(hashMapOf(USER_NAME to name), SetOptions.merge())
+			.addOnSuccessListener {
+				App.backend.getAuthManager().updateUserName(name, object : RequestCallback<Any> {
 					override fun onSuccess(result: Any) { callback?.onSuccess(result) }
 					override fun onFailure(error: Throwable) { callback?.onFailure(error) }
 				})

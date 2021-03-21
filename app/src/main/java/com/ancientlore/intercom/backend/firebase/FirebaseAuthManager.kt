@@ -41,6 +41,19 @@ object FirebaseAuthManager : AuthManager() {
 			?: Utils.logError("FirebaseAuthManager.updateUserIconUri(): No logged user to update")
 	}
 
+	override fun updateUserName(name: String, callback: RequestCallback<Any>?) {
+		auth.currentUser
+			?.run {
+				updateProfile(
+					UserProfileChangeRequest.Builder()
+						.setDisplayName(name)
+						.build())
+					.addOnSuccessListener { callback?.onSuccess(EmptyObject) }
+					.addOnFailureListener { callback?.onFailure(it) }
+			}
+			?: Utils.logError("FirebaseAuthManager.updateUserIconUri(): No logged user to update")
+	}
+
 	override fun signupViaEmail(params: EmailAuthParams, callback: RequestCallback<User>) {
 		auth.createUserWithEmailAndPassword(params.email, params.pass)
 			.addOnSuccessListener { result -> callback.onSuccess(toAppUser(result.user)) }

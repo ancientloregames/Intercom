@@ -1,5 +1,6 @@
 package com.ancientlore.intercom.ui.settings
 
+import android.app.AlertDialog
 import android.content.Context
 import android.net.Uri
 import androidx.core.content.ContextCompat
@@ -17,8 +18,10 @@ import com.ancientlore.intercom.utils.ImageUtils
 import com.ancientlore.intercom.utils.Utils
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
+import android.widget.EditText
 import androidx.annotation.ColorInt
 import androidx.annotation.Px
+import com.ancientlore.intercom.view.TextDrawable
 
 
 class SettingsViewModel(private val user: User)
@@ -34,12 +37,29 @@ class SettingsViewModel(private val user: User)
 	@ColorInt
 	private var abbrColor: Int = 0
 
+	private var editNameField: EditText? = null
+	private var editNameDialog: AlertDialog? = null
+
 	fun init(context: Context) {
 		if (user.iconUrl.isEmpty()) {
 			abbrSize = context.resources.getDimensionPixelSize(R.dimen.settingsUserNameAbSize)
 			abbrColor = ContextCompat.getColor(context, R.color.colorPrimaryDark)
 			userIcon.set(ImageUtils.createAbbreviationDrawable(user.name, abbrColor, abbrSize))
 		}
+
+		editNameField = EditText(context).apply {
+			setHint(R.string.dialog_edit_user_name_hint)
+			setText(user.name)
+		}
+		editNameDialog = AlertDialog.Builder(context)
+			.setTitle(R.string.dialog_edit_user_name_title)
+			.setMessage(R.string.dialog_edit_user_name_message)
+			.setView(editNameField)
+			.setPositiveButton(R.string.ok) { _, _ ->
+				updateUserName(editNameField!!.text.toString())
+			}
+			.setNegativeButton(R.string.cancel, null)
+			.create()
 	}
 
 	override fun clean() {
@@ -49,6 +69,11 @@ class SettingsViewModel(private val user: User)
 	}
 
 	fun onSetProfilePhotoClicked() = openGallerySub.onNext(EmptyObject)
+
+	fun onChangeUserNameClicked() {
+		editNameField?.setText(user.name)
+		editNameDialog?.show()
+	}
 
 	fun observeOpenGalleryRequest() = openGallerySub as Observable<*>
 
@@ -74,6 +99,22 @@ class SettingsViewModel(private val user: User)
 			override fun onFailure(error: Throwable) {
 				// TODO hide loading screen
 				Utils.logError(error)
+			}
+		})
+	}
+
+	private fun updateUserName(newUserName: String) {
+		UserRepository.updateName(newUserName, object : SimpleRequestCallback<Any>() {
+			override fun onSuccess(result: Any) {
+
+				userName.set(newUserName)
+
+				if (userIcon is TextDrawable || userIcon.get() == Uri.EMPTY)
+					userIcon.set(ImageUtils.createAbbreviationDrawable(newUserName, abbrColor, abbrSize))
+			}
+			override fun onFailure(error: Throwable) {
+				Utils.logError(error)
+				toastRequest.onNext(R.string.alert_error_change_name)
 			}
 		})
 	}

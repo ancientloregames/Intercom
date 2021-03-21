@@ -8,4 +8,5 @@ interface UserSource : DataSource<User> {
 	fun updateNotificationToken(token: String, callback: RequestCallback<Any>?)
 	fun getItem(phoneNumber: String, callback: RequestCallback<User>)
 	fun updateIcon(uri: Uri, callback: RequestCallback<Any>? = null)
+	fun updateName(name: String, callback: RequestCallback<Any>? = null)
 }

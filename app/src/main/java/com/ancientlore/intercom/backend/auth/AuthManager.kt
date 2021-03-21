@@ -14,4 +14,5 @@ abstract class AuthManager {
 
 	abstract fun getCurrentUser() : User
 	abstract fun updateUserIconUri(uri: Uri, callback: RequestCallback<Any>? = null)
+	abstract fun updateUserName(name: String, callback: RequestCallback<Any>? = null)
 }

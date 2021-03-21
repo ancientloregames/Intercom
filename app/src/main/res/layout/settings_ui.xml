@@ -65,6 +65,7 @@
 					android:singleLine="true"
 					android:ellipsize="end"
 					android:text="@{ui.userName}"
+					android:onClick="@{() -> ui.onChangeUserNameClicked()}"
 					tools:text="User Name" />
 
 			<TextView
@@ -83,6 +84,35 @@
 					android:text="@string/set_profile_photo"
 					android:onClick="@{() -> ui.onSetProfilePhotoClicked()}"
 					style="@style/settingsIconedTextItem" />
+
+			<View
+					android:layout_width="match_parent"
+					style="@style/userSettingsItemDivider"
+					/>
+
+			<LinearLayout
+					android:id="@+id/changeNameButton"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:orientation="vertical"
+					android:background="@drawable/bg_ripple_effect_gray"
+					android:onClick="@{() -> ui.onChangeUserNameClicked()}">
+
+				<TextView
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:text="@{ui.userName}"
+						tools:text="User Name"
+						style="@style/settingsDoubleTextItemUp" />
+
+				<TextView
+						android:id="@+id/changeName"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:text="@string/username"
+						style="@style/settingsDoubleTextItemDown" />
+
+			</LinearLayout>
 
 		</LinearLayout>
 

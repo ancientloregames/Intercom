@@ -49,6 +49,7 @@
 	<string name="alert_error_attach_file">Failed to attach file</string>
 	<string name="alert_error_set_photo">Failed to set photo</string>
 	<string name="alert_error_no_gallery">Failed to open gallery</string>
+	<string name="alert_error_change_name">Failed to change the name</string>
 
 	<string name="record">Record</string>
 	<string name="stop">Stop</string>
@@ -64,6 +65,7 @@
 	<string name="yes">Yes</string>
 	<string name="no">No</string>
 	<string name="maybe">Maybe</string>
+	<string name="ok">Ok</string>
 
 	<string name="you">You</string>
 	<string name="chat_notification_ticker">New message from %1$s</string>
@@ -78,4 +80,9 @@
 	<string name="bio">Bio</string>
 	<string name="bio_explain">Add a few words about yourself</string>
 	<string name="change_phone_explain">Tap to change phone number</string>
+
+	<string name="username">Username</string>
+	<string name="dialog_edit_user_name_title">Enter New Name</string>
+	<string name="dialog_edit_user_name_message">You can use <b>a-z</b>, <b>0-9</b> and underscores.\nMinimum length is <b>5</b> characters, maximum - <b>64</b></string>
+	<string name="dialog_edit_user_name_hint">Your Name</string>
 </resources>

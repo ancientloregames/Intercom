@@ -109,4 +109,41 @@
 		<item name="android:paddingBottom">10dp</item>
 	</style>
 
+	<style name="userSettingsItemDivider">
+		<item name="android:layout_marginStart">20dp</item>
+		<item name="android:layout_marginLeft">20dp</item>
+		<item name="android:layout_height">0.5dp</item>
+		<item name="android:background">@color/settingsItemDividerColor</item>
+	</style>
+
+	<style name="settingsDoubleTextItemUp" parent="@style/TextAppearance.AppCompat.Medium">
+		<item name="android:maxLines">1</item>
+		<item name="android:singleLine">true</item>
+		<item name="android:ellipsize">end</item>
+		<item name="android:textColor">@color/defaultTextColor</item>
+		<item name="android:textStyle">bold</item>
+		<item name="android:textSize">16sp</item>
+		<item name="android:gravity">start|center_vertical</item>
+		<item name="android:paddingStart">20dp</item>
+		<item name="android:paddingLeft">20dp</item>
+		<item name="android:paddingEnd">20dp</item>
+		<item name="android:paddingRight">20dp</item>
+		<item name="android:paddingTop">15dp</item>
+	</style>
+
+	<style name="settingsDoubleTextItemDown" parent="@style/TextAppearance.AppCompat.Medium">
+		<item name="android:maxLines">1</item>
+		<item name="android:singleLine">true</item>
+		<item name="android:ellipsize">end</item>
+		<item name="android:textColor">@color/defaultSubtitleColor</item>
+		<item name="android:textStyle">bold</item>
+		<item name="android:textSize">14sp</item>
+		<item name="android:gravity">start|center_vertical</item>
+		<item name="android:paddingStart">20dp</item>
+		<item name="android:paddingLeft">20dp</item>
+		<item name="android:paddingEnd">20dp</item>
+		<item name="android:paddingRight">20dp</item>
+		<item name="android:paddingBottom">10dp</item>
+	</style>
+
 </resources>

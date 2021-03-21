@@ -21,4 +21,6 @@
 
 	<color name="settingsSectionTitleTextColor">@color/colorPrimary</color>
 	<color name="settingsItemTextColor">#757575</color>
+
+	<color name="settingsItemDividerColor">#ccc</color>
 </resources>

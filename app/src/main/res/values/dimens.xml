@@ -8,4 +8,6 @@
 
 	<dimen name="chatInputMinHeight">45dp</dimen>
 	<dimen name="chatInputIndent">4dp</dimen>
+
+	<dimen name="settingsUserNameAbSize">36dp</dimen>
 </resources>
