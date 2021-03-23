@@ -21,6 +21,7 @@ import io.reactivex.subjects.PublishSubject
 import android.widget.EditText
 import androidx.annotation.ColorInt
 import androidx.annotation.Px
+import com.ancientlore.intercom.utils.extensions.showKeyboard
 import com.ancientlore.intercom.view.TextDrawable
 
 
@@ -73,6 +74,7 @@ class SettingsViewModel(private val user: User)
 	fun onChangeUserNameClicked() {
 		editNameField?.setText(user.name)
 		editNameDialog?.show()
+		Utils.runOnUiThread({ editNameField?.showKeyboard() }, 20)
 	}
 
 	fun observeOpenGalleryRequest() = openGallerySub as Observable<*>
