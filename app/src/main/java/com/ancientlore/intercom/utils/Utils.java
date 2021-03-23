@@ -1,10 +1,14 @@
 package com.ancientlore.intercom.utils;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.res.Resources;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.webkit.MimeTypeMap;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
@@ -170,5 +174,76 @@ public final class Utils
 		return phoneNumber != null
 				? new Regex(" |-").replace(phoneNumber, "")
 				: null;
+	}
+
+	public static boolean showKeyboard(View view)
+	{
+		return showKeyboard(view, InputMethodManager.SHOW_IMPLICIT);
+	}
+
+	public static boolean showKeyboard(View view, int flags)
+	{
+		if (view != null)
+		{
+			Context context = view.getContext();
+			if (context != null)
+			{
+				if (Looper.myLooper() == Looper.getMainLooper())
+				{
+					return view.requestFocus()
+							&& ((InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE))
+							.showSoftInput(view, flags);
+				}
+				else
+				{
+					return view.post(() ->
+					{
+						view.requestFocus();
+						((InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE))
+								.showSoftInput(view, flags);
+					});
+				}
+			}
+		}
+		return false;
+	}
+
+	public static boolean hideKeyboard(Activity activity)
+	{
+		return hideKeyboard(activity, 0);
+	}
+
+	public static boolean hideKeyboard(Activity activity, int flags)
+	{
+		View view = activity.getCurrentFocus();
+		return view != null && hideKeyboard(view, flags);
+	}
+
+	public static boolean hideKeyboard(View view)
+	{
+		return hideKeyboard(view, 0);
+	}
+
+	public static boolean hideKeyboard(View view, int flags)
+	{
+		if (view != null)
+		{
+			Context context = view.getContext();
+			if (context != null)
+			{
+				if (Looper.myLooper() == Looper.getMainLooper())
+				{
+					((InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE))
+							.hideSoftInputFromWindow(view.getWindowToken(), flags);
+				}
+				else
+				{
+					return view.post(() ->
+							((InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE))
+									.hideSoftInputFromWindow(view.getWindowToken(), flags));
+				}
+			}
+		}
+		return false;
 	}
 }
