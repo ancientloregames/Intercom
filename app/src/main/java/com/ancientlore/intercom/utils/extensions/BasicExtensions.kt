@@ -1,6 +1,7 @@
 package com.ancientlore.intercom.utils.extensions
 
 import android.Manifest
+import android.app.Activity
 import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
@@ -12,9 +13,13 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
+import android.os.Looper
 import android.provider.ContactsContract
 import android.provider.MediaStore
+import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.webkit.MimeTypeMap
+import android.widget.EditText
 import androidx.annotation.RequiresPermission
 import androidx.core.app.ActivityCompat
 import com.ancientlore.intercom.C
@@ -219,4 +224,52 @@ fun Drawable.toBitmap(): Bitmap? {
 	}
 
 	return bitmap
+}
+
+fun EditText.showKeyboard() : Boolean {
+	return showKeyboard(InputMethodManager.SHOW_IMPLICIT)
+}
+
+fun EditText.showKeyboard(flags: Int) : Boolean {
+	return context
+		?.let { context ->
+			if (Looper.myLooper() == Looper.getMainLooper()) {
+				val success = requestFocus()
+						&& (context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)
+					.showSoftInput(this, flags)
+				setSelection(length())
+				return success
+			} else {
+				post {
+					requestFocus()
+					(context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)
+						.showSoftInput(this, flags)
+					setSelection(length())
+				}
+			}
+		} ?: false
+}
+
+fun Activity.hideKeyboard() : Boolean {
+	return hideKeyboard(0)
+}
+
+fun Activity.hideKeyboard(flags: Int) : Boolean {
+	return hideKeyboard(currentFocus ?: return false, flags)
+}
+
+fun Context.hideKeyboard(view: View, flags: Int) : Boolean {
+	return view.context
+		?.let {
+			if (Looper.myLooper() == Looper.getMainLooper()) {
+				(getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)
+					.hideSoftInputFromWindow(view.windowToken, flags)
+			}
+			else {
+				view.post {
+					(getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)
+						.hideSoftInputFromWindow(view.windowToken, flags)
+				}
+			}
+		} ?: false
 }
