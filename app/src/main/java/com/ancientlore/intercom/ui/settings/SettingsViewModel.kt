@@ -23,6 +23,7 @@ import androidx.annotation.ColorInt
 import androidx.annotation.Px
 import com.ancientlore.intercom.utils.extensions.showKeyboard
 import com.ancientlore.intercom.view.TextDrawable
+import java.util.regex.Pattern
 
 
 class SettingsViewModel(private val user: User)
@@ -57,7 +58,11 @@ class SettingsViewModel(private val user: User)
 			.setMessage(R.string.dialog_edit_user_name_message)
 			.setView(editNameField)
 			.setPositiveButton(R.string.ok) { _, _ ->
-				updateUserName(editNameField!!.text.toString())
+				val text = editNameField!!.text.toString()
+				if (validateUserName(text))
+					updateUserName(text)
+				else
+					toastRequest.onNext(R.string.alert_error_invalid_name)
 			}
 			.setNegativeButton(R.string.cancel, null)
 			.create()
@@ -72,7 +77,7 @@ class SettingsViewModel(private val user: User)
 	fun onSetProfilePhotoClicked() = openGallerySub.onNext(EmptyObject)
 
 	fun onChangeUserNameClicked() {
-		editNameField?.setText(user.name)
+		editNameField?.setText(userName.get())
 		editNameDialog?.show()
 		Utils.runOnUiThread({ editNameField?.showKeyboard() }, 20)
 	}
@@ -105,13 +110,18 @@ class SettingsViewModel(private val user: User)
 		})
 	}
 
+	private fun validateUserName(name: String) : Boolean {
+		return name.length in 5..64 && Pattern.matches("[a-zA-Z0-9_]+", name)
+	}
+
 	private fun updateUserName(newUserName: String) {
 		UserRepository.updateName(newUserName, object : SimpleRequestCallback<Any>() {
 			override fun onSuccess(result: Any) {
 
 				userName.set(newUserName)
 
-				if (userIcon is TextDrawable || userIcon.get() == Uri.EMPTY)
+				val icon = userIcon.get()
+				if (icon is TextDrawable || icon == Uri.EMPTY)
 					userIcon.set(ImageUtils.createAbbreviationDrawable(newUserName, abbrColor, abbrSize))
 			}
 			override fun onFailure(error: Throwable) {
