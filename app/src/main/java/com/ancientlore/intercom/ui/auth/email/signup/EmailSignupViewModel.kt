@@ -27,20 +27,18 @@ class EmailSignupViewModel: AuthViewModel() {
 	private val userPass get() = passField.get()!!
 	private val userPass2 get() = emailField.get()!!
 
-	private val alertRequestEvent = PublishSubject.create<Int>()
 	private val signupRequest = PublishSubject.create<EmailAuthParams>()
 	private val loginRequest = PublishSubject.create<Any>()
 
 	private val credentials get() = composeParams()
 
-	fun observeAlertRequest() = alertRequestEvent as Observable<Int>
 	fun observeSignupRequest() = signupRequest as Observable<EmailAuthParams>
 	fun observeLoginRequest() = loginRequest as Observable<*>
 
 	fun onSignupClicked() {
 		when (val validityCode = getFieldsValidityCode()) {
 			VALIDITY_OK -> signupRequest.onNext(credentials)
-			else -> alertRequestEvent.onNext(validityCode)
+			else -> alertRequestSub.onNext(validityCode)
 		}
 	}
 

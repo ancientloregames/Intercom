@@ -30,6 +30,8 @@ class EmailLoginFragment : AuthFragment<EmailLoginViewModel, EmailLoginUiBinding
 	override fun initViewModel(viewModel: EmailLoginViewModel) {}
 
 	override fun observeViewModel(viewModel: EmailLoginViewModel) {
+		super.observeViewModel(viewModel)
+
 		subscriptions.add(viewModel.observeSignupRequest()
 			.subscribe { openSignupForm() })
 

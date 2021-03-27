@@ -31,7 +31,8 @@ class PhoneCheckFragment
 		?: throw RuntimeException("Phone number is a mandotory arg")
 
 	override fun getAlertMessage(alertCode: Int): String {
-		TODO()
+		// TODO
+		return ""
 	}
 
 	override fun getLayoutResId() = R.layout.phone_check_ui
@@ -57,10 +58,13 @@ class PhoneCheckFragment
 	}
 
 	override fun observeViewModel(viewModel: PhoneCheckViewModel) {
+		super.observeViewModel(viewModel)
+
 		subscriptions.add(viewModel.observeEnterRequest()
 			.subscribe { verifyCode(it) })
 	}
 
 	private fun verifyCode(code: String) {
+		// TODO
 	}
 }

@@ -45,11 +45,13 @@ class PhoneLoginFragment
 	}
 
 	override fun observeViewModel(viewModel: PhoneLoginViewModel) {
+		super.observeViewModel(viewModel)
+
 		subscriptions.add(viewModel.observeLoginSuccessEvent()
 			.subscribe { onLoginSuccess(it) })
 		subscriptions.add(viewModel.observeValidationRequestEvent()
 			.subscribe { onValidationRequest(it) })
-		subscriptions.add(viewModel.observeAlertRequestEvent()
+		subscriptions.add(viewModel.observeAlertRequest()
 			.subscribe { showAlert(it) })
 	}
 

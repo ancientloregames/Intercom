@@ -1,6 +1,5 @@
 package com.ancientlore.intercom.ui.auth
 
-import android.widget.Toast
 import androidx.databinding.ViewDataBinding
 import com.ancientlore.intercom.App
 import com.ancientlore.intercom.R
@@ -21,16 +20,10 @@ abstract class AuthFragment<VM : BasicViewModel, B : ViewDataBinding> : BasicFra
 
 	protected fun onFailedAuth(error: Throwable) {
 		Utils.logError(error)
-		showAlert(getString(R.string.auth_failure_msg))
+		showToast(getString(R.string.auth_failure_msg))
 	}
 
 	protected fun showAlert(alertCode: Int) {
-		showAlert(getAlertMessage(alertCode))
-	}
-
-	protected fun showAlert(message: String) {
-		Utils.runOnUiThread {
-			Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-		}
+		showToast(getAlertMessage(alertCode))
 	}
 }

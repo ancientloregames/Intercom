@@ -130,8 +130,8 @@ class ChatFlowFragment : BasicFragment<ChatFlowViewModel, ChatFlowUiBinding>() {
 	}
 
 	override fun observeViewModel(viewModel: ChatFlowViewModel) {
-		subscriptions.add(viewModel.observeToastRequest()
-			.subscribe { showToast(it) })
+		super.observeViewModel(viewModel)
+
 		subscriptions.add(viewModel.observeAttachMenuOpen()
 			.subscribe { openAttachMenu() })
 		subscriptions.add(viewModel.observeAudioRecord()

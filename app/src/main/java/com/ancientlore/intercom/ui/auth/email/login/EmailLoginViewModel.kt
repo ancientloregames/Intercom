@@ -25,7 +25,6 @@ class EmailLoginViewModel: AuthViewModel() {
 	private val userEmail get() = emailField.get()!!
 	private val userPass get() = passField.get()!!
 
-	private val alertRequest = PublishSubject.create<Int>()
 	private val signupRequest = PublishSubject.create<Any>()
 	private val loginRequest = PublishSubject.create<EmailAuthParams>()
 
@@ -36,7 +35,6 @@ class EmailLoginViewModel: AuthViewModel() {
 			loginRequest.onNext(credentials)
 	}
 
-	fun observeAlertRequest() = alertRequest as Observable<Int>
 	fun observeSignupRequest() = signupRequest as Observable<*>
 	fun observeLoginRequest() = loginRequest as Observable<EmailAuthParams>
 
@@ -44,7 +42,7 @@ class EmailLoginViewModel: AuthViewModel() {
 		val validationCode = checkValidity()
 
 		return if (validationCode != VALIDITY_OK) {
-			alertRequest.onNext(validationCode)
+			alertRequestSub.onNext(validationCode)
 			false
 		} else true
 	}

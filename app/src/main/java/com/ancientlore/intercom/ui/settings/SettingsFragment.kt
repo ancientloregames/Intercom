@@ -47,6 +47,8 @@ class SettingsFragment : BasicFragment<SettingsViewModel, SettingsUiBinding>()  
 	}
 
 	override fun observeViewModel(viewModel: SettingsViewModel) {
+		super.observeViewModel(viewModel)
+
 		subscriptions.add(viewModel.observeOpenGalleryRequest()
 			.subscribe { openGallery() })
 	}

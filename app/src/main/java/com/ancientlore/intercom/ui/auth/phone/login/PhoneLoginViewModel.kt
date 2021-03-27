@@ -5,6 +5,7 @@ import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.backend.auth.PhoneAuthParams
 import com.ancientlore.intercom.data.model.User
 import com.ancientlore.intercom.ui.auth.AuthViewModel
+import com.ancientlore.intercom.utils.Utils
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 
@@ -23,20 +24,17 @@ class PhoneLoginViewModel : AuthViewModel() {
 
 	private val loginSuccessEvent = PublishSubject.create<User>()
 	private val validationRequestEvent = PublishSubject.create<PhoneAuthParams>()
-	private val alertRequestEvent = PublishSubject.create<Int>()
 
 	fun onEnterClicked() {
 		when (val validityCode = getFieldsValidityCode()) {
 			VALIDITY_OK -> login()
-			else -> alertRequestEvent.onNext(validityCode)
+			else -> alertRequestSub.onNext(validityCode)
 		}
 	}
 
 	fun observeLoginSuccessEvent() = loginSuccessEvent as Observable<User>
 
 	fun observeValidationRequestEvent() = validationRequestEvent as Observable<PhoneAuthParams>
-
-	fun observeAlertRequestEvent() = alertRequestEvent as Observable<Int>
 
 	private fun getFieldsValidityCode(): Int {
 		return when {
@@ -61,8 +59,8 @@ class PhoneLoginViewModel : AuthViewModel() {
 					loginSuccessEvent.onNext(result)
 			}
 			override fun onFailure(error: Throwable) {
-				error.printStackTrace()
-				alertRequestEvent.onNext(ERROR_AUTH_FAILED)
+				Utils.logError(error)
+				alertRequestSub.onNext(ERROR_AUTH_FAILED)
 			}
 		})
 	}

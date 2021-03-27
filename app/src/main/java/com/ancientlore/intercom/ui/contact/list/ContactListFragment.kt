@@ -48,8 +48,8 @@ class ContactListFragment : BasicFragment<ContactListViewModel, ContactListUiBin
 	}
 
 	override fun observeViewModel(viewModel: ContactListViewModel) {
-		subscriptions.add(viewModel.observeToastRequest()
-			.subscribe { showToast(it) })
+		super.observeViewModel(viewModel)
+
 		subscriptions.add(viewModel.observeChatOpen()
 			.subscribe {
 				close()

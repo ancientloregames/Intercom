@@ -38,8 +38,6 @@ abstract class BasicFragment<VM : BasicViewModel, B : ViewDataBinding> : Fragmen
 
 	protected abstract fun initViewModel(viewModel: VM)
 
-	protected abstract fun observeViewModel(viewModel: VM)
-
 	final override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedState: Bundle?): View {
 		return inflater.inflate(getLayoutResId(), container, false)
 	}
@@ -61,6 +59,12 @@ abstract class BasicFragment<VM : BasicViewModel, B : ViewDataBinding> : Fragmen
 		observeViewModel(viewModel)
 	}
 
+	@CallSuper
+	protected open fun observeViewModel(viewModel: VM) {
+		subscriptions.add(viewModel.observeToastRequest()
+			.subscribe { showToast(it) })
+	}
+
 	protected open fun initView(view: View, savedInstanceState: Bundle?) {}
 
 	override fun onDestroyView() {
@@ -72,10 +76,16 @@ abstract class BasicFragment<VM : BasicViewModel, B : ViewDataBinding> : Fragmen
 		activity?.runOnUiThread(action)
 	}
 
-	protected fun showToast(@StringRes textResId: Int) {
-		runOnUiThread(Runnable {
-			Toast.makeText(context, textResId, Toast.LENGTH_LONG).show()
-		})
+	protected fun showToast(@StringRes textResId: Int, duration: Int = Toast.LENGTH_LONG) {
+		runOnUiThread {
+			Toast.makeText(context, textResId, duration).show()
+		}
+	}
+
+	protected fun showToast(message: String, duration: Int = Toast.LENGTH_LONG) {
+		runOnUiThread {
+			Toast.makeText(context, message, duration).show()
+		}
 	}
 
 	@CallSuper
