@@ -75,13 +75,14 @@ class ChatListAdapter(context: Context, items: MutableList<Chat>)
 		}
 
 		override fun bind(data: Chat) {
-			titleField.set(data.localName ?: data.name)
+			val name = data.localName ?: data.name
+			titleField.set(name)
 			messageField.set(data.lastMsgText)
 			dateField.set(data.lastMsgDate)
 
 			when {
 				data.iconUrl.isNotEmpty() -> icon.set(data.iconUri)
-				else -> icon.set(ImageUtils.createAbbreviationDrawable(data.name, iconColor, iconTextSize))
+				else -> icon.set(ImageUtils.createAbbreviationDrawable(name, iconColor, iconTextSize))
 			}
 		}
 
