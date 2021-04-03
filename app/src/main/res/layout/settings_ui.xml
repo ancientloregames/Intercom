@@ -45,7 +45,6 @@
 					android:layout_height="100dp"
 					android:layout_marginTop="15dp"
 					android:layout_gravity="center"
-					android:scaleType="center"
 					android:src="@{ui.userIcon}"
 					tools:backgroundColor="@color/colorPrimaryDark"
 					tools:tint="@android:color/white"
