@@ -45,7 +45,7 @@
 					android:layout_height="100dp"
 					android:layout_marginTop="15dp"
 					android:layout_gravity="center"
-					android:src="@{ui.userIcon}"
+					android:src="@{ui.userIconField}"
 					tools:backgroundColor="@color/colorPrimaryDark"
 					tools:tint="@android:color/white"
 					tools:srcCompat="@drawable/ic_avatar"
@@ -63,7 +63,7 @@
 					android:maxLines="1"
 					android:singleLine="true"
 					android:ellipsize="end"
-					android:text="@{ui.userName}"
+					android:text="@{ui.userNameField}"
 					android:onClick="@{() -> ui.onChangeUserNameClicked()}"
 					tools:text="User Name" />
 
@@ -100,15 +100,43 @@
 				<TextView
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
-						android:text="@{ui.userName}"
+						android:text="@{ui.userNameField}"
+						android:hint="@string/username_placeholder"
 						tools:text="User Name"
 						style="@style/settingsDoubleTextItemUp" />
 
 				<TextView
-						android:id="@+id/changeName"
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
 						android:text="@string/username"
+						style="@style/settingsDoubleTextItemDown" />
+
+			</LinearLayout>
+
+			<View
+					android:layout_width="match_parent"
+					style="@style/userSettingsItemDivider"
+					/>
+
+			<LinearLayout
+					android:id="@+id/changeStatusButton"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:orientation="vertical"
+					android:background="@drawable/bg_ripple_effect_gray"
+					android:onClick="@{() -> ui.onChangeUserStatusClicked()}">
+
+				<TextView
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:text="@{ui.userStatusField}"
+						android:hint="@string/user_status_placeholder"
+						style="@style/settingsDoubleTextItemUp" />
+
+				<TextView
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:text="@string/status"
 						style="@style/settingsDoubleTextItemDown" />
 
 			</LinearLayout>

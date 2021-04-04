@@ -23,14 +23,16 @@ import androidx.annotation.ColorInt
 import androidx.annotation.Px
 import com.ancientlore.intercom.utils.extensions.showKeyboard
 import com.ancientlore.intercom.view.TextDrawable
+import java.lang.ref.WeakReference
 import java.util.regex.Pattern
 
 
 class SettingsViewModel(private val user: User)
 	: BasicViewModel() {
 
-	val userIcon = ObservableField<Any>(user.iconUri)
-	val userName = ObservableField(user.name)
+	val userIconField = ObservableField<Any>(user.iconUri)
+	val userNameField = ObservableField(user.name)
+	val userStatusField = ObservableField(user.status)
 
 	private val openGallerySub = PublishSubject.create<Any>()
 
@@ -39,30 +41,53 @@ class SettingsViewModel(private val user: User)
 	@ColorInt
 	private var abbrColor: Int = 0
 
-	private var editNameField: EditText? = null
+	private var editNameViewRef: WeakReference<EditText>? = null
 	private var editNameDialog: AlertDialog? = null
+
+	private var editStatusViewRef: WeakReference<EditText>? = null
+	private var editStatusDialog: AlertDialog? = null
 
 	fun init(context: Context) {
 		if (user.iconUrl.isEmpty()) {
 			abbrSize = context.resources.getDimensionPixelSize(R.dimen.settingsUserNameAbSize)
 			abbrColor = ContextCompat.getColor(context, R.color.colorPrimaryDark)
-			userIcon.set(ImageUtils.createAbbreviationDrawable(user.name, abbrColor, abbrSize))
+			userIconField.set(ImageUtils.createAbbreviationDrawable(user.name, abbrColor, abbrSize))
 		}
 
-		editNameField = EditText(context).apply {
+		val editNameView = EditText(context).apply {
 			setHint(R.string.dialog_edit_user_name_hint)
 			setText(user.name)
 		}
+		editNameViewRef = WeakReference(editNameView)
 		editNameDialog = AlertDialog.Builder(context)
 			.setTitle(R.string.dialog_edit_user_name_title)
 			.setMessage(R.string.dialog_edit_user_name_message)
-			.setView(editNameField)
+			.setView(editNameView)
 			.setPositiveButton(R.string.ok) { _, _ ->
-				val text = editNameField!!.text.toString()
+				val text = editNameView.text.toString()
 				if (validateUserName(text))
 					updateUserName(text)
 				else
 					toastRequest.onNext(R.string.alert_error_invalid_name)
+			}
+			.setNegativeButton(R.string.cancel, null)
+			.create()
+
+		val editStatusView = EditText(context).apply {
+			setHint(R.string.dialog_edit_user_name_hint)
+			setText(user.name)
+		}
+		editStatusViewRef = WeakReference(editStatusView)
+		editStatusDialog = AlertDialog.Builder(context)
+			.setTitle(R.string.dialog_edit_user_status_title)
+			.setMessage(R.string.dialog_edit_user_status_message)
+			.setView(editStatusView)
+			.setPositiveButton(R.string.ok) { _, _ ->
+				val text = editStatusView.text.toString()
+				if (validateUserStatus(text))
+					updateUserStatus(text)
+				else
+					toastRequest.onNext(R.string.alert_error_invalid_user_status)
 			}
 			.setNegativeButton(R.string.cancel, null)
 			.create()
@@ -77,9 +102,21 @@ class SettingsViewModel(private val user: User)
 	fun onSetProfilePhotoClicked() = openGallerySub.onNext(EmptyObject)
 
 	fun onChangeUserNameClicked() {
-		editNameField?.setText(userName.get())
-		editNameDialog?.show()
-		Utils.runOnUiThread({ editNameField?.showKeyboard() }, 20)
+		editNameViewRef?.get()
+			?.let { view ->
+				view.setText(userNameField.get())
+				editNameDialog?.show()
+				Utils.runOnUiThread({ view.showKeyboard() }, 20)
+			}
+	}
+
+	fun onChangeUserStatusClicked() {
+		editStatusViewRef?.get()
+			?.let { view ->
+				view.setText(userStatusField.get())
+				editStatusDialog?.show()
+				Utils.runOnUiThread({ view.showKeyboard() }, 20)
+			}
 	}
 
 	fun observeOpenGalleryRequest() = openGallerySub as Observable<*>
@@ -95,7 +132,7 @@ class SettingsViewModel(private val user: User)
 				UserRepository.updateIcon(uri, object : SimpleRequestCallback<Any>() {
 					override fun onSuccess(result: Any) {
 						// TODO hide loading screen
-						userIcon.set(uri)
+						userIconField.set(uri)
 					}
 					override fun onFailure(error: Throwable) {
 						// TODO hide loading screen
@@ -118,15 +155,32 @@ class SettingsViewModel(private val user: User)
 		UserRepository.updateName(newUserName, object : SimpleRequestCallback<Any>() {
 			override fun onSuccess(result: Any) {
 
-				userName.set(newUserName)
+				userNameField.set(newUserName)
 
-				val icon = userIcon.get()
+				val icon = userIconField.get()
 				if (icon is TextDrawable || icon == Uri.EMPTY)
-					userIcon.set(ImageUtils.createAbbreviationDrawable(newUserName, abbrColor, abbrSize))
+					userIconField.set(ImageUtils.createAbbreviationDrawable(newUserName, abbrColor, abbrSize))
 			}
 			override fun onFailure(error: Throwable) {
 				Utils.logError(error)
 				toastRequest.onNext(R.string.alert_error_change_name)
+			}
+		})
+	}
+
+	private fun validateUserStatus(name: String) : Boolean {
+		return name.length < 256
+	}
+
+	private fun updateUserStatus(newStatus: String) {
+		UserRepository.updateStatus(newStatus, object : SimpleRequestCallback<Any>() {
+			override fun onSuccess(result: Any) {
+
+				userStatusField.set(newStatus)
+			}
+			override fun onFailure(error: Throwable) {
+				Utils.logError(error)
+				toastRequest.onNext(R.string.alert_error_change_user_status)
 			}
 		})
 	}

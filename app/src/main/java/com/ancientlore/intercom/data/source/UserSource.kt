@@ -9,4 +9,5 @@ interface UserSource : DataSource<User> {
 	fun getItem(phoneNumber: String, callback: RequestCallback<User>)
 	fun updateIcon(uri: Uri, callback: RequestCallback<Any>? = null)
 	fun updateName(name: String, callback: RequestCallback<Any>? = null)
+	fun updateStatus(status: String, callback: RequestCallback<Any>? = null)
 }

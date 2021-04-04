@@ -11,6 +11,7 @@ import com.ancientlore.intercom.data.source.remote.firestore.C.USERS
 import com.ancientlore.intercom.data.source.remote.firestore.C.USER_FCM_TOKEN
 import com.ancientlore.intercom.data.source.remote.firestore.C.USER_ICON_URL
 import com.ancientlore.intercom.data.source.remote.firestore.C.USER_NAME
+import com.ancientlore.intercom.data.source.remote.firestore.C.USER_STATUS
 import com.google.firebase.firestore.SetOptions
 
 class FirestoreUserSource(private val userId: String)
@@ -73,6 +74,13 @@ class FirestoreUserSource(private val userId: String)
 					override fun onFailure(error: Throwable) { callback?.onFailure(error) }
 				})
 			}
+			.addOnFailureListener { callback?.onFailure(it) }
+	}
+
+	override fun updateStatus(status: String, callback: RequestCallback<Any>?) {
+		user
+			.set(hashMapOf(USER_STATUS to status), SetOptions.merge())
+			.addOnSuccessListener { callback?.onSuccess(EmptyObject) }
 			.addOnFailureListener { callback?.onFailure(it) }
 	}
 }

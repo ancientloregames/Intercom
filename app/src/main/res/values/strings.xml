@@ -51,6 +51,8 @@
 	<string name="alert_error_no_gallery">Failed to open gallery</string>
 	<string name="alert_error_change_name">Failed to change the name</string>
 	<string name="alert_error_invalid_name">Inavalid name</string>
+	<string name="alert_error_change_user_status">Failed to change the status</string>
+	<string name="alert_error_invalid_user_status">Inavalid status</string>
 
 	<string name="record">Record</string>
 	<string name="stop">Stop</string>
@@ -83,7 +85,14 @@
 	<string name="change_phone_explain">Tap to change phone number</string>
 
 	<string name="username">Username</string>
+	<string name="username_placeholder">Tap to enter your username…</string>
 	<string name="dialog_edit_user_name_title">Enter New Name</string>
 	<string name="dialog_edit_user_name_message">You can use <b>a-z</b>, <b>0-9</b> and underscores.\nMinimum length is <b>5</b> characters, maximum - <b>64</b></string>
 	<string name="dialog_edit_user_name_hint">Your Name</string>
+
+	<string name="status">Status</string>
+	<string name="user_status_placeholder">Tap to enter your status…</string>
+	<string name="dialog_edit_user_status_title">Enter New Status</string>
+	<string name="dialog_edit_user_status_message">Maximum length is <b>64</b> characters</string>
+	<string name="dialog_edit_user_status_hint">Your Status</string>
 </resources>
