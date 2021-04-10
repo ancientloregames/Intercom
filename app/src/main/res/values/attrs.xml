@@ -14,4 +14,8 @@
 		<attr name="drawableTop" format="reference"/>
 		<attr name="drawableBottom" format="reference"/>
 	</declare-styleable>
+
+	<declare-styleable name="ColoredProgressBar">
+		<attr name="color" format="color"/>
+	</declare-styleable>
 </resources>
