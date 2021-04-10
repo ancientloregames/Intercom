@@ -247,6 +247,22 @@
 					android:contentDescription="@string/send"
 					tools:visibility="visible"
 			/>
+
+			<com.ancientlore.intercom.view.ColoredProgressBar
+					android:id="@+id/sendProgressView"
+					android:layout_width="@dimen/chatInputMinHeight"
+					android:layout_height="@dimen/chatInputMinHeight"
+					android:padding="5dp"
+					android:layout_marginTop="@dimen/chatInputIndent"
+					android:layout_marginRight="@dimen/chatInputIndent"
+					android:layout_marginBottom="@dimen/chatInputIndent"
+					android:layout_alignParentBottom="true"
+					android:layout_alignParentRight="true"
+					android:background="@drawable/bg_send_button_progressbar"
+					android:visibility="@{ui.showSendProgressField}"
+					app:color="@android:color/white"
+					tools:visibility="gone"
+					/>
 		</RelativeLayout>
 	</com.ancientlore.intercom.view.SwipableLayout>
 </layout>

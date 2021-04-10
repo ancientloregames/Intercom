@@ -3,6 +3,7 @@ package com.ancientlore.intercom.ui.chat.flow
 import android.media.MediaRecorder
 import android.net.Uri
 import android.util.Log
+import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableField
 import com.ancientlore.intercom.App
 import com.ancientlore.intercom.EmptyObject
@@ -26,7 +27,7 @@ class ChatFlowViewModel(private val userId: String,
 
 	val textField = ObservableField("")
 
-	private lateinit var listAdapter: ChatFlowAdapter
+	val showSendProgressField = ObservableBoolean(false)
 
 	private val repository = MessageRepository()
 
