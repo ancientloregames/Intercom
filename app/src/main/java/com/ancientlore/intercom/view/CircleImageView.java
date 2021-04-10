@@ -387,7 +387,7 @@ public class CircleImageView extends AppCompatImageView
 	}
 
 	private Bitmap getBitmapFromDrawable(Drawable drawable) {
-		if (drawable == null) {
+		if (drawable == null || drawable instanceof TextDrawable) {
 			return null;
 		}
 
