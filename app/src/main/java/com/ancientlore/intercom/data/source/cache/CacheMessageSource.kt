@@ -4,7 +4,7 @@ import com.ancientlore.intercom.data.model.Message
 
 object CacheMessageSource {
 
-	private val cache: MutableMap<Long, Message> = HashMap()
+	private val cache: MutableMap<String, Message> = HashMap()
 
 	fun isNotEmpty() = cache.isNotEmpty()
 
@@ -12,12 +12,12 @@ object CacheMessageSource {
 
 	fun getItem(id: Long) = cache[id]
 
-	fun addItem(item: Message) = cache.put(item.timestamp.time, item)
+	fun addItem(item: Message) = cache.put(item.id, item)
 
 	fun reset(newChats: List<Message>) {
 		cache.clear()
 		newChats.forEach {
-			cache[it.timestamp.time] = it
+			cache[it.id] = it
 		}
 	}
 }
