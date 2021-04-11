@@ -52,8 +52,9 @@ class ContactListFragment : BasicFragment<ContactListViewModel, ContactListUiBin
 
 		subscriptions.add(viewModel.observeChatOpen()
 			.subscribe {
+				val nav = navigator
 				close()
-				navigator?.openChatFlow(it)
+				nav?.openChatFlow(it)
 			})
 	}
 
