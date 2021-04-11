@@ -7,13 +7,18 @@ import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableField
 import com.ancientlore.intercom.App
 import com.ancientlore.intercom.EmptyObject
+import com.ancientlore.intercom.R
 import com.ancientlore.intercom.backend.ProgressRequestCallback
 import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.backend.SimpleRequestCallback
+import com.ancientlore.intercom.data.model.Chat
 import com.ancientlore.intercom.data.model.FileData
 import com.ancientlore.intercom.data.model.Message
+import com.ancientlore.intercom.data.source.ChatRepository
+import com.ancientlore.intercom.data.source.EmptyResultException
 import com.ancientlore.intercom.data.source.MessageRepository
 import com.ancientlore.intercom.ui.BasicViewModel
+import com.ancientlore.intercom.utils.Runnable1
 import com.ancientlore.intercom.utils.Utils
 import com.ancientlore.intercom.utils.extensions.createAudioMessageFile
 import com.ancientlore.intercom.view.MessageInputManager
@@ -21,8 +26,8 @@ import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import java.io.File
 
-class ChatFlowViewModel(private val userId: String,
-                        private val chatId: String)
+class ChatFlowViewModel(private val listAdapter: ChatFlowAdapter,
+                        private val params: ChatFlowParams)
 	: BasicViewModel() {
 
 	val textField = ObservableField("")
@@ -38,6 +43,31 @@ class ChatFlowViewModel(private val userId: String,
 	private val recordAudioSubj = PublishSubject.create<Any>()
 
 	private var inputManager: MessageInputManager? = null
+
+	init {
+		when {
+			params.chatId.isNotEmpty() -> {
+				initMessageRepository(params.chatId)
+			}
+			params.contactId.isNotEmpty() -> {
+				ChatRepository.getItem(params.contactId, object : RequestCallback<Chat> {
+					override fun onSuccess(chat: Chat) {
+						initMessageRepository(chat.id)
+					}
+					override fun onFailure(error: Throwable) {
+						if (error !is EmptyResultException)
+							Utils.logError(error)
+					}
+				})
+			}
+			// TODO Group chat
+			else -> {
+				val error = RuntimeException("Chat Flow Ui has been opened with no chat neither contacts ids")
+				Utils.logError(error)
+				throw error
+			}
+		}
+	}
 
 	fun attachInputPanelManager(manager: MessageInputManager) {
 		inputManager = manager
@@ -59,9 +89,9 @@ class ChatFlowViewModel(private val userId: String,
 							start()
 						}
 					} catch (e: IllegalStateException) {
-						e.printStackTrace()
+						Utils.logError(e)
 					}
-				} ?: Log.e("ChatFlow", "Unable to create audio output file")
+				} ?: Utils.logError("Unable to create audio output file")
 			}
 
 			override fun onCompleted() {
@@ -83,52 +113,27 @@ class ChatFlowViewModel(private val userId: String,
 						recorder!!.release()
 						recorder = null
 					} catch (e: RuntimeException) {
-						e.printStackTrace()
+						Utils.logError(e)
 					}
 				}
 			}
 		})
 	}
 
-	init {
-		val dataSourceProvider = App.backend.getDataSourceProvider()
-		repository.setRemoteSource(dataSourceProvider.getMessageSource(chatId))
-	}
-
-	override fun onCleared() {
-		super.onCleared()
-		detachDataListener()
-	}
-
-	fun setListAdapter(listAdapter: ChatFlowAdapter) {
-		this.listAdapter = listAdapter
-		attachDataListener()
-	}
-
-	private fun attachDataListener() {
-		repository.attachListener(object : RequestCallback<List<Message>>{
-			override fun onSuccess(result: List<Message>) {
-				listAdapter.setItems(result)
-				updateMessagesStatus(result)
-			}
-			override fun onFailure(error: Throwable) {
-				Utils.logError(error)
-			}
-		})
-	}
-
-	private fun updateMessagesStatus(result: List<Message>) {
-		result
-			.filter {  it.status != Message.STATUS_RECEIVED
-							&& it.senderId != userId }
-			.forEach {
-				repository.setMessageStatusReceived(it.id, null)
-			}
-	}
-
-	private fun detachDataListener() {
+	override fun clean() {
+		openAttachMenuSubj.onComplete()
+		recordAudioSubj.onComplete()
+		inputManager?.onStop()
 		repository.detachListener()
+
+		super.clean()
 	}
+
+	fun filter(text: String) = listAdapter.filter(text)
+
+	fun observeAttachMenuOpen() = openAttachMenuSubj as Observable<Any>
+
+	fun observeAudioRecord() = recordAudioSubj as Observable<Any>
 
 	fun onAttachButtonCliked() = openAttachMenuSubj.onNext(EmptyObject)
 
@@ -151,72 +156,155 @@ class ChatFlowViewModel(private val userId: String,
 	}
 
 	private fun sendMessage(text: String) {
-		repository.addMessage(Message(senderId = userId, text = text), null)
+		guarantyChat {
+			showSendProgressField.set(true)
+			val message = Message(senderId = params.userId, text = text)
+			repository.addMessage(message, object : RequestCallback<String> {
+				override fun onSuccess(result: String) {
+					showSendProgressField.set(false)
+				}
+				override fun onFailure(error: Throwable) {
+					onFailureSendingMessage(error)
+				}
+			})
+		}
 	}
 
 	fun handleAttachedImage(fileData: FileData, conpressed: Uri) {
-		val message = Message(senderId = userId, attachUrl = conpressed.toString(), type = Message.TYPE_IMAGE)
-		repository.addMessage(message, object : SimpleRequestCallback<String>() {
-			override fun onSuccess(messageId: String) {
-				App.backend.getStorageManager().uploadImage(fileData, chatId, object : ProgressRequestCallback<Uri> {
-					override fun onProgress(progress: Int) {
-						listAdapter.setFileUploadProgress(messageId, progress)
-					}
-					override fun onSuccess(uri: Uri) {
-						repository.updateMessageUri(messageId, uri, object : SimpleRequestCallback<Any>() {})
-					}
-					override fun onFailure(error: Throwable) {
-						Utils.logError(error)
-					}
-				})
-			}
-		})
+		guarantyChat { chatId ->
+			showSendProgressField.set(true)
+			val message = Message(senderId = params.userId, attachUrl = conpressed.toString(), type = Message.TYPE_IMAGE)
+			repository.addMessage(message, object : RequestCallback<String> {
+				override fun onSuccess(messageId: String) {
+					App.backend.getStorageManager().uploadImage(fileData, chatId, object : ProgressRequestCallback<Uri> {
+						override fun onProgress(progress: Int) {
+							listAdapter.setFileUploadProgress(messageId, progress)
+						}
+						override fun onSuccess(uri: Uri) {
+							repository.updateMessageUri(messageId, uri, object : RequestCallback<Any> {
+								override fun onSuccess(result: Any) {
+									showSendProgressField.set(false)
+								}
+								override fun onFailure(error: Throwable) { onFailureSendingMessage(error) }
+							})
+						}
+						override fun onFailure(error: Throwable) { onFailureSendingMessage(error) }
+					})
+				}
+				override fun onFailure(error: Throwable) { onFailureSendingMessage(error) }
+			})
+		}
 	}
 
 	fun handleAttachedFile(fileData: FileData) {
-		val message = Message(userId, fileData)
-		repository.addMessage(message, object : SimpleRequestCallback<String>() {
-			override fun onSuccess(messageId: String) {
-				App.backend.getStorageManager().uploadFile(fileData, chatId, object : ProgressRequestCallback<Uri> {
-					override fun onProgress(progress: Int) {
-						listAdapter.setFileUploadProgress(messageId, progress)
-					}
-					override fun onSuccess(result: Uri) {
-						repository.updateMessageUri(messageId, result, object : SimpleRequestCallback<Any>() {})
-					}
-					override fun onFailure(error: Throwable) {
-						Utils.logError(error)
-					}
-				})
-			}
-		})
+		guarantyChat { chatId ->
+			showSendProgressField.set(true)
+
+			val message = Message(params.userId, fileData)
+			repository.addMessage(message, object : RequestCallback<String> {
+
+				override fun onSuccess(messageId: String) {
+
+					App.backend.getStorageManager().uploadFile(fileData, chatId, object : ProgressRequestCallback<Uri> {
+						override fun onProgress(progress: Int) {
+							listAdapter.setFileUploadProgress(messageId, progress)
+						}
+						override fun onSuccess(result: Uri) {
+							repository.updateMessageUri(messageId, result, object : RequestCallback<Any> {
+								override fun onSuccess(result: Any) {
+									showSendProgressField.set(false)
+								}
+								override fun onFailure(error: Throwable) { onFailureSendingMessage(error) }
+							})
+						}
+						override fun onFailure(error: Throwable) { onFailureSendingMessage(error) }
+					})
+				}
+				override fun onFailure(error: Throwable) { onFailureSendingMessage(error) }
+			})
+		}
 	}
 
 	fun handleAudioMessage(file: File) {
-		val uri = Uri.fromFile(file)
-		val message = Message.createFromAudio(userId, file.name)
-		repository.addMessage(message, object : SimpleRequestCallback<String>() {
-			override fun onSuccess(messageId: String) {
-				App.backend.getStorageManager().uploadAudioMessage(uri, chatId, object : ProgressRequestCallback<Uri> {
-					override fun onProgress(progress: Int) {
-						listAdapter.setFileUploadProgress(messageId, progress)
-					}
-					override fun onSuccess(result: Uri) {
-						repository.updateMessageUri(messageId, result, object : SimpleRequestCallback<Any>() {})
-					}
-					override fun onFailure(error: Throwable) {
-						Utils.logError(error)
-					}
-				})
+		guarantyChat { chatId ->
+			showSendProgressField.set(true)
+
+			val message = Message.createFromAudio(params.userId, file.name)
+			repository.addMessage(message, object : RequestCallback<String> {
+
+				override fun onSuccess(messageId: String) {
+
+					val uri = Uri.fromFile(file)
+					App.backend.getStorageManager().uploadAudioMessage(uri, chatId, object : ProgressRequestCallback<Uri> {
+
+						override fun onProgress(progress: Int) {
+							listAdapter.setFileUploadProgress(messageId, progress)
+						}
+						override fun onSuccess(result: Uri) {
+
+							repository.updateMessageUri(messageId, result, object : RequestCallback<Any> {
+
+								override fun onSuccess(result: Any) {
+									showSendProgressField.set(false)
+								}
+								override fun onFailure(error: Throwable) { onFailureSendingMessage(error) }
+							})
+						}
+						override fun onFailure(error: Throwable) { onFailureSendingMessage(error) }
+					})
+				}
+				override fun onFailure(error: Throwable) { onFailureSendingMessage(error) }
+			})
+		}
+	}
+
+	private fun onFailureSendingMessage(error: Throwable) {
+		Utils.logError(error)
+		showSendProgressField.set(false)
+		toastRequest.onNext(R.string.alert_error_send_message)
+	}
+
+	private fun guarantyChat(callback: Runnable1<String>) {
+
+		if (repository.getChatId() == null) {
+			val chat = Chat(initiatorId = params.userId,
+				participants = listOf(params.userId, params.contactId))
+			ChatRepository.addItem(chat, object : RequestCallback<String> {
+				override fun onSuccess(id: String) {
+					initMessageRepository(id)
+					callback.run(id)
+				}
+				override fun onFailure(error: Throwable) {
+					Utils.logError(error)
+					toastRequest.onNext(R.string.alert_error_creating_chat)
+				}
+			})
+		}
+		else callback.run(repository.getChatId())
+	}
+
+	private fun initMessageRepository(chatId: String) {
+		repository.setRemoteSource(
+			App.backend.getDataSourceProvider()
+				.getMessageSource(chatId))
+
+		repository.attachListener(object : RequestCallback<List<Message>>{
+			override fun onSuccess(result: List<Message>) {
+				listAdapter.setItems(result)
+				updateMessagesStatus(result)
 			}
+			override fun onFailure(error: Throwable) { Utils.logError(error) }
 		})
 	}
 
-	fun filter(text: String) {
-		listAdapter.filter(text)
+	private fun updateMessagesStatus(messages: List<Message>) {
+		messages
+			.filter { it.status != Message.STATUS_RECEIVED && it.senderId != params.userId }
+			.forEach {
+				repository.setMessageStatusReceived(it.id, object : SimpleRequestCallback<Any>() {
+
+					override fun onFailure(error: Throwable) { Utils.logError(error) }
+				})
+			}
 	}
-
-	fun observeAttachMenuOpen() = openAttachMenuSubj as Observable<Any>
-
-	fun observeAudioRecord() = recordAudioSubj as Observable<Any>
 }

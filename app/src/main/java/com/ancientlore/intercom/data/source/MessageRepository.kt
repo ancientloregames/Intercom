@@ -59,6 +59,8 @@ class MessageRepository : MessageSource {
 		remoteSource?.detachListener()
 	}
 
+	override fun getChatId() = remoteSource?.getChatId()
+
 	fun setRemoteSource(source: MessageSource) {
 		remoteSource = source
 	}

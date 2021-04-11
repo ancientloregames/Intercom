@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.view.View
 import android.widget.SearchView
 import androidx.appcompat.widget.Toolbar
-import com.ancientlore.intercom.App
 import com.ancientlore.intercom.C
 import com.ancientlore.intercom.R
 import com.ancientlore.intercom.databinding.ChatFlowUiBinding
@@ -35,29 +34,19 @@ class ChatFlowFragment : BasicFragment<ChatFlowViewModel, ChatFlowUiBinding>() {
 		const val INTENT_GET_FILES = 101
 		const val INTENT_GET_IMAGES = 102
 
-		private const val ARG_CHAT_ID = "chat_id"
-		private const val ARG_CHAT_TITLE = "chat_title"
+		private const val ARG_PARAMS = "params"
 
-		fun newInstance(params: Params) : ChatFlowFragment {
+		fun newInstance(params: ChatFlowParams) : ChatFlowFragment {
 			return ChatFlowFragment().apply {
 				arguments = Bundle().apply {
-					putString(ARG_CHAT_ID, params.chatId)
-					putString(ARG_CHAT_TITLE, params.title)
+					putParcelable(ARG_PARAMS, params)
 				}
 			}
 		}
 	}
 
-	data class Params(val chatId: String, val title: String)
-
-	private val chatId get() = arguments?.getString(ARG_CHAT_ID)
-		?: throw RuntimeException("Chat id is a mandotory arg")
-
-	private val title get() = arguments?.getString(ARG_CHAT_TITLE)
-		?: throw RuntimeException("Chat title is a mandotory arg")
-
-	private val userId get() = App.backend.getAuthManager().getCurrentUser()?.id
-		?: throw RuntimeException("This fragment may be created only after successful authorization")
+	private val params : ChatFlowParams by lazy { arguments?.getParcelable<ChatFlowParams>(ARG_PARAMS)
+		?: throw RuntimeException("Chat id is a mandotory arg") }
 
 	override fun onBackPressed(): Boolean {
 		close()
@@ -66,7 +55,7 @@ class ChatFlowFragment : BasicFragment<ChatFlowViewModel, ChatFlowUiBinding>() {
 
 	override fun getLayoutResId() = R.layout.chat_flow_ui
 
-	override fun createViewModel() = ChatFlowViewModel(userId, chatId)
+	override fun createViewModel() = ChatFlowViewModel(listView.adapter as ChatFlowAdapter, params)
 
 	override fun bind(view: View, viewModel: ChatFlowViewModel) {
 		dataBinding = ChatFlowUiBinding.bind(view)
@@ -76,16 +65,14 @@ class ChatFlowFragment : BasicFragment<ChatFlowViewModel, ChatFlowUiBinding>() {
 	override fun initView(view: View, savedInstanceState: Bundle?) {
 		initToolbarMenu()
 		ToolbarManager(toolbar as Toolbar).apply {
-			setTitle(title)
-			enableBackButton(View.OnClickListener {
-				close()
-			})
+			setTitle(params.title)
+			enableBackButton { close() }
 		}
 
 		swipableLayout.setListener { close() }
 
 		with(listView) {
-			adapter = ChatFlowAdapter(userId, context!!, mutableListOf())
+			adapter = ChatFlowAdapter(params.userId, requireContext(), mutableListOf())
 			enableChatBehavior()
 		}
 	}
@@ -123,7 +110,6 @@ class ChatFlowFragment : BasicFragment<ChatFlowViewModel, ChatFlowUiBinding>() {
 				// TODO create custom image viewer fragment
 				context?.openFile(it)
 			})
-		viewModel.setListAdapter(listAdapter)
 
 		if (permissionManager!!.allowedAudioMessage())
 			viewModel.attachInputPanelManager(MessageInputManager(view!!))

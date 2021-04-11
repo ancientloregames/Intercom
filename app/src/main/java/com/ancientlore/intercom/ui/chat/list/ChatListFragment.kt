@@ -8,7 +8,7 @@ import android.widget.SearchView
 import com.ancientlore.intercom.R
 import com.ancientlore.intercom.databinding.ChatListUiBinding
 import com.ancientlore.intercom.ui.BasicFragment
-import com.ancientlore.intercom.ui.chat.flow.ChatFlowFragment
+import com.ancientlore.intercom.ui.chat.flow.ChatFlowParams
 import com.ancientlore.intercom.utils.Runnable1
 import kotlinx.android.synthetic.main.chat_list_ui.*
 
@@ -79,5 +79,5 @@ class ChatListFragment : BasicFragment<ChatListViewModel, ChatListUiBinding>() {
 
 	private fun openContactList() = navigator?.openContactList()
 
-	private fun openChatFlow(params: ChatFlowFragment.Params) = navigator?.openChatFlow(params)
+	private fun openChatFlow(params: ChatFlowParams) = navigator?.openChatFlow(params)
 }

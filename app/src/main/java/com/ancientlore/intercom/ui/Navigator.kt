@@ -5,7 +5,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import com.ancientlore.intercom.backend.auth.PhoneAuthParams
 import com.ancientlore.intercom.data.model.User
-import com.ancientlore.intercom.ui.chat.flow.ChatFlowFragment
+import com.ancientlore.intercom.ui.chat.flow.ChatFlowParams
 import com.ancientlore.intercom.utils.Runnable1
 
 
@@ -15,7 +15,7 @@ interface Navigator {
 	fun openPhoneAuthForm()
 	fun openPhoneCheckForm(params: PhoneAuthParams)
 	fun openContactList()
-	fun openChatFlow(params: ChatFlowFragment.Params)
+	fun openChatFlow(params: ChatFlowParams)
 	fun openSettings()
 
 	fun onSuccessfullAuth(user: User)

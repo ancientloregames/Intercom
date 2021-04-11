@@ -1,5 +1,6 @@
 package com.ancientlore.intercom.ui.chat.list
 
+import com.ancientlore.intercom.App
 import com.ancientlore.intercom.EmptyObject
 import com.ancientlore.intercom.backend.RepositorySubscription
 import com.ancientlore.intercom.backend.RequestCallback
@@ -9,7 +10,7 @@ import com.ancientlore.intercom.data.model.Contact
 import com.ancientlore.intercom.data.source.ChatRepository
 import com.ancientlore.intercom.data.source.ContactRepository
 import com.ancientlore.intercom.ui.BasicViewModel
-import com.ancientlore.intercom.ui.chat.flow.ChatFlowFragment
+import com.ancientlore.intercom.ui.chat.flow.ChatFlowParams
 import com.ancientlore.intercom.utils.Utils
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
@@ -20,7 +21,7 @@ class ChatListViewModel : BasicViewModel() {
 	private lateinit var listAdapter: ChatListAdapter
 
 	private val contactListRequest = PublishSubject.create<Any>()
-	private val openChatOpenSubj = PublishSubject.create<ChatFlowFragment.Params>()
+	private val openChatOpenSubj = PublishSubject.create<ChatFlowParams>()
 
 	private var repositorySub: RepositorySubscription? = null
 
@@ -34,7 +35,10 @@ class ChatListViewModel : BasicViewModel() {
 		this.listAdapter = listAdapter
 		listAdapter.setListener(object : ChatListAdapter.Listener {
 			override fun onChatSelected(chat: Chat) {
-				openChatOpenSubj.onNext(ChatFlowFragment.Params(chat.id, chat.localName ?: chat.name))
+				openChatOpenSubj.onNext(ChatFlowParams(
+					userId = App.backend.getAuthManager().getCurrentUser().id,
+					chatId = chat.id,
+					title = chat.localName ?: chat.name))
 			}
 		})
 		attachDataListener()
@@ -43,7 +47,7 @@ class ChatListViewModel : BasicViewModel() {
 	fun onShowContactListClicked() = contactListRequest.onNext(EmptyObject)
 
 	fun observeContactListRequest() = contactListRequest as Observable<*>
-	fun observeChatOpen() = openChatOpenSubj as Observable<ChatFlowFragment.Params>
+	fun observeChatOpen() = openChatOpenSubj as Observable<ChatFlowParams>
 
 	private fun attachDataListener() {
 		//TODO load chats independantly of contact list and assign names postpone

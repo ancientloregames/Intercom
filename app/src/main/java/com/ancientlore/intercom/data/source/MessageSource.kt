@@ -18,4 +18,6 @@ interface MessageSource : DataSource<Message> {
 	fun attachListener(callback: RequestCallback<List<Message>>)
 
 	fun detachListener()
+
+	fun getChatId(): String?
 }

@@ -70,4 +70,6 @@ open class FirestoreMessageSource(private val chatId: String)
 	override fun detachListener() {
 		changeListener?.remove()
 	}
+
+	override fun getChatId() = chatId
 }

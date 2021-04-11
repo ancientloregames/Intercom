@@ -32,6 +32,7 @@ import com.ancientlore.intercom.ui.auth.email.signup.EmailSignupFragment
 import com.ancientlore.intercom.ui.auth.phone.login.PhoneLoginFragment
 import com.ancientlore.intercom.ui.auth.phone.check.PhoneCheckFragment
 import com.ancientlore.intercom.ui.chat.flow.ChatFlowFragment
+import com.ancientlore.intercom.ui.chat.flow.ChatFlowParams
 import com.ancientlore.intercom.ui.chat.list.ChatListFragment
 import com.ancientlore.intercom.ui.contact.list.ContactListFragment
 import com.ancientlore.intercom.ui.settings.SettingsFragment
@@ -41,7 +42,6 @@ import com.ancientlore.intercom.utils.NotificationManager.Companion.EXTRA_CHAT_I
 import com.ancientlore.intercom.utils.NotificationManager.Companion.EXTRA_CHAT_TITLE
 import com.ancientlore.intercom.utils.extensions.checkPermission
 import com.ancientlore.intercom.utils.extensions.createChannel
-import com.google.firebase.firestore.FirebaseFirestore
 import java.util.*
 import java.util.concurrent.Executors
 
@@ -116,7 +116,10 @@ class MainActivity : AppCompatActivity(),
 					val chatId = getString(EXTRA_CHAT_ID)
 					val chatTitle = getString(EXTRA_CHAT_TITLE)
 					if (chatId != null && chatTitle != null)
-						openChatFlow(ChatFlowFragment.Params(chatId, chatTitle))
+						openChatFlow(ChatFlowParams(
+							userId = App.backend.getAuthManager().getCurrentUser().id,
+							chatId = chatId,
+							title = chatTitle))
 				}
 				true
 			}
@@ -186,7 +189,7 @@ class MainActivity : AppCompatActivity(),
 		}
 	}
 
-	override fun openChatFlow(params: ChatFlowFragment.Params) {
+	override fun openChatFlow(params: ChatFlowParams) {
 		runOnUiThread {
 			supportFragmentManager.beginTransaction()
 				.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_right)
