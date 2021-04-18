@@ -233,6 +233,7 @@ class MainActivity : AppCompatActivity(),
 	override fun openSettings() {
 		runOnUiThread {
 			supportFragmentManager.beginTransaction()
+				.setCustomAnimations(R.anim.slide_in_bottom, R.anim.slide_out_bottom)
 				.add(R.id.container, SettingsFragment.newInstance())
 				.commitNow()
 		}
@@ -298,8 +299,8 @@ class MainActivity : AppCompatActivity(),
 	}
 
 	override fun onContactListUpdate(contacts: List<DeviceContactsManager.Item>) {
-		UserRepository.getAll(object : RequestCallback<List<com.ancientlore.intercom.data.model.User>> {
-			override fun onSuccess(appUsers: List<com.ancientlore.intercom.data.model.User>) {
+		UserRepository.getAll(object : RequestCallback<List<User>> {
+			override fun onSuccess(appUsers: List<User>) {
 
 				val updateCandidates = mutableListOf<Contact>()
 				val appUsersTmp = LinkedList(appUsers)
