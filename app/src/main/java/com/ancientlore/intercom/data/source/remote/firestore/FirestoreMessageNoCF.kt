@@ -7,6 +7,12 @@ import com.ancientlore.intercom.data.model.Message
 import com.ancientlore.intercom.data.model.PushMessage
 import com.ancientlore.intercom.data.model.User
 import com.ancientlore.intercom.data.source.EmptyResultException
+import com.ancientlore.intercom.data.source.remote.firestore.C.CHATS
+import com.ancientlore.intercom.data.source.remote.firestore.C.USERS
+import com.ancientlore.intercom.data.source.remote.firestore.C.CHAT_ID
+import com.ancientlore.intercom.data.source.remote.firestore.C.CHAT_STATUS
+import com.ancientlore.intercom.data.source.remote.firestore.C.CHAT_LAST_MSG_TEXT
+import com.ancientlore.intercom.data.source.remote.firestore.C.CHAT_LAST_MSG_TIME
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.RemoteMessage
@@ -15,9 +21,6 @@ class FirestoreMessageNoCF(chatId: String): FirestoreMessageSource(chatId) {
 
 	internal companion object  {
 		private const val TAG = "FirestoreMessageNoCF"
-
-		private const val CHATS = "chats"
-		private const val USERS = "users"
 	}
 
 	private lateinit var chat: Chat
@@ -39,14 +42,14 @@ class FirestoreMessageNoCF(chatId: String): FirestoreMessageSource(chatId) {
 				}
 				chatMessages.document(it.id)
 					.update(HashMap<String, Any>().apply {
-						put("id", it.id)
-						put("status", 1)
+						put(CHAT_ID, it.id)
+						put(CHAT_STATUS, 1)
 					})
 					.addOnFailureListener { error -> Log.d(TAG, "Failure 1: ${error.message}") }
 
 				val userChatInfoUpdate = HashMap<String, Any>().apply {
-					put("lastMsgText", message.text)
-					put("lastMsgTime", FieldValue.serverTimestamp())
+					put(CHAT_LAST_MSG_TEXT, message.text)
+					put(CHAT_LAST_MSG_TIME, FieldValue.serverTimestamp())
 				}
 
 				if (chat.name.isEmpty()) {

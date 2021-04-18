@@ -19,4 +19,7 @@ object C {
 	const val CHAT_NAME = "name"
 	const val CHAT_LAST_MSG_TEXT = "lastMsgText"
 	const val CHAT_LAST_MSG_TIME = "lastMsgTime"
+	const val CHAT_TIMESTAMP = "timestamp"
+	const val CHAT_STATUS = "status"
+	const val CHAT_ATTACH_URL = "attachUrl"
 }

@@ -6,6 +6,11 @@ import com.ancientlore.intercom.data.source.EmptyResultException
 import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.data.model.Message
 import com.ancientlore.intercom.data.source.MessageSource
+import com.ancientlore.intercom.data.source.remote.firestore.C.CHATS
+import com.ancientlore.intercom.data.source.remote.firestore.C.CHAT_ATTACH_URL
+import com.ancientlore.intercom.data.source.remote.firestore.C.CHAT_STATUS
+import com.ancientlore.intercom.data.source.remote.firestore.C.CHAT_TIMESTAMP
+import com.ancientlore.intercom.data.source.remote.firestore.C.MESSAGES
 import com.google.firebase.firestore.ListenerRegistration
 
 open class FirestoreMessageSource(private val chatId: String)
@@ -13,9 +18,6 @@ open class FirestoreMessageSource(private val chatId: String)
 
 	internal companion object  {
 		private const val TAG = "FirestoreMessageSource"
-
-		private const val CHATS = "chats"
-		private const val MESSAGES = "messages"
 	}
 
 	protected val chatMessages get() = db.collection(CHATS).document(chatId).collection(MESSAGES)
@@ -41,20 +43,20 @@ open class FirestoreMessageSource(private val chatId: String)
 	}
 
 	override fun updateMessageUri(messageId: String, uri: Uri, callback: RequestCallback<Any>?) {
-		chatMessages.document(messageId).update("attachUrl", uri.toString())
+		chatMessages.document(messageId).update(CHAT_ATTACH_URL, uri.toString())
 			.addOnSuccessListener { callback?.onSuccess(EmptyObject) }
 			.addOnFailureListener { callback?.onFailure(it) }
 	}
 
 	override fun setMessageStatusReceived(id: String, callback: RequestCallback<Any>?) {
-		chatMessages.document(id).update("status", Message.STATUS_RECEIVED)
+		chatMessages.document(id).update(CHAT_STATUS, Message.STATUS_RECEIVED)
 			.addOnSuccessListener { callback?.onSuccess(EmptyObject) }
 			.addOnFailureListener { callback?.onFailure(it) }
 	}
 
 	override fun attachListener(callback: RequestCallback<List<Message>>) {
 		changeListener = chatMessages
-			.orderBy("timestamp")
+			.orderBy(CHAT_TIMESTAMP)
 			.addSnapshotListener { snapshot, e ->
 				if (e != null) {
 					callback.onFailure(e)
