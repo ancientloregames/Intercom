@@ -10,11 +10,11 @@ import com.ancientlore.intercom.ui.Bindable
 
 abstract class BasicRecyclerAdapter<I, H: BasicRecyclerAdapter.ViewHolder<I, B>, B: ViewDataBinding>(
 	context: Context,
-	private val items: List<I>)
+	private val items: List<I> = emptyList())
 	: RecyclerView.Adapter<H>() {
 
 	companion object {
-		private const val VIEW_TYPE_ITEM = 0
+		const val VIEW_TYPE_ITEM = 0
 	}
 
 	protected val layoutInflater: LayoutInflater = LayoutInflater.from(context)
