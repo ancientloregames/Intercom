@@ -12,10 +12,10 @@ import com.ancientlore.intercom.widget.recycler.BasicRecyclerAdapter
 import com.ancientlore.intercom.data.model.Chat
 import com.ancientlore.intercom.databinding.ChatListItemBinding
 import com.ancientlore.intercom.utils.ImageUtils
-import com.ancientlore.intercom.widget.recycler.FilterableRecyclerAdapter
+import com.ancientlore.intercom.widget.recycler.MutableRecyclerAdapter
 
 class ChatListAdapter(context: Context, items: MutableList<Chat>)
-	: FilterableRecyclerAdapter<Chat, ChatListAdapter.ViewHolder, ChatListItemBinding>(context, items) {
+	: MutableRecyclerAdapter<Chat, ChatListAdapter.ViewHolder, ChatListItemBinding>(context, items) {
 
 	interface Listener {
 		fun onChatSelected(chat: Chat)

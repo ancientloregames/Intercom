@@ -8,18 +8,21 @@ import com.ancientlore.intercom.widget.MutableAdapter
 
 abstract class MutableRecyclerAdapter<I: Comparable<I>, H: BasicRecyclerAdapter.ViewHolder<I, B>, B: ViewDataBinding>(
 	context: Context,
-	items: MutableList<I>)
-	: BasicRecyclerAdapter<I, H, B>(context, items),
+	items: MutableList<I>,
+	sort: Boolean = false)
+	: FilterableRecyclerAdapter<I, H, B>(context, items),
 	MutableAdapter<I> {
 
-	protected val mutableList get() = getItems() as MutableList<I>
-
-	protected var autoSort = false
+	private var autoSort = sort
 
 	abstract fun getDiffCallback(newItems: List<I>): DiffUtil.Callback
 
 	@UiThread
 	override fun setItems(newItems: List<I>) {
+
+		fullList.clear()
+		fullList.addAll(newItems)
+
 		val items =
 			if (autoSort) newItems.sorted()
 			else newItems
@@ -48,20 +51,33 @@ abstract class MutableRecyclerAdapter<I: Comparable<I>, H: BasicRecyclerAdapter.
 
 	@UiThread
 	override fun prependItem(newItem: I): Boolean {
-		if (isUnique(newItem)) {
-			mutableList.add(0, newItem)
-			notifyItemInserted(0)
-			return true
+		if (currentConstraint.isEmpty() || filter.satisfy(newItem, currentConstraint)) {
+			if (isUnique(newItem)) {
+				mutableList.add(0, newItem)
+				notifyItemInserted(0)
+				return true
+			}
 		}
 
+		if (isUnique(newItem)) {
+			fullList.add(0, newItem)
+			return true
+		}
 		return false
 	}
 
 	@UiThread
 	override fun appendItem(newItem: I): Boolean {
+		if (currentConstraint.isEmpty() || filter.satisfy(newItem, currentConstraint)) {
+			if (isUnique(newItem)) {
+				mutableList.add(newItem)
+				notifyItemInserted(itemCount - 1)
+				return true
+			}
+		}
+
 		if (isUnique(newItem)) {
-			mutableList.add(newItem)
-			notifyItemInserted(itemCount - 1)
+			fullList.add(newItem)
 			return true
 		}
 
@@ -69,10 +85,23 @@ abstract class MutableRecyclerAdapter<I: Comparable<I>, H: BasicRecyclerAdapter.
 	}
 
 	@UiThread
-	override fun updateItem(updatedItem: I) = updateItemAt(getItemPosition(updatedItem), updatedItem)
+	override fun updateItem(updatedItem: I) : Boolean {
+
+		val position = getFullListPosition(updatedItem)
+
+		if (position != -1) fullList[position] = updatedItem
+
+		return updateItemAt(getItemPosition(updatedItem), updatedItem)
+	}
 
 	@UiThread
-	override fun deleteItem(itemToDelete: I) = deleteItemAt(getItemPosition(itemToDelete))
+	override fun deleteItem(itemToDelete: I) : Boolean {
+		val position = getFullListPosition(itemToDelete)
+
+		if (position != -1) deleteItemAt(position)
+
+		return deleteItemAt(getItemPosition(itemToDelete))
+	}
 
 	@UiThread
 	private fun updateItemAt(position: Int, updatedItem: I): Boolean {

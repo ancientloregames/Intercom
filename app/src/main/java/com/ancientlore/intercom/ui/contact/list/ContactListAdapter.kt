@@ -9,10 +9,10 @@ import com.ancientlore.intercom.BR
 import com.ancientlore.intercom.widget.recycler.BasicRecyclerAdapter
 import com.ancientlore.intercom.databinding.ContactListItemBinding
 import com.ancientlore.intercom.data.model.Contact
-import com.ancientlore.intercom.widget.recycler.FilterableRecyclerAdapter
+import com.ancientlore.intercom.widget.recycler.MutableRecyclerAdapter
 
 class ContactListAdapter(context: Context, items: MutableList<Contact>)
-	: FilterableRecyclerAdapter<Contact, ContactListAdapter.ViewHolder, ContactListItemBinding>(context, items) {
+	: MutableRecyclerAdapter<Contact, ContactListAdapter.ViewHolder, ContactListItemBinding>(context, items) {
 
 	interface Listener {
 		fun onContactSelected(contact: Contact)

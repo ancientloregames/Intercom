@@ -27,7 +27,7 @@ import com.ancientlore.intercom.utils.Utils
 import com.ancientlore.intercom.utils.extensions.getAudioMessagesDir
 import com.ancientlore.intercom.utils.extensions.isNotEmpty
 import com.ancientlore.intercom.widget.recycler.BasicRecyclerAdapter
-import com.ancientlore.intercom.widget.recycler.FilterableRecyclerAdapter
+import com.ancientlore.intercom.widget.recycler.MutableRecyclerAdapter
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import java.io.File
@@ -35,7 +35,7 @@ import java.lang.RuntimeException
 
 class ChatFlowAdapter(private val userId: String,
                       context: Context, items: MutableList<Message>)
-	: FilterableRecyclerAdapter<Message, ChatFlowAdapter.ViewHolder, ViewDataBinding>(context, items) {
+	: MutableRecyclerAdapter<Message, ChatFlowAdapter.ViewHolder, ViewDataBinding>(context, items) {
 
 	private companion object {
 		private const val VIEW_TYPE_USER = 0
