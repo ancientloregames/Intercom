@@ -25,10 +25,11 @@ class ContactListAdapter(context: Context, items: MutableList<Contact>)
 	override fun createItemViewDataBinding(parent: ViewGroup, viewType: Int): ContactListItemBinding =
 		ContactListItemBinding.inflate(layoutInflater, parent, false)
 
-	override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-		super.onBindViewHolder(holder, position)
+	override fun bindItemViewHolder(holder: ViewHolder, position: Int, payloads: MutableList<Any>) {
 
 		val contact = getItem(position)!!
+
+		holder.bind(contact)
 
 		holder.listener = object : ViewHolder.Listener {
 			override fun onItemClicked() {
@@ -37,7 +38,7 @@ class ContactListAdapter(context: Context, items: MutableList<Contact>)
 		}
 	}
 
-	override fun getViewHolder(binding: ContactListItemBinding, viewType: Int) = ViewHolder(binding)
+	override fun createItemViewHolder(binding: ContactListItemBinding, viewType: Int) = ViewHolder(binding)
 
 	override fun isTheSame(first: Contact, second: Contact) = first.phone == second.phone
 

@@ -25,7 +25,7 @@ class ContactListFragment : BasicFragment<ContactListViewModel, ContactListUiBin
 
 	override fun getLayoutResId() = R.layout.contact_list_ui
 
-	override fun createViewModel() = ContactListViewModel()
+	override fun createViewModel() = ContactListViewModel(listView.adapter as ContactListAdapter)
 
 	override fun bind(view: View, viewModel: ContactListViewModel) {
 		dataBinding = ContactListUiBinding.bind(view)
@@ -44,17 +44,15 @@ class ContactListFragment : BasicFragment<ContactListViewModel, ContactListUiBin
 	}
 
 	override fun initViewModel(viewModel: ContactListViewModel) {
-		viewModel.init(listView.adapter as ContactListAdapter)
+		viewModel.init()
 	}
 
 	override fun observeViewModel(viewModel: ContactListViewModel) {
 		super.observeViewModel(viewModel)
 
-		subscriptions.add(viewModel.observeChatOpen()
+		subscriptions.add(viewModel.observeOpenContactDetail()
 			.subscribe {
-				val nav = navigator
-				close()
-				nav?.openChatFlow(it)
+				// TODO open contact detail not closing this ui
 			})
 	}
 

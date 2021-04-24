@@ -41,7 +41,7 @@ class ChatListFragment : BasicFragment<ChatListViewModel, ChatListUiBinding>() {
 
 	override fun getLayoutResId() = R.layout.chat_list_ui
 
-	override fun createViewModel() = ChatListViewModel()
+	override fun createViewModel() = ChatListViewModel(listView.adapter as ChatListAdapter)
 
 	override fun bind(view: View, viewModel: ChatListViewModel) {
 		dataBinding = ChatListUiBinding.bind(view)
@@ -49,7 +49,7 @@ class ChatListFragment : BasicFragment<ChatListViewModel, ChatListUiBinding>() {
 	}
 
 	override fun initViewModel(viewModel: ChatListViewModel) {
-		viewModel.init(listView.adapter as ChatListAdapter)
+		viewModel.init()
 	}
 
 	override fun observeViewModel(viewModel: ChatListViewModel) {
@@ -69,6 +69,10 @@ class ChatListFragment : BasicFragment<ChatListViewModel, ChatListUiBinding>() {
 
 	override fun onOptionsItemSelected(item: MenuItem): Boolean {
 		return when (item.itemId) {
+			R.id.contacts -> {
+				navigator?.openContactList()
+				true
+			}
 			R.id.settings -> {
 				navigator?.openSettings()
 				true

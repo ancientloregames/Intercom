@@ -52,7 +52,7 @@ class ChatFlowAdapter(private val userId: String,
 
 	override fun getDiffCallback(newItems: List<Message>) = DiffCallback(getItems(), newItems)
 
-	override fun getItemViewType(position: Int): Int {
+	override fun getItemViewTypeInner(position: Int): Int {
 		val message = getItem(position)!!
 		return when (message.senderId) {
 			userId -> when (message.type) {
@@ -80,7 +80,7 @@ class ChatFlowAdapter(private val userId: String,
 		}
 	}
 
-	override fun getViewHolder(binding: ViewDataBinding, viewType: Int): ViewHolder {
+	override fun createItemViewHolder(binding: ViewDataBinding, viewType: Int): ViewHolder {
 		return when (viewType) {
 			VIEW_TYPE_USER, VIEW_TYPE_OTHER -> ItemViewHolder(binding)
 			VIEW_TYPE_FILE_USER, VIEW_TYPE_FILE_OTHER -> FileItemViewHolder(binding)
@@ -89,8 +89,10 @@ class ChatFlowAdapter(private val userId: String,
 		}
 	}
 
-	override fun onBindViewHolder(holder: ViewHolder, position: Int, payloads: MutableList<Any>) {
+	override fun bindItemViewHolder(holder: ViewHolder, position: Int, payloads: MutableList<Any>) {
+
 		val item = getItem(position)!!
+
 		when (holder) {
 			is ItemViewHolder -> holder.listener = object : ItemViewHolder.Listener {
 				override fun onImageClick(uri: Uri) {
@@ -106,7 +108,8 @@ class ChatFlowAdapter(private val userId: String,
 
 		if (payloads.isNotEmpty())
 			holder.bind(payloads[0] as Bundle)
-		else super.onBindViewHolder(holder, position)
+		else
+			holder.bind(item)
 	}
 
 	override fun isTheSame(first: Message, second: Message) = first.timestamp == second.timestamp

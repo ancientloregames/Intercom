@@ -9,11 +9,11 @@ import com.ancientlore.intercom.widget.MutableAdapter
 abstract class MutableRecyclerAdapter<I: Comparable<I>, H: BasicRecyclerAdapter.ViewHolder<I, B>, B: ViewDataBinding>(
 	context: Context,
 	items: MutableList<I>,
-	sort: Boolean = false)
-	: FilterableRecyclerAdapter<I, H, B>(context, items),
+	withHeader: Boolean = false,
+	withFooter: Boolean = false,
+	private var autoSort: Boolean = false)
+	: FilterableRecyclerAdapter<I, H, B>(context, items, withHeader, withFooter),
 	MutableAdapter<I> {
-
-	private var autoSort = sort
 
 	abstract fun getDiffCallback(newItems: List<I>): DiffUtil.Callback
 
@@ -30,10 +30,6 @@ abstract class MutableRecyclerAdapter<I: Comparable<I>, H: BasicRecyclerAdapter.
 		val diffResult = DiffUtil.calculateDiff(getDiffCallback(items))
 		diffResult.dispatchUpdatesTo(this)
 
-		resetItems(items)
-	}
-
-	protected fun resetItems(newItems: List<I>) {
 		mutableList.clear()
 		mutableList.addAll(newItems)
 	}

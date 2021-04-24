@@ -16,9 +16,7 @@ import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import java.util.*
 
-class ChatListViewModel : BasicViewModel() {
-
-	private lateinit var listAdapter: ChatListAdapter
+class ChatListViewModel(private val listAdapter: ChatListAdapter) : BasicViewModel() {
 
 	private val contactListRequest = PublishSubject.create<Any>()
 	private val openChatOpenSubj = PublishSubject.create<ChatFlowParams>()
@@ -31,8 +29,7 @@ class ChatListViewModel : BasicViewModel() {
 		super.clean()
 	}
 
-	fun init(listAdapter: ChatListAdapter) {
-		this.listAdapter = listAdapter
+	fun init() {
 		listAdapter.setListener(object : ChatListAdapter.Listener {
 			override fun onChatSelected(chat: Chat) {
 				openChatOpenSubj.onNext(ChatFlowParams(

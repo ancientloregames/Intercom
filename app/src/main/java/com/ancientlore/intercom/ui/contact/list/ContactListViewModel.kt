@@ -11,9 +11,7 @@ import com.ancientlore.intercom.utils.Utils
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 
-class ContactListViewModel : BasicViewModel() {
-
-	private var listAdapter: ContactListAdapter? = null
+class ContactListViewModel(private val listAdapter: ContactListAdapter) : BasicViewModel() {
 
 	private val openChatSub = PublishSubject.create<ChatFlowParams>()
 
@@ -26,8 +24,7 @@ class ContactListViewModel : BasicViewModel() {
 		super.clean()
 	}
 
-	fun init(listAdapter: ContactListAdapter) {
-		this.listAdapter = listAdapter
+	fun init() {
 		listAdapter.setListener(object : ContactListAdapter.Listener {
 			override fun onContactSelected(contact: Contact) {
 				openChatSub.onNext(ChatFlowParams(
@@ -36,13 +33,10 @@ class ContactListViewModel : BasicViewModel() {
 					contactId = contact.id))
 			}
 		})
-		attachDataListener()
-	}
 
-	private fun attachDataListener() {
 		repositorySub = ContactRepository.attachListener(object : RequestCallback<List<Contact>>{
 			override fun onSuccess(result: List<Contact>) {
-				listAdapter?.setItems(result)
+				listAdapter.setItems(result)
 			}
 			override fun onFailure(error: Throwable) {
 				Utils.logError(error)
@@ -52,7 +46,5 @@ class ContactListViewModel : BasicViewModel() {
 
 	fun observeChatOpen() = openChatSub as Observable<ChatFlowParams>
 
-	fun filter(text: String) {
-		listAdapter?.filter(text)
-	}
+	fun filter(text: String) = listAdapter.filter(text)
 }

@@ -28,10 +28,11 @@ class ChatListAdapter(context: Context, items: MutableList<Chat>)
 	override fun createItemViewDataBinding(parent: ViewGroup, viewType: Int): ChatListItemBinding =
 		ChatListItemBinding.inflate(layoutInflater, parent, false)
 
-	override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-		super.onBindViewHolder(holder, position)
+	override fun bindItemViewHolder(holder: ViewHolder, position: Int, payloads: MutableList<Any>) {
 
 		val chat = getItem(position)!!
+
+		holder.bind(chat)
 
 		holder.listener = object : ViewHolder.Listener {
 			override fun onItemClicked() {
@@ -40,7 +41,7 @@ class ChatListAdapter(context: Context, items: MutableList<Chat>)
 		}
 	}
 
-	override fun getViewHolder(binding: ChatListItemBinding, viewType: Int) = ViewHolder(binding)
+	override fun createItemViewHolder(binding: ChatListItemBinding, viewType: Int) = ViewHolder(binding)
 
 	override fun isTheSame(first: Chat, second: Chat) = first.id == second.id
 
