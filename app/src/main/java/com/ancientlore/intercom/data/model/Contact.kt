@@ -21,4 +21,7 @@ data class Contact(val phone: String = "",
   val lastSeenDate: String by lazy { dateFormat.format(Date(lastSeenTime)) }
 
   override fun compareTo(other: Contact) = name.compareTo(other.name)
+
+  fun contains(string: CharSequence, ignoreCase: Boolean = true) =
+    name.contains(string, ignoreCase) || phone.contains(string, ignoreCase)
 }

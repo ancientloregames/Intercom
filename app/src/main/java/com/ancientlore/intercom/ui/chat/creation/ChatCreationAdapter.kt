@@ -148,6 +148,6 @@ class ChatCreationAdapter(context: Context, items: MutableList<Contact>)
 	override fun createFilter() = Filter()
 
 	inner class Filter: ListFilter() {
-		override fun satisfy(item: Contact, candidate: String) = item.cointains(candidate)
+		override fun satisfy(item: Contact, candidate: String) = item.contains(candidate)
 	}
 }

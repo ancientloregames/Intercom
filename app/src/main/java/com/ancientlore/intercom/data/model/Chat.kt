@@ -57,5 +57,6 @@ data class Chat(val id: String = "",
 	fun contains(text: String): Boolean {
 		return name.contains(text, true)
 				|| lastMsgText.contains(text, true)
+				|| localName?.contains(text, true) == true
 	}
 }
