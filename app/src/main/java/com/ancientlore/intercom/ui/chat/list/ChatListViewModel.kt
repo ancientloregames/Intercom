@@ -18,12 +18,14 @@ import java.util.*
 
 class ChatListViewModel(private val listAdapter: ChatListAdapter) : BasicViewModel() {
 
-	private val contactListRequest = PublishSubject.create<Any>()
-	private val openChatOpenSubj = PublishSubject.create<ChatFlowParams>()
+	private val chatCreationSub = PublishSubject.create<Any>()
+	private val chatOpenSub = PublishSubject.create<ChatFlowParams>()
 
 	private var repositorySub: RepositorySubscription? = null
 
 	override fun clean() {
+		chatCreationSub.onComplete()
+		chatOpenSub.onComplete()
 		repositorySub?.remove()
 
 		super.clean()
@@ -32,7 +34,7 @@ class ChatListViewModel(private val listAdapter: ChatListAdapter) : BasicViewMod
 	fun init() {
 		listAdapter.setListener(object : ChatListAdapter.Listener {
 			override fun onChatSelected(chat: Chat) {
-				openChatOpenSubj.onNext(ChatFlowParams(
+				chatOpenSub.onNext(ChatFlowParams(
 					userId = App.backend.getAuthManager().getCurrentUser().id,
 					chatId = chat.id,
 					title = chat.localName ?: chat.name))
@@ -41,10 +43,10 @@ class ChatListViewModel(private val listAdapter: ChatListAdapter) : BasicViewMod
 		attachDataListener()
 	}
 
-	fun onShowContactListClicked() = contactListRequest.onNext(EmptyObject)
+	fun onCreateChatClicked() = chatCreationSub.onNext(EmptyObject)
 
-	fun observeContactListRequest() = contactListRequest as Observable<*>
-	fun observeChatOpen() = openChatOpenSubj as Observable<ChatFlowParams>
+	fun observeChatCreationRequest() = chatCreationSub as Observable<*>
+	fun observeChatOpenRequest() = chatOpenSub as Observable<ChatFlowParams>
 
 	private fun attachDataListener() {
 		//TODO load chats independantly of contact list and assign names postpone

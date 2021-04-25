@@ -1,24 +1,22 @@
 package com.ancientlore.intercom.ui.contact.list
 
-import com.ancientlore.intercom.App
 import com.ancientlore.intercom.backend.RepositorySubscription
 import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.data.model.Contact
 import com.ancientlore.intercom.data.source.ContactRepository
 import com.ancientlore.intercom.ui.BasicViewModel
-import com.ancientlore.intercom.ui.chat.flow.ChatFlowParams
 import com.ancientlore.intercom.utils.Utils
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 
 class ContactListViewModel(private val listAdapter: ContactListAdapter) : BasicViewModel() {
 
-	private val openChatSub = PublishSubject.create<ChatFlowParams>()
+	private val openContactDetailSub = PublishSubject.create<Contact>()
 
 	private var repositorySub: RepositorySubscription? = null
 
 	override fun clean() {
-		openChatSub.onComplete()
+		openContactDetailSub.onComplete()
 		repositorySub?.remove()
 
 		super.clean()
@@ -27,10 +25,7 @@ class ContactListViewModel(private val listAdapter: ContactListAdapter) : BasicV
 	fun init() {
 		listAdapter.setListener(object : ContactListAdapter.Listener {
 			override fun onContactSelected(contact: Contact) {
-				openChatSub.onNext(ChatFlowParams(
-					userId = App.backend.getAuthManager().getCurrentUser().id,
-					title = contact.name,
-					contactId = contact.id))
+				openContactDetailSub.onNext(contact)
 			}
 		})
 
@@ -44,7 +39,7 @@ class ContactListViewModel(private val listAdapter: ContactListAdapter) : BasicV
 		})
 	}
 
-	fun observeChatOpen() = openChatSub as Observable<ChatFlowParams>
+	fun observeOpenContactDetail() = openContactDetailSub as Observable<Contact>
 
 	fun filter(text: String) = listAdapter.filter(text)
 }

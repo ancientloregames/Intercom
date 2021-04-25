@@ -31,6 +31,7 @@ import com.ancientlore.intercom.ui.auth.email.login.EmailLoginFragment
 import com.ancientlore.intercom.ui.auth.email.signup.EmailSignupFragment
 import com.ancientlore.intercom.ui.auth.phone.login.PhoneLoginFragment
 import com.ancientlore.intercom.ui.auth.phone.check.PhoneCheckFragment
+import com.ancientlore.intercom.ui.chat.creation.ChatCreationFragment
 import com.ancientlore.intercom.ui.chat.flow.ChatFlowFragment
 import com.ancientlore.intercom.ui.chat.flow.ChatFlowParams
 import com.ancientlore.intercom.ui.chat.list.ChatListFragment
@@ -181,6 +182,21 @@ class MainActivity : AppCompatActivity(),
 					supportFragmentManager.beginTransaction()
 						.setCustomAnimations(R.anim.slide_in_bottom, R.anim.slide_out_bottom)
 						.add(R.id.container, ContactListFragment.newInstance())
+						.commitNow()
+				}
+			} else {
+				//TODO show notification that permission is required
+			}
+		}
+	}
+
+	override fun openChatCreation() {
+		tryObserveDeviceContacts { success ->
+			if (success) {
+				runOnUiThread {
+					supportFragmentManager.beginTransaction()
+						.setCustomAnimations(R.anim.slide_in_bottom, R.anim.slide_out_bottom)
+						.add(R.id.container, ChatCreationFragment.newInstance())
 						.commitNow()
 				}
 			} else {

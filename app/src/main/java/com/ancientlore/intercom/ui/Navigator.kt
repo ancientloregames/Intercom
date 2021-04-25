@@ -15,6 +15,7 @@ interface Navigator {
 	fun openPhoneAuthForm()
 	fun openPhoneCheckForm(params: PhoneAuthParams)
 	fun openContactList()
+	fun openChatCreation()
 	fun openChatFlow(params: ChatFlowParams)
 	fun openSettings()
 

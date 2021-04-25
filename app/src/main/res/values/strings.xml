@@ -96,4 +96,7 @@
 	<string name="dialog_edit_user_status_title">Enter New Status</string>
 	<string name="dialog_edit_user_status_message">Maximum length is <b>64</b> characters</string>
 	<string name="dialog_edit_user_status_hint">Your Status</string>
+
+	<string name="create_group">Create Group</string>
+	<string name="contacts">Contacts</string>
 </resources>

@@ -55,9 +55,9 @@ class ChatListFragment : BasicFragment<ChatListViewModel, ChatListUiBinding>() {
 	override fun observeViewModel(viewModel: ChatListViewModel) {
 		super.observeViewModel(viewModel)
 
-		subscriptions.add(viewModel.observeContactListRequest()
-			.subscribe { openContactList() })
-		subscriptions.add(viewModel.observeChatOpen()
+		subscriptions.add(viewModel.observeChatCreationRequest()
+			.subscribe { openChatCreation() })
+		subscriptions.add(viewModel.observeChatOpenRequest()
 			.subscribe { openChatFlow(it) })
 	}
 
@@ -81,7 +81,7 @@ class ChatListFragment : BasicFragment<ChatListViewModel, ChatListUiBinding>() {
 		}
 	}
 
-	private fun openContactList() = navigator?.openContactList()
+	private fun openChatCreation() = navigator?.openChatCreation()
 
 	private fun openChatFlow(params: ChatFlowParams) = navigator?.openChatFlow(params)
 }

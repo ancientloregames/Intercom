@@ -54,7 +54,7 @@
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:layout_margin="16dp"
-				android:onClick="@{() -> ui.onShowContactListClicked()}"
+				android:onClick="@{() -> ui.onCreateChatClicked()}"
 				app:srcCompat="@drawable/ic_edit"
 				app:backgroundTint="@android:color/holo_blue_light"
 				app:layout_constraintBottom_toBottomOf="parent"
