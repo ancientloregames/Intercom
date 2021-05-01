@@ -43,6 +43,7 @@ import com.ancientlore.intercom.utils.NotificationManager.Companion.EXTRA_CHAT_I
 import com.ancientlore.intercom.utils.NotificationManager.Companion.EXTRA_CHAT_TITLE
 import com.ancientlore.intercom.utils.extensions.checkPermission
 import com.ancientlore.intercom.utils.extensions.createChannel
+import com.ancientlore.intercom.utils.extensions.hideKeyboard
 import java.util.*
 import java.util.concurrent.Executors
 
@@ -257,6 +258,7 @@ class MainActivity : AppCompatActivity(),
 
 	override fun closeFragment(fragment: Fragment) {
 		runOnUiThread {
+			hideKeyboard()
 			supportFragmentManager.beginTransaction()
 				.remove(fragment)
 				.commitNow()
