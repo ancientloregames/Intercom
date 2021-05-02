@@ -4,12 +4,13 @@ import com.ancientlore.intercom.backend.RepositorySubscription
 import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.data.model.Contact
 import com.ancientlore.intercom.data.source.ContactRepository
-import com.ancientlore.intercom.ui.BasicViewModel
+import com.ancientlore.intercom.ui.FilterableViewModel
 import com.ancientlore.intercom.utils.Utils
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 
-class ContactListViewModel(private val listAdapter: ContactListAdapter) : BasicViewModel() {
+class ContactListViewModel(listAdapter: ContactListAdapter)
+	: FilterableViewModel<ContactListAdapter>(listAdapter) {
 
 	private val openContactDetailSub = PublishSubject.create<Contact>()
 
@@ -40,6 +41,4 @@ class ContactListViewModel(private val listAdapter: ContactListAdapter) : BasicV
 	}
 
 	fun observeOpenContactDetail() = openContactDetailSub as Observable<Contact>
-
-	fun filter(text: String) = listAdapter.filter(text)
 }

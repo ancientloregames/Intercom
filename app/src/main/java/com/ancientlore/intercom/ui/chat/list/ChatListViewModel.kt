@@ -9,14 +9,15 @@ import com.ancientlore.intercom.data.model.Chat
 import com.ancientlore.intercom.data.model.Contact
 import com.ancientlore.intercom.data.source.ChatRepository
 import com.ancientlore.intercom.data.source.ContactRepository
-import com.ancientlore.intercom.ui.BasicViewModel
+import com.ancientlore.intercom.ui.FilterableViewModel
 import com.ancientlore.intercom.ui.chat.flow.ChatFlowParams
 import com.ancientlore.intercom.utils.Utils
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import java.util.*
 
-class ChatListViewModel(private val listAdapter: ChatListAdapter) : BasicViewModel() {
+class ChatListViewModel(listAdapter: ChatListAdapter)
+	: FilterableViewModel<ChatListAdapter>(listAdapter) {
 
 	private val chatCreationSub = PublishSubject.create<Any>()
 	private val chatOpenSub = PublishSubject.create<ChatFlowParams>()
@@ -80,9 +81,5 @@ class ChatListViewModel(private val listAdapter: ChatListAdapter) : BasicViewMod
 				}
 			}
 		}
-	}
-
-	fun filter(text: String) {
-		listAdapter.filter(text)
 	}
 }

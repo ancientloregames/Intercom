@@ -6,15 +6,14 @@ import com.ancientlore.intercom.backend.RepositorySubscription
 import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.data.model.Contact
 import com.ancientlore.intercom.data.source.ContactRepository
-import com.ancientlore.intercom.ui.BasicViewModel
+import com.ancientlore.intercom.ui.FilterableViewModel
 import com.ancientlore.intercom.ui.chat.flow.ChatFlowParams
 import com.ancientlore.intercom.utils.Utils
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 
-class ChatCreationViewModel : BasicViewModel() {
-
-	private var listAdapter: ChatCreationAdapter? = null
+class ChatCreationViewModel(listAdapter: ChatCreationAdapter)
+	: FilterableViewModel<ChatCreationAdapter>(listAdapter) {
 
 	private val openChatSub = PublishSubject.create<ChatFlowParams>()
 	private val createGroupSub = PublishSubject.create<Any>()
@@ -29,8 +28,7 @@ class ChatCreationViewModel : BasicViewModel() {
 		super.clean()
 	}
 
-	fun init(listAdapter: ChatCreationAdapter) {
-		this.listAdapter = listAdapter
+	fun init() {
 		listAdapter.setListener(object : ChatCreationAdapter.Listener {
 			override fun onContactSelected(contact: Contact) {
 				openChatSub.onNext(
@@ -61,8 +59,4 @@ class ChatCreationViewModel : BasicViewModel() {
 	fun observeChatOpen() = openChatSub as Observable<ChatFlowParams>
 
 	fun observeCreateGroup() = createGroupSub as Observable<ChatFlowParams>
-
-	fun filter(text: String) {
-		listAdapter?.filter(text)
-	}
 }

@@ -5,13 +5,12 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
-import android.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import com.ancientlore.intercom.C
 import com.ancientlore.intercom.R
 import com.ancientlore.intercom.databinding.ChatFlowUiBinding
 import com.ancientlore.intercom.dialog.bottomsheet.list.ListBottomSheetDialog
-import com.ancientlore.intercom.ui.BasicFragment
+import com.ancientlore.intercom.ui.FilterableFragment
 import com.ancientlore.intercom.ui.dialog.attach.AttachBottomSheetDialog
 import com.ancientlore.intercom.utils.ImageUtils
 import com.ancientlore.intercom.utils.Runnable1
@@ -28,7 +27,7 @@ import kotlinx.android.synthetic.main.chat_flow_ui.listView
 import kotlinx.android.synthetic.main.chat_flow_ui.toolbar
 import java.io.File
 
-class ChatFlowFragment : BasicFragment<ChatFlowViewModel, ChatFlowUiBinding>() {
+class ChatFlowFragment : FilterableFragment<ChatFlowViewModel, ChatFlowUiBinding>() {
 
 	companion object {
 		const val INTENT_GET_FILES = 101
@@ -53,6 +52,10 @@ class ChatFlowFragment : BasicFragment<ChatFlowViewModel, ChatFlowUiBinding>() {
 		return true
 	}
 
+	override fun getToolbar(): Toolbar = toolbar
+
+	override fun getToolbarMenuResId() = R.menu.chat_flow_menu
+
 	override fun getLayoutResId() = R.layout.chat_flow_ui
 
 	override fun createViewModel() = ChatFlowViewModel(listView.adapter as ChatFlowAdapter, params)
@@ -63,7 +66,8 @@ class ChatFlowFragment : BasicFragment<ChatFlowViewModel, ChatFlowUiBinding>() {
 	}
 
 	override fun initView(view: View, savedInstanceState: Bundle?) {
-		initToolbarMenu()
+		super.initView(view, savedInstanceState)
+
 		ToolbarManager(toolbar as Toolbar).apply {
 			setTitle(params.title)
 			enableBackButton { close() }
@@ -72,31 +76,9 @@ class ChatFlowFragment : BasicFragment<ChatFlowViewModel, ChatFlowUiBinding>() {
 		swipableLayout.setListener { close() }
 
 		with(listView) {
-			adapter = ChatFlowAdapter(params.userId, requireContext(), mutableListOf())
+			adapter = ChatFlowAdapter(params.userId, requireContext())
 			enableChatBehavior()
 		}
-	}
-
-	private fun initToolbarMenu() {
-		navigator?.createToolbarMenu(toolbar, Runnable1 { menu ->
-			activity?.menuInflater?.inflate(R.menu.chat_flow_menu, menu)
-			val search = menu.findItem(R.id.search).actionView as SearchView
-			search.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-				override fun onQueryTextSubmit(query: String?): Boolean {
-					query?.let { constraint ->
-						viewModel.filter(constraint)
-					}
-					return true
-				}
-				override fun onQueryTextChange(newText: String?): Boolean {
-					newText
-						?.takeIf { it.length > 1 }
-						?.let { viewModel.filter(it) }
-						?:run { viewModel.filter("") }
-					return true
-				}
-			})
-		})
 	}
 
 	override fun initViewModel(viewModel: ChatFlowViewModel) {

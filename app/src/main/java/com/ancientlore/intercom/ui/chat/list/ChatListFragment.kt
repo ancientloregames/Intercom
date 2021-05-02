@@ -1,43 +1,24 @@
 package com.ancientlore.intercom.ui.chat.list
 
 import android.os.Bundle
-import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.SearchView
+import androidx.appcompat.widget.Toolbar
 import com.ancientlore.intercom.R
 import com.ancientlore.intercom.databinding.ChatListUiBinding
-import com.ancientlore.intercom.ui.BasicFragment
+import com.ancientlore.intercom.ui.FilterableFragment
 import com.ancientlore.intercom.ui.chat.flow.ChatFlowParams
-import com.ancientlore.intercom.utils.Runnable1
 import kotlinx.android.synthetic.main.chat_list_ui.*
 
-class ChatListFragment : BasicFragment<ChatListViewModel, ChatListUiBinding>() {
+class ChatListFragment : FilterableFragment<ChatListViewModel, ChatListUiBinding>() {
 
 	companion object {
 		fun newInstance() = ChatListFragment()
 	}
 
-	private val menuCallback = Runnable1<Menu> { menu ->
-		activity?.menuInflater?.inflate(R.menu.chat_list_menu, menu)
+	override fun getToolbar(): Toolbar = toolbar
 
-		val search = menu.findItem(R.id.search).actionView as SearchView
-		search.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-			override fun onQueryTextSubmit(query: String?): Boolean {
-				query?.let { constraint ->
-					viewModel.filter(constraint)
-				}
-				return true
-			}
-			override fun onQueryTextChange(newText: String?): Boolean {
-				newText
-					?.takeIf { it.length > 1 }
-					?.let { viewModel.filter(it) }
-					?:run { viewModel.filter("") }
-				return true
-			}
-		})
-	}
+	override fun getToolbarMenuResId() = R.menu.chat_list_menu
 
 	override fun getLayoutResId() = R.layout.chat_list_ui
 
@@ -62,9 +43,11 @@ class ChatListFragment : BasicFragment<ChatListViewModel, ChatListUiBinding>() {
 	}
 
 	override fun initView(view: View, savedInstanceState: Bundle?) {
-		navigator?.createToolbarMenu(toolbar, menuCallback)
+		super.initView(view, savedInstanceState)
+
 		setHasOptionsMenu(true)
-		listView.adapter = ChatListAdapter(requireContext(), mutableListOf())
+
+		listView.adapter = ChatListAdapter(requireContext())
 	}
 
 	override fun onOptionsItemSelected(item: MenuItem): Boolean {

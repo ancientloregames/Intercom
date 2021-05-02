@@ -2,7 +2,6 @@ package com.ancientlore.intercom.ui.chat.flow
 
 import android.media.MediaRecorder
 import android.net.Uri
-import android.util.Log
 import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableField
 import com.ancientlore.intercom.App
@@ -17,7 +16,7 @@ import com.ancientlore.intercom.data.model.Message
 import com.ancientlore.intercom.data.source.ChatRepository
 import com.ancientlore.intercom.data.source.EmptyResultException
 import com.ancientlore.intercom.data.source.MessageRepository
-import com.ancientlore.intercom.ui.BasicViewModel
+import com.ancientlore.intercom.ui.FilterableViewModel
 import com.ancientlore.intercom.utils.Runnable1
 import com.ancientlore.intercom.utils.Utils
 import com.ancientlore.intercom.utils.extensions.createAudioMessageFile
@@ -26,9 +25,9 @@ import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import java.io.File
 
-class ChatFlowViewModel(private val listAdapter: ChatFlowAdapter,
+class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
                         private val params: ChatFlowParams)
-	: BasicViewModel() {
+	: FilterableViewModel<ChatFlowAdapter>(listAdapter) {
 
 	val textField = ObservableField("")
 
@@ -128,8 +127,6 @@ class ChatFlowViewModel(private val listAdapter: ChatFlowAdapter,
 
 		super.clean()
 	}
-
-	fun filter(text: String) = listAdapter.filter(text)
 
 	fun observeAttachMenuOpen() = openAttachMenuSubj as Observable<Any>
 
