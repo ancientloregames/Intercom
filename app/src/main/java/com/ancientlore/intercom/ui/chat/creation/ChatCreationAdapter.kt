@@ -15,15 +15,10 @@ import com.ancientlore.intercom.widget.recycler.BasicRecyclerAdapter
 import com.ancientlore.intercom.widget.recycler.MutableRecyclerAdapter
 import java.lang.RuntimeException
 
-class ChatCreationAdapter(context: Context, items: MutableList<Contact>)
+class ChatCreationAdapter(context: Context,
+                          items: MutableList<Contact> = mutableListOf())
 	: MutableRecyclerAdapter<Contact, ChatCreationAdapter.ViewHolder<ViewDataBinding>, ViewDataBinding>(
 			context, items, withHeader = true) {
-
-	companion object {
-		private const val VIEW_TYPE_HEADER = Int.MIN_VALUE
-		private const val VIEW_TYPE_FOOTER = Int.MAX_VALUE
-		private const val VIEW_TYPE_ITEM = 0
-	}
 
 	interface Listener {
 		fun onContactSelected(contact: Contact)
@@ -62,8 +57,6 @@ class ChatCreationAdapter(context: Context, items: MutableList<Contact>)
 			}
 		}
 	}
-
-	override fun bindFooterViewHolder(holder: ViewHolder<ViewDataBinding>, payloads: MutableList<Any>) {}
 
 	override fun bindItemViewHolder(holder: ViewHolder<ViewDataBinding>, position: Int, payloads: MutableList<Any>) {
 

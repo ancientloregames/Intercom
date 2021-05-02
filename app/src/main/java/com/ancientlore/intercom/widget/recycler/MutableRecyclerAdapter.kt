@@ -8,7 +8,7 @@ import com.ancientlore.intercom.widget.MutableAdapter
 
 abstract class MutableRecyclerAdapter<I: Comparable<I>, H: BasicRecyclerAdapter.ViewHolder<I, B>, B: ViewDataBinding>(
 	context: Context,
-	items: MutableList<I>,
+	items: MutableList<I> = mutableListOf(),
 	withHeader: Boolean = false,
 	withFooter: Boolean = false,
 	private var autoSort: Boolean = false)

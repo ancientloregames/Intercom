@@ -1,19 +1,20 @@
 package com.ancientlore.intercom.widget.recycler
 
 import android.content.Context
+import android.os.Bundle
 import androidx.annotation.UiThread
 import androidx.databinding.ViewDataBinding
 
 abstract class HeadedRecyclerAdapter<I: Comparable<I>, H: BasicRecyclerAdapter.ViewHolder<I, B>, B: ViewDataBinding>(
 	context: Context,
-	items: List<I>,
+	items: List<I> = emptyList(),
 	private val withHeader: Boolean = false,
 	private val withFooter: Boolean = false)
 	: BasicRecyclerAdapter<I, H, B>(context, items) {
 
 	companion object {
-		private const val VIEW_TYPE_HEADER = Int.MIN_VALUE
-		private const val VIEW_TYPE_FOOTER = Int.MAX_VALUE
+		const val VIEW_TYPE_HEADER = Int.MIN_VALUE
+		const val VIEW_TYPE_FOOTER = Int.MAX_VALUE
 	}
 
 	protected abstract fun createItemViewHolder(binding: B, viewType: Int): H
@@ -84,6 +85,9 @@ abstract class HeadedRecyclerAdapter<I: Comparable<I>, H: BasicRecyclerAdapter.V
 	fun notifyItemsChanged() = notifyItemRangeChanged(getFirstItemPosition(), getLastItemPosition())
 
 	@UiThread
+	fun notifyItemsChanged(payload: Bundle) = notifyItemRangeChanged(getFirstItemPosition(), getLastItemPosition(), payload)
+
+	@UiThread
 	fun notifyListItemChanged(position: Int) = notifyItemChanged(getViewPosition(position))
 
 	@UiThread
@@ -113,11 +117,11 @@ abstract class HeadedRecyclerAdapter<I: Comparable<I>, H: BasicRecyclerAdapter.V
 
 	private fun getFirstViewPosition() = 0
 
-	private fun getLastViewPosition() = itemCount - 1
+	private fun getLastViewPosition() = itemCount
 
 	private fun getFirstItemPosition() = if (withHeader) 1 else getFirstViewPosition()
 
-	private fun getLastItemPosition() = if (withFooter) itemCount - 2 else getLastViewPosition()
+	private fun getLastItemPosition() = itemCount - 1
 
 	private fun getItemPosition(viewPosition: Int) = if (withHeader) viewPosition - 1 else viewPosition
 

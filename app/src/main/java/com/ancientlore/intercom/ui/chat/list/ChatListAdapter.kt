@@ -14,7 +14,8 @@ import com.ancientlore.intercom.databinding.ChatListItemBinding
 import com.ancientlore.intercom.utils.ImageUtils
 import com.ancientlore.intercom.widget.recycler.MutableRecyclerAdapter
 
-class ChatListAdapter(context: Context, items: MutableList<Chat>)
+class ChatListAdapter(context: Context,
+                      items: MutableList<Chat> = mutableListOf())
 	: MutableRecyclerAdapter<Chat, ChatListAdapter.ViewHolder, ChatListItemBinding>(context, items) {
 
 	interface Listener {

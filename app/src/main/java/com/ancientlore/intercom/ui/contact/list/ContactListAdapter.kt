@@ -11,7 +11,8 @@ import com.ancientlore.intercom.databinding.ContactListItemBinding
 import com.ancientlore.intercom.data.model.Contact
 import com.ancientlore.intercom.widget.recycler.MutableRecyclerAdapter
 
-class ContactListAdapter(context: Context, items: MutableList<Contact>)
+class ContactListAdapter(context: Context,
+                         items: MutableList<Contact> = mutableListOf())
 	: MutableRecyclerAdapter<Contact, ContactListAdapter.ViewHolder, ContactListItemBinding>(context, items) {
 
 	interface Listener {

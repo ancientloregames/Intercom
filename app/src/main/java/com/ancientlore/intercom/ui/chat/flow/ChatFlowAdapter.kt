@@ -34,7 +34,8 @@ import java.io.File
 import java.lang.RuntimeException
 
 class ChatFlowAdapter(private val userId: String,
-                      context: Context, items: MutableList<Message>)
+                      context: Context,
+                      items: MutableList<Message> = mutableListOf())
 	: MutableRecyclerAdapter<Message, ChatFlowAdapter.ViewHolder, ViewDataBinding>(context, items) {
 
 	private companion object {

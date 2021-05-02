@@ -7,12 +7,12 @@ import androidx.databinding.ViewDataBinding
 
 abstract class FilterableRecyclerAdapter<I: Comparable<I>, H: BasicRecyclerAdapter.ViewHolder<I, B>, B: ViewDataBinding>(
 	context: Context,
-	items: List<I>,
+	items: List<I> = emptyList(),
 	withHeader: Boolean = false,
 	withFooter: Boolean = false)
 	: HeadedRecyclerAdapter<I, H, B>(context, items, withHeader, withFooter), Filterable {
 
-	protected val fullList = mutableListOf<I>()
+	protected val fullList = ArrayList<I>(items)
 
 	protected val mutableList get() = getItems() as MutableList<I>
 
@@ -57,7 +57,7 @@ abstract class FilterableRecyclerAdapter<I: Comparable<I>, H: BasicRecyclerAdapt
 		override fun publishResults(constraint: CharSequence?, results: FilterResults) {
 			results.values?.let {
 				setFilteredItems(it as List<I>)
-				notifyItemsChanged()
+				notifyDataSetChanged()
 			}
 		}
 	}
