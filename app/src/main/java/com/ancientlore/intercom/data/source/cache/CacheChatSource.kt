@@ -12,11 +12,28 @@ object CacheChatSource {
 
 	fun getItem(id: String) = cache[id]
 
-	fun addItem(item: Chat) = cache.put(item.id, item)
+	fun putItem(item: Chat) = cache.put(item.id, item)
 
 	fun deleteItem(chatId: String) = cache.remove(chatId)
 
 	fun deleteItem(item: Chat) = deleteItem(item.id)
+
+	fun updateItem(item: Chat): Boolean {
+		return getItem(item.id)
+			?.let {
+				val updatedItem = Chat(
+					id = it.id,
+					name = if (item.name.isNotEmpty()) item.name else it.name,
+					iconUrl = if (item.iconUrl.isNotEmpty()) item.iconUrl else it.iconUrl,
+					initiatorId = it.initiatorId,
+					participants = if (item.participants.isNotEmpty()) item.participants else it.participants,
+					lastMsgTime = it.lastMsgTime,
+					lastMsgText = it.lastMsgText
+				)
+				putItem(updatedItem)
+				true
+			} ?: false
+	}
 
 	fun reset(newChats: List<Chat>) {
 		cache.clear()

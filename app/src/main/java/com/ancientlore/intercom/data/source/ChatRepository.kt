@@ -30,7 +30,7 @@ object ChatRepository : ChatSource {
 		remoteSource
 			?.getItem(id, object : RequestCallback<Chat> {
 				override fun onSuccess(result: Chat) {
-					cacheSource.addItem(result)
+					cacheSource.putItem(result)
 					callback.onSuccess(result)
 				}
 				override fun onFailure(error: Throwable) {
@@ -43,12 +43,26 @@ object ChatRepository : ChatSource {
 	}
 
 	override fun addItem(item: Chat, callback: RequestCallback<String>?) {
+		cacheSource.putItem(item)
 		remoteSource?.addItem(item, callback)
 	}
 
 	override fun deleteItem(chatId: String, callback: RequestCallback<Any>?) {
 		cacheSource.deleteItem(chatId)
 		remoteSource?.deleteItem(chatId, callback)
+	}
+
+	override fun updateItem(item: Chat, callback: RequestCallback<Any>?) {
+		remoteSource
+			?.updateItem(item, object : RequestCallback<Any> {
+				override fun onSuccess(result: Any) {
+					cacheSource.updateItem(item)
+					callback?.onSuccess(result)
+				}
+				override fun onFailure(error: Throwable) {
+					callback?.onFailure(error)
+				}
+			})
 	}
 
 	override fun attachListener(callback: RequestCallback<List<Chat>>) : RepositorySubscription {

@@ -12,7 +12,6 @@ object C {
 	const val USER_STATUS = "status"
 
 	const val CONTACT_NAME = "name"
-	const val CONTACT_PHONE = "phone"
 	const val CONTACT_LAST_SEEN = "lastSeenTime"
 
 	const val CHAT_ID = "id"
@@ -22,4 +21,10 @@ object C {
 	const val CHAT_TIMESTAMP = "timestamp"
 	const val CHAT_STATUS = "status"
 	const val CHAT_ATTACH_URL = "attachUrl"
+
+	const val FIELD_ID = "id"
+	const val FIELD_NAME = "name"
+	const val FIELD_ICON_URL = "iconUrl"
+	const val FIELD_TIMESTAMP = "timestamp"
+	const val FIELD_PARTICIPANTS = "participants"
 }

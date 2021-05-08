@@ -10,7 +10,10 @@ import com.ancientlore.intercom.data.source.ChatSource
 import com.ancientlore.intercom.data.source.remote.firestore.C.CHATS
 import com.ancientlore.intercom.data.source.remote.firestore.C.USERS
 import com.ancientlore.intercom.data.source.remote.firestore.C.CHAT_LAST_MSG_TIME
+import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_ICON_URL
+import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_NAME
 import com.ancientlore.intercom.utils.SingletonHolder
+import com.google.firebase.firestore.SetOptions
 
 open class FirestoreChatSource protected constructor(private val userId: String)
 	: FirestoreSource<Chat>(), ChatSource {
@@ -71,6 +74,19 @@ open class FirestoreChatSource protected constructor(private val userId: String)
 					}
 
 			}
+			.addOnFailureListener { callback?.onFailure(it) }
+	}
+
+	override fun updateItem(item: Chat, callback: RequestCallback<Any>?) {
+		db.collection(CHATS)
+			.document(item.id)
+			.set(HashMap<String, Any>().apply {
+				if (item.name.isNotEmpty())
+					put(FIELD_NAME, item.name)
+				if (item.iconUrl.isNotEmpty())
+					put(FIELD_ICON_URL, item.iconUrl)
+			}, SetOptions.merge())
+			.addOnSuccessListener { callback?.onSuccess(EmptyObject) }
 			.addOnFailureListener { callback?.onFailure(it) }
 	}
 
