@@ -6,4 +6,6 @@ object C {
 	const val SMALL_SIZE_BYTES = 204800L // 200 KB
 
 	const val THUMBNAIL_SIZE = 100
+
+	const val ICON_DIR_PATH = "group_chat_icons"
 }

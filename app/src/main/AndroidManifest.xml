@@ -73,6 +73,9 @@
 
 		<service android:name=".service.FileUploadService"
 				android:exported="false" />
+
+		<service android:name=".service.ChatIconUploadService"
+				android:exported="false" />
 	</application>
 
 </manifest>

@@ -26,6 +26,11 @@ object FirebaseStorageManager : StorageManager {
 			.addOnFailureListener { exception -> callback.onFailure(exception) }
 	}
 
+	override fun upload(data: FileData, fullPath: String, callback: ProgressRequestCallback<Uri>) {
+		val fileRef = storage.getReference("$fullPath/${data.name}")
+		upload(data.uri, fileRef, callback)
+	}
+
 	override fun uploadImage(data: FileData, path: String, callback: ProgressRequestCallback<Uri>) {
 		val fileRef = storage.getReference("images/$path/${data.name}")
 		upload(data.uri, fileRef, callback)
@@ -37,7 +42,7 @@ object FirebaseStorageManager : StorageManager {
 	}
 
 	override fun uploadAudioMessage(uri: Uri, path: String, callback: ProgressRequestCallback<Uri>) {
-		val fileRef = storage.getReference("files/$path/${uri.lastPathSegment}")
+		val fileRef = storage.getReference("audio/$path/${uri.lastPathSegment}")
 		upload(uri, fileRef, callback)
 	}
 

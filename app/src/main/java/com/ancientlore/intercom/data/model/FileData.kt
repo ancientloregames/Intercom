@@ -8,6 +8,7 @@ data class FileData(val id: Long = 0,
                     val name: String = "",
                     val uri: Uri = Uri.EMPTY,
                     val size: Long = 0,
+                    val mimeType: String = "",
                     val extension: String = "") : Parcelable {
 
 	constructor(parcel: Parcel) : this(
