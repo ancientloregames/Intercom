@@ -99,4 +99,8 @@
 
 	<string name="create_group">Create Group</string>
 	<string name="contacts">Contacts</string>
+
+	<string name="upload_finished">Upload finished</string>
+	<string name="upload_failed">Upload failed</string>
+	<string name="uploading">Uploading…</string>
 </resources>

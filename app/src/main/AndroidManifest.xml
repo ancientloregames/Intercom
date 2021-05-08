@@ -70,6 +70,9 @@
 				<action android:name="com.ancientlore.intercom.action.REPLY"/>
 			</intent-filter>
 		</receiver>
+
+		<service android:name=".service.FileUploadService"
+				android:exported="false" />
 	</application>
 
 </manifest>
