@@ -171,7 +171,7 @@ class MainActivity : AppCompatActivity(),
 	private fun openChatList() {
 		runOnUiThread {
 			supportFragmentManager.beginTransaction()
-				.replace(R.id.container, ChatListFragment.newInstance())
+				.replace(R.id.mainContainer, ChatListFragment.newInstance())
 				.commitNow()
 		}
 	}
@@ -182,7 +182,7 @@ class MainActivity : AppCompatActivity(),
 				runOnUiThread {
 					supportFragmentManager.beginTransaction()
 						.setCustomAnimations(R.anim.slide_in_bottom, R.anim.slide_out_bottom)
-						.add(R.id.container, ContactListFragment.newInstance())
+						.replace(R.id.modalContainer, ContactListFragment.newInstance())
 						.commitNow()
 				}
 			} else {
@@ -197,7 +197,7 @@ class MainActivity : AppCompatActivity(),
 				runOnUiThread {
 					supportFragmentManager.beginTransaction()
 						.setCustomAnimations(R.anim.slide_in_bottom, R.anim.slide_out_bottom)
-						.add(R.id.container, ChatCreationFragment.newInstance())
+						.replace(R.id.modalContainer, ChatCreationFragment.newInstance())
 						.commitNow()
 				}
 			} else {
@@ -210,7 +210,7 @@ class MainActivity : AppCompatActivity(),
 		runOnUiThread {
 			supportFragmentManager.beginTransaction()
 				.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_right)
-				.add(R.id.container, ChatFlowFragment.newInstance(params))
+				.replace(R.id.modalContainer, ChatFlowFragment.newInstance(params))
 				.commitNowAllowingStateLoss()
 		}
 	}
@@ -218,7 +218,7 @@ class MainActivity : AppCompatActivity(),
 	override fun openLoginForm() {
 		runOnUiThread {
 			supportFragmentManager.beginTransaction()
-				.replace(R.id.container, EmailLoginFragment.newInstance())
+				.replace(R.id.mainContainer, EmailLoginFragment.newInstance())
 				.commitNow()
 		}
 	}
@@ -226,7 +226,7 @@ class MainActivity : AppCompatActivity(),
 	override fun openSignupForm() {
 		runOnUiThread {
 			supportFragmentManager.beginTransaction()
-				.replace(R.id.container, EmailSignupFragment.newInstance())
+				.replace(R.id.mainContainer, EmailSignupFragment.newInstance())
 				.commitNow()
 		}
 	}
@@ -234,7 +234,7 @@ class MainActivity : AppCompatActivity(),
 	override fun openPhoneAuthForm() {
 		runOnUiThread {
 			supportFragmentManager.beginTransaction()
-				.replace(R.id.container, PhoneLoginFragment.newInstance())
+				.replace(R.id.mainContainer, PhoneLoginFragment.newInstance())
 				.commitNow()
 		}
 	}
@@ -242,7 +242,7 @@ class MainActivity : AppCompatActivity(),
 	override fun openPhoneCheckForm(params: PhoneAuthParams) {
 		runOnUiThread {
 			supportFragmentManager.beginTransaction()
-				.replace(R.id.container, PhoneCheckFragment.newInstance(params))
+				.replace(R.id.mainContainer, PhoneCheckFragment.newInstance(params))
 				.commitNow()
 		}
 	}
@@ -251,7 +251,7 @@ class MainActivity : AppCompatActivity(),
 		runOnUiThread {
 			supportFragmentManager.beginTransaction()
 				.setCustomAnimations(R.anim.slide_in_bottom, R.anim.slide_out_bottom)
-				.add(R.id.container, SettingsFragment.newInstance())
+				.replace(R.id.modalContainer, SettingsFragment.newInstance())
 				.commitNow()
 		}
 	}
