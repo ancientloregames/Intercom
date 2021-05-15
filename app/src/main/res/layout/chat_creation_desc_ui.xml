@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+		xmlns:app="http://schemas.android.com/apk/res-auto"
+		xmlns:tools="http://schemas.android.com/tools"
+		>
+	<data>
+		<variable
+				name="ui"
+				type="com.ancientlore.intercom.ui.chat.creation.description.ChatCreationDescViewModel"/>
+	</data>
+
+	<com.ancientlore.intercom.view.SwipableLayout
+			android:id="@+id/swipableLayout"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent">
+
+		<androidx.constraintlayout.widget.ConstraintLayout
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:background="@android:color/white">
+
+			<com.google.android.material.appbar.AppBarLayout
+					android:id="@+id/appbar"
+					android:layout_width="0dp"
+					android:layout_height="wrap_content"
+					app:layout_constraintStart_toStartOf="parent"
+					app:layout_constraintEnd_toEndOf="parent"
+					app:layout_constraintTop_toTopOf="parent"
+					app:layout_constraintBottom_toTopOf="@+id/iconView"
+					android:theme="@style/AppTheme.AppBarOverlay">
+
+				<androidx.appcompat.widget.Toolbar
+						android:id="@+id/toolbar"
+						android:layout_width="match_parent"
+						android:layout_height="?attr/actionBarSize"
+						android:background="?attr/colorPrimary"
+						app:popupTheme="@style/AppTheme.PopupOverlay"
+						app:title="@string/new_group"
+						tools:subtitle="10 members"
+						tools:navigationIcon="drawable/ic_nav_back"
+						/>
+
+			</com.google.android.material.appbar.AppBarLayout>
+
+			<com.ancientlore.intercom.view.CircleImageView
+					android:id="@+id/iconView"
+					android:layout_width="60dp"
+					android:layout_height="60dp"
+					android:layout_margin="10dp"
+					android:src="@{ui.groupIconField}"
+					app:backgroundColor="@color/colorPrimaryDark"
+					app:layout_constraintTop_toBottomOf="@id/appbar"
+					app:layout_constraintStart_toStartOf="parent"
+					app:layout_constraintEnd_toStartOf="@id/nameView"
+					app:layout_constraintBottom_toTopOf="@id/dividerView"
+					android:onClick="@{() -> ui.onIconClicked()}"
+				/>
+
+			<ImageView
+					android:layout_width="60dp"
+					android:layout_height="60dp"
+					android:layout_margin="10dp"
+					android:scaleType="centerInside"
+					android:clickable="false"
+					android:focusable="false"
+					android:focusableInTouchMode="false"
+					app:srcCompat="@drawable/ic_add_photo_24dp"
+					app:tint="#80FFFFFF"
+					app:layout_constraintTop_toBottomOf="@id/appbar"
+					app:layout_constraintStart_toStartOf="parent"
+					app:layout_constraintEnd_toStartOf="@id/nameView"
+					app:layout_constraintBottom_toTopOf="@id/dividerView"
+					/>
+
+			<EditText
+					android:id="@+id/nameView"
+					android:layout_width="0dp"
+					android:layout_height="wrap_content"
+					android:hint="@string/group_name_field_hint"
+					android:text="@={ui.groupNameField}"
+					app:layout_constraintTop_toBottomOf="@id/appbar"
+					app:layout_constraintEnd_toEndOf="parent"
+					app:layout_constraintStart_toEndOf="@id/iconView"
+					app:layout_constraintBottom_toTopOf="@id/dividerView"
+				/>
+
+			<View
+					android:id="@+id/dividerView"
+					android:layout_width="0dp"
+					android:layout_height="12dp"
+					android:background="#ddd"
+					app:layout_constraintBottom_toTopOf="@id/listView"
+					app:layout_constraintStart_toStartOf="parent"
+					app:layout_constraintEnd_toEndOf="parent"
+					app:layout_constraintTop_toBottomOf="@id/iconView"
+				/>
+
+			<androidx.recyclerview.widget.RecyclerView
+					android:id="@+id/listView"
+					android:layout_width="0dp"
+					android:layout_height="0dp"
+					app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+					app:layout_constraintTop_toBottomOf="@+id/dividerView"
+					app:layout_constraintEnd_toEndOf="parent"
+					app:layout_constraintBottom_toBottomOf="parent"
+					app:layout_constraintStart_toStartOf="parent"
+					tools:listitem="@layout/chat_creation_desc_item"
+					/>
+
+			<com.google.android.material.floatingactionbutton.FloatingActionButton
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_margin="@dimen/floatingButtonIndent"
+					android:onClick="@{() -> ui.onNextClicked()}"
+					app:srcCompat="@drawable/ic_check_24dp"
+					android:tint="@android:color/white"
+					app:backgroundTint="@android:color/holo_blue_light"
+					app:layout_constraintBottom_toBottomOf="parent"
+					app:layout_constraintEnd_toEndOf="parent"
+					/>
+
+		</androidx.constraintlayout.widget.ConstraintLayout>
+	</com.ancientlore.intercom.view.SwipableLayout>
+</layout>

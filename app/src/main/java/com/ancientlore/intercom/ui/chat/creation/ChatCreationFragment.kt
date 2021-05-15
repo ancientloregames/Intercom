@@ -61,9 +61,7 @@ class ChatCreationFragment : FilterableFragment<ChatCreationViewModel, ChatCreat
 
 		subscriptions.add(viewModel.observeCreateGroup()
 			.subscribe {
-				val nav = navigator
-				close()
-				nav?.openChatFlow(it)
+				navigator?.openChatCreationGroup()
 			})
 	}
 }

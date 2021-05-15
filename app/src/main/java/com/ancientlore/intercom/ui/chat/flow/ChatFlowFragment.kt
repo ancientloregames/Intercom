@@ -7,9 +7,12 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.widget.Toolbar
 import com.ancientlore.intercom.C
+import com.ancientlore.intercom.C.ICON_DIR_PATH
 import com.ancientlore.intercom.R
 import com.ancientlore.intercom.databinding.ChatFlowUiBinding
 import com.ancientlore.intercom.dialog.bottomsheet.list.ListBottomSheetDialog
+import com.ancientlore.intercom.service.ChatIconUploadService
+import com.ancientlore.intercom.service.FileUploadService
 import com.ancientlore.intercom.ui.FilterableFragment
 import com.ancientlore.intercom.ui.dialog.attach.AttachBottomSheetDialog
 import com.ancientlore.intercom.utils.ImageUtils
@@ -104,6 +107,8 @@ class ChatFlowFragment : FilterableFragment<ChatFlowViewModel, ChatFlowUiBinding
 			.subscribe { openAttachMenu() })
 		subscriptions.add(viewModel.observeAudioRecord()
 			.subscribe { recordAudio() })
+		subscriptions.add(viewModel.observeUploadIcon()
+			.subscribe { uploadIcon(it) })
 	}
 
 	override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -198,5 +203,25 @@ class ChatFlowFragment : FilterableFragment<ChatFlowViewModel, ChatFlowUiBinding
 				viewModel.attachInputPanelManager(MessageInputManager(view!!))
 			}
 		})
+	}
+
+	private fun uploadIcon(chatId: String) {
+		permissionManager?.requestPermissionWriteStorage { granted ->
+			if (granted) {
+				activity?.run {
+					startService(Intent(this, ChatIconUploadService::class.java)
+						.putParcelableArrayListExtra(FileUploadService.EXTRA_URI_LIST, arrayListOf(params.iconUri))
+						.putExtra(FileUploadService.EXTRA_PATH, ICON_DIR_PATH)
+						.putExtra(FileUploadService.EXTRA_NOTIFY, true)
+						.putExtra(ChatIconUploadService.EXTRA_CHAT_ID, chatId)
+						.putExtra(ChatIconUploadService.EXTRA_USER_ID, params.userId)
+						.putStringArrayListExtra(ChatIconUploadService.EXTRA_CHAT_PARTICIPANTS,
+							if (params.participants is ArrayList)
+								params.participants as ArrayList
+							else ArrayList(params.participants))
+						.setAction(FileUploadService.ACTION_UPLOAD))
+				}
+			}
+		}
 	}
 }

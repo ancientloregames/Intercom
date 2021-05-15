@@ -41,6 +41,8 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 
 	private val recordAudioSubj = PublishSubject.create<Any>()
 
+	private val uploadIconSub = PublishSubject.create<String>() // Chat Id
+
 	private var inputManager: MessageInputManager? = null
 
 	init {
@@ -48,8 +50,10 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 			params.chatId.isNotEmpty() -> {
 				initMessageRepository(params.chatId)
 			}
-			params.contactId.isNotEmpty() -> {
-				ChatRepository.getItem(params.contactId, object : RequestCallback<Chat> {
+			params.participants.size == 2 -> { // Privat chat
+				val contactId = params.participants.first { it != params.userId }
+
+				ChatRepository.getItem(contactId, object : RequestCallback<Chat> {
 					override fun onSuccess(chat: Chat) {
 						initMessageRepository(chat.id)
 					}
@@ -59,7 +63,8 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 					}
 				})
 			}
-			// TODO Group chat
+			params.participants.size > 2 -> {
+			}
 			else -> {
 				val error = RuntimeException("Chat Flow Ui has been opened with no chat neither contacts ids")
 				Utils.logError(error)
@@ -131,6 +136,8 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 	fun observeAttachMenuOpen() = openAttachMenuSubj as Observable<Any>
 
 	fun observeAudioRecord() = recordAudioSubj as Observable<Any>
+
+	fun observeUploadIcon() = uploadIconSub as Observable<String>
 
 	fun onAttachButtonCliked() = openAttachMenuSubj.onNext(EmptyObject)
 
@@ -264,11 +271,17 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 	private fun guarantyChat(callback: Runnable1<String>) {
 
 		if (repository.getChatId() == null) {
-			val chat = Chat(initiatorId = params.userId,
-				participants = listOf(params.userId, params.contactId))
+
+			val chat = Chat(
+				name = params.title,
+				iconUrl = params.iconUri.toString(),
+				initiatorId = params.userId,
+				participants = params.participants)
+
 			ChatRepository.addItem(chat, object : RequestCallback<String> {
 				override fun onSuccess(id: String) {
 					initMessageRepository(id)
+					uploadIconSub.onNext(id)
 					callback.run(id)
 				}
 				override fun onFailure(error: Throwable) {

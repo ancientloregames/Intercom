@@ -32,6 +32,8 @@ import com.ancientlore.intercom.ui.auth.email.signup.EmailSignupFragment
 import com.ancientlore.intercom.ui.auth.phone.login.PhoneLoginFragment
 import com.ancientlore.intercom.ui.auth.phone.check.PhoneCheckFragment
 import com.ancientlore.intercom.ui.chat.creation.ChatCreationFragment
+import com.ancientlore.intercom.ui.chat.creation.description.ChatCreationDescFragment
+import com.ancientlore.intercom.ui.chat.creation.group.ChatCreationGroupFragment
 import com.ancientlore.intercom.ui.chat.flow.ChatFlowFragment
 import com.ancientlore.intercom.ui.chat.flow.ChatFlowParams
 import com.ancientlore.intercom.ui.chat.list.ChatListFragment
@@ -252,6 +254,24 @@ class MainActivity : AppCompatActivity(),
 			supportFragmentManager.beginTransaction()
 				.setCustomAnimations(R.anim.slide_in_bottom, R.anim.slide_out_bottom)
 				.replace(R.id.modalContainer, SettingsFragment.newInstance())
+				.commitNow()
+		}
+	}
+
+	override fun openChatCreationGroup() {
+		runOnUiThread {
+			supportFragmentManager.beginTransaction()
+				.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_right)
+				.add(R.id.modalContainer, ChatCreationGroupFragment.newInstance())
+				.commitNow()
+		}
+	}
+
+	override fun openChatCreationDesc(contacts: List<Contact>) {
+		runOnUiThread {
+			supportFragmentManager.beginTransaction()
+				.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_right)
+				.add(R.id.modalContainer, ChatCreationDescFragment.newInstance(contacts))
 				.commitNow()
 		}
 	}

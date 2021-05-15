@@ -54,6 +54,7 @@
 	<string name="alert_error_change_user_status">Failed to change the status</string>
 	<string name="alert_error_invalid_user_status">Inavalid status</string>
 	<string name="alert_error_send_message">Failed to send message</string>
+	<string name="alert_error_name_required">The name is required</string>
 
 	<string name="record">Record</string>
 	<string name="stop">Stop</string>
@@ -98,6 +99,8 @@
 	<string name="dialog_edit_user_status_hint">Your Status</string>
 
 	<string name="create_group">Create Group</string>
+	<string name="new_group">New Group</string>
+	<string name="group_name_field_hint">Enter group name</string>
 	<string name="contacts">Contacts</string>
 
 	<string name="upload_finished">Upload finished</string>

@@ -1,5 +1,6 @@
 package com.ancientlore.intercom.ui.chat.creation
 
+import android.net.Uri
 import com.ancientlore.intercom.App
 import com.ancientlore.intercom.EmptyObject
 import com.ancientlore.intercom.backend.RepositorySubscription
@@ -31,11 +32,13 @@ class ChatCreationViewModel(listAdapter: ChatCreationAdapter)
 	fun init() {
 		listAdapter.setListener(object : ChatCreationAdapter.Listener {
 			override fun onContactSelected(contact: Contact) {
+				val userId = App.backend.getAuthManager().getCurrentUser().id
 				openChatSub.onNext(
 					ChatFlowParams(
-					userId = App.backend.getAuthManager().getCurrentUser().id,
-					title = contact.name,
-					contactId = contact.id)
+						userId = userId,
+						title = contact.name,
+						iconUri = Uri.parse(contact.iconUrl),
+						participants = listOf(contact.id, userId))
 				)
 			}
 			override fun onCreateGroup() {
@@ -58,5 +61,5 @@ class ChatCreationViewModel(listAdapter: ChatCreationAdapter)
 
 	fun observeChatOpen() = openChatSub as Observable<ChatFlowParams>
 
-	fun observeCreateGroup() = createGroupSub as Observable<ChatFlowParams>
+	fun observeCreateGroup() = createGroupSub as Observable<Any>
 }
