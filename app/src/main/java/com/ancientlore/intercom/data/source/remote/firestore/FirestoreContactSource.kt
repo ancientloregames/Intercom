@@ -8,9 +8,9 @@ import com.ancientlore.intercom.data.source.ContactSource
 import com.ancientlore.intercom.data.source.EmptyResultException
 import com.ancientlore.intercom.backend.RepositorySubscription
 import com.ancientlore.intercom.data.source.remote.firestore.C.CONTACTS
-import com.ancientlore.intercom.data.source.remote.firestore.C.CONTACT_LAST_SEEN
-import com.ancientlore.intercom.data.source.remote.firestore.C.CONTACT_NAME
-import com.ancientlore.intercom.data.source.remote.firestore.C.CONTACT_PHONE
+import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_ICON_URL
+import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_LAST_SEEN
+import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_NAME
 import com.ancientlore.intercom.data.source.remote.firestore.C.USERS
 import com.ancientlore.intercom.utils.SingletonHolder
 import com.google.firebase.firestore.SetOptions
@@ -72,11 +72,12 @@ class FirestoreContactSource private constructor(private val userId: String)
 
 			userContacts.document(contact.phone)
 				.set(HashMap<String, Any>().apply {
-					put(CONTACT_PHONE, contact.phone)
 					if (contact.name.isNotEmpty())
-						put(CONTACT_NAME, contact.name)
+						put(FIELD_NAME, contact.name)
 					if (contact.lastSeenTime != 0L)
-						put(CONTACT_LAST_SEEN, contact.name)
+						put(FIELD_LAST_SEEN, contact.name)
+					if (contact.iconUrl.isNotEmpty())
+						put(FIELD_ICON_URL, contact.iconUrl)
 				}, SetOptions.merge())
 				.addOnFailureListener {
 					callback?.onFailure(it)

@@ -9,8 +9,8 @@ import com.ancientlore.intercom.data.model.Chat
 import com.ancientlore.intercom.data.source.ChatSource
 import com.ancientlore.intercom.data.source.remote.firestore.C.CHATS
 import com.ancientlore.intercom.data.source.remote.firestore.C.USERS
-import com.ancientlore.intercom.data.source.remote.firestore.C.CHAT_LAST_MSG_TIME
 import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_ICON_URL
+import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_LAST_MSG_TIME
 import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_NAME
 import com.ancientlore.intercom.utils.SingletonHolder
 import com.google.firebase.firestore.SetOptions
@@ -92,7 +92,7 @@ open class FirestoreChatSource protected constructor(private val userId: String)
 
 	override fun attachListener(callback: RequestCallback<List<Chat>>) : RepositorySubscription {
 		val registration = userChats
-			.orderBy(CHAT_LAST_MSG_TIME)
+			.orderBy(FIELD_LAST_MSG_TIME)
 			.addSnapshotListener { snapshot, error ->
 				if (error != null) {
 					callback.onFailure(error)

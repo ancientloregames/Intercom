@@ -9,10 +9,10 @@ import com.ancientlore.intercom.data.model.User
 import com.ancientlore.intercom.data.source.EmptyResultException
 import com.ancientlore.intercom.data.source.remote.firestore.C.CHATS
 import com.ancientlore.intercom.data.source.remote.firestore.C.USERS
-import com.ancientlore.intercom.data.source.remote.firestore.C.CHAT_ID
-import com.ancientlore.intercom.data.source.remote.firestore.C.CHAT_STATUS
-import com.ancientlore.intercom.data.source.remote.firestore.C.CHAT_LAST_MSG_TEXT
-import com.ancientlore.intercom.data.source.remote.firestore.C.CHAT_LAST_MSG_TIME
+import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_ID
+import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_LAST_MSG_TEXT
+import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_LAST_MSG_TIME
+import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_STATUS
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.RemoteMessage
@@ -42,17 +42,17 @@ class FirestoreMessageNoCF(chatId: String): FirestoreMessageSource(chatId) {
 				}
 				chatMessages.document(it.id)
 					.update(HashMap<String, Any>().apply {
-						put(CHAT_ID, it.id)
-						put(CHAT_STATUS, 1)
+						put(FIELD_ID, it.id)
+						put(FIELD_STATUS, 1)
 					})
 					.addOnFailureListener { error -> Log.d(TAG, "Failure 1: ${error.message}") }
 
 				val userChatInfoUpdate = HashMap<String, Any>().apply {
-					put(CHAT_LAST_MSG_TEXT, message.text)
-					put(CHAT_LAST_MSG_TIME, FieldValue.serverTimestamp())
+					put(FIELD_LAST_MSG_TEXT, message.text)
+					put(FIELD_LAST_MSG_TIME, FieldValue.serverTimestamp())
 				}
 
-				if (chat.name.isEmpty()) {
+				if (chat.participants.size == 2) {
 
 					val senderId = message.senderId
 					val receiverId = if (message.senderId != chat.participants[0]) chat.participants[0] else chat.participants[1]
@@ -62,13 +62,13 @@ class FirestoreMessageNoCF(chatId: String): FirestoreMessageSource(chatId) {
 						.collection(CHATS)
 						.document(receiverId)
 						.update(userChatInfoUpdate)
-						.addOnFailureListener { error -> Log.d(TAG, "Failure 2: ${error.message}") }
+						.addOnFailureListener { error -> callback?.onFailure(error) }
 					db.collection(USERS)
 						.document(receiverId)
 						.collection(CHATS)
 						.document(senderId)
 						.update(userChatInfoUpdate)
-						.addOnFailureListener { error -> Log.d(TAG, "Failure 3: ${error.message}") }
+						.addOnFailureListener { error -> callback?.onFailure(error) }
 				}
 				else {
 					for (receiverId in chat.participants) {
@@ -77,7 +77,7 @@ class FirestoreMessageNoCF(chatId: String): FirestoreMessageSource(chatId) {
 							.collection(CHATS)
 							.document(chat.name)
 							.update(userChatInfoUpdate)
-							.addOnFailureListener { error -> Log.d(TAG, "Failure 1: ${error.message}") }
+							.addOnFailureListener { error -> callback?.onFailure(error) }
 					}
 				}
 

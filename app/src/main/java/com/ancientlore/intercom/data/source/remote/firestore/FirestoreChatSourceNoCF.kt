@@ -5,11 +5,10 @@ import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.data.model.Chat
 import com.ancientlore.intercom.data.source.ChatSource
 import com.ancientlore.intercom.data.source.remote.firestore.C.CHATS
-import com.ancientlore.intercom.data.source.remote.firestore.C.CHAT_ID
-import com.ancientlore.intercom.data.source.remote.firestore.C.CHAT_LAST_MSG_TEXT
-import com.ancientlore.intercom.data.source.remote.firestore.C.CHAT_LAST_MSG_TIME
-import com.ancientlore.intercom.data.source.remote.firestore.C.CHAT_NAME
 import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_ICON_URL
+import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_ID
+import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_LAST_MSG_TEXT
+import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_LAST_MSG_TIME
 import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_NAME
 import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_PARTICIPANTS
 import com.ancientlore.intercom.data.source.remote.firestore.C.USERS
@@ -35,11 +34,11 @@ class FirestoreChatSourceNoCF private constructor(userId: String)
 						.collection(CHATS)
 						.document(item.participants[1])
 						.set(hashMapOf(
-							CHAT_ID to it.id,
+							FIELD_ID to it.id,
 							FIELD_ICON_URL to item.iconUrl,
-							CHAT_LAST_MSG_TEXT to "",
-							CHAT_LAST_MSG_TIME to FieldValue.serverTimestamp(),
-							CHAT_NAME to item.participants[1]
+							FIELD_LAST_MSG_TEXT to "",
+							FIELD_LAST_MSG_TIME to FieldValue.serverTimestamp(),
+							FIELD_NAME to item.participants[1]
 						), SetOptions.merge())
 						.addOnFailureListener { error -> callback?.onFailure(error) }
 					db.collection(USERS)
@@ -47,11 +46,11 @@ class FirestoreChatSourceNoCF private constructor(userId: String)
 						.collection(CHATS)
 						.document(item.participants[0])
 						.set(hashMapOf(
-							CHAT_ID to it.id,
+							FIELD_ID to it.id,
 							FIELD_ICON_URL to item.iconUrl,
-							CHAT_LAST_MSG_TEXT to "",
-							CHAT_LAST_MSG_TIME to FieldValue.serverTimestamp(),
-							CHAT_NAME to item.participants[0]
+							FIELD_LAST_MSG_TEXT to "",
+							FIELD_LAST_MSG_TIME to FieldValue.serverTimestamp(),
+							FIELD_NAME to item.participants[0]
 						), SetOptions.merge())
 						.addOnFailureListener { error -> callback?.onFailure(error) }
 				}
@@ -62,11 +61,11 @@ class FirestoreChatSourceNoCF private constructor(userId: String)
 							.collection(CHATS)
 							.document(it.id)
 							.set(hashMapOf(
-								CHAT_ID to it.id,
+								FIELD_ID to it.id,
 								FIELD_ICON_URL to item.iconUrl,
-								CHAT_LAST_MSG_TEXT to "",
-								CHAT_LAST_MSG_TIME to FieldValue.serverTimestamp(),
-								CHAT_NAME to item.name
+								FIELD_LAST_MSG_TEXT to "",
+								FIELD_LAST_MSG_TIME to FieldValue.serverTimestamp(),
+								FIELD_NAME to item.name
 							), SetOptions.merge())
 							.addOnFailureListener { error -> callback?.onFailure(error) }
 					}

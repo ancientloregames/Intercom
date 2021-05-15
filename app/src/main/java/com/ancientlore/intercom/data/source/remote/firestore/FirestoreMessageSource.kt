@@ -7,9 +7,9 @@ import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.data.model.Message
 import com.ancientlore.intercom.data.source.MessageSource
 import com.ancientlore.intercom.data.source.remote.firestore.C.CHATS
-import com.ancientlore.intercom.data.source.remote.firestore.C.CHAT_ATTACH_URL
-import com.ancientlore.intercom.data.source.remote.firestore.C.CHAT_STATUS
-import com.ancientlore.intercom.data.source.remote.firestore.C.CHAT_TIMESTAMP
+import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_ATTACH_URL
+import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_STATUS
+import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_TIMESTAMP
 import com.ancientlore.intercom.data.source.remote.firestore.C.MESSAGES
 import com.google.firebase.firestore.ListenerRegistration
 
@@ -43,20 +43,20 @@ open class FirestoreMessageSource(private val chatId: String)
 	}
 
 	override fun updateMessageUri(messageId: String, uri: Uri, callback: RequestCallback<Any>?) {
-		chatMessages.document(messageId).update(CHAT_ATTACH_URL, uri.toString())
+		chatMessages.document(messageId).update(FIELD_ATTACH_URL, uri.toString())
 			.addOnSuccessListener { callback?.onSuccess(EmptyObject) }
 			.addOnFailureListener { callback?.onFailure(it) }
 	}
 
 	override fun setMessageStatusReceived(id: String, callback: RequestCallback<Any>?) {
-		chatMessages.document(id).update(CHAT_STATUS, Message.STATUS_RECEIVED)
+		chatMessages.document(id).update(FIELD_STATUS, Message.STATUS_RECEIVED)
 			.addOnSuccessListener { callback?.onSuccess(EmptyObject) }
 			.addOnFailureListener { callback?.onFailure(it) }
 	}
 
 	override fun attachListener(callback: RequestCallback<List<Message>>) {
 		changeListener = chatMessages
-			.orderBy(CHAT_TIMESTAMP)
+			.orderBy(FIELD_TIMESTAMP)
 			.addSnapshotListener { snapshot, e ->
 				if (e != null) {
 					callback.onFailure(e)

@@ -7,28 +7,28 @@ import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.data.model.User
 import com.ancientlore.intercom.data.source.EmptyResultException
 import com.ancientlore.intercom.data.source.UserSource
+import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_FCM_TOKEN
+import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_ICON_URL
+import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_NAME
+import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_STATUS
 import com.ancientlore.intercom.data.source.remote.firestore.C.USERS
-import com.ancientlore.intercom.data.source.remote.firestore.C.USER_FCM_TOKEN
-import com.ancientlore.intercom.data.source.remote.firestore.C.USER_ICON_URL
-import com.ancientlore.intercom.data.source.remote.firestore.C.USER_NAME
-import com.ancientlore.intercom.data.source.remote.firestore.C.USER_STATUS
 import com.google.firebase.firestore.SetOptions
 
-class FirestoreUserSource(private val userId: String)
+open class FirestoreUserSource(protected val userId: String)
 	: FirestoreSource<User>(), UserSource {
 
 	internal companion object  {
 		private const val TAG = "FirestoreUserSource"
 	}
 
-	private val user get() = users.document(userId)
+	protected val user get() = users.document(userId)
 
-	private val users get() = db.collection(USERS)
+	protected val users get() = db.collection(USERS)
 
 	override fun getObjectClass() = User::class.java
 
 	override fun updateNotificationToken(token: String, callback: RequestCallback<Any>?) {
-		user.update(USER_FCM_TOKEN, token)
+		user.update(FIELD_FCM_TOKEN, token)
 			.addOnSuccessListener { callback?.onSuccess(EmptyObject) }
 			.addOnFailureListener { callback?.onFailure(it) }
 	}
@@ -55,7 +55,7 @@ class FirestoreUserSource(private val userId: String)
 
 	override fun updateIcon(uri: Uri, callback: RequestCallback<Any>?) {
 		user
-			.set(hashMapOf(USER_ICON_URL to uri.toString()), SetOptions.merge())
+			.set(hashMapOf(FIELD_ICON_URL to uri.toString()), SetOptions.merge())
 			.addOnSuccessListener {
 				App.backend.getAuthManager().updateUserIconUri(uri, object : RequestCallback<Any> {
 					override fun onSuccess(result: Any) { callback?.onSuccess(result) }
@@ -67,7 +67,7 @@ class FirestoreUserSource(private val userId: String)
 
 	override fun updateName(name: String, callback: RequestCallback<Any>?) {
 		user
-			.set(hashMapOf(USER_NAME to name), SetOptions.merge())
+			.set(hashMapOf(FIELD_NAME to name), SetOptions.merge())
 			.addOnSuccessListener {
 				App.backend.getAuthManager().updateUserName(name, object : RequestCallback<Any> {
 					override fun onSuccess(result: Any) { callback?.onSuccess(result) }
@@ -79,7 +79,7 @@ class FirestoreUserSource(private val userId: String)
 
 	override fun updateStatus(status: String, callback: RequestCallback<Any>?) {
 		user
-			.set(hashMapOf(USER_STATUS to status), SetOptions.merge())
+			.set(hashMapOf(FIELD_STATUS to status), SetOptions.merge())
 			.addOnSuccessListener { callback?.onSuccess(EmptyObject) }
 			.addOnFailureListener { callback?.onFailure(it) }
 	}
