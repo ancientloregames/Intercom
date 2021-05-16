@@ -22,6 +22,10 @@ object ContactRepository : ContactSource { //TODO Cache Source usage
 		remoteSource?.update(contacts, callback)
 	}
 
+	override fun update(contact: Contact, callback: RequestCallback<Any>?) {
+		remoteSource?.update(contact, callback)
+	}
+
 	override fun attachListener(callback: RequestCallback<List<Contact>>) : RepositorySubscription {
 		return remoteSource
 			?.attachListener(callback)

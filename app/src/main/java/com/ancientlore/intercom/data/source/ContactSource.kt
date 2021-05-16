@@ -10,6 +10,8 @@ interface ContactSource : DataSource<Contact> {
 
 	fun update(contacts: List<Contact>, callback: RequestCallback<Any>? = null)
 
+	fun update(contact: Contact, callback: RequestCallback<Any>? = null)
+
 	fun attachListener(callback: RequestCallback<List<Contact>>) : RepositorySubscription
 
 	fun attachListener(contactId: String, callback: RequestCallback<Contact>) : RepositorySubscription

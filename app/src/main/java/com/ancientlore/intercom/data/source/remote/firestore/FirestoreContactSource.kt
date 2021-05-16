@@ -89,6 +89,24 @@ class FirestoreContactSource private constructor(private val userId: String)
 			callback?.onSuccess(EmptyObject)
 	}
 
+	override fun update(contact: Contact, callback: RequestCallback<Any>?) {
+		if (contact.phone.isNotEmpty()) {
+
+			userContacts.document(contact.phone)
+				.set(HashMap<String, Any>().apply {
+					if (contact.name.isNotEmpty())
+						put(FIELD_NAME, contact.name)
+					if (contact.lastSeenTime != 0L)
+						put(FIELD_LAST_SEEN, contact.name)
+					if (contact.iconUrl.isNotEmpty())
+						put(FIELD_ICON_URL, contact.iconUrl)
+				}, SetOptions.merge())
+				.addOnSuccessListener { callback?.onSuccess(EmptyObject) }
+				.addOnFailureListener { callback?.onFailure(it) }
+		}
+		else callback?.onFailure(RuntimeException("Contact phone number shouldn't be empty"))
+	}
+
 	override fun attachListener(callback: RequestCallback<List<Contact>>) : RepositorySubscription {
 
 		val registration = userContacts.addSnapshotListener { snapshot, error ->
