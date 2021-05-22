@@ -38,7 +38,7 @@ abstract class MutableRecyclerAdapter<I: Comparable<I>, H: BasicRecyclerAdapter.
 	override fun setItem(newItem: I, position: Int): Boolean {
 		if (isUnique(newItem) && isValidPosition(position)) {
 			mutableList.add(position, newItem)
-			notifyItemInserted(itemCount - 1)
+			notifyListItemInserted(itemCount - 1)
 			return true
 		}
 
@@ -50,7 +50,7 @@ abstract class MutableRecyclerAdapter<I: Comparable<I>, H: BasicRecyclerAdapter.
 		if (currentConstraint.isEmpty() || filter.satisfy(newItem, currentConstraint)) {
 			if (isUnique(newItem)) {
 				mutableList.add(0, newItem)
-				notifyItemInserted(0)
+				notifyListItemInserted(0)
 				return true
 			}
 		}
@@ -67,7 +67,7 @@ abstract class MutableRecyclerAdapter<I: Comparable<I>, H: BasicRecyclerAdapter.
 		if (currentConstraint.isEmpty() || filter.satisfy(newItem, currentConstraint)) {
 			if (isUnique(newItem)) {
 				mutableList.add(newItem)
-				notifyItemInserted(itemCount - 1)
+				notifyListItemInserted(itemCount - 1)
 				return true
 			}
 		}
@@ -103,7 +103,7 @@ abstract class MutableRecyclerAdapter<I: Comparable<I>, H: BasicRecyclerAdapter.
 	private fun updateItemAt(position: Int, updatedItem: I): Boolean {
 		if (isValidPosition(position)) {
 			mutableList[position] = updatedItem
-			notifyItemChanged(position)
+			notifyListItemChanged(position)
 			return true
 		}
 
@@ -114,7 +114,7 @@ abstract class MutableRecyclerAdapter<I: Comparable<I>, H: BasicRecyclerAdapter.
 	protected fun deleteItemAt(position: Int): Boolean {
 		if (isValidPosition(position)) {
 			mutableList.removeAt(position)
-			notifyItemRemoved(position)
+			notifyListItemRemoved(position)
 			return true
 		}
 

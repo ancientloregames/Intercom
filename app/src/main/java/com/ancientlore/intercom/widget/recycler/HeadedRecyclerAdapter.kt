@@ -91,6 +91,9 @@ abstract class HeadedRecyclerAdapter<I: Comparable<I>, H: BasicRecyclerAdapter.V
 	fun notifyListItemChanged(position: Int) = notifyItemChanged(getViewPosition(position))
 
 	@UiThread
+	fun notifyListItemChanged(position: Int, payload: Bundle) = notifyItemChanged(getViewPosition(position), payload)
+
+	@UiThread
 	fun notifyListItemInserted(position: Int) = notifyItemInserted(getViewPosition(position))
 
 	@UiThread

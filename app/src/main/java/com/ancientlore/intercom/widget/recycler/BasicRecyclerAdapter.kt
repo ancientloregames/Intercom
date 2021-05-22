@@ -49,6 +49,8 @@ abstract class BasicRecyclerAdapter<I, H: BasicRecyclerAdapter.ViewHolder<I, B>,
 
 	protected open fun isUnique(item: I) = items.none { it == item }
 
+	protected fun contains(item: I) = items.contains(item)
+
 	abstract class ViewHolder<T, B: ViewDataBinding>(protected val binding: B) : RecyclerView.ViewHolder(binding.root),
 		Bindable<T> {
 
