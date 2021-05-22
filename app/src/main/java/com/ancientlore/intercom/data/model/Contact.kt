@@ -31,6 +31,9 @@ data class Contact(val phone: String = "",
   @delegate:Exclude @get:Exclude
   val lastSeenDate: String by lazy { dateFormat.format(Date(lastSeenTime)) }
 
+  @get:Exclude
+  var checked: Boolean = false
+
   constructor(parcel: Parcel) : this(
     parcel.readString(),
     parcel.readString(),
@@ -50,6 +53,20 @@ data class Contact(val phone: String = "",
   override fun describeContents() = 0
 
   override fun compareTo(other: Contact) = name.compareTo(other.name)
+
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (javaClass != other?.javaClass) return false
+
+    other as Contact
+
+    return phone == other.phone
+        && name == other.name
+        && chatId == other.chatId
+        && iconUrl == other.iconUrl
+        && lastSeenTime == other.lastSeenTime
+        && checked == other.checked
+  }
 
   fun contains(string: CharSequence, ignoreCase: Boolean = true) =
     name.contains(string, ignoreCase) || phone.contains(string, ignoreCase)

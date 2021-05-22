@@ -9,22 +9,30 @@ import com.ancientlore.intercom.utils.Utils
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 
-class ChatCreationGroupViewModel(listAdapter: ChatCreationGroupAdapter)
+class ChatCreationGroupViewModel(listAdapter: ChatCreationGroupAdapter,
+                                 private val selectedListAdapter: ChatCreationSelectedAdapter)
 	: FilterableViewModel<ChatCreationGroupAdapter>(listAdapter) {
 
 	private val openNextSub = PublishSubject.create<List<Contact>>()
 
 	private var repositorySub: RepositorySubscription? = null
 
-	private val contacts = mutableListOf<Contact>()
-
 	private var adapterListener = object : ChatCreationGroupAdapter.Listener {
 		override fun onContactSelected(contact: Contact) {
-			val contactIndex = contacts.indexOf(contact)
-			if (contactIndex == -1)
-				contacts.add(contact)
+			contact.checked = contact.checked.not()
+
+			if (selectedListAdapter.hasContact(contact))
+				selectedListAdapter.deleteItem(contact)
 			else
-				contacts.removeAt(contactIndex)
+				selectedListAdapter.prependItem(contact)
+		}
+	}
+
+	private var selectedAdapterListener = object : ChatCreationSelectedAdapter.Listener {
+		override fun onContactSelected(contact: Contact) {
+
+			selectedListAdapter.deleteItem(contact)
+			listAdapter.switchCheckBoxItem(contact)
 		}
 	}
 
@@ -38,6 +46,8 @@ class ChatCreationGroupViewModel(listAdapter: ChatCreationGroupAdapter)
 	fun init() {
 		listAdapter.setListener(adapterListener)
 
+		selectedListAdapter.setListener(selectedAdapterListener)
+
 		repositorySub = ContactRepository.attachListener(object : RequestCallback<List<Contact>> {
 			override fun onSuccess(result: List<Contact>) {
 				listAdapter.setItems(result)
@@ -48,7 +58,7 @@ class ChatCreationGroupViewModel(listAdapter: ChatCreationGroupAdapter)
 		})
 	}
 
-	fun onNextClicked() = openNextSub.onNext(contacts)
+	fun onNextClicked() = openNextSub.onNext(selectedListAdapter.getContacts())
 
 	fun observeNextRequest() = openNextSub as Observable<List<Contact>>
 }

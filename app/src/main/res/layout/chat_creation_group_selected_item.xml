@@ -5,39 +5,31 @@
 	<data>
 		<variable
 				name="ui"
-				type="com.ancientlore.intercom.ui.chat.creation.description.ChatCreationDescAdapter.ViewHolder"/>
+				type="com.ancientlore.intercom.ui.chat.creation.group.ChatCreationSelectedAdapter.ItemViewHolder"/>
 	</data>
 
 	<LinearLayout
-			android:layout_width="65dp"
+			android:layout_width="@dimen/chatCreationGroupSelectedItemImageSize"
 			android:layout_height="wrap_content"
 			android:orientation="vertical"
+			android:onClick="@{() -> ui.onClick()}"
+			android:paddingTop="10dp"
 			android:layout_marginLeft="5dp"
 			android:layout_marginRight="5dp">
 
-		<androidx.recyclerview.widget.RecyclerView
-				android:id="@+id/selectedListView"
-				android:layout_width="0dp"
-				android:layout_height="wrap_content"
-				android:paddingTop="10dp"
-				android:orientation="horizontal"
-				app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-				app:layout_constraintEnd_toEndOf="parent"
-				app:layout_constraintStart_toStartOf="parent"
-				tools:listitem="@layout/chat_creation_selected_list_item"
-				/>
-
 		<com.ancientlore.intercom.view.CircleImageView
 				android:layout_width="match_parent"
-				android:layout_height="65dp"
-				app:backgroundColor="@color/colorPrimary"
+				android:layout_height="@dimen/chatCreationGroupSelectedItemImageSize"
+				android:src="@{ui.iconField}"
+				app:backgroundColor="@color/chatIconBackColor"
 				tools:src="@drawable/ic_avatar"
+				tools:tint="@android:color/white"
 			/>
 
 		<TextView
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:text=""
+				android:text="@{ui.nameField}"
 				tools:text="@string/username"
 				style="@style/onelineTextField"
 			/>

@@ -26,7 +26,9 @@ class ChatCreationGroupFragment : FilterableFragment<ChatCreationGroupViewModel,
 
 	override fun getLayoutResId() = R.layout.chat_creation_group_ui
 
-	override fun createViewModel() = ChatCreationGroupViewModel(listView.adapter as ChatCreationGroupAdapter)
+	override fun createViewModel() = ChatCreationGroupViewModel(
+		listView.adapter as ChatCreationGroupAdapter,
+		selectedListView.adapter as ChatCreationSelectedAdapter)
 
 	override fun bind(view: View, viewModel: ChatCreationGroupViewModel) {
 		dataBinding = ChatCreationGroupUiBinding.bind(view)
@@ -43,6 +45,7 @@ class ChatCreationGroupFragment : FilterableFragment<ChatCreationGroupViewModel,
 		swipableLayout.setListener { close() }
 
 		listView.adapter = ChatCreationGroupAdapter(requireContext())
+		selectedListView.adapter = ChatCreationSelectedAdapter(requireContext())
 	}
 
 	override fun initViewModel(viewModel: ChatCreationGroupViewModel) {
