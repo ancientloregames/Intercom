@@ -69,6 +69,10 @@ class ChatCreationFragment : FilterableFragment<ChatCreationViewModel, ChatCreat
 			.subscribe {
 				addContact()
 			})
+		subscriptions.add(viewModel.observeUpdateContactCount()
+			.subscribe {
+				(toolbar as Toolbar).subtitle = getString(R.string.contact_count, it)
+			})
 	}
 
 	private fun addContact() {

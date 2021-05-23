@@ -19,6 +19,7 @@ class ChatCreationViewModel(listAdapter: ChatCreationAdapter)
 	private val openChatSub = PublishSubject.create<ChatFlowParams>()
 	private val createGroupSub = PublishSubject.create<Any>()
 	private val addContactSub = PublishSubject.create<Any>()
+	private val updateContactCountSub = PublishSubject.create<Int>()
 
 	private var repositorySub: RepositorySubscription? = null
 
@@ -56,6 +57,7 @@ class ChatCreationViewModel(listAdapter: ChatCreationAdapter)
 		repositorySub = ContactRepository.attachListener(object : RequestCallback<List<Contact>> {
 			override fun onSuccess(result: List<Contact>) {
 				listAdapter?.setItems(result)
+				updateContactCountSub.onNext(result.size)
 			}
 			override fun onFailure(error: Throwable) {
 				Utils.logError(error)
@@ -68,4 +70,6 @@ class ChatCreationViewModel(listAdapter: ChatCreationAdapter)
 	fun observeCreateGroup() = createGroupSub as Observable<Any>
 
 	fun observeAddContact() = addContactSub as Observable<Any>
+
+	fun observeUpdateContactCount() = updateContactCountSub as Observable<Int>
 }

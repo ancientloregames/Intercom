@@ -6,20 +6,15 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.widget.Toolbar
-import com.ancientlore.intercom.C
 import com.ancientlore.intercom.R
 import com.ancientlore.intercom.data.model.Contact
 import com.ancientlore.intercom.databinding.ChatCreationDescUiBinding
 import com.ancientlore.intercom.ui.FilterableFragment
-import com.ancientlore.intercom.utils.ImageUtils
 import com.ancientlore.intercom.utils.ToolbarManager
 import com.ancientlore.intercom.utils.Utils
-import com.ancientlore.intercom.utils.extensions.getAppCacheDir
-import com.ancientlore.intercom.utils.extensions.getFileData
 import kotlinx.android.synthetic.main.chat_creation_desc_ui.listView
 import kotlinx.android.synthetic.main.chat_creation_desc_ui.swipableLayout
 import kotlinx.android.synthetic.main.chat_creation_desc_ui.toolbar
-import java.io.File
 import java.lang.RuntimeException
 
 class ChatCreationDescFragment : FilterableFragment<ChatCreationDescViewModel, ChatCreationDescUiBinding>() {
@@ -65,6 +60,7 @@ class ChatCreationDescFragment : FilterableFragment<ChatCreationDescViewModel, C
 
 		ToolbarManager(toolbar as Toolbar).apply {
 			enableBackButton { close() }
+			setSubtitle(getString(R.string.member_count, contacts.size))
 		}
 
 		swipableLayout.setListener { close() }
