@@ -23,6 +23,7 @@ class ChatCreationAdapter(context: Context,
 	interface Listener {
 		fun onContactSelected(contact: Contact)
 		fun onCreateGroup()
+		fun onAddContact()
 	}
 
 	private var listener: Listener? = null
@@ -51,9 +52,16 @@ class ChatCreationAdapter(context: Context,
 	}
 
 	override fun bindHeaderViewHolder(holder: ViewHolder<ViewDataBinding>, payloads: MutableList<Any>) {
+		holder as HeaderViewHolder
+
 		holder.listener = object : ViewHolder.Listener {
 			override fun onItemClicked() {
 				listener?.onCreateGroup()
+			}
+		}
+		holder.addContactListener = object : HeaderViewHolder.AddContactListener {
+			override fun onClicked() {
+				listener?.onAddContact()
 			}
 		}
 	}
@@ -91,11 +99,18 @@ class ChatCreationAdapter(context: Context,
 	class HeaderViewHolder(binding: ChatCreationHeaderBinding)
 		: ViewHolder<ChatCreationHeaderBinding>(binding) {
 
+		interface AddContactListener {
+			fun onClicked()
+		}
+		var addContactListener: AddContactListener? = null
+
 		init {
 			binding.setVariable(BR.ui, this)
 		}
 
 		override fun bind(data: Contact) {}
+
+		fun onAddContactClick() = addContactListener?.onClicked()
 	}
 
 	class FooterViewHolder(binding: ChatCreationFooterBinding)

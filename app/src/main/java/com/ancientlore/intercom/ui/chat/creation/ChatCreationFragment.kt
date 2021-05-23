@@ -1,6 +1,8 @@
 package com.ancientlore.intercom.ui.chat.creation
 
+import android.content.Intent
 import android.os.Bundle
+import android.provider.ContactsContract
 import android.view.View
 import androidx.appcompat.widget.Toolbar
 import com.ancientlore.intercom.R
@@ -63,5 +65,16 @@ class ChatCreationFragment : FilterableFragment<ChatCreationViewModel, ChatCreat
 			.subscribe {
 				navigator?.openChatCreationGroup()
 			})
+		subscriptions.add(viewModel.observeAddContact()
+			.subscribe {
+				addContact()
+			})
+	}
+
+	private fun addContact() {
+		val intent = Intent(Intent.ACTION_INSERT)
+			.setType(ContactsContract.Contacts.CONTENT_TYPE)
+			.putExtra("finishActivityOnSaveCompleted", true)
+		startActivity(intent)
 	}
 }

@@ -18,6 +18,7 @@ class ChatCreationViewModel(listAdapter: ChatCreationAdapter)
 
 	private val openChatSub = PublishSubject.create<ChatFlowParams>()
 	private val createGroupSub = PublishSubject.create<Any>()
+	private val addContactSub = PublishSubject.create<Any>()
 
 	private var repositorySub: RepositorySubscription? = null
 
@@ -44,6 +45,9 @@ class ChatCreationViewModel(listAdapter: ChatCreationAdapter)
 			override fun onCreateGroup() {
 				createGroupSub.onNext(EmptyObject)
 			}
+			override fun onAddContact() {
+				addContactSub.onNext(EmptyObject)
+			}
 		})
 		attachDataListener()
 	}
@@ -62,4 +66,6 @@ class ChatCreationViewModel(listAdapter: ChatCreationAdapter)
 	fun observeChatOpen() = openChatSub as Observable<ChatFlowParams>
 
 	fun observeCreateGroup() = createGroupSub as Observable<Any>
+
+	fun observeAddContact() = addContactSub as Observable<Any>
 }

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-		xmlns:tools="http://schemas.android.com/tools">
+		xmlns:tools="http://schemas.android.com/tools"
+		xmlns:app="http://schemas.android.com/apk/res-auto">
 	<data>
 		<import type="android.view.View" />
 		<variable
@@ -14,14 +15,27 @@
 			>
 
 		<TextView
-				android:id="@+id/titleView"
+				android:id="@+id/createGroupView"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:gravity="center_vertical"
 				android:text="@string/create_group"
 				android:drawableStart="@drawable/ic_group_36dp"
 				android:drawableLeft="@drawable/ic_group_36dp"
+				app:drawableTint="@color/settingsItemTextColor"
 				android:onClick="@{() -> ui.onClick()}"
+				style="@style/settingsIconedTextItem" />
+
+		<TextView
+				android:id="@+id/addContactView"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:gravity="center_vertical"
+				android:text="@string/add_contact"
+				android:drawableStart="@drawable/ic_add_contact_36dp"
+				android:drawableLeft="@drawable/ic_add_contact_36dp"
+				app:drawableTint="@color/settingsItemTextColor"
+				android:onClick="@{() -> ui.onAddContactClick()}"
 				style="@style/settingsIconedTextItem" />
 
 		<TextView
