@@ -119,10 +119,7 @@ public class FileUploadService extends BasicService
 			{
 				Log.d(TAG, "upload: onSuccess");
 
-				if (params.broadcast)
-					broadcastUploadFinished(result, fileData.getUri());
-				if (params.showNotice)
-					showUploadFinishedNotification(result, fileData.getUri());
+				handleUploadFinish(result, fileData.getUri(), params);
 
 				taskCompleted();
 			}
@@ -131,10 +128,7 @@ public class FileUploadService extends BasicService
 			{
 				Utils.logError("FileUploadService.upload.storage.onFailure. uri: " + fileData.getUri(), error);
 
-				if (params.broadcast)
-					broadcastUploadFinished(null, fileData.getUri());
-				if (params.showNotice)
-					showUploadFinishedNotification(null, fileData.getUri());
+				handleUploadFinish(null, fileData.getUri(), params);
 
 				taskCompleted();
 			}
@@ -156,6 +150,14 @@ public class FileUploadService extends BasicService
 			Utils.logError("ChatCreationDescFragment.handleActivityResult(): Failed to create file");
 
 		return null;
+	}
+
+	protected void handleUploadFinish(@Nullable Uri downloadUrl, Uri fileUri, Params params)
+	{
+		if (params.broadcast)
+			broadcastUploadFinished(downloadUrl, fileUri);
+		if (params.showNotice)
+			showUploadFinishedNotification(downloadUrl, fileUri);
 	}
 
 	protected boolean broadcastUploadFinished(@Nullable Uri downloadUrl, Uri fileUri)

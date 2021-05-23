@@ -85,8 +85,7 @@ class ChatIconUploadService : FileUploadService() {
 				override fun onFailure(error: Throwable) {
 					Utils.logError("ChatIconUploadService.upload.storage.onFailure. uri: ${fileData.uri}", error)
 
-					if (params.broadcast) broadcastUploadFinished(null, fileData.uri)
-					if (params.showNotice) showUploadFinishedNotification(null, fileData.uri)
+					handleUploadFinish(null, params.iconUri, params)
 
 					taskCompleted()
 				}
@@ -106,16 +105,14 @@ class ChatIconUploadService : FileUploadService() {
 				override fun onSuccess(result: Any) {
 					Log.d(TAG, "upload: onSuccess update in database")
 
-					if (params.broadcast) broadcastUploadFinished(serverUri, params.iconUri)
-					if (params.showNotice) showUploadFinishedNotification(serverUri, params.iconUri)
+					handleUploadFinish(serverUri, params.iconUri, params)
 
 					taskCompleted()
 				}
 				override fun onFailure(error: Throwable) {
 					Utils.logError("ChatIconUploadService.upload.db.onFailure. uri: $serverUri", error)
 
-					if (params.broadcast) broadcastUploadFinished(serverUri, params.iconUri)
-					if (params.showNotice) showUploadFinishedNotification(serverUri, params.iconUri)
+					handleUploadFinish(serverUri, params.iconUri, params)
 
 					taskCompleted()
 				}
