@@ -12,6 +12,8 @@
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
 			tools:context=".ui.chatlist.ChatListFragment"
+			android:background="@android:color/white"
+			android:clickable="true"
 	>
 
 		<com.google.android.material.appbar.AppBarLayout
