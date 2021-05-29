@@ -2,6 +2,8 @@ package com.ancientlore.intercom.ui.chat.creation.group
 
 import android.content.Context
 import android.view.ViewGroup
+import androidx.annotation.ColorInt
+import androidx.annotation.Px
 import androidx.core.content.ContextCompat
 import androidx.databinding.ObservableField
 import androidx.databinding.ViewDataBinding
@@ -79,14 +81,16 @@ class ChatCreationSelectedAdapter(context: Context,
 		val nameField = ObservableField("")
 		val iconField = ObservableField<Any>()
 
-		private val iconColor: Int
-		private val iconTextSize: Int
+		@ColorInt
+		private val iconAbbrColor: Int
+		@Px
+		private val iconAbbrTextSize: Int
 
 		init {
 			binding.setVariable(BR.ui, this)
 
-			iconColor = ContextCompat.getColor(context, R.color.chatIconBackColor)
-			iconTextSize = resources.getDimensionPixelSize(R.dimen.chatListIconTextSize)
+			iconAbbrColor = ContextCompat.getColor(context, R.color.chatIconBackColor)
+			iconAbbrTextSize = resources.getDimensionPixelSize(R.dimen.chatListIconTextSize)
 		}
 
 		override fun bind(data: Contact) {
@@ -94,7 +98,7 @@ class ChatCreationSelectedAdapter(context: Context,
 
 			iconField.set(when {
 				data.iconUrl.isNotEmpty() -> data.iconUrl
-				else -> ImageUtils.createAbbreviationDrawable(data.name, iconColor, iconTextSize)
+				else -> ImageUtils.createAbbreviationDrawable(data.name, iconAbbrColor, iconAbbrTextSize)
 			})
 		}
 	}

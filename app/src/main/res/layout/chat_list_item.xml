@@ -23,7 +23,7 @@
 				android:layout_height="40dp"
 				android:layout_marginRight="8dp"
 				android:layout_marginEnd="8dp"
-				android:src="@{chat.icon}"
+				android:src="@{chat.iconField}"
 				app:layout_constraintStart_toStartOf="parent"
 				app:layout_constraintBottom_toBottomOf="parent"
 				app:layout_constraintTop_toTopOf="parent"

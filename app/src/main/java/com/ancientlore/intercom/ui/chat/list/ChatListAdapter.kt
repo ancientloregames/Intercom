@@ -2,11 +2,12 @@ package com.ancientlore.intercom.ui.chat.list
 
 import android.content.Context
 import android.view.ViewGroup
+import androidx.annotation.ColorInt
+import androidx.annotation.Px
 import androidx.core.content.ContextCompat
 import androidx.databinding.ObservableField
 import androidx.recyclerview.widget.DiffUtil
 import com.ancientlore.intercom.BR
-import com.ancientlore.intercom.EmptyObject
 import com.ancientlore.intercom.R
 import com.ancientlore.intercom.widget.recycler.BasicRecyclerAdapter
 import com.ancientlore.intercom.data.model.Chat
@@ -61,12 +62,14 @@ class ChatListAdapter(context: Context,
 
 		var listener: Listener? = null
 
-		val icon = ObservableField<Any>(EmptyObject)
+		val iconField = ObservableField<Any>()
 		val titleField = ObservableField<String>("")
 		val messageField = ObservableField<String>("")
 		val dateField = ObservableField<String>("")
 
+		@ColorInt
 		private val iconColor: Int
+		@Px
 		private val iconTextSize: Int
 
 		init {
@@ -82,10 +85,10 @@ class ChatListAdapter(context: Context,
 			messageField.set(data.lastMsgText)
 			dateField.set(data.lastMsgDate)
 
-			when {
-				data.iconUrl.isNotEmpty() -> icon.set(data.iconUri)
-				else -> icon.set(ImageUtils.createAbbreviationDrawable(name, iconColor, iconTextSize))
-			}
+			iconField.set(when {
+				data.iconUrl.isNotEmpty() -> data.iconUrl
+				else -> ImageUtils.createAbbreviationDrawable(name, iconColor, iconTextSize)
+			})
 		}
 
 		fun onClick() = listener?.onItemClicked()

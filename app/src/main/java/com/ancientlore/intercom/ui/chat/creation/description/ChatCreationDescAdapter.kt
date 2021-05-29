@@ -1,14 +1,18 @@
 package com.ancientlore.intercom.ui.chat.creation.description
 
 import android.content.Context
-import android.net.Uri
 import android.view.ViewGroup
+import androidx.annotation.ColorInt
+import androidx.annotation.Px
+import androidx.core.content.ContextCompat
 import androidx.databinding.ObservableField
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.DiffUtil
 import com.ancientlore.intercom.BR
+import com.ancientlore.intercom.R
 import com.ancientlore.intercom.data.model.Contact
 import com.ancientlore.intercom.databinding.ChatCreationDescItemBinding
+import com.ancientlore.intercom.utils.ImageUtils
 import com.ancientlore.intercom.widget.recycler.BasicRecyclerAdapter
 import com.ancientlore.intercom.widget.recycler.MutableRecyclerAdapter
 import java.lang.RuntimeException
@@ -60,15 +64,28 @@ class ChatCreationDescAdapter(context: Context,
 
 		val nameField = ObservableField("")
 		val subtitleField = ObservableField("")
-		val photoUri = ObservableField(Uri.EMPTY)
+		val iconField = ObservableField<Any>()
+
+		@ColorInt
+		private val iconAbbrColor: Int
+		@Px
+		private val iconAbbrTextSize: Int
 
 		init {
 			binding.setVariable(BR.ui, this)
+
+			iconAbbrColor = ContextCompat.getColor(context, R.color.chatIconBackColor)
+			iconAbbrTextSize = resources.getDimensionPixelSize(R.dimen.chatListIconTextSize)
 		}
 
 		override fun bind(data: Contact) {
 			nameField.set(data.name)
 			subtitleField.set(data.phone)
+
+			iconField.set(when {
+				data.iconUrl.isNotEmpty() -> data.iconUrl
+				else -> ImageUtils.createAbbreviationDrawable(data.name, iconAbbrColor, iconAbbrTextSize)
+			})
 		}
 	}
 

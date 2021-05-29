@@ -37,7 +37,7 @@
 				android:layout_height="40dp"
 				android:layout_marginRight="8dp"
 				android:layout_marginEnd="8dp"
-				android:src="@{ui.photoUri}"
+				android:src="@{ui.iconField}"
 				app:layout_constraintStart_toEndOf="@+id/checkbox"
 				app:layout_constraintBottom_toBottomOf="parent"
 				app:layout_constraintTop_toTopOf="parent"

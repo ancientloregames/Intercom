@@ -16,18 +16,20 @@
 			android:orientation="vertical"
 			android:onClick="@{() -> ui.onClick()}"
 			>
-		<androidx.appcompat.widget.AppCompatImageView
+		<com.ancientlore.intercom.view.CircleImageView
 				android:id="@+id/iconView"
 				android:layout_width="40dp"
 				android:layout_height="40dp"
 				android:layout_marginRight="8dp"
 				android:layout_marginEnd="8dp"
-				android:src="@{ui.photoUri}"
+				android:src="@{ui.iconField}"
 				app:layout_constraintStart_toStartOf="parent"
 				app:layout_constraintBottom_toBottomOf="parent"
 				app:layout_constraintTop_toTopOf="parent"
 				app:layout_constraintEnd_toStartOf="@+id/titleView"
-				tools:src="@mipmap/ic_launcher"
+				tools:src="@drawable/ic_avatar"
+				tools:tint="@android:color/white"
+				tools:backgroundColor="@color/chatIconBackColor"
 				/>
 
 		<androidx.appcompat.widget.AppCompatTextView
