@@ -1,5 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+	<attr name="asCircle" format="boolean"/>
+
+	<attr name="placeholder" format="reference"/>
+	<attr name="fallback" format="reference"/>
+	<attr name="error" format="reference"/>
+
+	<attr name="placeholderTint" format="color"/>
+	<attr name="fallbackTint" format="color"/>
+	<attr name="errorTint" format="color"/>
+
+	<attr name="abbrText" format="string" />
+	<attr name="abbrSize" format="float" />
+	<attr name="abbrTextColor" format="color" />
+	<attr name="abbrBackColor" format="color" />
+
+	<declare-styleable name="IconImageView">
+		<attr name="asCircle" />
+
+		<attr name="abbrText" />
+		<attr name="abbrSize" />
+		<attr name="abbrTextColor" />
+		<attr name="abbrBackColor" />
+
+		<attr name="placeholder" />
+		<attr name="fallback" />
+		<attr name="error" />
+
+		<attr name="placeholderTint" />
+		<attr name="fallbackTint" />
+		<attr name="errorTint" />
+	</declare-styleable>
+
 	<declare-styleable name="CircleImageView">
 		<attr name="borderWidth" format="dimension" />
 		<attr name="borderColor" format="color" />

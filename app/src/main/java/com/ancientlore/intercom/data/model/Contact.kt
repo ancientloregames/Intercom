@@ -1,5 +1,6 @@
 package com.ancientlore.intercom.data.model
 
+import android.net.Uri
 import android.os.Parcel
 import android.os.Parcelable
 import com.google.firebase.firestore.Exclude
@@ -30,6 +31,9 @@ data class Contact(val phone: String = "",
 
   @delegate:Exclude @get:Exclude
   val lastSeenDate: String by lazy { dateFormat.format(Date(lastSeenTime)) }
+
+  @delegate:Exclude @get:Exclude
+  val iconUri: Uri by lazy { Uri.parse(iconUrl) }
 
   @get:Exclude
   var checked: Boolean = false

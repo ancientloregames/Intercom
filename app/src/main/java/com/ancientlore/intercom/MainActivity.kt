@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.app.NotificationManager
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -41,6 +42,7 @@ import com.ancientlore.intercom.ui.contact.list.ContactListFragment
 import com.ancientlore.intercom.ui.settings.SettingsFragment
 import com.ancientlore.intercom.utils.*
 import com.ancientlore.intercom.utils.NotificationManager.Companion.ACTION_OPEN_FROM_PUSH
+import com.ancientlore.intercom.utils.NotificationManager.Companion.EXTRA_CHAT_ICON
 import com.ancientlore.intercom.utils.NotificationManager.Companion.EXTRA_CHAT_ID
 import com.ancientlore.intercom.utils.NotificationManager.Companion.EXTRA_CHAT_TITLE
 import com.ancientlore.intercom.utils.extensions.checkPermission
@@ -119,11 +121,13 @@ class MainActivity : AppCompatActivity(),
 				intent.extras!!.run {
 					val chatId = getString(EXTRA_CHAT_ID)
 					val chatTitle = getString(EXTRA_CHAT_TITLE)
-					if (chatId != null && chatTitle != null)
+					val chatIconUrl = getString(EXTRA_CHAT_ICON)
+					if (chatId != null && chatTitle != null && chatIconUrl != null)
 						openChatFlow(ChatFlowParams(
 							userId = App.backend.getAuthManager().getCurrentUser().id,
 							chatId = chatId,
-							title = chatTitle))
+							title = chatTitle,
+							iconUri = Uri.parse(chatIconUrl)))
 				}
 				true
 			}

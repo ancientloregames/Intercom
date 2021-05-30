@@ -38,7 +38,8 @@ class ChatListViewModel(listAdapter: ChatListAdapter)
 				chatOpenSub.onNext(ChatFlowParams(
 					userId = App.backend.getAuthManager().getCurrentUser().id,
 					chatId = chat.id,
-					title = chat.localName ?: chat.name))
+					title = chat.localName ?: chat.name,
+					iconUri = chat.iconUri))
 			}
 		})
 		attachDataListener()

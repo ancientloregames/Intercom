@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+	<dimen name="actionBarLogoIndent">5dp</dimen>
+
 	<dimen name="floatingButtonIndent">16dp</dimen>
 
 	<dimen name="chatListIconTextSize">16sp</dimen>

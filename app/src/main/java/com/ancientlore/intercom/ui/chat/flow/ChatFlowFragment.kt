@@ -2,10 +2,12 @@ package com.ancientlore.intercom.ui.chat.flow
 
 import android.app.Activity.RESULT_OK
 import android.content.Intent
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
 import com.ancientlore.intercom.C
 import com.ancientlore.intercom.C.ICON_DIR_PATH
 import com.ancientlore.intercom.R
@@ -72,8 +74,9 @@ class ChatFlowFragment : FilterableFragment<ChatFlowViewModel, ChatFlowUiBinding
 		super.initView(view, savedInstanceState)
 
 		ToolbarManager(toolbar as Toolbar).apply {
-			setTitle(params.title)
+			//setTitle(params.title)
 			enableBackButton { close() }
+			//setLogo(params.iconUri, getFallbackActionBarIcon())
 		}
 
 		swipableLayout.setListener { close() }
@@ -82,6 +85,16 @@ class ChatFlowFragment : FilterableFragment<ChatFlowViewModel, ChatFlowUiBinding
 			adapter = ChatFlowAdapter(params.userId, requireContext())
 			enableChatBehavior()
 		}
+	}
+
+	private fun getFallbackActionBarIcon() : Drawable {
+
+		return if (params.title.isNotEmpty()) {
+			ImageUtils.createAbbreviationDrawable(toolbar.title.toString(),
+				ContextCompat.getColor(toolbar.context, R.color.chatIconBackColor),
+				toolbar.resources.getDimensionPixelSize(R.dimen.chatListIconTextSize))
+		}
+		else throw RuntimeException("Error! Chat flow title is mandatory")
 	}
 
 	override fun initViewModel(viewModel: ChatFlowViewModel) {

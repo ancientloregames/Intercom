@@ -32,6 +32,7 @@ class NotificationManager private constructor(private val context: Context) {
 		const val EXTRA_CHAT_ID = "chat_id"
 		const val EXTRA_MESSAGE_ID = "message_id"
 		const val EXTRA_CHAT_TITLE = "chat_title"
+		const val EXTRA_CHAT_ICON = "chat_icon"
 
 		private var currentId = 0
 		private var idCounter = -1
@@ -110,6 +111,7 @@ class NotificationManager private constructor(private val context: Context) {
 					putExtras(Bundle().apply {
 						putString(EXTRA_CHAT_ID, message.chatId)
 						putString(EXTRA_CHAT_TITLE, message.title)
+						putString(EXTRA_CHAT_ICON, message.iconUrl)
 					})
 				}
 			}

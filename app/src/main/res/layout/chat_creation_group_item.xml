@@ -31,7 +31,7 @@
 				app:layout_constraintHorizontal_bias="0"
 				/>
 
-		<androidx.appcompat.widget.AppCompatImageView
+		<com.ancientlore.intercom.view.CircleImageView
 				android:id="@+id/iconView"
 				android:layout_width="40dp"
 				android:layout_height="40dp"

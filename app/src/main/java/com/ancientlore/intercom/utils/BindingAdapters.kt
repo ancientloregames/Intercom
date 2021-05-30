@@ -1,5 +1,6 @@
 package com.ancientlore.intercom.utils
 
+import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.view.View
@@ -11,6 +12,7 @@ import androidx.databinding.BindingAdapter
 import com.ancientlore.intercom.utils.extensions.isNotEmpty
 import com.ancientlore.intercom.view.ChatImageView
 import com.ancientlore.intercom.view.DrawableCompatTextView
+import com.ancientlore.intercom.view.TextDrawable
 import com.bumptech.glide.Glide
 
 
@@ -50,6 +52,67 @@ fun setImageResource(imageView: ImageView, data: Any) {
 		is String -> Glide.with(imageView.context)
 			.load(Uri.parse(data))
 			.into(imageView)
+		is Drawable -> imageView.setImageDrawable(data)
+		is Int -> imageView.setImageResource(data)
+		else -> imageView.setImageURI(null)
+	}
+}
+
+@BindingAdapter(value = [
+	"android:src",
+	"asCircle",
+	"abbrText", "abbrSize", "abbrTextColor", "abbrBackColor",
+	"fallback", "placeholder", "error",
+	"fallbackTint", "placeholderTint", "errorTint"], requireAll = false)
+fun setImageResource(imageView: ImageView, data: Any,
+                     asCircle: Boolean = false,
+                     abbrText: String? = null, abbrSize: Float = 0f, abbrTextColor: Int = Color.WHITE, abbrBackColor: Int = Color.TRANSPARENT,
+                     fallback: Drawable?, placeholder: Drawable?, error: Drawable?,
+                     fallbackTint: Int = Color.TRANSPARENT, placeholderTint: Int = Color.TRANSPARENT, errorTint: Int = Color.TRANSPARENT) {
+	when (data) {
+		is Uri -> {
+			val request = Glide.with(imageView.context)
+				.load(data)
+
+			if (asCircle)
+				request.optionalCircleCrop()
+
+			fallback?.let {
+				request.fallback(
+					if (fallbackTint != Color.TRANSPARENT)
+						ImageUtils.setTint(it, fallbackTint)
+					else it)
+			}
+
+			placeholder?.let {
+				request.placeholder(
+					if (placeholderTint != Color.TRANSPARENT)
+						ImageUtils.setTint(it, placeholderTint)
+					else it)
+			}
+
+			error?.let {
+				request.error(
+					if (errorTint != Color.TRANSPARENT)
+						ImageUtils.setTint(it, errorTint)
+					else it)
+			} ?: abbrText?.let {
+				request.error(TextDrawable.builder()
+					.beginConfig()
+					.toUpperCase()
+					.textColor(abbrTextColor)
+					.fontSize(abbrSize.toInt())
+					.bold()
+					.endConfig()
+					.buildRound(ImageUtils.createAbbreviation(it), abbrBackColor))
+			}
+
+			request.into(imageView)
+		}
+		is String -> setImageResource(imageView, Uri.parse(data), asCircle,
+			abbrText, abbrSize, abbrTextColor, abbrBackColor,
+			fallback, placeholder, error,
+			fallbackTint, placeholderTint, errorTint)
 		is Drawable -> imageView.setImageDrawable(data)
 		is Int -> imageView.setImageResource(data)
 		else -> imageView.setImageURI(null)

@@ -31,6 +31,12 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 
 	val textField = ObservableField("")
 
+	val actionBarTitleField = ObservableField(params.title)
+
+	val actionBarSubtitleField = ObservableField("")
+
+	val actionBarIconField = ObservableField(params.iconUri)
+
 	val showSendProgressField = ObservableBoolean(false)
 
 	private val repository = MessageRepository()
@@ -42,6 +48,8 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 	private val recordAudioSubj = PublishSubject.create<Any>()
 
 	private val uploadIconSub = PublishSubject.create<String>() // Chat Id
+
+	private val openChatDetailSub = PublishSubject.create<Any>()
 
 	private var inputManager: MessageInputManager? = null
 
@@ -140,6 +148,8 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 	fun observeUploadIcon() = uploadIconSub as Observable<String>
 
 	fun onAttachButtonCliked() = openAttachMenuSubj.onNext(EmptyObject)
+
+	fun onActionBarCliked() = openChatDetailSub.onNext(EmptyObject)
 
 	fun onSendButtonClicked() {
 		messageText.takeIf { it.isNotBlank() }

@@ -16,7 +16,7 @@
 			android:orientation="vertical"
 			android:onClick="@{() -> contact.onClick()}"
 	>
-		<androidx.appcompat.widget.AppCompatImageView
+		<com.ancientlore.intercom.view.CircleImageView
 				android:id="@+id/iconView"
 				android:layout_width="40dp"
 				android:layout_height="40dp"

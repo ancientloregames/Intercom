@@ -1,6 +1,5 @@
 package com.ancientlore.intercom.ui.chat.creation
 
-import android.net.Uri
 import com.ancientlore.intercom.App
 import com.ancientlore.intercom.EmptyObject
 import com.ancientlore.intercom.backend.RepositorySubscription
@@ -39,7 +38,7 @@ class ChatCreationViewModel(listAdapter: ChatCreationAdapter)
 					ChatFlowParams(
 						userId = userId,
 						title = contact.name,
-						iconUri = Uri.parse(contact.iconUrl),
+						iconUri = contact.iconUri,
 						participants = listOf(contact.id, userId))
 				)
 			}
