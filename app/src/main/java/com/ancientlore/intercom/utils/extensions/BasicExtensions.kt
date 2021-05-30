@@ -16,6 +16,7 @@ import android.os.Environment
 import android.os.Looper
 import android.provider.ContactsContract
 import android.provider.MediaStore
+import android.util.TypedValue
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.webkit.MimeTypeMap
@@ -33,6 +34,9 @@ import java.io.FileOutputStream
 import java.io.IOException
 import kotlin.math.max
 
+fun runOnUiThread(runnable: Runnable) {
+	Utils.runOnUiThread(runnable)
+}
 
 fun Context.getAppCacheDir(): File {
 	var state: String? = null
@@ -273,4 +277,11 @@ fun Context.hideKeyboard(view: View, flags: Int) : Boolean {
 				}
 			}
 		} ?: false
+}
+
+fun Context.getActionBarPixelSize() : Int {
+	return with (TypedValue()
+		.apply { theme.resolveAttribute(android.R.attr.actionBarSize, this, true) }) {
+		TypedValue.complexToDimensionPixelSize(data, resources.displayMetrics)
+	}
 }

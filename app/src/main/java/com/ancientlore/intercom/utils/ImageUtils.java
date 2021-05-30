@@ -5,6 +5,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Build;
@@ -108,7 +110,7 @@ public class ImageUtils
 	}
 
 	@NotNull
-	private static String createAbbreviation(@NotNull String rawText)
+	public static String createAbbreviation(@NotNull String rawText)
 	{
 		StringBuilder abbreviation = new StringBuilder();
 
@@ -195,5 +197,15 @@ public class ImageUtils
 
 
 		return rotateImage(bitmap, rotation);
+	}
+
+	public static final Drawable setTint(Drawable drawable, int tint)
+	{
+		if (drawable == null || tint == Color.TRANSPARENT)
+			return drawable;
+
+		Drawable tintedDrawable = drawable.mutate();
+		tintedDrawable.setColorFilter(tint, PorterDuff.Mode.SRC_ATOP);
+		return tintedDrawable;
 	}
 }
