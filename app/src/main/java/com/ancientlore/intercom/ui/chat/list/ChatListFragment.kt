@@ -52,6 +52,10 @@ class ChatListFragment : FilterableFragment<ChatListViewModel, ChatListUiBinding
 
 	override fun onOptionsItemSelected(item: MenuItem): Boolean {
 		return when (item.itemId) {
+			R.id.createGroup -> {
+				navigator?.openChatCreationGroup()
+				true
+			}
 			R.id.contacts -> {
 				navigator?.openContactList()
 				true
