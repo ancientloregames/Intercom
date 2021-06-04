@@ -20,6 +20,7 @@ import com.ancientlore.intercom.ui.FilterableViewModel
 import com.ancientlore.intercom.utils.Runnable1
 import com.ancientlore.intercom.utils.Utils
 import com.ancientlore.intercom.utils.extensions.createAudioMessageFile
+import com.ancientlore.intercom.utils.extensions.isInternal
 import com.ancientlore.intercom.view.MessageInputManager
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
@@ -273,7 +274,8 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 	}
 
 	private fun onFailureSendingMessage(error: Throwable) {
-		Utils.logError(error)
+		if (error !is EmptyResultException)
+			Utils.logError(error)
 		showSendProgressField.set(false)
 		toastRequest.onNext(R.string.alert_error_send_message)
 	}
@@ -286,12 +288,17 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 				name = params.title,
 				iconUrl = params.iconUri.toString(),
 				initiatorId = params.userId,
-				participants = params.participants)
+				participants = params.participants,
+				type = if (params.participants.size == 2) Chat.TYPE_PRIVATE else Chat.TYPE_GROUP,
+				pin = false)
 
 			ChatRepository.addItem(chat, object : RequestCallback<String> {
 				override fun onSuccess(id: String) {
 					initMessageRepository(id)
-					uploadIconSub.onNext(id)
+
+					if (params.iconUri.isInternal())
+						uploadIconSub.onNext(id)
+
 					callback.run(id)
 				}
 				override fun onFailure(error: Throwable) {
@@ -313,7 +320,10 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 				listAdapter.setItems(result)
 				updateMessagesStatus(result)
 			}
-			override fun onFailure(error: Throwable) { Utils.logError(error) }
+			override fun onFailure(error: Throwable) {
+				if (error !is EmptyResultException)
+					Utils.logError(error)
+			}
 		})
 	}
 
@@ -323,7 +333,10 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 			.forEach {
 				repository.setMessageStatusReceived(it.id, object : SimpleRequestCallback<Any>() {
 
-					override fun onFailure(error: Throwable) { Utils.logError(error) }
+					override fun onFailure(error: Throwable) {
+						if (error !is EmptyResultException)
+							Utils.logError(error)
+					}
 				})
 			}
 	}

@@ -21,6 +21,7 @@ class ChatIconUploadService : FileUploadService() {
 
 		const val EXTRA_CHAT_ID = "extra_chat_id"           // String
 		const val EXTRA_USER_ID = "extra_user_id"           // String
+		const val EXTRA_CHAT_TYPE = "extra_type"                 // Int
 		const val EXTRA_CHAT_PARTICIPANTS = "extra_chat_part"  // ArrayList<String>
 	}
 
@@ -28,6 +29,7 @@ class ChatIconUploadService : FileUploadService() {
 
 		val chatId: String? = intent.getStringExtra(EXTRA_CHAT_ID)
 		val userId: String? = intent.getStringExtra(EXTRA_USER_ID)
+		val type: Int = intent.getIntExtra(EXTRA_CHAT_TYPE, -1)
 		val participants: List<String>? = intent.getStringArrayListExtra(EXTRA_CHAT_PARTICIPANTS)
 
 		val iconUri: Uri get() = uriList[0]
@@ -37,6 +39,7 @@ class ChatIconUploadService : FileUploadService() {
 					&& uriList.size == 1
 					&& chatId != null
 					&& userId != null
+					&& type >= 0
 					&& participants != null
 					&& participants.isNotEmpty()
 		}
@@ -99,6 +102,7 @@ class ChatIconUploadService : FileUploadService() {
 		}
 			.updateItem(Chat(
 				id = params.chatId!!,
+				type = params.type,
 				iconUrl = serverUri.toString(),
 				participants = params.participants!!), object : RequestCallback<Any> {
 

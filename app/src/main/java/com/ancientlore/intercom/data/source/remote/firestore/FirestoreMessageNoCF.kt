@@ -14,6 +14,7 @@ import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_LAST_MSG_TE
 import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_LAST_MSG_TIME
 import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_STATUS
 import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.SetOptions
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.RemoteMessage
 
@@ -40,11 +41,14 @@ class FirestoreMessageNoCF(chatId: String): FirestoreMessageSource(chatId) {
 					callback?.onFailure(EmptyResultException("$TAG: empty"))
 					return@addOnSuccessListener
 				}
-				chatMessages.document(it.id)
-					.update(HashMap<String, Any>().apply {
-						put(FIELD_ID, it.id)
+
+				val messageId = it.id
+
+				chatMessages.document(messageId)
+					.set(HashMap<String, Any>().apply {
+						put(FIELD_ID, messageId)
 						put(FIELD_STATUS, 1)
-					})
+					}, SetOptions.merge())
 					.addOnFailureListener { error -> Log.d(TAG, "Failure 1: ${error.message}") }
 
 				val userChatInfoUpdate = HashMap<String, Any>().apply {
@@ -61,13 +65,14 @@ class FirestoreMessageNoCF(chatId: String): FirestoreMessageSource(chatId) {
 						.document(senderId)
 						.collection(CHATS)
 						.document(receiverId)
-						.update(userChatInfoUpdate)
+						.set(userChatInfoUpdate, SetOptions.merge())
+						.addOnSuccessListener { callback?.onSuccess(messageId) }
 						.addOnFailureListener { error -> callback?.onFailure(error) }
 					db.collection(USERS)
 						.document(receiverId)
 						.collection(CHATS)
 						.document(senderId)
-						.update(userChatInfoUpdate)
+						.set(userChatInfoUpdate, SetOptions.merge())
 						.addOnFailureListener { error -> callback?.onFailure(error) }
 				}
 				else {
@@ -75,13 +80,15 @@ class FirestoreMessageNoCF(chatId: String): FirestoreMessageSource(chatId) {
 						db.collection(USERS)
 							.document(receiverId)
 							.collection(CHATS)
-							.document(chat.name)
-							.update(userChatInfoUpdate)
+							.document(getChatId())
+							.set(userChatInfoUpdate, SetOptions.merge())
+							.addOnSuccessListener {
+								if (message.senderId == receiverId)
+									callback?.onSuccess(messageId)
+							}
 							.addOnFailureListener { error -> callback?.onFailure(error) }
 					}
 				}
-
-				callback?.onSuccess(it.id)
 			}
 			.addOnFailureListener { callback?.onFailure(it) }
 	}

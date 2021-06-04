@@ -21,6 +21,7 @@ class ChatListViewModel(listAdapter: ChatListAdapter)
 
 	private val chatCreationSub = PublishSubject.create<Any>()
 	private val chatOpenSub = PublishSubject.create<ChatFlowParams>()
+	private val openChatMenuSub = PublishSubject.create<Chat>()
 
 	private var repositorySub: RepositorySubscription? = null
 
@@ -38,8 +39,12 @@ class ChatListViewModel(listAdapter: ChatListAdapter)
 				chatOpenSub.onNext(ChatFlowParams(
 					userId = App.backend.getAuthManager().getCurrentUser().id,
 					chatId = chat.id,
+					chatType = chat.type,
 					title = chat.localName ?: chat.name,
 					iconUri = chat.iconUri))
+			}
+			override fun onItemLongClick(chat: Chat) {
+				openChatMenuSub.onNext(chat)
 			}
 		})
 		attachDataListener()
@@ -49,6 +54,7 @@ class ChatListViewModel(listAdapter: ChatListAdapter)
 
 	fun observeChatCreationRequest() = chatCreationSub as Observable<*>
 	fun observeChatOpenRequest() = chatOpenSub as Observable<ChatFlowParams>
+	fun observeOpenChatMenuRequest() = openChatMenuSub as Observable<Chat>
 
 	private fun attachDataListener() {
 		//TODO load chats independantly of contact list and assign names postpone
@@ -82,5 +88,19 @@ class ChatListViewModel(listAdapter: ChatListAdapter)
 				}
 			}
 		}
+	}
+
+	fun switchChatPin(chat: Chat) {
+		ChatRepository.updateItem(Chat(
+			id = chat.id,
+			name = chat.name,
+			type = chat.type,
+			pin = chat.pin?.not() ?: false,
+			participants = chat.participants
+		), object : SimpleRequestCallback<Any>() {
+			override fun onFailure(error: Throwable) {
+				Utils.logError(error)
+			}
+		})
 	}
 }

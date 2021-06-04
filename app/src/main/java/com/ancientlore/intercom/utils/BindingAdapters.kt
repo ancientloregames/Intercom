@@ -69,45 +69,55 @@ fun setImageResource(imageView: ImageView, data: Any,
                      abbrText: String? = null, abbrSize: Float = 0f, abbrTextColor: Int = Color.WHITE, abbrBackColor: Int = Color.TRANSPARENT,
                      fallback: Drawable?, placeholder: Drawable?, error: Drawable?,
                      fallbackTint: Int = Color.TRANSPARENT, placeholderTint: Int = Color.TRANSPARENT, errorTint: Int = Color.TRANSPARENT) {
+
+	val fallbackDrawable = abbrText?.let {
+		TextDrawable.builder()
+			.beginConfig()
+			.toUpperCase()
+			.textColor(abbrTextColor)
+			.fontSize(abbrSize.toInt())
+			.bold()
+			.endConfig()
+			.buildRound(ImageUtils.createAbbreviation(it), abbrBackColor)
+	} ?: fallback ?: placeholder
+
 	when (data) {
 		is Uri -> {
-			val request = Glide.with(imageView.context)
-				.load(data)
+			if (data.isNotEmpty()) {
+				val request = Glide.with(imageView.context)
+					.load(data)
 
-			if (asCircle)
-				request.optionalCircleCrop()
+				if (asCircle)
+					request.optionalCircleCrop()
 
-			fallback?.let {
-				request.fallback(
-					if (fallbackTint != Color.TRANSPARENT)
-						ImageUtils.setTint(it, fallbackTint)
-					else it)
+				fallback?.let {
+					request.fallback(
+						if (fallbackTint != Color.TRANSPARENT)
+							ImageUtils.setTint(it, fallbackTint)
+						else it)
+				}
+
+				placeholder?.let {
+					request.placeholder(
+						if (placeholderTint != Color.TRANSPARENT)
+							ImageUtils.setTint(it, placeholderTint)
+						else it)
+				}
+
+				error?.let {
+					request.error(
+						if (errorTint != Color.TRANSPARENT)
+							ImageUtils.setTint(it, errorTint)
+						else it)
+				} ?: fallbackDrawable?.let {
+					request.error(it)
+				}
+
+				request.into(imageView)
 			}
-
-			placeholder?.let {
-				request.placeholder(
-					if (placeholderTint != Color.TRANSPARENT)
-						ImageUtils.setTint(it, placeholderTint)
-					else it)
-			}
-
-			error?.let {
-				request.error(
-					if (errorTint != Color.TRANSPARENT)
-						ImageUtils.setTint(it, errorTint)
-					else it)
-			} ?: abbrText?.let {
-				request.error(TextDrawable.builder()
-					.beginConfig()
-					.toUpperCase()
-					.textColor(abbrTextColor)
-					.fontSize(abbrSize.toInt())
-					.bold()
-					.endConfig()
-					.buildRound(ImageUtils.createAbbreviation(it), abbrBackColor))
-			}
-
-			request.into(imageView)
+			else fallbackDrawable
+				?.let { imageView.setImageDrawable(it) }
+				?: imageView.setImageURI(null)
 		}
 		is String -> setImageResource(imageView, Uri.parse(data), asCircle,
 			abbrText, abbrSize, abbrTextColor, abbrBackColor,
@@ -115,7 +125,9 @@ fun setImageResource(imageView: ImageView, data: Any,
 			fallbackTint, placeholderTint, errorTint)
 		is Drawable -> imageView.setImageDrawable(data)
 		is Int -> imageView.setImageResource(data)
-		else -> imageView.setImageURI(null)
+		else -> fallbackDrawable
+			?.let { imageView.setImageDrawable(it) }
+			?: imageView.setImageURI(null)
 	}
 }
 

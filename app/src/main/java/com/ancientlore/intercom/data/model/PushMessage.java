@@ -21,6 +21,7 @@ public class PushMessage implements Parcelable
 	public String title = "";
 	public String body = "";
 	public String chatId = "";
+	public int chaType = 0;
 	public String iconUrl = "";
 
 	@Type
@@ -34,6 +35,7 @@ public class PushMessage implements Parcelable
 		title = in.readString();
 		body = in.readString();
 		chatId = in.readString();
+		chaType = in.readInt();
 		type = in.readString();
 		iconUrl = in.readString();
 	}
@@ -45,6 +47,7 @@ public class PushMessage implements Parcelable
 		dest.writeString(title);
 		dest.writeString(body);
 		dest.writeString(chatId);
+		dest.writeInt(chaType);
 		dest.writeString(type);
 		dest.writeString(iconUrl);
 	}

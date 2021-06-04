@@ -45,6 +45,7 @@ import com.ancientlore.intercom.utils.NotificationManager.Companion.ACTION_OPEN_
 import com.ancientlore.intercom.utils.NotificationManager.Companion.EXTRA_CHAT_ICON
 import com.ancientlore.intercom.utils.NotificationManager.Companion.EXTRA_CHAT_ID
 import com.ancientlore.intercom.utils.NotificationManager.Companion.EXTRA_CHAT_TITLE
+import com.ancientlore.intercom.utils.NotificationManager.Companion.EXTRA_CHAT_TYPE
 import com.ancientlore.intercom.utils.extensions.checkPermission
 import com.ancientlore.intercom.utils.extensions.createChannel
 import com.ancientlore.intercom.utils.extensions.hideKeyboard
@@ -120,12 +121,14 @@ class MainActivity : AppCompatActivity(),
 			ACTION_OPEN_FROM_PUSH -> {
 				intent.extras!!.run {
 					val chatId = getString(EXTRA_CHAT_ID)
+					val chatType = getInt(EXTRA_CHAT_TYPE)
 					val chatTitle = getString(EXTRA_CHAT_TITLE)
 					val chatIconUrl = getString(EXTRA_CHAT_ICON)
 					if (chatId != null && chatTitle != null && chatIconUrl != null)
 						openChatFlow(ChatFlowParams(
 							userId = App.backend.getAuthManager().getCurrentUser().id,
 							chatId = chatId,
+							chatType = chatType,
 							title = chatTitle,
 							iconUri = Uri.parse(chatIconUrl)))
 				}

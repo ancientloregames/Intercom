@@ -228,6 +228,7 @@ class ChatFlowFragment : FilterableFragment<ChatFlowViewModel, ChatFlowUiBinding
 						.putExtra(FileUploadService.EXTRA_NOTIFY, true)
 						.putExtra(ChatIconUploadService.EXTRA_CHAT_ID, chatId)
 						.putExtra(ChatIconUploadService.EXTRA_USER_ID, params.userId)
+						.putExtra(ChatIconUploadService.EXTRA_CHAT_TYPE, params.chatType)
 						.putStringArrayListExtra(ChatIconUploadService.EXTRA_CHAT_PARTICIPANTS,
 							if (params.participants is ArrayList)
 								params.participants as ArrayList

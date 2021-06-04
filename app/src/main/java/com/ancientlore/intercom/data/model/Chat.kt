@@ -12,10 +12,15 @@ data class Chat(val id: String = "",
                 val initiatorId: String = "",
                 val participants: List<String> = emptyList(),
                 val lastMsgTime: Date = Date(0),
-                val lastMsgText: String = "")
+                val lastMsgText: String = "",
+                val type: Int = TYPE_PRIVATE,
+                val pin: Boolean? = null)
 	: Comparable<Chat> {
 
 	companion object {
+		const val TYPE_PRIVATE = 0
+		const val TYPE_GROUP = 1
+
 		private val dateFormat = SimpleDateFormat("MMM dd", Locale.getDefault())
 	}
 
@@ -40,6 +45,7 @@ data class Chat(val id: String = "",
 				&& initiatorId == other.initiatorId
 				&& participants == other.participants
 				&& lastMsgText == other.lastMsgText
+				&& pin == other.pin
 	}
 
 	override fun hashCode(): Int {
@@ -49,10 +55,17 @@ data class Chat(val id: String = "",
 		result = 31 * result + participants.hashCode()
 		result = 31 * result + lastMsgTime.hashCode()
 		result = 31 * result + lastMsgText.hashCode()
+		pin?.let { result = 31 * result + pin.hashCode() }
 		return result
 	}
 
-	override fun compareTo(other: Chat) = lastMsgTime.compareTo(other.lastMsgTime)
+	override fun compareTo(other: Chat) : Int {
+		var weight = 0 // lastMsgTime.compareTo(other.lastMsgTime) FIXME for some reason Firestore returns null in non-nullable value
+		if (pin == true) weight += 2
+		if (other.pin == true) weight -= 2
+		return weight
+
+	}
 
 	fun contains(text: String): Boolean {
 		return name.contains(text, true)

@@ -23,7 +23,7 @@ open class FirestoreChatSource protected constructor(private val userId: String)
 		private const val TAG = "FirestoreChatSource"
 	}
 
-	private val userChats get() = db.collection(USERS).document(userId).collection(CHATS)
+	protected val userChats get() = db.collection(USERS).document(userId).collection(CHATS)
 
 	override fun getObjectClass() = Chat::class.java
 

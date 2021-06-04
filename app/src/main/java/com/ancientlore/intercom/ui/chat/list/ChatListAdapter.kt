@@ -17,10 +17,14 @@ import com.ancientlore.intercom.widget.recycler.MutableRecyclerAdapter
 
 class ChatListAdapter(context: Context,
                       items: MutableList<Chat> = mutableListOf())
-	: MutableRecyclerAdapter<Chat, ChatListAdapter.ViewHolder, ChatListItemBinding>(context, items) {
+	: MutableRecyclerAdapter<Chat, ChatListAdapter.ViewHolder, ChatListItemBinding>(
+	context = context,
+	items = items,
+	autoSort = true) {
 
 	interface Listener {
 		fun onChatSelected(chat: Chat)
+		fun onItemLongClick(chat: Chat)
 	}
 
 	private var listener: Listener? = null
@@ -40,6 +44,9 @@ class ChatListAdapter(context: Context,
 			override fun onItemClicked() {
 				listener?.onChatSelected(chat)
 			}
+			override fun onItemLongClicked() {
+				listener?.onItemLongClick(chat)
+			}
 		}
 	}
 
@@ -58,6 +65,7 @@ class ChatListAdapter(context: Context,
 
 		interface Listener {
 			fun onItemClicked()
+			fun onItemLongClicked()
 		}
 
 		var listener: Listener? = null
@@ -66,6 +74,8 @@ class ChatListAdapter(context: Context,
 		val titleField = ObservableField<String>("")
 		val messageField = ObservableField<String>("")
 		val dateField = ObservableField<String>("")
+
+		val pinField = ObservableField(false)
 
 		@ColorInt
 		private val iconColor: Int
@@ -89,9 +99,16 @@ class ChatListAdapter(context: Context,
 				data.iconUrl.isNotEmpty() -> data.iconUrl
 				else -> ImageUtils.createAbbreviationDrawable(name, iconColor, iconTextSize)
 			})
+
+			pinField.set(data.pin == true)
 		}
 
 		fun onClick() = listener?.onItemClicked()
+
+		fun onLongClick(): Boolean {
+			listener?.onItemLongClicked()
+			return true
+		}
 	}
 
 	class DiffCallback(private val oldItems: List<Chat>,

@@ -20,18 +20,18 @@ abstract class MutableRecyclerAdapter<I: Comparable<I>, H: BasicRecyclerAdapter.
 	@UiThread
 	override fun setItems(newItems: List<I>) {
 
-		fullList.clear()
-		fullList.addAll(newItems)
-
 		val items =
 			if (autoSort) newItems.sorted()
 			else newItems
+
+		fullList.clear()
+		fullList.addAll(items)
 
 		val diffResult = DiffUtil.calculateDiff(getDiffCallback(items))
 		diffResult.dispatchUpdatesTo(this)
 
 		mutableList.clear()
-		mutableList.addAll(newItems)
+		mutableList.addAll(items)
 	}
 
 	@UiThread

@@ -30,6 +30,7 @@ class NotificationManager private constructor(private val context: Context) {
 		const val EXTRA_NOTIFICATION_ID = "not_id"
 		const val EXTRA_MESSAGE = "message"
 		const val EXTRA_CHAT_ID = "chat_id"
+		const val EXTRA_CHAT_TYPE = "chat_type"
 		const val EXTRA_MESSAGE_ID = "message_id"
 		const val EXTRA_CHAT_TITLE = "chat_title"
 		const val EXTRA_CHAT_ICON = "chat_icon"
@@ -110,6 +111,7 @@ class NotificationManager private constructor(private val context: Context) {
 					flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
 					putExtras(Bundle().apply {
 						putString(EXTRA_CHAT_ID, message.chatId)
+						putInt(EXTRA_CHAT_TYPE, message.chaType)
 						putString(EXTRA_CHAT_TITLE, message.title)
 						putString(EXTRA_CHAT_ICON, message.iconUrl)
 					})

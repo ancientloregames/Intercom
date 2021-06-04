@@ -14,8 +14,9 @@
 			android:layout_height="65dp"
 			android:padding="8dp"
 			android:orientation="vertical"
-			android:background="@drawable/bg_ripple_effect_gray"
+			android:background="?android:attr/selectableItemBackground"
 			android:onClick="@{() -> chat.onClick()}"
+			android:onLongClick="@{() -> chat.onLongClick()}"
 	>
 		<com.ancientlore.intercom.view.CircleImageView
 				android:id="@+id/iconView"
@@ -80,5 +81,17 @@
 				tools:text="Jun 06"
 				style="@style/onelineTextField"
 		/>
+
+		<ImageView
+				android:id="@+id/pinView"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				app:srcCompat="@drawable/ic_pin_24dp"
+				app:tint="@color/defaultGreyColor"
+				app:layout_constraintEnd_toEndOf="parent"
+				app:layout_constraintTop_toBottomOf="@+id/timestampView"
+				app:layout_constraintBottom_toBottomOf="parent"
+				android:visibility="@{chat.pinField}"
+			/>
 	</androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

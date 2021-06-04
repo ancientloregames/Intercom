@@ -4,6 +4,7 @@ import com.ancientlore.intercom.App
 import com.ancientlore.intercom.EmptyObject
 import com.ancientlore.intercom.backend.RepositorySubscription
 import com.ancientlore.intercom.backend.RequestCallback
+import com.ancientlore.intercom.data.model.Chat
 import com.ancientlore.intercom.data.model.Contact
 import com.ancientlore.intercom.data.source.ContactRepository
 import com.ancientlore.intercom.ui.FilterableViewModel
@@ -39,7 +40,8 @@ class ChatCreationViewModel(listAdapter: ChatCreationAdapter)
 						userId = userId,
 						title = contact.name,
 						iconUri = contact.iconUri,
-						participants = listOf(contact.id, userId))
+						chatType = Chat.TYPE_PRIVATE,
+						participants = listOf(userId, contact.id))
 				)
 			}
 			override fun onCreateGroup() {

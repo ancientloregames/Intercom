@@ -6,6 +6,7 @@ import android.os.Parcelable
 
 data class ChatFlowParams(val userId: String = "",
                           val chatId: String = "",
+                          val chatType: Int,
                           val title: String = "",
                           val iconUri: Uri = Uri.EMPTY,
                           val participants: List<String> = emptyList()) : Parcelable {
@@ -13,6 +14,7 @@ data class ChatFlowParams(val userId: String = "",
 	constructor(parcel: Parcel) : this(
 		parcel.readString(),
 		parcel.readString(),
+		parcel.readInt(),
 		parcel.readString(),
 		parcel.readParcelable(Uri::class.java.classLoader),
 		arrayListOf<String>().apply {
@@ -23,6 +25,7 @@ data class ChatFlowParams(val userId: String = "",
 	override fun writeToParcel(parcel: Parcel, flags: Int) {
 		parcel.writeString(userId)
 		parcel.writeString(chatId)
+		parcel.writeInt(chatType)
 		parcel.writeString(title)
 		parcel.writeParcelable(iconUri, 0)
 		parcel.writeList(participants)

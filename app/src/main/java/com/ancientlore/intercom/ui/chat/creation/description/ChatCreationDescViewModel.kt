@@ -5,6 +5,7 @@ import androidx.databinding.ObservableField
 import com.ancientlore.intercom.App
 import com.ancientlore.intercom.EmptyObject
 import com.ancientlore.intercom.R
+import com.ancientlore.intercom.data.model.Chat
 import com.ancientlore.intercom.data.model.Contact
 import com.ancientlore.intercom.ui.FilterableViewModel
 import com.ancientlore.intercom.ui.chat.flow.ChatFlowParams
@@ -58,8 +59,9 @@ class ChatCreationDescViewModel(listAdapter: ChatCreationDescAdapter)
 			createChatSub.onNext(ChatFlowParams(
 				userId = userId,
 				title = groupName,
+				chatType = Chat.TYPE_GROUP,
 				iconUri = iconUri ?: Uri.EMPTY,
-				participants = contacts.map { it.id }.plus(userId)
+				participants = listOf(userId).plus(contacts.map { it.id })
 			))
 		}
 		else toastRequest.onNext(R.string.alert_error_name_required)
