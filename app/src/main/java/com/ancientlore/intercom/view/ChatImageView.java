@@ -94,7 +94,7 @@ public class ChatImageView extends AppCompatImageView
 	@Override
 	public void setImageURI(@Nullable Uri uri)
 	{
-		if (uri != Uri.EMPTY) {
+		if (uri != null && uri != Uri.EMPTY) {
 			if ("file".equals(uri.getScheme())) {
 				String lastSegment = uri.getLastPathSegment();
 				String filename = lastSegment.substring(lastSegment.lastIndexOf("/") + 1);
