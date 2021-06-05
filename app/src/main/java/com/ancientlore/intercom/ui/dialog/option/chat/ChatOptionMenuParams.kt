@@ -3,14 +3,17 @@ package com.ancientlore.intercom.ui.dialog.option.chat
 import android.os.Parcel
 import android.os.Parcelable
 
-data class ChatOptionMenuParams(val pin: Boolean) : Parcelable {
+data class ChatOptionMenuParams(val pin: Boolean,
+                                val mute: Boolean) : Parcelable {
 
 	constructor(parcel: Parcel) : this(
+		parcel.readByte() != 0.toByte(),
 		parcel.readByte() != 0.toByte()
 	)
 
 	override fun writeToParcel(parcel: Parcel, flags: Int) {
 		parcel.writeByte(if (pin) 1 else 0)
+		parcel.writeByte(if (mute) 1 else 0)
 	}
 
 	override fun describeContents(): Int {

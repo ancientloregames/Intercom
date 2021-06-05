@@ -290,7 +290,8 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 				initiatorId = params.userId,
 				participants = params.participants,
 				type = if (params.participants.size == 2) Chat.TYPE_PRIVATE else Chat.TYPE_GROUP,
-				pin = false)
+				pin = false,
+				mute = false)
 
 			ChatRepository.addItem(chat, object : RequestCallback<String> {
 				override fun onSuccess(id: String) {

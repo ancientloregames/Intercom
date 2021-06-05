@@ -103,4 +103,18 @@ class ChatListViewModel(listAdapter: ChatListAdapter)
 			}
 		})
 	}
+
+	fun switchChatMute(chat: Chat) {
+		ChatRepository.updateItem(Chat(
+			id = chat.id,
+			name = chat.name,
+			type = chat.type,
+			mute = chat.mute?.not() ?: false,
+			participants = chat.participants
+		), object : SimpleRequestCallback<Any>() {
+			override fun onFailure(error: Throwable) {
+				Utils.logError(error)
+			}
+		})
+	}
 }

@@ -15,6 +15,7 @@ object C {
 	const val FIELD_PARTICIPANTS = "participants"
 	const val FIELD_TYPE = "type"
 	const val FIELD_PIN = "pin"
+	const val FIELD_MUTE = "mute"
 
 	const val FIELD_STATUS = "status"
 	const val FIELD_LAST_SEEN = "lastSeenTime"

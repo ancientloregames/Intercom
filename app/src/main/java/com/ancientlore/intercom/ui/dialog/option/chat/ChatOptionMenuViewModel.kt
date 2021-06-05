@@ -8,14 +8,20 @@ class ChatOptionMenuViewModel(val params: ChatOptionMenuParams)
 	: BasicViewModel() {
 
 	private val onPinSubj = PublishSubject.create<Boolean>()
+	private val onMuteSubj = PublishSubject.create<Boolean>()
 
 	override fun clean() {
 		onPinSubj.onComplete()
+		onMuteSubj.onComplete()
 
 		super.clean()
 	}
 
 	fun onPinClick() = onPinSubj.onNext(params.pin.not())
 
+	fun onMuteClick() = onMuteSubj.onNext(params.mute.not())
+
 	fun observePinClicked() = onPinSubj as Observable<Boolean>
+
+	fun observeMuteClicked() = onMuteSubj as Observable<Boolean>
 }

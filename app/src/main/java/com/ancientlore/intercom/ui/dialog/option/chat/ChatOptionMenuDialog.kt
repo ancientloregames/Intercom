@@ -34,6 +34,7 @@ class ChatOptionMenuDialog: DialogFragment() {
 
 	interface Listener {
 		fun onPinClicked(pin: Boolean)
+		fun onMuteClicked(pin: Boolean)
 	}
 	var listener: Listener? = null
 
@@ -87,6 +88,12 @@ class ChatOptionMenuDialog: DialogFragment() {
 		subscriptions.add(viewModel.observePinClicked()
 			.subscribe {
 				listener?.onPinClicked(it)
+				dismiss()
+			})
+
+		subscriptions.add(viewModel.observeMuteClicked()
+			.subscribe {
+				listener?.onMuteClicked(it)
 				dismiss()
 			})
 	}

@@ -83,6 +83,18 @@
 		/>
 
 		<ImageView
+				android:id="@+id/muteView"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				app:srcCompat="@drawable/ic_mute_24dp"
+				app:tint="@color/defaultGreyColor"
+				app:layout_constraintEnd_toStartOf="@+id/pinView"
+				app:layout_constraintTop_toBottomOf="@+id/timestampView"
+				app:layout_constraintBottom_toBottomOf="parent"
+				android:visibility="@{chat.muteField}"
+				/>
+
+		<ImageView
 				android:id="@+id/pinView"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"

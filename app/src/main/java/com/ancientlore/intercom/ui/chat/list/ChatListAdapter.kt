@@ -76,6 +76,7 @@ class ChatListAdapter(context: Context,
 		val dateField = ObservableField<String>("")
 
 		val pinField = ObservableField(false)
+		val muteField = ObservableField(false)
 
 		@ColorInt
 		private val iconColor: Int
@@ -101,6 +102,7 @@ class ChatListAdapter(context: Context,
 			})
 
 			pinField.set(data.pin == true)
+			muteField.set(data.mute == true)
 		}
 
 		fun onClick() = listener?.onItemClicked()

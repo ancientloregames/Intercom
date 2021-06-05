@@ -10,6 +10,7 @@ import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_ICON_URL
 import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_ID
 import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_LAST_MSG_TEXT
 import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_LAST_MSG_TIME
+import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_MUTE
 import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_NAME
 import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_PARTICIPANTS
 import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_PIN
@@ -48,7 +49,8 @@ class FirestoreChatSourceNoCF private constructor(userId: String)
 							FIELD_LAST_MSG_TIME to Date(0),
 							FIELD_NAME to item.participants[1],
 							FIELD_TYPE to item.type,
-							FIELD_PIN to item.pin
+							FIELD_PIN to item.pin,
+							FIELD_MUTE to item.mute
 						), SetOptions.merge())
 						.addOnSuccessListener { callback?.onSuccess(chatId) }
 						.addOnFailureListener { error -> callback?.onFailure(error) }
@@ -63,7 +65,8 @@ class FirestoreChatSourceNoCF private constructor(userId: String)
 							FIELD_LAST_MSG_TIME to Date(0),
 							FIELD_NAME to item.participants[0],
 							FIELD_TYPE to item.type,
-							FIELD_PIN to item.pin
+							FIELD_PIN to item.pin,
+							FIELD_MUTE to item.mute
 						), SetOptions.merge())
 						.addOnFailureListener { error -> callback?.onFailure(error) }
 				}
@@ -80,7 +83,8 @@ class FirestoreChatSourceNoCF private constructor(userId: String)
 								FIELD_LAST_MSG_TIME to FieldValue.serverTimestamp(),
 								FIELD_NAME to item.name,
 								FIELD_TYPE to item.type,
-								FIELD_PIN to item.pin
+								FIELD_PIN to item.pin,
+								FIELD_MUTE to item.mute
 							), SetOptions.merge())
 							.addOnSuccessListener {
 								if (item.initiatorId == participant)
@@ -97,13 +101,15 @@ class FirestoreChatSourceNoCF private constructor(userId: String)
 	override fun updateItem(item: Chat, callback: RequestCallback<Any>?) {
 		if (item.id.isNotEmpty()) {
 
-			if (item.pin != null) {
+			if (item.pin != null || item.mute != null) {
 
 				val chatId = if (item.type == TYPE_PRIVATE) item.name else item.id
 
 				val userChatChangeMap = HashMap<String, Any>().apply {
 					if (item.pin != null)
 						put(FIELD_PIN, item.pin)
+					if (item.mute != null)
+						put(FIELD_MUTE, item.mute)
 				}
 				userChats
 					.document(chatId)

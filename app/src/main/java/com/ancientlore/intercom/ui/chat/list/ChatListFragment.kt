@@ -81,11 +81,14 @@ class ChatListFragment : FilterableFragment<ChatListViewModel, ChatListUiBinding
 		activity?.run {
 
 			val dialog = ChatOptionMenuDialog
-				.newInstance(ChatOptionMenuParams(pin = chat.pin == true))
+				.newInstance(ChatOptionMenuParams(pin = chat.pin == true, mute = chat.mute == true))
 
 			dialog.listener = object : ChatOptionMenuDialog.Listener {
 				override fun onPinClicked(pin: Boolean) {
 					viewModel.switchChatPin(chat)
+				}
+				override fun onMuteClicked(pin: Boolean) {
+					viewModel.switchChatMute(chat)
 				}
 			}
 

@@ -14,7 +14,8 @@ data class Chat(val id: String = "",
                 val lastMsgTime: Date = Date(0),
                 val lastMsgText: String = "",
                 val type: Int = TYPE_PRIVATE,
-                val pin: Boolean? = null)
+                val pin: Boolean? = null,
+                val mute: Boolean? = null)
 	: Comparable<Chat> {
 
 	companion object {
@@ -46,6 +47,7 @@ data class Chat(val id: String = "",
 				&& participants == other.participants
 				&& lastMsgText == other.lastMsgText
 				&& pin == other.pin
+				&& mute == other.mute
 	}
 
 	override fun hashCode(): Int {
@@ -56,6 +58,7 @@ data class Chat(val id: String = "",
 		result = 31 * result + lastMsgTime.hashCode()
 		result = 31 * result + lastMsgText.hashCode()
 		pin?.let { result = 31 * result + pin.hashCode() }
+		mute?.let { result = 31 * result + mute.hashCode() }
 		return result
 	}
 
