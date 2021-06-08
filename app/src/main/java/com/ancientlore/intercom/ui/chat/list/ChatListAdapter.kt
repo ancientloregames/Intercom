@@ -13,6 +13,7 @@ import com.ancientlore.intercom.widget.recycler.BasicRecyclerAdapter
 import com.ancientlore.intercom.data.model.Chat
 import com.ancientlore.intercom.databinding.ChatListItemBinding
 import com.ancientlore.intercom.utils.ImageUtils
+import com.ancientlore.intercom.utils.extensions.setColorRegion
 import com.ancientlore.intercom.widget.recycler.MutableRecyclerAdapter
 
 class ChatListAdapter(context: Context,
@@ -71,9 +72,9 @@ class ChatListAdapter(context: Context,
 		var listener: Listener? = null
 
 		val iconField = ObservableField<Any>()
-		val titleField = ObservableField<String>("")
-		val messageField = ObservableField<String>("")
-		val dateField = ObservableField<String>("")
+		val titleField = ObservableField("")
+		val messageField = ObservableField<CharSequence>("")
+		val dateField = ObservableField("")
 
 		val pinField = ObservableField(false)
 		val muteField = ObservableField(false)
@@ -83,17 +84,31 @@ class ChatListAdapter(context: Context,
 		@Px
 		private val iconTextSize: Int
 
+		@ColorInt
+		private val senderTextColor: Int
+
 		init {
 			binding.setVariable(BR.chat, this)
 
 			iconColor = ContextCompat.getColor(context, R.color.chatIconBackColor)
+			senderTextColor = ContextCompat.getColor(context, R.color.chatIconBackColor)
 			iconTextSize = resources.getDimensionPixelSize(R.dimen.chatListIconTextSize)
 		}
 
 		override fun bind(data: Chat) {
+
+
 			val name = data.localName ?: data.name
+
 			titleField.set(name)
-			messageField.set(data.lastMsgText)
+
+			if (data.participants.size > 2) {
+				val senderName = (data.lastMsgSenderLocalName ?: data.lastMsgSenderId) + ':'
+				val message = "$senderName ${data.lastMsgText}".setColorRegion(senderName, senderTextColor)
+				messageField.set(message)
+			}
+			else messageField.set(data.lastMsgText)
+
 			dateField.set(data.lastMsgDate)
 
 			iconField.set(when {

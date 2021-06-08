@@ -188,7 +188,10 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 	fun handleAttachedImage(fileData: FileData, conpressed: Uri) {
 		guarantyChat { chatId ->
 			showSendProgressField.set(true)
-			val message = Message(senderId = params.userId, attachUrl = conpressed.toString(), type = Message.TYPE_IMAGE)
+			val message = Message(
+				senderId = params.userId,
+				attachUrl = conpressed.toString(),
+				type = Message.TYPE_IMAGE)
 			repository.addMessage(message, object : RequestCallback<String> {
 				override fun onSuccess(messageId: String) {
 					App.backend.getStorageManager().uploadImage(fileData, chatId, object : ProgressRequestCallback<Uri> {

@@ -81,6 +81,10 @@ class ChatListViewModel(listAdapter: ChatListAdapter)
 			while (contactListIter.hasNext()) {
 				val contact = contactListIter.next()
 
+				if (chat.lastMsgSenderId == contact.phone) {
+					chat.lastMsgSenderLocalName = contact.name
+				}
+
 				if (chat.name == contact.phone) {
 					chat.localName = contact.name
 					contactListIter.remove()

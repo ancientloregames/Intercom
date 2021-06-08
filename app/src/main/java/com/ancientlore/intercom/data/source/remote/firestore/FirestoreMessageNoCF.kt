@@ -10,6 +10,7 @@ import com.ancientlore.intercom.data.source.EmptyResultException
 import com.ancientlore.intercom.data.source.remote.firestore.C.CHATS
 import com.ancientlore.intercom.data.source.remote.firestore.C.USERS
 import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_ID
+import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_LAST_MSG_SENDER
 import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_LAST_MSG_TEXT
 import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_LAST_MSG_TIME
 import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_STATUS
@@ -42,6 +43,7 @@ class FirestoreMessageNoCF(chatId: String): FirestoreMessageSource(chatId) {
 					return@addOnSuccessListener
 				}
 
+				val senderId = message.senderId
 				val messageId = it.id
 
 				chatMessages.document(messageId)
@@ -52,13 +54,13 @@ class FirestoreMessageNoCF(chatId: String): FirestoreMessageSource(chatId) {
 					.addOnFailureListener { error -> Log.d(TAG, "Failure 1: ${error.message}") }
 
 				val userChatInfoUpdate = HashMap<String, Any>().apply {
+					put(FIELD_LAST_MSG_SENDER, senderId)
 					put(FIELD_LAST_MSG_TEXT, message.text)
 					put(FIELD_LAST_MSG_TIME, FieldValue.serverTimestamp())
 				}
 
 				if (chat.participants.size == 2) {
 
-					val senderId = message.senderId
 					val receiverId = if (message.senderId != chat.participants[0]) chat.participants[0] else chat.participants[1]
 
 					db.collection(USERS)

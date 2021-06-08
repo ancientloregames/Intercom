@@ -11,6 +11,7 @@ data class Chat(val id: String = "",
                 val iconUrl: String = "",
                 val initiatorId: String = "",
                 val participants: List<String> = emptyList(),
+                val lastMsgSenderId: String = "",
                 val lastMsgTime: Date = Date(0),
                 val lastMsgText: String = "",
                 val type: Int = TYPE_PRIVATE,
@@ -33,6 +34,9 @@ data class Chat(val id: String = "",
 
 	@set:Exclude @get:Exclude
 	var localName: String? = null
+
+	@set:Exclude @get:Exclude
+	var lastMsgSenderLocalName: String? = null
 
 	override fun equals(other: Any?): Boolean {
 		if (this === other) return true
