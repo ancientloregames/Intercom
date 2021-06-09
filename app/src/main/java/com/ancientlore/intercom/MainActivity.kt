@@ -81,6 +81,8 @@ class MainActivity : AppCompatActivity(),
 
 	private var toolbarMenuCallback: Runnable1<Menu>? = null
 
+	private var firstResume: Boolean = true
+
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		setContentView(R.layout.main_activity)
@@ -95,6 +97,13 @@ class MainActivity : AppCompatActivity(),
 	override fun onResume() {
 		isInBackground = false
 
+		if (firstResume.not()) {
+			firstResume = false
+			if (App.backend.getAuthManager().loggedIn) {
+				UserRepository.updateOnlineStatus(true)
+			}
+		}
+
 		super.onResume()
 	}
 
@@ -102,6 +111,14 @@ class MainActivity : AppCompatActivity(),
 		isInBackground = true
 
 		super.onPause()
+	}
+
+	override fun onStop() {
+
+		if (App.backend.getAuthManager().loggedIn) {
+			UserRepository.updateOnlineStatus(false)
+		}
+		super.onStop()
 	}
 
 	private fun onFirstStart() {
@@ -378,7 +395,10 @@ class MainActivity : AppCompatActivity(),
 
 	private fun initRepositories(userId: String) {
 		val dataSourceProvider = App.backend.getDataSourceProvider()
-		UserRepository.setRemoteSource(dataSourceProvider.getUserSource(userId))
+		UserRepository.apply {
+			setRemoteSource(dataSourceProvider.getUserSource(userId))
+			updateOnlineStatus(true)
+		}
 		ChatRepository.setRemoteSource(dataSourceProvider.getChatSource(userId))
 		ContactRepository.setRemoteSource(dataSourceProvider.getContactSource(userId))
 	}

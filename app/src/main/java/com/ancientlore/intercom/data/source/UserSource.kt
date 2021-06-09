@@ -10,4 +10,5 @@ interface UserSource : DataSource<User> {
 	fun updateIcon(uri: Uri, callback: RequestCallback<Any>? = null)
 	fun updateName(name: String, callback: RequestCallback<Any>? = null)
 	fun updateStatus(status: String, callback: RequestCallback<Any>? = null)
+	fun updateOnlineStatus(online: Boolean, callback: RequestCallback<Any>? = null)
 }

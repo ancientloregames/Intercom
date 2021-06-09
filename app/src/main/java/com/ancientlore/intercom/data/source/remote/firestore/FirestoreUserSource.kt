@@ -3,15 +3,20 @@ package com.ancientlore.intercom.data.source.remote.firestore
 import android.net.Uri
 import com.ancientlore.intercom.App
 import com.ancientlore.intercom.EmptyObject
+import com.ancientlore.intercom.backend.RepositorySubscription
 import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.data.model.User
 import com.ancientlore.intercom.data.source.EmptyResultException
 import com.ancientlore.intercom.data.source.UserSource
 import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_FCM_TOKEN
 import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_ICON_URL
+import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_LAST_SEEN
 import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_NAME
+import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_ONLINE
 import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_STATUS
 import com.ancientlore.intercom.data.source.remote.firestore.C.USERS
+import com.ancientlore.intercom.utils.Utils
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.SetOptions
 
 open class FirestoreUserSource(protected val userId: String)
@@ -83,4 +88,14 @@ open class FirestoreUserSource(protected val userId: String)
 			.addOnSuccessListener { callback?.onSuccess(EmptyObject) }
 			.addOnFailureListener { callback?.onFailure(it) }
 	}
+
+	override fun updateOnlineStatus(online: Boolean, callback: RequestCallback<Any>?) {
+		user
+			.set(hashMapOf(
+				FIELD_LAST_SEEN to FieldValue.serverTimestamp(),
+				FIELD_ONLINE to online), SetOptions.merge())
+			.addOnSuccessListener { callback?.onSuccess(EmptyObject) }
+			.addOnFailureListener { callback?.onFailure(it) ?: Utils.logError(it) }
+	}
+
 }

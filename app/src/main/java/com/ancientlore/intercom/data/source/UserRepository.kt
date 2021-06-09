@@ -68,6 +68,11 @@ object UserRepository : UserSource {
 			?: callback?.onFailure(RuntimeException("UserRepository.updateStatus(): No remote source"))
 	}
 
+	override fun updateOnlineStatus(online: Boolean, callback: RequestCallback<Any>?) {
+		remoteSource?.updateOnlineStatus(online, callback)
+			?: callback?.onFailure(RuntimeException("UserRepository.updatePresence(): No remote source"))
+	}
+
 	fun setRemoteSource(source: UserSource) {
 		remoteSource = source
 	}
