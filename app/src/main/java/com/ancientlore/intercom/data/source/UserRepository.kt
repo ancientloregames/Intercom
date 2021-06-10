@@ -1,6 +1,8 @@
 package com.ancientlore.intercom.data.source
 
 import android.net.Uri
+import android.util.Log
+import com.ancientlore.intercom.backend.RepositorySubscription
 import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.data.model.User
 import com.ancientlore.intercom.data.source.cache.CacheUserSource
@@ -71,6 +73,31 @@ object UserRepository : UserSource {
 	override fun updateOnlineStatus(online: Boolean, callback: RequestCallback<Any>?) {
 		remoteSource?.updateOnlineStatus(online, callback)
 			?: callback?.onFailure(RuntimeException("UserRepository.updatePresence(): No remote source"))
+	}
+
+	override fun attachListener(
+		userId: String,
+		callback: RequestCallback<User>
+	): RepositorySubscription {
+		return remoteSource
+			?.attachListener(userId, object : RequestCallback<User> {
+				override fun onSuccess(result: User) {
+					callback.onSuccess(result)
+				}
+				override fun onFailure(error: Throwable) {
+					callback.onFailure(error)
+				}
+			})
+			?: run {
+				callback.onFailure(RuntimeException("Error! No remote source to attach to in the user repository"))
+
+				return object : RepositorySubscription {
+					override fun remove() {
+						Log.w("UserRepository",
+							"attachListener(): There were no remoteSource! No subscription to remove")
+					}
+				}
+			}
 	}
 
 	fun setRemoteSource(source: UserSource) {

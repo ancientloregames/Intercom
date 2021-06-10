@@ -1,5 +1,6 @@
 package com.ancientlore.intercom.ui.chat.flow
 
+import android.content.Context
 import android.media.MediaRecorder
 import android.net.Uri
 import androidx.databinding.ObservableBoolean
@@ -7,15 +8,10 @@ import androidx.databinding.ObservableField
 import com.ancientlore.intercom.App
 import com.ancientlore.intercom.EmptyObject
 import com.ancientlore.intercom.R
-import com.ancientlore.intercom.backend.ProgressRequestCallback
-import com.ancientlore.intercom.backend.RequestCallback
-import com.ancientlore.intercom.backend.SimpleRequestCallback
-import com.ancientlore.intercom.data.model.Chat
-import com.ancientlore.intercom.data.model.FileData
-import com.ancientlore.intercom.data.model.Message
-import com.ancientlore.intercom.data.source.ChatRepository
-import com.ancientlore.intercom.data.source.EmptyResultException
-import com.ancientlore.intercom.data.source.MessageRepository
+import com.ancientlore.intercom.backend.*
+import com.ancientlore.intercom.data.model.*
+import com.ancientlore.intercom.data.model.Chat.Companion.TYPE_PRIVATE
+import com.ancientlore.intercom.data.source.*
 import com.ancientlore.intercom.ui.FilterableViewModel
 import com.ancientlore.intercom.utils.Runnable1
 import com.ancientlore.intercom.utils.Utils
@@ -52,16 +48,23 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 
 	private val openChatDetailSub = PublishSubject.create<Any>()
 
+	private var contactRepSub: RepositorySubscription? = null
+
 	private var inputManager: MessageInputManager? = null
 
-	init {
+	fun init(context: Context) {
 		when {
 			params.chatId.isNotEmpty() -> {
 				initMessageRepository(params.chatId)
-			}
-			params.participants.size == 2 -> { // Privat chat
-				val contactId = params.participants.first { it != params.userId }
 
+				/*FIXME should reorganized db structure. separate chat description and chat messages*/
+				if (params.chatType == TYPE_PRIVATE) {
+					val contactId = params.participants.first { it != params.userId }
+					observeContactOnlineStatus(context, contactId)
+				}
+			}
+			params.chatType == TYPE_PRIVATE -> {
+				val contactId = params.participants.first { it != params.userId }
 				ChatRepository.getItem(contactId, object : RequestCallback<Chat> {
 					override fun onSuccess(chat: Chat) {
 						initMessageRepository(chat.id)
@@ -71,6 +74,7 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 							Utils.logError(error)
 					}
 				})
+				observeContactOnlineStatus(context, contactId)
 			}
 			params.participants.size > 2 -> {
 			}
@@ -137,6 +141,7 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 		openAttachMenuSubj.onComplete()
 		recordAudioSubj.onComplete()
 		inputManager?.onStop()
+		contactRepSub?.remove()
 		repository.detachListener()
 
 		super.clean()
@@ -343,5 +348,18 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 					}
 				})
 			}
+	}
+
+	private fun observeContactOnlineStatus(context: Context, contactId: String) {
+		contactRepSub = UserRepository.attachListener(contactId, object : CrashlyticsRequestCallback<User>() {
+
+			override fun onSuccess(conterpart: User) {
+				if (conterpart.online)
+					actionBarSubtitleField.set(context.getString(R.string.online))
+				else
+					actionBarSubtitleField.set(context.getString(R.string.last_seen,
+						conterpart.lastSeenDate))
+			}
+		})
 	}
 }

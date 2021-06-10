@@ -6,6 +6,7 @@ import com.ancientlore.intercom.backend.RepositorySubscription
 import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.backend.SimpleRequestCallback
 import com.ancientlore.intercom.data.model.Chat
+import com.ancientlore.intercom.data.model.Chat.Companion.TYPE_PRIVATE
 import com.ancientlore.intercom.data.model.Contact
 import com.ancientlore.intercom.data.source.ChatRepository
 import com.ancientlore.intercom.data.source.ContactRepository
@@ -36,12 +37,20 @@ class ChatListViewModel(listAdapter: ChatListAdapter)
 	fun init() {
 		listAdapter.setListener(object : ChatListAdapter.Listener {
 			override fun onChatSelected(chat: Chat) {
+
+				val userId = App.backend.getAuthManager().getCurrentUser().id
+
+				val participants = if (chat.type == TYPE_PRIVATE) {
+					listOf(userId, chat.name)
+				} else emptyList()
+
 				chatOpenSub.onNext(ChatFlowParams(
-					userId = App.backend.getAuthManager().getCurrentUser().id,
+					userId = userId,
 					chatId = chat.id,
 					chatType = chat.type,
 					title = chat.localName ?: chat.name,
-					iconUri = chat.iconUri))
+					iconUri = chat.iconUri,
+					participants = participants))
 			}
 			override fun onItemLongClick(chat: Chat) {
 				openChatMenuSub.onNext(chat)

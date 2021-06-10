@@ -98,4 +98,24 @@ open class FirestoreUserSource(protected val userId: String)
 			.addOnFailureListener { callback?.onFailure(it) ?: Utils.logError(it) }
 	}
 
+	override fun attachListener(userId: String, callback: RequestCallback<User>) : RepositorySubscription {
+		val registration = users
+			.document(userId)
+			.addSnapshotListener { snapshot, error ->
+				if (error != null) {
+					callback.onFailure(error)
+					return@addSnapshotListener
+				}
+				else if (snapshot != null) {
+					deserialize(snapshot)
+						?.let { callback.onSuccess(it)  }
+				}
+			}
+
+		return object : RepositorySubscription {
+			override fun remove() {
+				registration.remove()
+			}
+		}
+	}
 }

@@ -20,6 +20,8 @@ object FirebaseAuthManager : AuthManager() {
 
 	private var verificationId: String? = null
 
+	val loggedIn get() = auth.currentUser != null
+
 	override fun isNeedPhoneCheck() = false
 
 	override fun getCurrentUser() : User {

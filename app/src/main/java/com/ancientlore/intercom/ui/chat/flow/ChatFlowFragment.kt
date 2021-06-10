@@ -98,6 +98,10 @@ class ChatFlowFragment : FilterableFragment<ChatFlowViewModel, ChatFlowUiBinding
 	}
 
 	override fun initViewModel(viewModel: ChatFlowViewModel) {
+		context?. let {
+			viewModel.init(it)
+		}
+
 		val listAdapter = listView.adapter as ChatFlowAdapter
 		subscriptions.add(listAdapter.observeFileOpen()
 			.subscribe {
