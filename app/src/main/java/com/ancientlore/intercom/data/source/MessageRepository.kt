@@ -31,6 +31,10 @@ class MessageRepository : MessageSource {
 		remoteSource?.addMessage(message, callback)
 	}
 
+	override fun deleteMessage(messageId: String, callback: RequestCallback<Any>?) {
+		remoteSource?.deleteMessage(messageId, callback)
+	}
+
 	override fun updateMessageUri(messageId: String, uri: Uri, callback: RequestCallback<Any>?) {
 		remoteSource?.updateMessageUri(messageId, uri, callback)
 	}

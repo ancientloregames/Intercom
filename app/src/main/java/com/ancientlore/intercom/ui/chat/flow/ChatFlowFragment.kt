@@ -11,12 +11,14 @@ import androidx.core.content.ContextCompat
 import com.ancientlore.intercom.C
 import com.ancientlore.intercom.C.ICON_DIR_PATH
 import com.ancientlore.intercom.R
+import com.ancientlore.intercom.data.model.Message
 import com.ancientlore.intercom.databinding.ChatFlowUiBinding
 import com.ancientlore.intercom.dialog.bottomsheet.list.ListBottomSheetDialog
 import com.ancientlore.intercom.service.ChatIconUploadService
 import com.ancientlore.intercom.service.FileUploadService
 import com.ancientlore.intercom.ui.FilterableFragment
 import com.ancientlore.intercom.ui.dialog.attach.AttachBottomSheetDialog
+import com.ancientlore.intercom.ui.dialog.option.message.MessageOptionMenuDialog
 import com.ancientlore.intercom.utils.ImageUtils
 import com.ancientlore.intercom.utils.Runnable1
 import com.ancientlore.intercom.utils.ToolbarManager
@@ -112,9 +114,28 @@ class ChatFlowFragment : FilterableFragment<ChatFlowViewModel, ChatFlowUiBinding
 				// TODO create custom image viewer fragment
 				context?.openFile(it)
 			})
+		subscriptions.add(listAdapter.observeOptionMenuOpen()
+			.subscribe {
+				openMessageMenu(it)
+			})
 
 		if (permissionManager!!.allowedAudioMessage())
 			viewModel.attachInputPanelManager(MessageInputManager(view!!))
+	}
+
+	private fun openMessageMenu(message: Message) {
+		activity?.run {
+
+			val dialog = MessageOptionMenuDialog.newInstance()
+
+			dialog.listener = object : MessageOptionMenuDialog.Listener {
+				override fun onDeleteClicked() {
+					viewModel.handleDelete(message)
+				}
+			}
+
+			dialog.show(supportFragmentManager)
+		}
 	}
 
 	override fun observeViewModel(viewModel: ChatFlowViewModel) {

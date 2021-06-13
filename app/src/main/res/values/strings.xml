@@ -117,4 +117,7 @@
 
 	<string name="online">online</string>
 	<string name="last_seen">last seen %s</string>
+
+	<string name="delete">Delete</string>
+	<string name="message_deleted">Message deleted</string>
 </resources>

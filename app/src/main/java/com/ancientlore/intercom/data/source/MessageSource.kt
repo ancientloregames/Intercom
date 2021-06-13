@@ -11,6 +11,8 @@ interface MessageSource : DataSource<Message> {
 	 */
 	fun addMessage(message: Message, callback: RequestCallback<String>?)
 
+	fun deleteMessage(messageId: String, callback: RequestCallback<Any>? = null)
+
 	fun updateMessageUri(messageId: String, uri: Uri, callback: RequestCallback<Any>?)
 
 	fun setMessageStatusReceived(id: String, callback: RequestCallback<Any>?)

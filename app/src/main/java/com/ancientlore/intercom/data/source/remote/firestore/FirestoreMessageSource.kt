@@ -42,6 +42,12 @@ open class FirestoreMessageSource(private val chatId: String)
 			.addOnFailureListener { callback?.onFailure(it) }
 	}
 
+	override fun deleteMessage(messageId: String, callback: RequestCallback<Any>?) {
+		chatMessages.document(messageId).delete()
+			.addOnSuccessListener { callback?.onSuccess(EmptyObject) }
+			.addOnFailureListener { callback?.onFailure(it) }
+	}
+
 	override fun updateMessageUri(messageId: String, uri: Uri, callback: RequestCallback<Any>?) {
 		chatMessages.document(messageId).update(FIELD_ATTACH_URL, uri.toString())
 			.addOnSuccessListener { callback?.onSuccess(EmptyObject) }

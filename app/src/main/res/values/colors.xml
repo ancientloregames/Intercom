@@ -6,8 +6,9 @@
 
 	<color name="defaultTextColor">#333</color>
 	<color name="defaultSubtitleColor">#777</color>
-	<color name="defaultGreyColor">#757575</color>
 	<color name="defaultListItemDividerColor">#ccc</color>
+
+	<color name="defaultGreyColor">#757575</color>
 
 	<color name="chatMsgTimestampColor">#666</color>
 	<color name="chatMsgStatusColor">@color/chatMsgTimestampColor</color>
@@ -26,4 +27,6 @@
 	<color name="settingsItemTextColor">#757575</color>
 
 	<color name="settingsItemDividerColor">#ccc</color>
+
+	<color name="deleteRedColor">#932323</color>
 </resources>

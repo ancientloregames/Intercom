@@ -51,6 +51,8 @@ class ChatFlowAdapter(private val userId: String,
 
 	private val openImage = PublishSubject.create<Uri>()
 
+	private val openOptionMenuSubj = PublishSubject.create<Message>()
+
 	override fun getDiffCallback(newItems: List<Message>) = DiffCallback(getItems(), newItems)
 
 	override fun getItemViewTypeInner(position: Int): Int {
@@ -94,13 +96,19 @@ class ChatFlowAdapter(private val userId: String,
 
 		val item = getItem(position)!!
 
+		holder.longClickListener = object : ViewHolder.LongClickListener {
+			override fun onLongClick() {
+				openOptionMenuSubj.onNext(item)
+			}
+		}
+
 		when (holder) {
-			is ItemViewHolder -> holder.listener = object : ItemViewHolder.Listener {
+			is ItemViewHolder -> holder.imageClickListener = object : ItemViewHolder.ImageClickListener {
 				override fun onImageClick(uri: Uri) {
 					openImage.onNext(uri)
 				}
 			}
-			is FileItemViewHolder -> holder.listener = object : FileItemViewHolder.Listener {
+			is FileItemViewHolder -> holder.fileClickListener = object : FileItemViewHolder.FileClickListener {
 				override fun onItemClick() {
 					openFile.onNext(item.attachUri)
 				}
@@ -245,11 +253,11 @@ class ChatFlowAdapter(private val userId: String,
 	class FileItemViewHolder(binding: ViewDataBinding)
 		: ViewHolder(binding) {
 
-		interface Listener {
+		interface FileClickListener {
 			fun onItemClick()
 		}
 
-		var listener: Listener? = null
+		var fileClickListener: FileClickListener? = null
 
 		val titleField = ObservableField("")
 		val subtitleField = ObservableField("")
@@ -264,17 +272,17 @@ class ChatFlowAdapter(private val userId: String,
 			subtitleField.set(data.info)
 		}
 
-		fun onItemClick() = listener?.onItemClick()
+		fun onItemClick() = fileClickListener?.onItemClick()
 	}
 
 	class ItemViewHolder(binding: ViewDataBinding)
 		: ViewHolder(binding) {
 
-		interface Listener {
+		interface ImageClickListener {
 			fun onImageClick(uri: Uri)
 		}
 
-		var listener: Listener? = null
+		var imageClickListener: ImageClickListener? = null
 
 		val textField = ObservableField("")
 		val imageUri = ObservableField(Uri.EMPTY)
@@ -301,16 +309,27 @@ class ChatFlowAdapter(private val userId: String,
 				imageUri.set(Uri.parse(newImageUrl))
 		}
 
-		fun onImageClick() = listener?.onImageClick(imageUri.get()!!)
+		fun onImageClick() = imageClickListener?.onImageClick(imageUri.get()!!)
 	}
 
 	abstract class ViewHolder(binding: ViewDataBinding)
 		: BasicRecyclerAdapter.ViewHolder<Message, ViewDataBinding>(binding) {
 
+		interface LongClickListener {
+			fun onLongClick()
+		}
+
+		var longClickListener: LongClickListener? = null
+
 		val timestampField = ObservableField("")
 		val statusIconRes = ObservableInt()
 		val uploadProgress = ObservableInt(100)
 		val progressVisibility = ObservableBoolean()
+
+		fun onLongClick() : Boolean {
+			longClickListener?.onLongClick()
+			return true
+		}
 
 		@CallSuper
 		override fun bind(data: Message) {
@@ -382,6 +401,8 @@ class ChatFlowAdapter(private val userId: String,
 	fun observeFileOpen() = openFile as Observable<Uri>
 
 	fun observeImageOpen() = openImage as Observable<Uri>
+
+	fun observeOptionMenuOpen() = openOptionMenuSubj as Observable<Message>
 
 	inner class Filter: ListFilter() {
 		override fun satisfy(item: Message, candidate: String) = item.contains(candidate)

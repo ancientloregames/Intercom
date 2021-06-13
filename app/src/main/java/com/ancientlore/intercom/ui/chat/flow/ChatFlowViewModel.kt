@@ -281,6 +281,14 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 		}
 	}
 
+	fun handleDelete(message: Message) {
+		repository.deleteMessage(message.id, object : CrashlyticsRequestCallback<Any>() {
+			override fun onSuccess(result: Any) {
+				toastRequest.onNext(R.string.message_deleted)
+			}
+		})
+	}
+
 	private fun onFailureSendingMessage(error: Throwable) {
 		if (error !is EmptyResultException)
 			Utils.logError(error)

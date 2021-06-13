@@ -16,7 +16,8 @@
 			android:layout_marginRight="8dp"
 			android:layout_marginBottom="4dp"
 			android:background="@drawable/bg_msg_other"
-			android:onClick="@{() -> message.onItemClick()}">
+			android:onClick="@{() -> message.onItemClick()}"
+			android:onLongClick="@{() -> message.onLongClick()}">
 
 		<com.ancientlore.intercom.view.CircleImageView
 				android:id="@+id/imageView"
