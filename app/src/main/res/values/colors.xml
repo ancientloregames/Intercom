@@ -29,4 +29,7 @@
 	<color name="settingsItemDividerColor">#ccc</color>
 
 	<color name="deleteRedColor">#932323</color>
+
+	<color name="callDeclineButton">#BA1111</color>
+	<color name="callAnswerButton">#4CAF50</color>
 </resources>

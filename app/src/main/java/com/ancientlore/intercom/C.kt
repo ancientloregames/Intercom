@@ -8,4 +8,8 @@ object C {
 	const val THUMBNAIL_SIZE = 100
 
 	const val ICON_DIR_PATH = "group_chat_icons"
+
+	const val DEFAULT_LOG_TAG = "Intercom"
+
+	const val CALLS_LOG_TAG = "Calls"
 }

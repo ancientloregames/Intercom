@@ -16,4 +16,6 @@
 	<dimen name="settingsUserNameAbSize">36dp</dimen>
 
 	<dimen name="chatCreationGroupSelectedItemImageSize">65dp</dimen>
+
+	<dimen name="callRoundButtonSize">70dp</dimen>
 </resources>

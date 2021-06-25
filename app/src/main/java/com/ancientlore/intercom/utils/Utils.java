@@ -7,9 +7,13 @@ import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.MimeTypeMap;
+
+import com.ancientlore.intercom.C;
+
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.NotNull;
@@ -54,11 +58,25 @@ public final class Utils
 		return uriStr != null ? Uri.parse(uriStr) : Uri.EMPTY;
 	}
 
-	public static void logError(Throwable throwable)
+	public static void logError(@Nullable Throwable throwable, @Nullable String tag, @Nullable String text)
 	{
 		// TODO: use fabric crashlytycs logException later
+		String logTag = tag != null ? tag : C.DEFAULT_LOG_TAG;
+		String logText = text != null ? text : "";
 		if (throwable != null)
-			throwable.printStackTrace();
+			Log.e(logTag, logText, throwable);
+		else
+			Log.e(logTag, logText);
+	}
+
+	public static void logError(Throwable throwable, @Nullable String tag)
+	{
+		logError(throwable, tag, null);
+	}
+
+	public static void logError(Throwable throwable)
+	{
+		logError(throwable, null);
 	}
 
 	public static void logError(String text)
@@ -73,6 +91,12 @@ public final class Utils
 			logError(new RuntimeException(text, throwable));
 		else
 			logError(throwable);
+	}
+
+	public static void logError(String tag, String text)
+	{
+		if (text != null)
+			logError(new RuntimeException(text), tag, null);
 	}
 
 	public static void closeQuietly(Closeable closeable)

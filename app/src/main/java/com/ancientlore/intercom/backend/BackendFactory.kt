@@ -7,4 +7,5 @@ abstract class BackendFactory {
 	abstract fun getDataSourceProvider(): DataSourceProvider
 	abstract fun getStorageManager(): StorageManager
 	abstract fun getMessagingManager(): MessagingManager
+	abstract fun getCallManager(): CallManager<*>
 }

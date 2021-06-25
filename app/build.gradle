@@ -12,6 +12,8 @@ android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
 
+    ndkVersion "23.1.7779620"
+
     defaultConfig {
         applicationId "com.ancientlore.intercom"
         minSdkVersion rootProject.ext.minSdkVersion

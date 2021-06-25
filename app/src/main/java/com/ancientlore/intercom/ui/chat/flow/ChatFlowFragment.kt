@@ -2,15 +2,15 @@ package com.ancientlore.intercom.ui.chat.flow
 
 import android.app.Activity.RESULT_OK
 import android.content.Intent
-import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
+import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.widget.Toolbar
-import androidx.core.content.ContextCompat
 import com.ancientlore.intercom.C
 import com.ancientlore.intercom.C.ICON_DIR_PATH
 import com.ancientlore.intercom.R
+import com.ancientlore.intercom.data.model.Chat
 import com.ancientlore.intercom.data.model.Message
 import com.ancientlore.intercom.databinding.ChatFlowUiBinding
 import com.ancientlore.intercom.dialog.bottomsheet.list.ListBottomSheetDialog
@@ -75,6 +75,8 @@ class ChatFlowFragment : FilterableFragment<ChatFlowViewModel, ChatFlowUiBinding
 	override fun initView(view: View, savedInstanceState: Bundle?) {
 		super.initView(view, savedInstanceState)
 
+		setHasOptionsMenu(true)
+
 		ToolbarManager(toolbar as Toolbar).apply {
 			//setTitle(params.title)
 			enableBackButton { close() }
@@ -89,14 +91,17 @@ class ChatFlowFragment : FilterableFragment<ChatFlowViewModel, ChatFlowUiBinding
 		}
 	}
 
-	private fun getFallbackActionBarIcon() : Drawable {
-
-		return if (params.title.isNotEmpty()) {
-			ImageUtils.createAbbreviationDrawable(toolbar.title.toString(),
-				ContextCompat.getColor(toolbar.context, R.color.chatIconBackColor),
-				toolbar.resources.getDimensionPixelSize(R.dimen.chatListIconTextSize))
+	override fun onOptionsItemSelected(item: MenuItem): Boolean {
+		return when (item.itemId) {
+			R.id.call -> {
+				if (params.chatType == Chat.TYPE_PRIVATE) {
+					val contactId = params.participants.first { it != params.userId }
+					navigator?.openCallOffer(contactId)
+				}
+				true
+			}
+			else -> super.onOptionsItemSelected(item)
 		}
-		else throw RuntimeException("Error! Chat flow title is mandatory")
 	}
 
 	override fun initViewModel(viewModel: ChatFlowViewModel) {

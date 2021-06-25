@@ -11,4 +11,6 @@ object FirebaseFactory : BackendFactory() {
 	override fun getStorageManager() = FirebaseStorageManager
 
 	override fun getMessagingManager() = FirebaseMessagingManager
+
+	override fun getCallManager() = FirestoreWebrtcCallManager
 }

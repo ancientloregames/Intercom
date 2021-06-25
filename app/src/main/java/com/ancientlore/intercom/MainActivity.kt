@@ -23,6 +23,7 @@ import com.ancientlore.intercom.backend.SimpleRequestCallback
 import com.ancientlore.intercom.backend.auth.PhoneAuthParams
 import com.ancientlore.intercom.data.model.Contact
 import com.ancientlore.intercom.data.model.User
+import com.ancientlore.intercom.data.model.call.Offer
 import com.ancientlore.intercom.data.source.ChatRepository
 import com.ancientlore.intercom.data.source.ContactRepository
 import com.ancientlore.intercom.data.source.UserRepository
@@ -32,6 +33,8 @@ import com.ancientlore.intercom.ui.auth.email.login.EmailLoginFragment
 import com.ancientlore.intercom.ui.auth.email.signup.EmailSignupFragment
 import com.ancientlore.intercom.ui.auth.phone.login.PhoneLoginFragment
 import com.ancientlore.intercom.ui.auth.phone.check.PhoneCheckFragment
+import com.ancientlore.intercom.ui.call.answer.CallAnswerFragment
+import com.ancientlore.intercom.ui.call.offer.CallOfferFragment
 import com.ancientlore.intercom.ui.chat.creation.ChatCreationFragment
 import com.ancientlore.intercom.ui.chat.creation.description.ChatCreationDescFragment
 import com.ancientlore.intercom.ui.chat.creation.group.ChatCreationGroupFragment
@@ -62,6 +65,7 @@ class MainActivity : AppCompatActivity(),
 		private const val PERM_READ_STORAGE = 102
 		private const val PERM_WRITE_STORAGE = 103
 		private const val PERM_AUDIO_MESSAGES = 104
+		private const val PERM_CALLS = 105
 
 		var isInBackground = false
 			private set
@@ -300,6 +304,18 @@ class MainActivity : AppCompatActivity(),
 		}
 	}
 
+	override fun openCallOffer(calleeId: String) {
+		requestPermissionCalls { granted ->
+			if (granted)
+			runOnUiThread {
+				supportFragmentManager.beginTransaction()
+					.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_right)
+					.add(R.id.modalContainer, CallOfferFragment.newInstance(calleeId))
+					.commitNow()
+			}
+		}
+	}
+
 	override fun closeFragment(fragment: Fragment) {
 		runOnUiThread {
 			hideKeyboard()
@@ -312,10 +328,30 @@ class MainActivity : AppCompatActivity(),
 	override fun onSuccessfullAuth(user: User) {
 		initRepositories(user.id)
 		tryObserveDeviceContacts()
+		attachCallListener()
 		//FirebaseFirestore.getInstance().clearPersistence()
 		updateNotificationToken()
 		openChatList()
 		handleIntent(intent)
+	}
+
+	// TODO abstraction!!!!!
+	private fun attachCallListener() {
+
+		App.backend.getCallManager().setIncomingCallHandler { offer ->
+			openCallAnswer(offer)
+		}
+	}
+
+	override fun openCallAnswer(offer: Offer) {
+		requestPermissionCalls { granted ->
+			if (granted) {
+				supportFragmentManager.beginTransaction()
+					.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_right)
+					.add(R.id.modalContainer, CallAnswerFragment.newInstance(offer))
+					.commitNow()
+			}
+		}
 	}
 
 	override fun requestPermissionReadContacts(onResult: Runnable1<Boolean>) {
@@ -354,9 +390,23 @@ class MainActivity : AppCompatActivity(),
 			ActivityCompat.requestPermissions(this, permissions, PERM_AUDIO_MESSAGES)
 		}
 	}
+	fun requestPermissionCalls(onResult: Runnable1<Boolean>) {
+		if (allowedCalls())
+			onResult.run(true)
+		else {
+			permRequestCallback = onResult
+			val permissions = arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO)
+			ActivityCompat.requestPermissions(this, permissions, PERM_CALLS)
+		}
+	}
 
 	override fun allowedAudioMessage(): Boolean {
 		return checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+				&& checkPermission(Manifest.permission.RECORD_AUDIO)
+	}
+
+	fun allowedCalls(): Boolean {
+		return checkPermission(Manifest.permission.CAMERA)
 				&& checkPermission(Manifest.permission.RECORD_AUDIO)
 	}
 

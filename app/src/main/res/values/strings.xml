@@ -120,4 +120,9 @@
 
 	<string name="delete">Delete</string>
 	<string name="message_deleted">Message deleted</string>
+
+	<string name="call">Call</string>
+	<string name="hangup">Hangup</string>
+	<string name="answer">Answer</string>
+	<string name="decline">Decline</string>
 </resources>
