@@ -3,7 +3,6 @@ package com.ancientlore.intercom.widget.recycler
 import android.content.Context
 import androidx.annotation.UiThread
 import androidx.databinding.ViewDataBinding
-import androidx.recyclerview.widget.DiffUtil
 import com.ancientlore.intercom.widget.MutableAdapter
 
 abstract class MutableRecyclerAdapter<I: Comparable<I>, H: BasicRecyclerAdapter.ViewHolder<I, B>, B: ViewDataBinding>(
@@ -15,7 +14,7 @@ abstract class MutableRecyclerAdapter<I: Comparable<I>, H: BasicRecyclerAdapter.
 	: FilterableRecyclerAdapter<I, H, B>(context, items, withHeader, withFooter),
 	MutableAdapter<I> {
 
-	abstract fun getDiffCallback(newItems: List<I>): DiffUtil.Callback
+	abstract fun getDiffCallback(newItems: List<I>): HeadedRecyclerDiffUtil.Callback
 
 	@UiThread
 	override fun setItems(newItems: List<I>) {
@@ -27,7 +26,7 @@ abstract class MutableRecyclerAdapter<I: Comparable<I>, H: BasicRecyclerAdapter.
 		fullList.clear()
 		fullList.addAll(items)
 
-		val diffResult = DiffUtil.calculateDiff(getDiffCallback(items))
+		val diffResult = HeadedRecyclerDiffUtil.calculateDiff(getDiffCallback(items))
 		diffResult.dispatchUpdatesTo(this)
 
 		mutableList.clear()

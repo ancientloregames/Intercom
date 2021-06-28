@@ -9,7 +9,6 @@ import androidx.core.content.ContextCompat
 import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableField
 import androidx.databinding.ViewDataBinding
-import androidx.recyclerview.widget.DiffUtil
 import com.ancientlore.intercom.BR
 import com.ancientlore.intercom.R
 import com.ancientlore.intercom.data.model.Contact
@@ -18,6 +17,7 @@ import com.ancientlore.intercom.utils.ImageUtils
 import com.ancientlore.intercom.utils.extensions.isNotEmpty
 import com.ancientlore.intercom.widget.recycler.BasicRecyclerAdapter
 import com.ancientlore.intercom.widget.recycler.MutableRecyclerAdapter
+import com.ancientlore.intercom.widget.recycler.HeadedRecyclerDiffUtil
 import java.lang.RuntimeException
 
 class ChatCreationGroupAdapter(context: Context,
@@ -145,7 +145,7 @@ class ChatCreationGroupAdapter(context: Context,
 
 	class DiffCallback(private val oldItems: List<Contact>,
 	                   private val newItems: List<Contact>)
-		: DiffUtil.Callback() {
+		: HeadedRecyclerDiffUtil.Callback() {
 
 		override fun getOldListSize() = oldItems.size
 

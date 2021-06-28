@@ -6,7 +6,6 @@ import androidx.annotation.ColorInt
 import androidx.annotation.Px
 import androidx.core.content.ContextCompat
 import androidx.databinding.ObservableField
-import androidx.recyclerview.widget.DiffUtil
 import com.ancientlore.intercom.BR
 import com.ancientlore.intercom.R
 import com.ancientlore.intercom.widget.recycler.BasicRecyclerAdapter
@@ -14,6 +13,7 @@ import com.ancientlore.intercom.databinding.ContactListItemBinding
 import com.ancientlore.intercom.data.model.Contact
 import com.ancientlore.intercom.utils.ImageUtils
 import com.ancientlore.intercom.widget.recycler.MutableRecyclerAdapter
+import com.ancientlore.intercom.widget.recycler.HeadedRecyclerDiffUtil
 
 class ContactListAdapter(context: Context,
                          items: MutableList<Contact> = mutableListOf())
@@ -90,7 +90,7 @@ class ContactListAdapter(context: Context,
 
 	class DiffCallback(private val oldItems: List<Contact>,
 	                   private val newItems: List<Contact>)
-		: DiffUtil.Callback() {
+		: HeadedRecyclerDiffUtil.Callback() {
 
 		override fun getOldListSize() = oldItems.size
 

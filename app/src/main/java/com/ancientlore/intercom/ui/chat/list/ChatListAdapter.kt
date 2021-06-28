@@ -6,7 +6,6 @@ import androidx.annotation.ColorInt
 import androidx.annotation.Px
 import androidx.core.content.ContextCompat
 import androidx.databinding.ObservableField
-import androidx.recyclerview.widget.DiffUtil
 import com.ancientlore.intercom.BR
 import com.ancientlore.intercom.R
 import com.ancientlore.intercom.widget.recycler.BasicRecyclerAdapter
@@ -15,6 +14,7 @@ import com.ancientlore.intercom.databinding.ChatListItemBinding
 import com.ancientlore.intercom.utils.ImageUtils
 import com.ancientlore.intercom.utils.extensions.setColorRegion
 import com.ancientlore.intercom.widget.recycler.MutableRecyclerAdapter
+import com.ancientlore.intercom.widget.recycler.HeadedRecyclerDiffUtil
 
 class ChatListAdapter(context: Context,
                       items: MutableList<Chat> = mutableListOf())
@@ -130,7 +130,7 @@ class ChatListAdapter(context: Context,
 
 	class DiffCallback(private val oldItems: List<Chat>,
 	                   private val newItems: List<Chat>)
-		: DiffUtil.Callback() {
+		: HeadedRecyclerDiffUtil.Callback() {
 
 		override fun getOldListSize() = oldItems.size
 

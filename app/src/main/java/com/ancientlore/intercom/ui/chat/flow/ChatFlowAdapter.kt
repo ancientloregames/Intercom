@@ -12,7 +12,6 @@ import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableField
 import androidx.databinding.ObservableInt
 import androidx.databinding.ViewDataBinding
-import androidx.recyclerview.widget.DiffUtil
 import com.ancientlore.intercom.App
 import com.ancientlore.intercom.BR
 import com.ancientlore.intercom.R
@@ -28,6 +27,7 @@ import com.ancientlore.intercom.utils.extensions.getAudioMessagesDir
 import com.ancientlore.intercom.utils.extensions.isNotEmpty
 import com.ancientlore.intercom.widget.recycler.BasicRecyclerAdapter
 import com.ancientlore.intercom.widget.recycler.MutableRecyclerAdapter
+import com.ancientlore.intercom.widget.recycler.HeadedRecyclerDiffUtil
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import java.io.File
@@ -364,7 +364,7 @@ class ChatFlowAdapter(private val userId: String,
 
 	class DiffCallback(private val oldItems: List<Message>,
 	                   private val newItems: List<Message>)
-		: DiffUtil.Callback() {
+		: HeadedRecyclerDiffUtil.Callback() {
 
 		companion object {
 			const val KEY_URL = "url"
