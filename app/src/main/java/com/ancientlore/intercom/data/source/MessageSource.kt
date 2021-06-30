@@ -1,6 +1,7 @@
 package com.ancientlore.intercom.data.source
 
 import android.net.Uri
+import com.ancientlore.intercom.backend.RepositorySubscription
 import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.data.model.Message
 
@@ -17,9 +18,7 @@ interface MessageSource : DataSource<Message> {
 
 	fun setMessageStatusReceived(id: String, callback: RequestCallback<Any>?)
 
-	fun attachListener(callback: RequestCallback<List<Message>>)
-
-	fun detachListener()
+	fun attachListener(callback: RequestCallback<List<Message>>) : RepositorySubscription
 
 	fun getChatId(): String?
 }

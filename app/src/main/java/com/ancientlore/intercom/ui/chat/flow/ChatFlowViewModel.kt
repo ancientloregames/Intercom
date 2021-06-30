@@ -38,6 +38,8 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 
 	private val repository = MessageRepository()
 
+	private var repositorySub: RepositorySubscription? = null
+
 	private val messageText get() = textField.get()!!
 
 	private val openAttachMenuSubj = PublishSubject.create<Any>()
@@ -142,7 +144,7 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 		recordAudioSubj.onComplete()
 		inputManager?.onStop()
 		contactRepSub?.remove()
-		repository.detachListener()
+		repositorySub?.remove()
 
 		super.clean()
 	}
@@ -332,7 +334,7 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 			App.backend.getDataSourceProvider()
 				.getMessageSource(chatId))
 
-		repository.attachListener(object : RequestCallback<List<Message>>{
+		repositorySub = repository.attachListener(object : RequestCallback<List<Message>>{
 			override fun onSuccess(result: List<Message>) {
 				listAdapter.setItems(result)
 				updateMessagesStatus(result)

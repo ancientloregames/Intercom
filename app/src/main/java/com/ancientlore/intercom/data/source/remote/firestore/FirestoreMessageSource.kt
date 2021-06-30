@@ -2,6 +2,7 @@ package com.ancientlore.intercom.data.source.remote.firestore
 
 import android.net.Uri
 import com.ancientlore.intercom.EmptyObject
+import com.ancientlore.intercom.backend.RepositorySubscription
 import com.ancientlore.intercom.data.source.EmptyResultException
 import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.data.model.Message
@@ -11,7 +12,6 @@ import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_ATTACH_URL
 import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_STATUS
 import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_TIMESTAMP
 import com.ancientlore.intercom.data.source.remote.firestore.C.MESSAGES
-import com.google.firebase.firestore.ListenerRegistration
 
 open class FirestoreMessageSource(private val chatId: String)
 	: FirestoreSource<Message>(), MessageSource {
@@ -21,8 +21,6 @@ open class FirestoreMessageSource(private val chatId: String)
 	}
 
 	protected val chatMessages get() = db.collection(CHATS).document(chatId).collection(MESSAGES)
-
-	private var changeListener: ListenerRegistration? = null
 
 	override fun getObjectClass() = Message::class.java
 
@@ -60,8 +58,8 @@ open class FirestoreMessageSource(private val chatId: String)
 			.addOnFailureListener { callback?.onFailure(it) }
 	}
 
-	override fun attachListener(callback: RequestCallback<List<Message>>) {
-		changeListener = chatMessages
+	override fun attachListener(callback: RequestCallback<List<Message>>) : RepositorySubscription {
+		val registration = chatMessages
 			.orderBy(FIELD_TIMESTAMP)
 			.addSnapshotListener { snapshot, e ->
 				if (e != null) {
@@ -73,10 +71,12 @@ open class FirestoreMessageSource(private val chatId: String)
 						?: callback.onFailure(EmptyResultException("$TAG: empty"))
 				}
 			}
-	}
 
-	override fun detachListener() {
-		changeListener?.remove()
+		return object : RepositorySubscription {
+			override fun remove() {
+				registration.remove()
+			}
+		}
 	}
 
 	override fun getChatId() = chatId

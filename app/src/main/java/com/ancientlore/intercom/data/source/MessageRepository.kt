@@ -1,10 +1,12 @@
 package com.ancientlore.intercom.data.source
 
 import android.net.Uri
+import com.ancientlore.intercom.backend.RepositorySubscription
 import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.data.model.Message
 import com.ancientlore.intercom.data.source.cache.CacheMessageSource
 import com.ancientlore.intercom.utils.Utils
+import java.lang.RuntimeException
 
 class MessageRepository : MessageSource {
 
@@ -43,24 +45,27 @@ class MessageRepository : MessageSource {
 		remoteSource?.setMessageStatusReceived(id, callback)
 	}
 
-	override fun attachListener(callback: RequestCallback<List<Message>>) {
+	override fun attachListener(callback: RequestCallback<List<Message>>) : RepositorySubscription {
 
-		remoteSource?.attachListener(object : RequestCallback<List<Message>> {
-			override fun onSuccess(result: List<Message>) {
-				cacheSource.reset(result)
-				callback.onSuccess(result)
-			}
-			override fun onFailure(error: Throwable) {
-				callback.onFailure(error)
-			}
-		}) ?: run {
-			Utils.logError("MessageRepository.attachListener(): no remote source attached!")
-			callback.onSuccess(cacheSource.getAll())
-		}
-	}
+		return remoteSource
+			?.attachListener(object : RequestCallback<List<Message>> {
+				override fun onSuccess(result: List<Message>) {
+					cacheSource.reset(result)
+					callback.onSuccess(result)
+				}
+				override fun onFailure(error: Throwable) {
+					callback.onFailure(error)
+				}
+			})
+			?: run {
+				callback.onFailure(RuntimeException("Error! No remote source to attach to in the message repository"))
 
-	override fun detachListener() {
-		remoteSource?.detachListener()
+				return object : RepositorySubscription {
+					override fun remove() {
+						Utils.logError("MessageRepository.attachListener(): There were no remoteSource! No subscription to remove")
+					}
+				}
+			}
 	}
 
 	override fun getChatId() = remoteSource?.getChatId()
