@@ -103,7 +103,7 @@ class MainActivity : AppCompatActivity(),
 
 		if (firstResume.not()) {
 			firstResume = false
-			if (App.backend.getAuthManager().loggedIn) {
+			if (App.backend.getAuthManager().isLoggedIn()) {
 				UserRepository.updateOnlineStatus(true)
 			}
 		}
@@ -119,7 +119,7 @@ class MainActivity : AppCompatActivity(),
 
 	override fun onStop() {
 
-		if (App.backend.getAuthManager().loggedIn) {
+		if (App.backend.getAuthManager().isLoggedIn()) {
 			UserRepository.updateOnlineStatus(false)
 		}
 		super.onStop()

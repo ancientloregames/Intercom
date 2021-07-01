@@ -12,7 +12,7 @@ import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
-object FirebaseAuthManager : AuthManager() {
+object FirebaseAuthManager : AuthManager {
 
 	private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
 
@@ -20,7 +20,9 @@ object FirebaseAuthManager : AuthManager() {
 
 	private var verificationId: String? = null
 
-	val loggedIn get() = auth.currentUser != null
+	override fun isLoggedIn() = auth.currentUser != null
+
+	override fun logout() = auth.signOut()
 
 	override fun isNeedPhoneCheck() = false
 

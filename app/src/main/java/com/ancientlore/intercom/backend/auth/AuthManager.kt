@@ -4,15 +4,19 @@ import android.net.Uri
 import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.data.model.User
 
-abstract class AuthManager {
-	abstract fun signupViaEmail(params: EmailAuthParams, callback: RequestCallback<User>)
-	abstract fun loginViaEmail(params: EmailAuthParams, callback: RequestCallback<User>)
+interface AuthManager {
+	fun signupViaEmail(params: EmailAuthParams, callback: RequestCallback<User>)
+	fun loginViaEmail(params: EmailAuthParams, callback: RequestCallback<User>)
 
-	abstract fun loginViaPhone(params: PhoneAuthParams, callback: RequestCallback<User>)
-	abstract fun verifySmsCode(smsCode: String, callback: RequestCallback<User>)
-	abstract fun isNeedPhoneCheck() : Boolean
+	fun loginViaPhone(params: PhoneAuthParams, callback: RequestCallback<User>)
+	fun verifySmsCode(smsCode: String, callback: RequestCallback<User>)
+	fun isNeedPhoneCheck() : Boolean
 
-	abstract fun getCurrentUser() : User
-	abstract fun updateUserIconUri(uri: Uri, callback: RequestCallback<Any>? = null)
-	abstract fun updateUserName(name: String, callback: RequestCallback<Any>? = null)
+	fun isLoggedIn() : Boolean
+
+	fun logout()
+
+	fun getCurrentUser() : User
+	fun updateUserIconUri(uri: Uri, callback: RequestCallback<Any>? = null)
+	fun updateUserName(name: String, callback: RequestCallback<Any>? = null)
 }

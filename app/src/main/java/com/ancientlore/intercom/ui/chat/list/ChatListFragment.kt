@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.widget.Toolbar
+import com.ancientlore.intercom.App
 import com.ancientlore.intercom.R
 import com.ancientlore.intercom.data.model.Chat
 import com.ancientlore.intercom.databinding.ChatListUiBinding
@@ -67,6 +68,11 @@ class ChatListFragment : FilterableFragment<ChatListViewModel, ChatListUiBinding
 			}
 			R.id.settings -> {
 				navigator?.openSettings()
+				true
+			}
+			R.id.logout -> {
+				App.backend.getAuthManager().logout()
+				navigator?.openPhoneAuthForm()
 				true
 			}
 			else -> super.onOptionsItemSelected(item)
