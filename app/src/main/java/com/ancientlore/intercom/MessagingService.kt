@@ -1,6 +1,5 @@
 package com.ancientlore.intercom
 
-import com.ancientlore.intercom.backend.SimpleRequestCallback
 import com.ancientlore.intercom.data.model.PushMessage
 import com.ancientlore.intercom.data.source.UserRepository
 import com.ancientlore.intercom.utils.JsonUtils
@@ -30,7 +29,7 @@ class MessagingService: FirebaseMessagingService() {
 						UserRepository.setRemoteSource(remoteSource)
 					}
 
-					UserRepository.updateNotificationToken(token, object : SimpleRequestCallback<Any>() {})
+					UserRepository.updateNotificationToken(token)
 				}
 		}
 	}

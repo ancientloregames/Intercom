@@ -33,6 +33,12 @@ data class Message(val id: String = "",
 		fun createFromAudio(senderId: String, filePath: String) : Message {
 			return Message(senderId = senderId, attachUrl = filePath, type = TYPE_AUDIO)
 		}
+
+		fun createWithId(message: Message, id: String) : Message {
+			return Message(id, message.timestamp, message.senderId,
+				message.text, message.info, message.attachUrl,
+				message.type, message.status, message.progress)
+		}
   }
 
   constructor(senderId: String, fileData: FileData) : this(

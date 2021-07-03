@@ -34,25 +34,25 @@ open class FirestoreMessageSource(private val chatId: String)
 			.addOnFailureListener { callback.onFailure(it) }
 	}
 
-	override fun addMessage(message: Message, callback: RequestCallback<String>?) {
+	override fun addMessage(message: Message, callback: RequestCallback<String>) {
 		chatMessages.add(message)
 			.addOnSuccessListener { callback?.onSuccess(it.id) }
 			.addOnFailureListener { callback?.onFailure(it) }
 	}
 
-	override fun deleteMessage(messageId: String, callback: RequestCallback<Any>?) {
+	override fun deleteMessage(messageId: String, callback: RequestCallback<Any>) {
 		chatMessages.document(messageId).delete()
 			.addOnSuccessListener { callback?.onSuccess(EmptyObject) }
 			.addOnFailureListener { callback?.onFailure(it) }
 	}
 
-	override fun updateMessageUri(messageId: String, uri: Uri, callback: RequestCallback<Any>?) {
+	override fun updateMessageUri(messageId: String, uri: Uri, callback: RequestCallback<Any>) {
 		chatMessages.document(messageId).update(FIELD_ATTACH_URL, uri.toString())
 			.addOnSuccessListener { callback?.onSuccess(EmptyObject) }
 			.addOnFailureListener { callback?.onFailure(it) }
 	}
 
-	override fun setMessageStatusReceived(id: String, callback: RequestCallback<Any>?) {
+	override fun setMessageStatusReceived(id: String, callback: RequestCallback<Any>) {
 		chatMessages.document(id).update(FIELD_STATUS, Message.STATUS_RECEIVED)
 			.addOnSuccessListener { callback?.onSuccess(EmptyObject) }
 			.addOnFailureListener { callback?.onFailure(it) }

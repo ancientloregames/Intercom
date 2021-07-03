@@ -2,19 +2,9 @@ package com.ancientlore.intercom.data.source.cache
 
 import com.ancientlore.intercom.data.model.Chat
 
-object CacheChatSource {
-
-	private val cache: MutableMap<String, Chat> = HashMap()
-
-	fun isNotEmpty() = cache.isNotEmpty()
-
-	fun getAll() = cache.values.toList()
-
-	fun getItem(id: String) = cache[id]
+object CacheChatSource : CacheSource<Chat>() {
 
 	fun putItem(item: Chat) = cache.put(item.id, item)
-
-	fun deleteItem(chatId: String) = cache.remove(chatId)
 
 	fun deleteItem(item: Chat) = deleteItem(item.id)
 

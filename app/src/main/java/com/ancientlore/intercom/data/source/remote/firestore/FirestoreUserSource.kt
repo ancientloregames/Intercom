@@ -32,7 +32,7 @@ open class FirestoreUserSource(protected val userId: String)
 
 	override fun getObjectClass() = User::class.java
 
-	override fun updateNotificationToken(token: String, callback: RequestCallback<Any>?) {
+	override fun updateNotificationToken(token: String, callback: RequestCallback<Any>) {
 		user.update(FIELD_FCM_TOKEN, token)
 			.addOnSuccessListener { callback?.onSuccess(EmptyObject) }
 			.addOnFailureListener { callback?.onFailure(it) }
@@ -58,7 +58,7 @@ open class FirestoreUserSource(protected val userId: String)
 			.addOnFailureListener { callback.onFailure(it) }
 	}
 
-	override fun updateIcon(uri: Uri, callback: RequestCallback<Any>?) {
+	override fun updateIcon(uri: Uri, callback: RequestCallback<Any>) {
 		user
 			.set(hashMapOf(FIELD_ICON_URL to uri.toString()), SetOptions.merge())
 			.addOnSuccessListener {
@@ -70,7 +70,7 @@ open class FirestoreUserSource(protected val userId: String)
 			.addOnFailureListener { callback?.onFailure(it) }
 	}
 
-	override fun updateName(name: String, callback: RequestCallback<Any>?) {
+	override fun updateName(name: String, callback: RequestCallback<Any>) {
 		user
 			.set(hashMapOf(FIELD_NAME to name), SetOptions.merge())
 			.addOnSuccessListener {
@@ -82,14 +82,14 @@ open class FirestoreUserSource(protected val userId: String)
 			.addOnFailureListener { callback?.onFailure(it) }
 	}
 
-	override fun updateStatus(status: String, callback: RequestCallback<Any>?) {
+	override fun updateStatus(status: String, callback: RequestCallback<Any>) {
 		user
 			.set(hashMapOf(FIELD_STATUS to status), SetOptions.merge())
 			.addOnSuccessListener { callback?.onSuccess(EmptyObject) }
 			.addOnFailureListener { callback?.onFailure(it) }
 	}
 
-	override fun updateOnlineStatus(online: Boolean, callback: RequestCallback<Any>?) {
+	override fun updateOnlineStatus(online: Boolean, callback: RequestCallback<Any>) {
 		user
 			.set(hashMapOf(
 				FIELD_LAST_SEEN to FieldValue.serverTimestamp(),

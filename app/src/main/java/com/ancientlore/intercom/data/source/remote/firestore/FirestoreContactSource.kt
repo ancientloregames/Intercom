@@ -60,7 +60,7 @@ class FirestoreContactSource private constructor(private val userId: String)
 			.addOnFailureListener { callback.onFailure(it) }
 	}
 
-	override fun update(contacts: List<Contact>, callback: RequestCallback<Any>?) {
+	override fun update(contacts: List<Contact>, callback: RequestCallback<Any>) {
 
 		var success = true
 
@@ -89,7 +89,7 @@ class FirestoreContactSource private constructor(private val userId: String)
 			callback?.onSuccess(EmptyObject)
 	}
 
-	override fun update(contact: Contact, callback: RequestCallback<Any>?) {
+	override fun update(contact: Contact, callback: RequestCallback<Any>) {
 		if (contact.phone.isNotEmpty()) {
 
 			userContacts.document(contact.phone)

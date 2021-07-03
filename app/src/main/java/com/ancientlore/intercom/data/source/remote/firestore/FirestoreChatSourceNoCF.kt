@@ -31,7 +31,7 @@ class FirestoreChatSourceNoCF private constructor(userId: String)
 		private const val TAG = "FirestoreChatSourceNoCF"
 	}
 
-	override fun addItem(item: Chat, callback: RequestCallback<String>?) {
+	override fun addItem(item: Chat, callback: RequestCallback<String>) {
 		db.collection(CHATS).add(item)
 			.addOnSuccessListener {
 
@@ -98,7 +98,7 @@ class FirestoreChatSourceNoCF private constructor(userId: String)
 	}
 
 	//FIXME this looks ugly. Need to separate Chat and UserChat models
-	override fun updateItem(item: Chat, callback: RequestCallback<Any>?) {
+	override fun updateItem(item: Chat, callback: RequestCallback<Any>) {
 		if (item.id.isNotEmpty()) {
 
 			if (item.pin != null || item.mute != null) {

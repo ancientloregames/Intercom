@@ -47,13 +47,13 @@ open class FirestoreChatSource protected constructor(private val userId: String)
 			.addOnFailureListener { callback.onFailure(it) }
 	}
 
-	override fun addItem(item: Chat, callback: RequestCallback<String>?) {
+	override fun addItem(item: Chat, callback: RequestCallback<String>) {
 		db.collection(CHATS).add(item)
 			.addOnSuccessListener { callback?.onSuccess(it.id) }
 			.addOnFailureListener { callback?.onFailure(it) }
 	}
 
-	override fun deleteItem(chatId: String, callback: RequestCallback<Any>?) {
+	override fun deleteItem(chatId: String, callback: RequestCallback<Any>) {
 		db.collection(CHATS)
 			.document(chatId)
 			.get()
@@ -77,7 +77,7 @@ open class FirestoreChatSource protected constructor(private val userId: String)
 			.addOnFailureListener { callback?.onFailure(it) }
 	}
 
-	override fun updateItem(item: Chat, callback: RequestCallback<Any>?) {
+	override fun updateItem(item: Chat, callback: RequestCallback<Any>) {
 		db.collection(CHATS)
 			.document(item.id)
 			.set(HashMap<String, Any>().apply {

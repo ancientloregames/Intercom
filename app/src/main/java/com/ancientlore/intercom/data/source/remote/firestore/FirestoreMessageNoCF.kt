@@ -35,7 +35,7 @@ class FirestoreMessageNoCF(chatId: String): FirestoreMessageSource(chatId) {
 			}
 	}
 
-	override fun addMessage(message: Message, callback: RequestCallback<String>?) {
+	override fun addMessage(message: Message, callback: RequestCallback<String>) {
 		chatMessages.add(message)
 			.addOnSuccessListener {
 				if (chat == null) {

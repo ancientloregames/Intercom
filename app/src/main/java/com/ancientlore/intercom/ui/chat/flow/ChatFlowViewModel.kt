@@ -67,13 +67,9 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 			}
 			params.chatType == TYPE_PRIVATE -> {
 				val contactId = params.participants.first { it != params.userId }
-				ChatRepository.getItem(contactId, object : RequestCallback<Chat> {
+				ChatRepository.getItem(contactId, object : CrashlyticsRequestCallback<Chat>() {
 					override fun onSuccess(chat: Chat) {
 						initMessageRepository(chat.id)
-					}
-					override fun onFailure(error: Throwable) {
-						if (error !is EmptyResultException)
-							Utils.logError(error)
 					}
 				})
 				observeContactOnlineStatus(context, contactId)
@@ -350,13 +346,7 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 		messages
 			.filter { it.status != Message.STATUS_RECEIVED && it.senderId != params.userId }
 			.forEach {
-				repository.setMessageStatusReceived(it.id, object : SimpleRequestCallback<Any>() {
-
-					override fun onFailure(error: Throwable) {
-						if (error !is EmptyResultException)
-							Utils.logError(error)
-					}
-				})
+				repository.setMessageStatusReceived(it.id)
 			}
 	}
 

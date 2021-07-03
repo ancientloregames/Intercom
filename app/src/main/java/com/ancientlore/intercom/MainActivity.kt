@@ -18,8 +18,7 @@ import androidx.annotation.StringRes
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
-import com.ancientlore.intercom.backend.RequestCallback
-import com.ancientlore.intercom.backend.SimpleRequestCallback
+import com.ancientlore.intercom.backend.CrashlyticsRequestCallback
 import com.ancientlore.intercom.backend.auth.PhoneAuthParams
 import com.ancientlore.intercom.data.model.Contact
 import com.ancientlore.intercom.data.model.User
@@ -411,7 +410,7 @@ class MainActivity : AppCompatActivity(),
 	}
 
 	override fun onContactListUpdate(contacts: List<DeviceContactsManager.Item>) {
-		UserRepository.getAll(object : RequestCallback<List<User>> {
+		UserRepository.getAll(object : CrashlyticsRequestCallback<List<User>>() {
 			override fun onSuccess(appUsers: List<User>) {
 
 				val updateCandidates = mutableListOf<Contact>()
@@ -434,12 +433,10 @@ class MainActivity : AppCompatActivity(),
 					}
 				}
 
-				ContactRepository.update(updateCandidates, object : RequestCallback<Any> {
+				ContactRepository.update(updateCandidates, object : CrashlyticsRequestCallback<Any>() {
 					override fun onSuccess(result: Any) { Log.d("Intercom", "Success updating contacts") }
-					override fun onFailure(error: Throwable) { Utils.logError(error) }
 				})
 			}
-			override fun onFailure(error: Throwable) { Utils.logError(error) }
 		})
 	}
 
@@ -454,9 +451,9 @@ class MainActivity : AppCompatActivity(),
 	}
 
 	private fun updateNotificationToken() {
-		App.backend.getMessagingManager().getToken(object : SimpleRequestCallback<String>() {
+		App.backend.getMessagingManager().getToken(object : CrashlyticsRequestCallback<String>() {
 			override fun onSuccess(token: String) {
-				UserRepository.updateNotificationToken(token, object : SimpleRequestCallback<Any>() {})
+				UserRepository.updateNotificationToken(token)
 			}
 		})
 	}

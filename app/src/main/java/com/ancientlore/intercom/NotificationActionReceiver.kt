@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import androidx.core.app.RemoteInput
-import com.ancientlore.intercom.backend.SimpleRequestCallback
 import com.ancientlore.intercom.data.model.Message
 import com.ancientlore.intercom.data.model.PushMessage
 import com.ancientlore.intercom.data.source.MessageRepository
@@ -49,11 +48,11 @@ class NotificationActionReceiver: BroadcastReceiver() {
 		val user = App.backend.getAuthManager().getCurrentUser()!!
 		val replyMessage = Message(senderId = user.id, text = replyText)
 
-		addMessage(replyMessage, object : SimpleRequestCallback<String>("MessageReply") {})
+		addMessage(replyMessage)
 	}
 
 	private fun MessageRepository.markAsRead(messageId: String) {
-		setMessageStatusReceived(messageId, object : SimpleRequestCallback<Any>("MessageReply") {})
+		setMessageStatusReceived(messageId)
 	}
 
 	private fun getReplyText(intent: Intent): String {
