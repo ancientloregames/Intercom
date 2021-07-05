@@ -1,6 +1,5 @@
 package com.ancientlore.intercom.data.source.remote.firestore
 
-import android.util.Log
 import com.ancientlore.intercom.EmptyObject
 import com.ancientlore.intercom.backend.RepositorySubscription
 import com.ancientlore.intercom.data.source.EmptyResultException
@@ -19,38 +18,36 @@ open class FirestoreChatSource protected constructor(private val userId: String)
 	: FirestoreSource<Chat>(), ChatSource {
 
 	internal companion object : SingletonHolder<FirestoreChatSource, String>(
-		{ userId -> FirestoreChatSource(userId) }) {
-		private const val TAG = "FirestoreChatSource"
-	}
+		{ userId -> FirestoreChatSource(userId) })
 
 	protected val userChats get() = db.collection(USERS).document(userId).collection(CHATS)
 
 	override fun getObjectClass() = Chat::class.java
 
+	override fun getWorkerThreadName() = "fsChatSource_thread"
+
 	override fun getAll(callback: RequestCallback<List<Chat>>) {
 		userChats.get()
-			.addOnSuccessListener { snapshot ->
-				deserialize(snapshot).takeIf { it.isNotEmpty() }
-					?.let { callback.onSuccess(it) }
-					?: callback.onFailure(EmptyResultException("$TAG: empty"))
-			}
-			.addOnFailureListener { callback.onFailure(it) }
+			.addOnSuccessListener { exec { callback.onSuccess(deserialize(it)) } }
+			.addOnFailureListener { exec { callback.onFailure(it) } }
 	}
 
 	override fun getItem(id: String, callback: RequestCallback<Chat>) {
 		userChats.document(id).get()
 			.addOnSuccessListener { snapshot ->
-				deserialize(snapshot)
-					?.let { callback.onSuccess(it) }
-					?: callback.onFailure(EmptyResultException("$TAG: no chat with id $id"))
+				exec {
+					deserialize(snapshot)
+						?.let { callback.onSuccess(it) }
+						?: callback.onFailure(EmptyResultException("no chat with id $id"))
+				}
 			}
-			.addOnFailureListener { callback.onFailure(it) }
+			.addOnFailureListener { exec { callback.onFailure(it) } }
 	}
 
 	override fun addItem(item: Chat, callback: RequestCallback<String>) {
 		db.collection(CHATS).add(item)
-			.addOnSuccessListener { callback?.onSuccess(it.id) }
-			.addOnFailureListener { callback?.onFailure(it) }
+			.addOnSuccessListener { exec { callback.onSuccess(it.id) } }
+			.addOnFailureListener { exec { callback.onFailure(it) } }
 	}
 
 	override fun deleteItem(chatId: String, callback: RequestCallback<Any>) {
@@ -58,23 +55,24 @@ open class FirestoreChatSource protected constructor(private val userId: String)
 			.document(chatId)
 			.get()
 			.addOnSuccessListener { snapshot ->
-				deserialize(snapshot)
-					?.let { chat ->
-						db.collection(USERS)
-							.document(userId)
-							.collection(CHATS)
-							.document(
-								if (chat.name.isNotEmpty())
-									chat.name
-								else
-									chat.participants.first { it != userId })
-							.delete()
-							.addOnSuccessListener { callback?.onSuccess(EmptyObject) }
-							.addOnFailureListener { error -> Log.d(TAG, error.message) }
-					}
-
+				exec {
+					deserialize(snapshot)
+						?.let { chat ->
+							db.collection(USERS)
+								.document(userId)
+								.collection(CHATS)
+								.document(
+									if (chat.name.isNotEmpty())
+										chat.name
+									else
+										chat.participants.first { it != userId })
+								.delete()
+								.addOnSuccessListener { exec { callback.onSuccess(EmptyObject) } }
+								.addOnFailureListener { exec { callback.onFailure(it) } }
+						}
+				}
 			}
-			.addOnFailureListener { callback?.onFailure(it) }
+			.addOnFailureListener { exec { callback.onFailure(it) } }
 	}
 
 	override fun updateItem(item: Chat, callback: RequestCallback<Any>) {
@@ -86,22 +84,20 @@ open class FirestoreChatSource protected constructor(private val userId: String)
 				if (item.iconUrl.isNotEmpty())
 					put(FIELD_ICON_URL, item.iconUrl)
 			}, SetOptions.merge())
-			.addOnSuccessListener { callback?.onSuccess(EmptyObject) }
-			.addOnFailureListener { callback?.onFailure(it) }
+			.addOnSuccessListener { exec { callback.onSuccess(EmptyObject) } }
+			.addOnFailureListener { exec { callback.onFailure(it) }
+			}
 	}
 
 	override fun attachListener(callback: RequestCallback<List<Chat>>) : RepositorySubscription {
 		val registration = userChats
 			.orderBy(FIELD_LAST_MSG_TIME)
 			.addSnapshotListener { snapshot, error ->
-				if (error != null) {
-					callback.onFailure(error)
-					return@addSnapshotListener
-				}
-				else if (snapshot != null) {
-					deserialize(snapshot)
-						.takeIf { it.isNotEmpty() }
-						?.let { callback.onSuccess(it)  }
+				exec {
+					if (error != null)
+						callback.onFailure(error)
+					else if (snapshot != null)
+						callback.onSuccess(deserialize(snapshot))
 				}
 			}
 

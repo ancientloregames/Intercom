@@ -11,6 +11,7 @@ import com.ancientlore.intercom.data.source.ChatRepository
 import com.ancientlore.intercom.data.source.ContactRepository
 import com.ancientlore.intercom.ui.FilterableViewModel
 import com.ancientlore.intercom.ui.chat.flow.ChatFlowParams
+import com.ancientlore.intercom.utils.extensions.runOnUiThread
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import java.util.*
@@ -70,7 +71,9 @@ class ChatListViewModel(listAdapter: ChatListAdapter)
 				repositorySub = ChatRepository.attachListener(object : CrashlyticsRequestCallback<List<Chat>>() {
 					override fun onSuccess(chats: List<Chat>) {
 						assignPrivateChatNames(chats, contacts)
-						listAdapter.setItems(chats)
+						runOnUiThread {
+							listAdapter.setItems(chats)
+						}
 					}
 				})
 			}

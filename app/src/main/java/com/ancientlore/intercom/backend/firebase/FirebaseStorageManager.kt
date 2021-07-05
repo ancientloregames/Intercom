@@ -11,8 +11,12 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
 import java.io.File
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 object FirebaseStorageManager : StorageManager {
+
+	private val service: ExecutorService = Executors.newSingleThreadExecutor { r -> Thread(r, "fsStorageManager_thread") }
 
 	private val storage: FirebaseStorage by lazy { FirebaseStorage.getInstance() }
 
@@ -49,18 +53,24 @@ object FirebaseStorageManager : StorageManager {
 	private fun upload(uri: Uri, fileRef: StorageReference, callback: ProgressRequestCallback<Uri>) {
 		fileRef.putFile(uri)
 			.addOnProgressListener {
-				val progress = it.bytesTransferred / it.totalByteCount.toFloat() * 100
-				callback.onProgress(progress.toInt())
+				exec {
+					val progress = it.bytesTransferred / it.totalByteCount.toFloat() * 100
+					callback.onProgress(progress.toInt())
+				}
 			}
 			.continueWithTask( Continuation<UploadTask.TaskSnapshot, Task<Uri>> { task ->
 				if (!task.isSuccessful)
 					task.exception?.let {
-						callback.onFailure(it)
+						exec { callback.onFailure(it) }
 					}
 
 				return@Continuation fileRef.downloadUrl
 			})
-			.addOnSuccessListener { downloadUri -> callback.onSuccess(downloadUri) }
-			.addOnFailureListener { exception -> callback.onFailure(exception) }
+			.addOnSuccessListener { downloadUri -> exec { callback.onSuccess(downloadUri) } }
+			.addOnFailureListener { exception -> exec { callback.onFailure(exception) } }
+	}
+
+	private fun exec(command: Runnable) {
+		service.execute(command)
 	}
 }

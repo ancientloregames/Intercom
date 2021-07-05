@@ -1,6 +1,5 @@
 package com.ancientlore.intercom.data.source.remote.firestore
 
-import android.util.Log
 import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.data.model.Chat
 import com.ancientlore.intercom.data.model.Message
@@ -21,10 +20,6 @@ import com.google.firebase.messaging.RemoteMessage
 
 class FirestoreMessageNoCF(chatId: String): FirestoreMessageSource(chatId) {
 
-	internal companion object  {
-		private const val TAG = "FirestoreMessageNoCF"
-	}
-
 	private lateinit var chat: Chat
 
 	init {
@@ -39,7 +34,7 @@ class FirestoreMessageNoCF(chatId: String): FirestoreMessageSource(chatId) {
 		chatMessages.add(message)
 			.addOnSuccessListener {
 				if (chat == null) {
-					callback?.onFailure(EmptyResultException("$TAG: empty"))
+					callback.onFailure(EmptyResultException("FirestoreMessageNoCF. No chat in repository"))
 					return@addOnSuccessListener
 				}
 
@@ -51,7 +46,7 @@ class FirestoreMessageNoCF(chatId: String): FirestoreMessageSource(chatId) {
 						put(FIELD_ID, messageId)
 						put(FIELD_STATUS, 1)
 					}, SetOptions.merge())
-					.addOnFailureListener { error -> Log.d(TAG, "Failure 1: ${error.message}") }
+					.addOnFailureListener { exec { callback.onFailure(it) } }
 
 				val userChatInfoUpdate = HashMap<String, Any>().apply {
 					put(FIELD_LAST_MSG_SENDER, senderId)
@@ -68,14 +63,14 @@ class FirestoreMessageNoCF(chatId: String): FirestoreMessageSource(chatId) {
 						.collection(CHATS)
 						.document(receiverId)
 						.set(userChatInfoUpdate, SetOptions.merge())
-						.addOnSuccessListener { callback?.onSuccess(messageId) }
-						.addOnFailureListener { error -> callback?.onFailure(error) }
+						.addOnSuccessListener { exec { callback.onSuccess(messageId) } }
+						.addOnFailureListener { exec { callback.onFailure(it) } }
 					db.collection(USERS)
 						.document(receiverId)
 						.collection(CHATS)
 						.document(senderId)
 						.set(userChatInfoUpdate, SetOptions.merge())
-						.addOnFailureListener { error -> callback?.onFailure(error) }
+						.addOnFailureListener { exec { callback.onFailure(it) } }
 				}
 				else {
 					for (receiverId in chat.participants) {
@@ -86,13 +81,13 @@ class FirestoreMessageNoCF(chatId: String): FirestoreMessageSource(chatId) {
 							.set(userChatInfoUpdate, SetOptions.merge())
 							.addOnSuccessListener {
 								if (message.senderId == receiverId)
-									callback?.onSuccess(messageId)
+									exec { callback.onSuccess(messageId) }
 							}
-							.addOnFailureListener { error -> callback?.onFailure(error) }
+							.addOnFailureListener { exec { callback.onFailure(it) } }
 					}
 				}
 			}
-			.addOnFailureListener { callback?.onFailure(it) }
+			.addOnFailureListener { exec { callback.onFailure(it) } }
 	}
 
 	/*
@@ -106,15 +101,17 @@ class FirestoreMessageNoCF(chatId: String): FirestoreMessageSource(chatId) {
 			.addOnSuccessListener { snapshot ->
 				snapshot.toObject(User::class.java)
 					?.let { user ->
-						FirebaseMessaging.getInstance()
-							.send(RemoteMessage.Builder(/*user.token + */"@gcm.googleapis.com")
-								.setMessageId(notification.messageId)
-								.addData("id", notification.messageId)
-								.addData("chatId", notification.chatId)
-								.addData("type", notification.type)
-								.addData("title", notification.title)
-								.addData("body", notification.text)
-								.build())
+						exec {
+							FirebaseMessaging.getInstance()
+								.send(RemoteMessage.Builder(/*user.token + */"@gcm.googleapis.com")
+									.setMessageId(notification.messageId)
+									.addData("id", notification.messageId)
+									.addData("chatId", notification.chatId)
+									.addData("type", notification.type)
+									.addData("title", notification.title)
+									.addData("body", notification.text)
+									.build())
+						}
 					}
 			}
 	}

@@ -74,7 +74,7 @@ class MainActivity : AppCompatActivity(),
 		fun onBackPressed(): Boolean
 	}
 
-	private val userContactExecutor = Executors.newSingleThreadExecutor{
+	private val userContactExecutor = Executors.newSingleThreadExecutor{ //TODO terminate on logout (multiaccount mode)
 			run: Runnable? -> Thread(run, "exec_contactUpdate")
 	}
 
@@ -413,29 +413,31 @@ class MainActivity : AppCompatActivity(),
 		UserRepository.getAll(object : CrashlyticsRequestCallback<List<User>>() {
 			override fun onSuccess(appUsers: List<User>) {
 
-				val updateCandidates = mutableListOf<Contact>()
-				val appUsersTmp = LinkedList(appUsers)
+				userContactExecutor.execute {
+					val updateCandidates = mutableListOf<Contact>()
+					val appUsersTmp = LinkedList(appUsers)
 
-				//FIXME in real app its better to switch inner and outer iterators because there will be
-				//      much more app users than local contacts. Also, maybe better to
-				//      to use UserRepository.getItem on every contacts if the list is small enough
-				for (contact in contacts) {
+					//FIXME in real app its better to switch inner and outer iterators because there will be
+					//      much more app users than local contacts. Also, maybe better to
+					//      to use UserRepository.getItem on every contacts if the list is small enough
+					for (contact in contacts) {
 
-					val appUserIter = appUsersTmp.iterator()
-					while (appUserIter.hasNext()) {
-						val user = appUserIter.next()
+						val appUserIter = appUsersTmp.iterator()
+						while (appUserIter.hasNext()) {
+							val user = appUserIter.next()
 
-						if (contact.formatedMainNumber == user.phone) {
-							updateCandidates.add(Contact(phone = user.phone, name = contact.name))
-							appUserIter.remove()
-							break
+							if (contact.formatedMainNumber == user.phone) {
+								updateCandidates.add(Contact(phone = user.phone, name = contact.name))
+								appUserIter.remove()
+								break
+							}
 						}
 					}
-				}
 
-				ContactRepository.update(updateCandidates, object : CrashlyticsRequestCallback<Any>() {
-					override fun onSuccess(result: Any) { Log.d("Intercom", "Success updating contacts") }
-				})
+					ContactRepository.update(updateCandidates, object : CrashlyticsRequestCallback<Any>() {
+						override fun onSuccess(result: Any) { Log.d("Intercom", "Success updating contacts") }
+					})
+				}
 			}
 		})
 	}
@@ -473,9 +475,7 @@ class MainActivity : AppCompatActivity(),
 		DeviceContactsManager.registerUpdateListener(this) //TODO unregister on logout (multiaccount mode)
 		DeviceContactsManager.enableObserver(this)
 
-		userContactExecutor.execute { //TODO terminate on logout (multiaccount mode)
-			onContactListUpdate(DeviceContactsManager.getContacts(this))
-		}
+		onContactListUpdate(DeviceContactsManager.getContacts(this))
 	}
 
 	private fun showToast(@StringRes textResId: Int) {

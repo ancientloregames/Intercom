@@ -10,6 +10,7 @@ import com.ancientlore.intercom.data.source.ContactRepository
 import com.ancientlore.intercom.ui.FilterableViewModel
 import com.ancientlore.intercom.ui.chat.flow.ChatFlowParams
 import com.ancientlore.intercom.utils.Utils
+import com.ancientlore.intercom.utils.extensions.runOnUiThread
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 
@@ -26,6 +27,8 @@ class ChatCreationViewModel(listAdapter: ChatCreationAdapter)
 	override fun clean() {
 		openChatSub.onComplete()
 		createGroupSub.onComplete()
+		addContactSub.onComplete()
+		updateContactCountSub.onComplete()
 		repositorySub?.remove()
 
 		super.clean()
@@ -57,7 +60,9 @@ class ChatCreationViewModel(listAdapter: ChatCreationAdapter)
 	private fun attachDataListener() {
 		repositorySub = ContactRepository.attachListener(object : RequestCallback<List<Contact>> {
 			override fun onSuccess(result: List<Contact>) {
-				listAdapter?.setItems(result)
+				runOnUiThread {
+					listAdapter.setItems(result)
+				}
 				updateContactCountSub.onNext(result.size)
 			}
 			override fun onFailure(error: Throwable) {

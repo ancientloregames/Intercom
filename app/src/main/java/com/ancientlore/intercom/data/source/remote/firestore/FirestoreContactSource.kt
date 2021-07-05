@@ -5,68 +5,70 @@ import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.data.model.Contact
 import com.ancientlore.intercom.data.model.User
 import com.ancientlore.intercom.data.source.ContactSource
-import com.ancientlore.intercom.data.source.EmptyResultException
 import com.ancientlore.intercom.backend.RepositorySubscription
+import com.ancientlore.intercom.data.source.EmptyResultException
 import com.ancientlore.intercom.data.source.remote.firestore.C.CONTACTS
 import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_ICON_URL
 import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_LAST_SEEN
 import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_NAME
 import com.ancientlore.intercom.data.source.remote.firestore.C.USERS
 import com.ancientlore.intercom.utils.SingletonHolder
+import com.ancientlore.intercom.utils.Utils
 import com.google.firebase.firestore.SetOptions
 import java.lang.RuntimeException
-import java.util.*
 import kotlin.collections.HashMap
 
 class FirestoreContactSource private constructor(private val userId: String)
 : FirestoreSource<Contact>(), ContactSource {
 
 	internal companion object : SingletonHolder<FirestoreContactSource, String>(
-		{ userId -> FirestoreContactSource(userId) }) {
-		private const val TAG = "FirestoreMessageSource"
-	}
+		{ userId -> FirestoreContactSource(userId) })
 
 	private val userContacts get() = db.collection(USERS).document(userId).collection(CONTACTS)
 
 	override fun getObjectClass() = Contact::class.java
 
+	override fun getWorkerThreadName() = "fsContactSource_thread"
+
 	override fun getAll(callback: RequestCallback<List<Contact>>) {
 		userContacts.get()
-			.addOnSuccessListener { snapshot ->
-				deserialize(snapshot).takeIf { it.isNotEmpty() }
-					?.let { callback.onSuccess(it) }
-					?: callback.onFailure(EmptyResultException("$TAG: empty"))
-			}
-			.addOnFailureListener { callback.onFailure(it) }
+			.addOnSuccessListener { exec { callback.onSuccess(deserialize(it)) } }
+			.addOnFailureListener { exec { callback.onFailure(it) } }
 	}
 
 	override fun addAll(contacts: List<Contact>, callback: RequestCallback<Any>) {
 		db.collection(USERS).get()
 			.addOnSuccessListener { snapshot ->
-				val list = contacts.toMutableList()
-				snapshot.toObjects(User::class.java).forEach { user ->
-					val iter = list.listIterator()
-					while (iter.hasNext()) {
-						val contact = iter.next()
-						if (user.phone == contact.phone) {
-							contact.iconUrl = user.iconUrl
-							userContacts.document(user.phone).set(contact)
-							iter.remove()
+				exec {
+					val list = contacts.toMutableList()
+					snapshot.toObjects(User::class.java).forEach { user ->
+						val iter = list.listIterator()
+						while (iter.hasNext()) {
+							val contact = iter.next()
+							if (user.phone == contact.phone) {
+								contact.iconUrl = user.iconUrl
+								userContacts.document(user.phone).set(contact)
+								iter.remove()
+							}
 						}
 					}
+					callback.onSuccess(EmptyObject)
 				}
-				callback.onSuccess(EmptyObject)
 			}
-			.addOnFailureListener { callback.onFailure(it) }
+			.addOnFailureListener { exec { callback.onFailure(it) } }
 	}
 
 	override fun update(contacts: List<Contact>, callback: RequestCallback<Any>) {
 
-		var success = true
+		if (contacts.isEmpty()) {
+			exec { callback.onSuccess(EmptyObject) }
+			return
+		}
 
+		val lastContactPhone = contacts.last().phone
 		for (contact in contacts) {
 			if (contact.phone.isEmpty()) {
-				callback?.onFailure(RuntimeException("Contact phone number shouldn't be empty"))
+				Utils.logError("Contact phone number shouldn't be empty: ${contact.name}")
 				continue
 			}
 
@@ -79,14 +81,12 @@ class FirestoreContactSource private constructor(private val userId: String)
 					if (contact.iconUrl.isNotEmpty())
 						put(FIELD_ICON_URL, contact.iconUrl)
 				}, SetOptions.merge())
-				.addOnFailureListener {
-					callback?.onFailure(it)
-					success = false
+				.addOnSuccessListener {
+					if (contact.phone == lastContactPhone)
+						exec { callback.onSuccess(EmptyObject) }
 				}
+				.addOnFailureListener { exec { callback.onFailure(it) } }
 		}
-
-		if (success)
-			callback?.onSuccess(EmptyObject)
 	}
 
 	override fun update(contact: Contact, callback: RequestCallback<Any>) {
@@ -101,23 +101,24 @@ class FirestoreContactSource private constructor(private val userId: String)
 					if (contact.iconUrl.isNotEmpty())
 						put(FIELD_ICON_URL, contact.iconUrl)
 				}, SetOptions.merge())
-				.addOnSuccessListener { callback?.onSuccess(EmptyObject) }
-				.addOnFailureListener { callback?.onFailure(it) }
+				.addOnSuccessListener { exec { callback.onSuccess(EmptyObject) } }
+				.addOnFailureListener { exec { callback.onFailure(it) } }
 		}
-		else callback?.onFailure(RuntimeException("Contact phone number shouldn't be empty"))
+		else Utils.logError("Contact phone number shouldn't be empty: ${contact.name}")
 	}
 
 	override fun attachListener(callback: RequestCallback<List<Contact>>) : RepositorySubscription {
 
-		val registration = userContacts.addSnapshotListener { snapshot, error ->
-			if (error != null) {
-				callback.onFailure(error)
-				return@addSnapshotListener
+		val registration = userContacts
+			.addSnapshotListener { snapshot, error ->
+				exec {
+					when {
+						error != null -> callback.onFailure(error)
+						snapshot != null -> callback.onSuccess(deserialize(snapshot))
+						else -> callback.onFailure(EmptyResultException())
+					}
+				}
 			}
-			else if (snapshot != null) {
-				callback.onSuccess(deserialize(snapshot))
-			}
-		}
 
 		return object : RepositorySubscription {
 			override fun remove() {
@@ -128,16 +129,19 @@ class FirestoreContactSource private constructor(private val userId: String)
 
 	override fun attachListener(id: String, callback: RequestCallback<Contact>) : RepositorySubscription {
 
-		val registration = userContacts.document(id).addSnapshotListener { snapshot, error ->
-			if (error != null) {
-				callback.onFailure(error)
-				return@addSnapshotListener
+		val registration = userContacts
+			.document(id)
+			.addSnapshotListener { snapshot, error ->
+				exec {
+					when {
+						error != null -> callback.onFailure(error)
+						snapshot != null -> deserialize(snapshot)
+							?.let { callback.onSuccess(it) }
+							?: callback.onFailure(RuntimeException("Failed to deserialize contact: $id"))
+						else -> callback.onFailure(EmptyResultException())
+					}
+				}
 			}
-			else if (snapshot != null) {
-				deserialize(snapshot)
-					?.let { callback.onSuccess(it)  }
-			}
-		}
 
 		return object : RepositorySubscription {
 			override fun remove() {

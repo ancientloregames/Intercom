@@ -16,7 +16,7 @@ object ChatRepository : ChatSource {
 
 		remoteSource.getAll(object : RequestCallback<List<Chat>> {
 			override fun onSuccess(result: List<Chat>) {
-				resetCache(result)
+				cacheSource.reset(result)
 				callback.onSuccess(result)
 			}
 			override fun onFailure(error: Throwable) {
@@ -91,7 +91,7 @@ object ChatRepository : ChatSource {
 		return remoteSource.attachListener(object : RequestCallback<List<Chat>> {
 
 			override fun onSuccess(result: List<Chat>) {
-				resetCache(result)
+				cacheSource.reset(result)
 				callback.onSuccess(result)
 			}
 			override fun onFailure(error: Throwable) {
@@ -102,9 +102,5 @@ object ChatRepository : ChatSource {
 
 	fun setRemoteSource(source: ChatSource) {
 		remoteSource = source
-	}
-
-	private fun resetCache(newNotes: List<Chat>) {
-		cacheSource.reset(newNotes)
 	}
 }

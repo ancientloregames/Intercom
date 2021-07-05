@@ -15,16 +15,12 @@ import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_NAME
 import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_ONLINE
 import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_STATUS
 import com.ancientlore.intercom.data.source.remote.firestore.C.USERS
-import com.ancientlore.intercom.utils.Utils
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.SetOptions
+import java.lang.RuntimeException
 
 open class FirestoreUserSource(protected val userId: String)
 	: FirestoreSource<User>(), UserSource {
-
-	internal companion object  {
-		private const val TAG = "FirestoreUserSource"
-	}
 
 	protected val user get() = users.document(userId)
 
@@ -32,30 +28,37 @@ open class FirestoreUserSource(protected val userId: String)
 
 	override fun getObjectClass() = User::class.java
 
+	override fun getWorkerThreadName() = "fsUserSource_thread"
+
 	override fun updateNotificationToken(token: String, callback: RequestCallback<Any>) {
-		user.update(FIELD_FCM_TOKEN, token)
-			.addOnSuccessListener { callback?.onSuccess(EmptyObject) }
-			.addOnFailureListener { callback?.onFailure(it) }
+		user
+			.update(FIELD_FCM_TOKEN, token)
+			.addOnSuccessListener { exec { callback.onSuccess(EmptyObject) } }
+			.addOnFailureListener { exec { callback.onFailure(it) } }
 	}
 
 	override fun getAll(callback: RequestCallback<List<User>>) {
 		users.get()
 			.addOnSuccessListener { snapshot ->
-				deserialize(snapshot).takeIf { it.isNotEmpty() }
-					?.let { callback.onSuccess(it) }
-					?: callback.onSuccess(emptyList())
+				exec {
+					deserialize(snapshot).takeIf { it.isNotEmpty() }
+						?.let { callback.onSuccess(it) }
+						?: callback.onSuccess(emptyList())
+				}
 			}
-			.addOnFailureListener { callback.onFailure(it) }
+			.addOnFailureListener { exec { callback.onFailure(it) } }
 	}
 
 	override fun getItem(phoneNumber: String, callback: RequestCallback<User>) {
 		users.document(phoneNumber).get()
 			.addOnSuccessListener { snapshot ->
-				deserialize(snapshot)
-					?.let { callback.onSuccess(it) }
-					?: callback.onFailure(EmptyResultException())
+				exec {
+					deserialize(snapshot)
+						?.let { callback.onSuccess(it) }
+						?: callback.onFailure(EmptyResultException())
+				}
 			}
-			.addOnFailureListener { callback.onFailure(it) }
+			.addOnFailureListener { exec { callback.onFailure(it) } }
 	}
 
 	override fun updateIcon(uri: Uri, callback: RequestCallback<Any>) {
@@ -63,11 +66,11 @@ open class FirestoreUserSource(protected val userId: String)
 			.set(hashMapOf(FIELD_ICON_URL to uri.toString()), SetOptions.merge())
 			.addOnSuccessListener {
 				App.backend.getAuthManager().updateUserIconUri(uri, object : RequestCallback<Any> {
-					override fun onSuccess(result: Any) { callback?.onSuccess(result) }
-					override fun onFailure(error: Throwable) { callback?.onFailure(error) }
+					override fun onSuccess(result: Any) { exec { callback.onSuccess(result) } }
+					override fun onFailure(error: Throwable) { exec { callback.onFailure(error) } }
 				})
 			}
-			.addOnFailureListener { callback?.onFailure(it) }
+			.addOnFailureListener { exec { callback.onFailure(it) } }
 	}
 
 	override fun updateName(name: String, callback: RequestCallback<Any>) {
@@ -75,18 +78,18 @@ open class FirestoreUserSource(protected val userId: String)
 			.set(hashMapOf(FIELD_NAME to name), SetOptions.merge())
 			.addOnSuccessListener {
 				App.backend.getAuthManager().updateUserName(name, object : RequestCallback<Any> {
-					override fun onSuccess(result: Any) { callback?.onSuccess(result) }
-					override fun onFailure(error: Throwable) { callback?.onFailure(error) }
+					override fun onSuccess(result: Any) { exec { callback.onSuccess(result) } }
+					override fun onFailure(error: Throwable) { exec { callback.onFailure(error) } }
 				})
 			}
-			.addOnFailureListener { callback?.onFailure(it) }
+			.addOnFailureListener { callback.onFailure(it) }
 	}
 
 	override fun updateStatus(status: String, callback: RequestCallback<Any>) {
 		user
 			.set(hashMapOf(FIELD_STATUS to status), SetOptions.merge())
-			.addOnSuccessListener { callback?.onSuccess(EmptyObject) }
-			.addOnFailureListener { callback?.onFailure(it) }
+			.addOnSuccessListener { exec { callback.onSuccess(EmptyObject) } }
+			.addOnFailureListener { exec { callback.onFailure(it) } }
 	}
 
 	override fun updateOnlineStatus(online: Boolean, callback: RequestCallback<Any>) {
@@ -94,21 +97,22 @@ open class FirestoreUserSource(protected val userId: String)
 			.set(hashMapOf(
 				FIELD_LAST_SEEN to FieldValue.serverTimestamp(),
 				FIELD_ONLINE to online), SetOptions.merge())
-			.addOnSuccessListener { callback?.onSuccess(EmptyObject) }
-			.addOnFailureListener { callback?.onFailure(it) ?: Utils.logError(it) }
+			.addOnSuccessListener { exec { callback.onSuccess(EmptyObject) } }
+			.addOnFailureListener { exec { callback.onFailure(it) } }
 	}
 
 	override fun attachListener(userId: String, callback: RequestCallback<User>) : RepositorySubscription {
 		val registration = users
 			.document(userId)
 			.addSnapshotListener { snapshot, error ->
-				if (error != null) {
-					callback.onFailure(error)
-					return@addSnapshotListener
-				}
-				else if (snapshot != null) {
-					deserialize(snapshot)
-						?.let { callback.onSuccess(it)  }
+				exec {
+					when {
+						error != null -> callback.onFailure(error)
+						snapshot != null -> deserialize(snapshot)
+							?.let { callback.onSuccess(it) }
+							?: callback.onFailure(RuntimeException("Failed to deserialize contact: $userId"))
+						else -> callback.onFailure(EmptyResultException())
+					}
 				}
 			}
 

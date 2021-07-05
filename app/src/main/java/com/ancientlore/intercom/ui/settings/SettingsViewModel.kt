@@ -21,6 +21,7 @@ import io.reactivex.subjects.PublishSubject
 import android.widget.EditText
 import androidx.annotation.ColorInt
 import androidx.annotation.Px
+import com.ancientlore.intercom.utils.extensions.runOnUiThread
 import com.ancientlore.intercom.utils.extensions.showKeyboard
 import com.ancientlore.intercom.view.TextDrawable
 import java.lang.ref.WeakReference
@@ -132,7 +133,9 @@ class SettingsViewModel(private val user: User)
 				UserRepository.updateIcon(uri, object : SimpleRequestCallback<Any>() {
 					override fun onSuccess(result: Any) {
 						// TODO hide loading screen
-						userIconField.set(uri)
+						runOnUiThread {
+							userIconField.set(uri)
+						}
 					}
 					override fun onFailure(error: Throwable) {
 						// TODO hide loading screen
@@ -155,11 +158,13 @@ class SettingsViewModel(private val user: User)
 		UserRepository.updateName(newUserName, object : SimpleRequestCallback<Any>() {
 			override fun onSuccess(result: Any) {
 
-				userNameField.set(newUserName)
+				runOnUiThread {
+					userNameField.set(newUserName)
 
-				val icon = userIconField.get()
-				if (icon is TextDrawable || icon == Uri.EMPTY)
-					userIconField.set(ImageUtils.createAbbreviationDrawable(newUserName, abbrColor, abbrSize))
+					val icon = userIconField.get()
+					if (icon is TextDrawable || icon == Uri.EMPTY)
+						userIconField.set(ImageUtils.createAbbreviationDrawable(newUserName, abbrColor, abbrSize))
+				}
 			}
 			override fun onFailure(error: Throwable) {
 				Utils.logError(error)
@@ -176,7 +181,9 @@ class SettingsViewModel(private val user: User)
 		UserRepository.updateStatus(newStatus, object : SimpleRequestCallback<Any>() {
 			override fun onSuccess(result: Any) {
 
-				userStatusField.set(newStatus)
+				runOnUiThread {
+					userStatusField.set(newStatus)
+				}
 			}
 			override fun onFailure(error: Throwable) {
 				Utils.logError(error)

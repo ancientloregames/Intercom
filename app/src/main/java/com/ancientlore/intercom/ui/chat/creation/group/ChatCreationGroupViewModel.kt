@@ -6,6 +6,7 @@ import com.ancientlore.intercom.data.model.Contact
 import com.ancientlore.intercom.data.source.ContactRepository
 import com.ancientlore.intercom.ui.FilterableViewModel
 import com.ancientlore.intercom.utils.Utils
+import com.ancientlore.intercom.utils.extensions.runOnUiThread
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 
@@ -50,7 +51,9 @@ class ChatCreationGroupViewModel(listAdapter: ChatCreationGroupAdapter,
 
 		repositorySub = ContactRepository.attachListener(object : RequestCallback<List<Contact>> {
 			override fun onSuccess(result: List<Contact>) {
-				listAdapter.setItems(result)
+				runOnUiThread {
+					listAdapter.setItems(result)
+				}
 			}
 			override fun onFailure(error: Throwable) {
 				Utils.logError(error)

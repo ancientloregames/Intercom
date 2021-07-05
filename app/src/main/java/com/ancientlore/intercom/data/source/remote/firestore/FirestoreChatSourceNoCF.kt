@@ -27,15 +27,13 @@ class FirestoreChatSourceNoCF private constructor(userId: String)
 	: FirestoreChatSource(userId), ChatSource {
 
 	internal companion object : SingletonHolder<FirestoreChatSourceNoCF, String>(
-		{ userId -> FirestoreChatSourceNoCF(userId) }) {
-		private const val TAG = "FirestoreChatSourceNoCF"
-	}
+		{ userId -> FirestoreChatSourceNoCF(userId) })
 
 	override fun addItem(item: Chat, callback: RequestCallback<String>) {
 		db.collection(CHATS).add(item)
-			.addOnSuccessListener {
+			.addOnSuccessListener { doc ->
 
-				val chatId = it.id
+				val chatId = doc.id
 
 				if (item.type == TYPE_PRIVATE) {
 					db.collection(USERS)
@@ -52,8 +50,8 @@ class FirestoreChatSourceNoCF private constructor(userId: String)
 							FIELD_PIN to item.pin,
 							FIELD_MUTE to item.mute
 						), SetOptions.merge())
-						.addOnSuccessListener { callback?.onSuccess(chatId) }
-						.addOnFailureListener { error -> callback?.onFailure(error) }
+						.addOnSuccessListener { exec { callback.onSuccess(chatId) } }
+						.addOnFailureListener { exec { callback.onFailure(it) } }
 					db.collection(USERS)
 						.document(item.participants[1])
 						.collection(CHATS)
@@ -68,7 +66,7 @@ class FirestoreChatSourceNoCF private constructor(userId: String)
 							FIELD_PIN to item.pin,
 							FIELD_MUTE to item.mute
 						), SetOptions.merge())
-						.addOnFailureListener { error -> callback?.onFailure(error) }
+						.addOnFailureListener { exec { callback.onFailure(it) } }
 				}
 				else {
 					for (participant in item.participants) {
@@ -88,13 +86,13 @@ class FirestoreChatSourceNoCF private constructor(userId: String)
 							), SetOptions.merge())
 							.addOnSuccessListener {
 								if (item.initiatorId == participant)
-									callback?.onSuccess(chatId)
+									exec { callback.onSuccess(chatId) }
 							}
-							.addOnFailureListener { error -> callback?.onFailure(error) }
+							.addOnFailureListener { exec { callback.onFailure(it) } }
 					}
 				}
 			}
-			.addOnFailureListener { callback?.onFailure(it) }
+			.addOnFailureListener { exec { callback.onFailure(it) } }
 	}
 
 	//FIXME this looks ugly. Need to separate Chat and UserChat models
@@ -114,7 +112,8 @@ class FirestoreChatSourceNoCF private constructor(userId: String)
 				userChats
 					.document(chatId)
 					.set(userChatChangeMap, SetOptions.merge())
-					.addOnFailureListener { callback?.onFailure(it) }
+					.addOnSuccessListener { exec { callback.onSuccess(EmptyObject) } }
+					.addOnFailureListener { exec { callback.onFailure(it) } }
 			}
 
 			val changeMap = HashMap<String, Any>().apply {
@@ -137,13 +136,14 @@ class FirestoreChatSourceNoCF private constructor(userId: String)
 								.collection(CHATS)
 								.document(item.participants[1])
 								.set(changeMap, SetOptions.merge())
-								.addOnFailureListener { callback?.onFailure(it) }
+								.addOnSuccessListener { exec { callback.onSuccess(EmptyObject) } }
+								.addOnFailureListener { exec { callback.onFailure(it) } }
 							db.collection(USERS)
 								.document(item.participants[1])
 								.collection(CHATS)
 								.document(item.participants[0])
 								.set(changeMap, SetOptions.merge())
-								.addOnFailureListener { callback?.onFailure(it) }
+								.addOnFailureListener { exec { callback.onFailure(it) } }
 						}
 						else {
 							for (participant in item.participants) {
@@ -152,15 +152,17 @@ class FirestoreChatSourceNoCF private constructor(userId: String)
 									.collection(CHATS)
 									.document(item.id)
 									.set(changeMap, SetOptions.merge())
-									.addOnFailureListener { callback?.onFailure(it) }
+									.addOnSuccessListener {
+										if (item.initiatorId == participant)
+											exec { callback.onSuccess(EmptyObject) }
+									}
+									.addOnFailureListener { exec { callback.onFailure(it) } }
 							}
 						}
-
-						callback?.onSuccess(EmptyObject)
 					}
-					.addOnFailureListener { callback?.onFailure(it) }
+					.addOnFailureListener { exec { callback.onFailure(it) } }
 			}
 		}
-		else callback?.onFailure(RuntimeException("Chat id shouldn't be empty"))
+		else exec { callback.onFailure(RuntimeException("Chat id shouldn't be empty")) }
 	}
 }

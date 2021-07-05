@@ -17,6 +17,7 @@ import com.ancientlore.intercom.utils.Runnable1
 import com.ancientlore.intercom.utils.Utils
 import com.ancientlore.intercom.utils.extensions.createAudioMessageFile
 import com.ancientlore.intercom.utils.extensions.isInternal
+import com.ancientlore.intercom.utils.extensions.runOnUiThread
 import com.ancientlore.intercom.view.MessageInputManager
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
@@ -179,7 +180,9 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 			val message = Message(senderId = params.userId, text = text)
 			repository.addMessage(message, object : RequestCallback<String> {
 				override fun onSuccess(result: String) {
-					showSendProgressField.set(false)
+					runOnUiThread {
+						showSendProgressField.set(false)
+					}
 				}
 				override fun onFailure(error: Throwable) {
 					onFailureSendingMessage(error)
@@ -199,12 +202,16 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 				override fun onSuccess(messageId: String) {
 					App.backend.getStorageManager().uploadImage(fileData, chatId, object : ProgressRequestCallback<Uri> {
 						override fun onProgress(progress: Int) {
-							listAdapter.setFileUploadProgress(messageId, progress)
+							runOnUiThread {
+								listAdapter.setFileUploadProgress(messageId, progress)
+							}
 						}
 						override fun onSuccess(uri: Uri) {
 							repository.updateMessageUri(messageId, uri, object : RequestCallback<Any> {
 								override fun onSuccess(result: Any) {
-									showSendProgressField.set(false)
+									runOnUiThread {
+										showSendProgressField.set(false)
+									}
 								}
 								override fun onFailure(error: Throwable) { onFailureSendingMessage(error) }
 							})
@@ -228,12 +235,16 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 
 					App.backend.getStorageManager().uploadFile(fileData, chatId, object : ProgressRequestCallback<Uri> {
 						override fun onProgress(progress: Int) {
-							listAdapter.setFileUploadProgress(messageId, progress)
+							runOnUiThread {
+								listAdapter.setFileUploadProgress(messageId, progress)
+							}
 						}
 						override fun onSuccess(result: Uri) {
 							repository.updateMessageUri(messageId, result, object : RequestCallback<Any> {
 								override fun onSuccess(result: Any) {
-									showSendProgressField.set(false)
+									runOnUiThread {
+										showSendProgressField.set(false)
+									}
 								}
 								override fun onFailure(error: Throwable) { onFailureSendingMessage(error) }
 							})
@@ -259,14 +270,18 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 					App.backend.getStorageManager().uploadAudioMessage(uri, chatId, object : ProgressRequestCallback<Uri> {
 
 						override fun onProgress(progress: Int) {
-							listAdapter.setFileUploadProgress(messageId, progress)
+							runOnUiThread {
+								listAdapter.setFileUploadProgress(messageId, progress)
+							}
 						}
 						override fun onSuccess(result: Uri) {
 
 							repository.updateMessageUri(messageId, result, object : RequestCallback<Any> {
 
 								override fun onSuccess(result: Any) {
-									showSendProgressField.set(false)
+									runOnUiThread {
+										showSendProgressField.set(false)
+									}
 								}
 								override fun onFailure(error: Throwable) { onFailureSendingMessage(error) }
 							})
@@ -290,7 +305,9 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 	private fun onFailureSendingMessage(error: Throwable) {
 		if (error !is EmptyResultException)
 			Utils.logError(error)
-		showSendProgressField.set(false)
+		runOnUiThread {
+			showSendProgressField.set(false)
+		}
 		toastRequest.onNext(R.string.alert_error_send_message)
 	}
 
@@ -314,7 +331,9 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 					if (params.iconUri.isInternal())
 						uploadIconSub.onNext(id)
 
-					callback.run(id)
+					runOnUiThread {
+						callback.run(id)
+					}
 				}
 				override fun onFailure(error: Throwable) {
 					Utils.logError(error)
@@ -330,14 +349,12 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 			App.backend.getDataSourceProvider()
 				.getMessageSource(chatId))
 
-		repositorySub = repository.attachListener(object : RequestCallback<List<Message>>{
+		repositorySub = repository.attachListener(object : CrashlyticsRequestCallback<List<Message>>() {
 			override fun onSuccess(result: List<Message>) {
-				listAdapter.setItems(result)
+				runOnUiThread {
+					listAdapter.setItems(result)
+				}
 				updateMessagesStatus(result)
-			}
-			override fun onFailure(error: Throwable) {
-				if (error !is EmptyResultException)
-					Utils.logError(error)
 			}
 		})
 	}
@@ -354,11 +371,13 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 		contactRepSub = UserRepository.attachListener(contactId, object : CrashlyticsRequestCallback<User>() {
 
 			override fun onSuccess(conterpart: User) {
-				if (conterpart.online)
-					actionBarSubtitleField.set(context.getString(R.string.online))
-				else
-					actionBarSubtitleField.set(context.getString(R.string.last_seen,
-						conterpart.lastSeenDate))
+				runOnUiThread {
+					if (conterpart.online)
+						actionBarSubtitleField.set(context.getString(R.string.online))
+					else
+						actionBarSubtitleField.set(context.getString(R.string.last_seen,
+							conterpart.lastSeenDate))
+				}
 			}
 		})
 	}
