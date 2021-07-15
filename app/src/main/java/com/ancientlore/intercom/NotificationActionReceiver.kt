@@ -25,6 +25,7 @@ class NotificationActionReceiver: BroadcastReceiver() {
 
 				MessageRepository().apply {
 					setRemoteSource(App.backend.getDataSourceProvider().getMessageSource(message.chatId))
+					setRemoteSource(App.frontend.getDataSourceProvider().getMessageSource(message.chatId))
 					markAsRead(message.id)
 					sendReply(getReplyText(intent))
 				}
@@ -35,6 +36,7 @@ class NotificationActionReceiver: BroadcastReceiver() {
 			ACTION_READ -> {
 				MessageRepository().apply {
 					setRemoteSource(App.backend.getDataSourceProvider().getMessageSource(getChatId(intent)))
+					setRemoteSource(App.frontend.getDataSourceProvider().getMessageSource(getChatId(intent)))
 					markAsRead(getMessageId(intent))
 				}
 
@@ -48,7 +50,7 @@ class NotificationActionReceiver: BroadcastReceiver() {
 		val user = App.backend.getAuthManager().getCurrentUser()!!
 		val replyMessage = Message(senderId = user.id, text = replyText)
 
-		addMessage(replyMessage)
+		addItem(replyMessage)
 	}
 
 	private fun MessageRepository.markAsRead(messageId: String) {

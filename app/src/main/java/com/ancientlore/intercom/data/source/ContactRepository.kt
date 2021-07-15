@@ -10,7 +10,10 @@ import com.ancientlore.intercom.utils.Utils
 object ContactRepository : ContactSource {
 
 	private var remoteSource: ContactSource = DummyContactSource
+	private var localSource: ContactSource? = null
 	private val cacheSource = CacheContactSource
+
+	override fun getSourceId() = remoteSource.getSourceId()
 
 	override fun getAll(callback: RequestCallback<List<Contact>>) {
 
@@ -18,57 +21,85 @@ object ContactRepository : ContactSource {
 
 			override fun onSuccess(result: List<Contact>) {
 				cacheSource.reset(result)
+				localSource?.addItems(result)
 				callback.onSuccess(result)
 			}
 			override fun onFailure(error: Throwable) {
 				Utils.logError(error)
-				cacheSource.getAll()
-					.takeIf { it.isNotEmpty() }
-					?.let { callback.onSuccess(it) }
-					?: callback.onFailure(EmptyResultException())
+				getAllFallback(callback)
 			}
 		})
 	}
 
-	override fun addAll(contacts: List<Contact>, callback: RequestCallback<Any>) {
+	override fun getItem(id: String, callback: RequestCallback<Contact>) {
 
-		remoteSource.addAll(contacts, object : RequestCallback<Any> {
+		remoteSource.getItem(id, object : RequestCallback<Contact> {
 
-			override fun onSuccess(result: Any) {
-				cacheSource.addItems(contacts)
+			override fun onSuccess(result: Contact) {
+				cacheSource.addItem(result)
+				localSource?.addItem(result)
 				callback.onSuccess(result)
 			}
 			override fun onFailure(error: Throwable) {
-				callback.onFailure(error)
+				Utils.logError(error)
+				getItemFallback(id, callback)
 			}
 		})
 	}
 
-	override fun update(contacts: List<Contact>, callback: RequestCallback<Any>) {
+	override fun addItem(item: Contact, callback: RequestCallback<String>) {
 
-		remoteSource.update(contacts, object : RequestCallback<Any> {
+		remoteSource.addItem(item, object : RequestCallback<String> {
 
-			override fun onSuccess(result: Any) {
-				cacheSource.updateItems(contacts)
+			override fun onSuccess(result: String) {
+				cacheSource.addItem(item)
+				localSource?.addItem(item)
 				callback.onSuccess(result)
 			}
-			override fun onFailure(error: Throwable) {
-				callback.onFailure(error)
-			}
+			override fun onFailure(error: Throwable) { callback.onFailure(error) }
 		})
 	}
 
-	override fun update(contact: Contact, callback: RequestCallback<Any>) {
+	override fun addItems(items: List<Contact>, callback: RequestCallback<List<String>>) {
 
-		remoteSource.update(contact, object : RequestCallback<Any> {
+		remoteSource.addItems(items, object : RequestCallback<List<String>> {
 
-			override fun onSuccess(result: Any) {
-				cacheSource.updateItem(contact)
+			override fun onSuccess(result: List<String>) {
+				cacheSource.addItems(items)
+				localSource?.addItems(items)
 				callback.onSuccess(result)
 			}
-			override fun onFailure(error: Throwable) {
-				callback.onFailure(error)
+			override fun onFailure(error: Throwable) { callback.onFailure(error) }
+		})
+	}
+
+	override fun deleteItem(id: String, callback: RequestCallback<Any>) {
+		TODO("Not yet implemented")
+	}
+
+	override fun update(items: List<Contact>, callback: RequestCallback<Any>) {
+
+		remoteSource.update(items, object : RequestCallback<Any> {
+
+			override fun onSuccess(result: Any) {
+				cacheSource.updateItems(items)
+				localSource?.update(items)
+				callback.onSuccess(result)
 			}
+			override fun onFailure(error: Throwable) { callback.onFailure(error) }
+		})
+	}
+
+	override fun update(item: Contact, callback: RequestCallback<Any>) {
+
+		remoteSource.update(item, object : RequestCallback<Any> {
+
+			override fun onSuccess(result: Any) {
+				cacheSource.updateItem(item)
+				localSource?.update(item)
+				callback.onSuccess(result)
+			}
+			override fun onFailure(error: Throwable) { callback.onFailure(error) }
 		})
 	}
 
@@ -78,10 +109,12 @@ object ContactRepository : ContactSource {
 
 			override fun onSuccess(result: List<Contact>) {
 				cacheSource.reset(result)
+				localSource?.addItems(result)
 				callback.onSuccess(result)
 			}
 			override fun onFailure(error: Throwable) {
-				callback.onFailure(error)
+				Utils.logError(error)
+				getAllFallback(callback)
 			}
 		})
 	}
@@ -91,16 +124,79 @@ object ContactRepository : ContactSource {
 		return remoteSource.attachListener(id, object : RequestCallback<Contact> {
 
 			override fun onSuccess(result: Contact) {
-				cacheSource.updateItem(result)
+				cacheSource.addItem(result)
+				localSource?.addItem(result)
 				callback.onSuccess(result)
 			}
 			override fun onFailure(error: Throwable) {
-				callback.onFailure(error)
+				Utils.logError(error)
+				getItemFallback(id, callback)
 			}
 		})
 	}
 
 	fun setRemoteSource(source: ContactSource) {
 		remoteSource = source
+
+		cacheSource.clear()
+		localSource?.let {
+			if (source.getSourceId() != it.getSourceId())
+				localSource = null
+		}
+	}
+
+	fun setLocalSource(source: ContactSource) {
+		localSource = source
+
+		if (source.getSourceId() != remoteSource.getSourceId()) {
+			cacheSource.clear()
+			remoteSource = DummyContactSource
+		}
+	}
+
+	private fun getAllFallback(callback: RequestCallback<List<Contact>>) {
+
+		cacheSource.getAll(object : RequestCallback<List<Contact>> {
+
+			override fun onSuccess(result: List<Contact>) {
+				callback.onSuccess(result)
+			}
+			override fun onFailure(error: Throwable) {
+				localSource
+					?.run { getAll(object : RequestCallback<List<Contact>> {
+
+						override fun onSuccess(result: List<Contact>) {
+							cacheSource.reset(result)
+							callback.onSuccess(result)
+						}
+						override fun onFailure(error: Throwable) {
+							callback.onFailure(EmptyResultException)
+						}
+					}) }
+			}
+		})
+	}
+
+	private fun getItemFallback(id: String, callback: RequestCallback<Contact>) {
+
+		cacheSource.getItem(id, object : RequestCallback<Contact> {
+
+			override fun onSuccess(result: Contact) {
+				callback.onSuccess(result)
+			}
+			override fun onFailure(error: Throwable) {
+				localSource
+					?.run { getItem(id, object : RequestCallback<Contact> {
+
+						override fun onSuccess(result: Contact) {
+							cacheSource.addItem(result)
+							callback.onSuccess(result)
+						}
+						override fun onFailure(error: Throwable) {
+							callback.onFailure(EmptyResultException)
+						}
+					}) }
+			}
+		})
 	}
 }

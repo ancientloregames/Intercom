@@ -19,7 +19,7 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.SetOptions
 import java.lang.RuntimeException
 
-open class FirestoreUserSource(protected val userId: String)
+open class FirestoreUserSource(private val userId: String)
 	: FirestoreSource<User>(), UserSource {
 
 	protected val user get() = users.document(userId)
@@ -30,6 +30,8 @@ open class FirestoreUserSource(protected val userId: String)
 
 	override fun getWorkerThreadName() = "fsUserSource_thread"
 
+	override fun getSourceId() = userId
+
 	override fun updateNotificationToken(token: String, callback: RequestCallback<Any>) {
 		user
 			.update(FIELD_FCM_TOKEN, token)
@@ -39,26 +41,52 @@ open class FirestoreUserSource(protected val userId: String)
 
 	override fun getAll(callback: RequestCallback<List<User>>) {
 		users.get()
+			.addOnSuccessListener { exec { callback.onSuccess(deserialize(it)) } }
+			.addOnFailureListener { exec { callback.onFailure(it) } }
+	}
+
+	override fun addItem(item: User, callback: RequestCallback<String>) {
+
+		db.collection(USERS)
+			.document(item.phone)
+			.get()
+			.addOnSuccessListener { exec { callback.onSuccess(item.phone) } }
+			.addOnFailureListener { exec { callback.onFailure(it) } }
+	}
+
+	override fun addItems(items: List<User>, callback: RequestCallback<List<String>>) {
+		if (items.isEmpty()) {
+			callback.onSuccess(emptyList())
+			return
+		}
+		val lastChatId = items.last().id
+		for (item in items) {
+			db.collection(USERS).add(item)
+				.addOnSuccessListener {
+					if (item.id == lastChatId) {
+						exec { callback.onSuccess(items.map { it.id }) }
+					}
+				}
+				.addOnFailureListener { exec { callback.onFailure(it) } }
+		}
+	}
+
+	override fun getItem(id: String, callback: RequestCallback<User>) {
+		users
+			.document(id)
+			.get()
 			.addOnSuccessListener { snapshot ->
 				exec {
-					deserialize(snapshot).takeIf { it.isNotEmpty() }
+					deserialize(snapshot)
 						?.let { callback.onSuccess(it) }
-						?: callback.onSuccess(emptyList())
+						?: callback.onFailure(EmptyResultException)
 				}
 			}
 			.addOnFailureListener { exec { callback.onFailure(it) } }
 	}
 
-	override fun getItem(phoneNumber: String, callback: RequestCallback<User>) {
-		users.document(phoneNumber).get()
-			.addOnSuccessListener { snapshot ->
-				exec {
-					deserialize(snapshot)
-						?.let { callback.onSuccess(it) }
-						?: callback.onFailure(EmptyResultException())
-				}
-			}
-			.addOnFailureListener { exec { callback.onFailure(it) } }
+	override fun deleteItem(id: String, callback: RequestCallback<Any>) {
+		TODO("Not yet implemented")
 	}
 
 	override fun updateIcon(uri: Uri, callback: RequestCallback<Any>) {
@@ -101,17 +129,36 @@ open class FirestoreUserSource(protected val userId: String)
 			.addOnFailureListener { exec { callback.onFailure(it) } }
 	}
 
-	override fun attachListener(userId: String, callback: RequestCallback<User>) : RepositorySubscription {
+	override fun attachListener(callback: RequestCallback<List<User>>): RepositorySubscription {
 		val registration = users
-			.document(userId)
+			.addSnapshotListener { snapshot, error ->
+				exec {
+					when {
+						error != null -> callback.onFailure(error)
+						snapshot != null -> callback.onSuccess(deserialize(snapshot))
+						else -> callback.onFailure(EmptyResultException)
+					}
+				}
+			}
+
+		return object : RepositorySubscription {
+			override fun remove() {
+				registration.remove()
+			}
+		}
+	}
+
+	override fun attachListener(id: String, callback: RequestCallback<User>) : RepositorySubscription {
+		val registration = users
+			.document(id)
 			.addSnapshotListener { snapshot, error ->
 				exec {
 					when {
 						error != null -> callback.onFailure(error)
 						snapshot != null -> deserialize(snapshot)
 							?.let { callback.onSuccess(it) }
-							?: callback.onFailure(RuntimeException("Failed to deserialize contact: $userId"))
-						else -> callback.onFailure(EmptyResultException())
+							?: callback.onFailure(RuntimeException("Failed to deserialize contact: $id"))
+						else -> callback.onFailure(EmptyResultException)
 					}
 				}
 			}

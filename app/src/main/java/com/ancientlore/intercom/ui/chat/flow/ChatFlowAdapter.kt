@@ -121,9 +121,9 @@ class ChatFlowAdapter(private val userId: String,
 			holder.bind(item)
 	}
 
-	override fun isTheSame(first: Message, second: Message) = first.timestamp == second.timestamp
+	override fun isTheSame(first: Message, second: Message) = first == second
 
-	override fun isUnique(item: Message) = getItems().none { it.timestamp == item.timestamp }
+	override fun isUnique(item: Message) = getItems().none { it.id == item.id }
 
 	override fun createFilter() = Filter()
 

@@ -3,20 +3,24 @@ package com.ancientlore.intercom.data.model
 import android.net.Uri
 import android.os.Parcel
 import android.os.Parcelable
+import androidx.room.*
+import com.ancientlore.intercom.utils.Identifiable
 import com.google.firebase.firestore.Exclude
 import java.text.DateFormat
 import java.util.*
 
-data class Contact(val phone: String = "",
-                   val name: String = "",
-                   val chatId: String = "",
-                   var iconUrl: String = "",
-                   val lastSeenTime: Long = 0)
-  : Comparable<Contact>, Parcelable {
+@Entity(tableName = "contacts",
+  indices = [
+    Index("userId")
+  ])
+data class Contact(@field:PrimaryKey var phone: String = "",
+                   @field:ColumnInfo var name: String = "",
+                   @field:ColumnInfo var chatId: String = "",
+                   @field:ColumnInfo var iconUrl: String = "",
+                   @field:[ColumnInfo Exclude] var userId: String = "")
+  : Comparable<Contact>, Parcelable, Identifiable<String> {
 
   companion object CREATOR : Parcelable.Creator<Contact> {
-
-    private val dateFormat = DateFormat.getTimeInstance(DateFormat.SHORT)
 
     override fun createFromParcel(parcel: Parcel): Contact {
       return Contact(parcel)
@@ -27,15 +31,10 @@ data class Contact(val phone: String = "",
     }
   }
 
-  val id: String get() = phone
-
-  @delegate:Exclude @get:Exclude
-  val lastSeenDate: String by lazy { dateFormat.format(Date(lastSeenTime)) }
-
-  @delegate:Exclude @get:Exclude
+  @delegate:[Exclude Ignore] @get:[Exclude Ignore]
   val iconUri: Uri by lazy { Uri.parse(iconUrl) }
 
-  @get:Exclude
+  @field:[Exclude Ignore]
   var checked: Boolean = false
 
   constructor(parcel: Parcel) : this(
@@ -43,7 +42,7 @@ data class Contact(val phone: String = "",
     parcel.readString(),
     parcel.readString(),
     parcel.readString(),
-    parcel.readLong()
+    parcel.readString()
   )
 
   override fun writeToParcel(parcel: Parcel, flags: Int) {
@@ -51,7 +50,7 @@ data class Contact(val phone: String = "",
     parcel.writeString(name)
     parcel.writeString(chatId)
     parcel.writeString(iconUrl)
-    parcel.writeLong(lastSeenTime)
+    parcel.writeString(userId)
   }
 
   override fun describeContents() = 0
@@ -68,9 +67,21 @@ data class Contact(val phone: String = "",
         && name == other.name
         && chatId == other.chatId
         && iconUrl == other.iconUrl
-        && lastSeenTime == other.lastSeenTime
         && checked == other.checked
   }
+
+  override fun hashCode(): Int {
+    var result = phone.hashCode()
+    result = 31 * result + name.hashCode()
+    result = 31 * result + chatId.hashCode()
+    result = 31 * result + iconUrl.hashCode()
+    result = 31 * result + userId.hashCode()
+    result = 31 * result + checked.hashCode()
+    return result
+  }
+
+  @Exclude @Ignore
+  override fun getIdentity() = phone
 
   fun contains(string: CharSequence, ignoreCase: Boolean = true) =
     name.contains(string, ignoreCase) || phone.contains(string, ignoreCase)

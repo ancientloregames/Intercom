@@ -18,6 +18,7 @@ import androidx.annotation.StringRes
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
+import com.ancientlore.intercom.C.DEFAULT_LOG_TAG
 import com.ancientlore.intercom.backend.CrashlyticsRequestCallback
 import com.ancientlore.intercom.backend.auth.PhoneAuthParams
 import com.ancientlore.intercom.data.model.Contact
@@ -326,15 +327,20 @@ class MainActivity : AppCompatActivity(),
 
 	override fun onSuccessfullAuth(user: User) {
 		initRepositories(user.id)
-		tryObserveDeviceContacts()
+		UserRepository.updateOnlineStatus(true, object: CrashlyticsRequestCallback<Any>() {
+			override fun onSuccess(result: Any) {
+				tryObserveDeviceContacts()
+			}
+		})
 		attachCallListener()
 		//FirebaseFirestore.getInstance().clearPersistence()
+		//val databasesDir = File(context.getApplicationInfo().dataDir.toString() + "/databases")
+		//File(databasesDir, "intercom.db").delete()
 		updateNotificationToken()
 		openChatList()
 		handleIntent(intent)
 	}
 
-	// TODO abstraction!!!!!
 	private fun attachCallListener() {
 
 		App.backend.getCallManager().setIncomingCallHandler { offer ->
@@ -435,7 +441,7 @@ class MainActivity : AppCompatActivity(),
 					}
 
 					ContactRepository.update(updateCandidates, object : CrashlyticsRequestCallback<Any>() {
-						override fun onSuccess(result: Any) { Log.d("Intercom", "Success updating contacts") }
+						override fun onSuccess(result: Any) { Log.d(DEFAULT_LOG_TAG, "Success updating contacts") }
 					})
 				}
 			}
@@ -443,13 +449,20 @@ class MainActivity : AppCompatActivity(),
 	}
 
 	private fun initRepositories(userId: String) {
-		val dataSourceProvider = App.backend.getDataSourceProvider()
+		val remoteDataSourceProvider = App.backend.getDataSourceProvider()
+		val localDataSourceProvider = App.frontend.getDataSourceProvider()
 		UserRepository.apply {
-			setRemoteSource(dataSourceProvider.getUserSource(userId))
-			updateOnlineStatus(true)
+			setRemoteSource(remoteDataSourceProvider.getUserSource(userId))
+			setLocalSource(localDataSourceProvider.getUserSource(userId))
 		}
-		ChatRepository.setRemoteSource(dataSourceProvider.getChatSource(userId))
-		ContactRepository.setRemoteSource(dataSourceProvider.getContactSource(userId))
+		ChatRepository.apply {
+			setRemoteSource(remoteDataSourceProvider.getChatSource(userId))
+			setLocalSource(localDataSourceProvider.getChatSource(userId))
+		}
+		ContactRepository.apply {
+			setRemoteSource(remoteDataSourceProvider.getContactSource(userId))
+			setLocalSource(localDataSourceProvider.getContactSource(userId))
+		}
 	}
 
 	private fun updateNotificationToken() {

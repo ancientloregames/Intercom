@@ -1,23 +1,30 @@
 package com.ancientlore.intercom.data.model
 
 import android.net.Uri
+import androidx.annotation.IntDef
+import androidx.room.*
+import com.ancientlore.intercom.utils.Identifiable
 import com.google.firebase.firestore.Exclude
 import java.text.SimpleDateFormat
 import java.util.*
 
-
-data class Chat(val id: String = "",
-                val name: String = "",
-                val iconUrl: String = "",
-                val initiatorId: String = "",
-                val participants: List<String> = emptyList(),
-                val lastMsgSenderId: String = "",
-                val lastMsgTime: Date = Date(0),
-                val lastMsgText: String = "",
-                val type: Int = TYPE_PRIVATE,
-                val pin: Boolean? = null,
-                val mute: Boolean? = null)
-	: Comparable<Chat> {
+@Entity(tableName = "chats",
+	indices = [
+		Index("userId")
+	])
+data class Chat(@field:PrimaryKey var id: String = "",
+                @field:ColumnInfo var name: String = "",
+                @field:ColumnInfo var iconUrl: String = "",
+                @field:ColumnInfo var initiatorId: String = "",
+                @field:ColumnInfo var participants: List<String> = emptyList(),
+                @field:ColumnInfo var lastMsgSenderId: String = "",
+                @field:ColumnInfo var lastMsgTime: Date? = null,
+                @field:ColumnInfo var lastMsgText: String = "",
+                @field:[ColumnInfo Type] var type: Int = TYPE_PRIVATE,
+                @field:ColumnInfo var pin: Boolean? = null,
+                @field:ColumnInfo var mute: Boolean? = null,
+                @field:[ColumnInfo Exclude] var userId: String = "")
+	: Comparable<Chat>, Identifiable<String> {
 
 	companion object {
 		const val TYPE_PRIVATE = 0
@@ -26,16 +33,22 @@ data class Chat(val id: String = "",
 		private val dateFormat = SimpleDateFormat("MMM dd", Locale.getDefault())
 	}
 
-	@delegate:Exclude @get:Exclude
+	@IntDef(TYPE_PRIVATE, TYPE_GROUP)
+	@Retention(AnnotationRetention.SOURCE)
+	annotation class Type
+
+	@delegate:[Exclude Ignore] @get:[Exclude Ignore]
 	val iconUri: Uri by lazy { Uri.parse(iconUrl) }
 
-	@delegate:Exclude @get:Exclude
+	@delegate:[Exclude Ignore] @get:[Exclude Ignore]
 	val lastMsgDate: String by lazy { if (lastMsgTime != null) dateFormat.format(lastMsgTime) else "" }
 
-	@set:Exclude @get:Exclude
+	// TODO maybe shouldn't exclude from room
+	@field:[Exclude Ignore]
 	var localName: String? = null
 
-	@set:Exclude @get:Exclude
+	// TODO maybe shouldn't exclude from room
+	@field:[Exclude Ignore]
 	var lastMsgSenderLocalName: String? = null
 
 	override fun equals(other: Any?): Boolean {
@@ -47,9 +60,12 @@ data class Chat(val id: String = "",
 		return lastMsgTime == other.lastMsgTime
 				&& id == other.id
 				&& name == other.name
+				&& iconUrl == other.iconUrl
 				&& initiatorId == other.initiatorId
 				&& participants == other.participants
+				&& lastMsgSenderId == other.lastMsgSenderId
 				&& lastMsgText == other.lastMsgText
+				&& type == other.type
 				&& pin == other.pin
 				&& mute == other.mute
 	}
@@ -57,10 +73,13 @@ data class Chat(val id: String = "",
 	override fun hashCode(): Int {
 		var result = id.hashCode()
 		result = 31 * result + name.hashCode()
+		result = 31 * result + iconUrl.hashCode()
 		result = 31 * result + initiatorId.hashCode()
 		result = 31 * result + participants.hashCode()
+		result = 31 * result + lastMsgSenderId.hashCode()
 		result = 31 * result + lastMsgTime.hashCode()
 		result = 31 * result + lastMsgText.hashCode()
+		result = 31 * result + type.hashCode()
 		pin?.let { result = 31 * result + pin.hashCode() }
 		mute?.let { result = 31 * result + mute.hashCode() }
 		return result
@@ -79,4 +98,7 @@ data class Chat(val id: String = "",
 				|| lastMsgText.contains(text, true)
 				|| localName?.contains(text, true) == true
 	}
+
+	@Exclude @Ignore
+	override fun getIdentity() = id
 }

@@ -105,9 +105,9 @@ class FirestoreChatSourceNoCF private constructor(userId: String)
 
 				val userChatChangeMap = HashMap<String, Any>().apply {
 					if (item.pin != null)
-						put(FIELD_PIN, item.pin)
+						put(FIELD_PIN, item.pin!!)
 					if (item.mute != null)
-						put(FIELD_MUTE, item.mute)
+						put(FIELD_MUTE, item.mute!!)
 				}
 				userChats
 					.document(chatId)

@@ -22,6 +22,8 @@ open class FirestoreMessageSource(private val chatId: String)
 
 	override fun getWorkerThreadName() = "fsMessageSource_thread"
 
+	override fun getSourceId() = chatId
+
 	override fun getAll(callback: RequestCallback<List<Message>>) {
 		chatMessages
 			.get()
@@ -29,16 +31,40 @@ open class FirestoreMessageSource(private val chatId: String)
 			.addOnFailureListener { exec { callback.onFailure(it) } }
 	}
 
-	override fun addMessage(message: Message, callback: RequestCallback<String>) {
+	override fun addItem(item: Message, callback: RequestCallback<String>) {
 		chatMessages
-			.add(message)
+			.add(item)
 			.addOnSuccessListener { exec { callback.onSuccess(it.id) } }
 			.addOnFailureListener { exec { callback.onFailure(it) } }
 	}
 
-	override fun deleteMessage(messageId: String, callback: RequestCallback<Any>) {
+	override fun addItems(items: List<Message>, callback: RequestCallback<List<String>>) {
+		if (items.isEmpty()) {
+			callback.onSuccess(emptyList())
+			return
+		}
+		val remoteMessages = ArrayList<String>(items.size)
+		val lastMessageId = items.last().id
+		for (item in items) {
+			chatMessages
+				.add(item)
+				.addOnSuccessListener {
+					remoteMessages.add(it.id)
+					if (item.id == lastMessageId) {
+						exec { callback.onSuccess(remoteMessages) }
+					}
+				}
+				.addOnFailureListener { exec { callback.onFailure(it) } }
+		}
+	}
+
+	override fun getItem(id: String, callback: RequestCallback<Message>) {
+		TODO("Not yet implemented")
+	}
+
+	override fun deleteItem(id: String, callback: RequestCallback<Any>) {
 		chatMessages
-			.document(messageId)
+			.document(id)
 			.delete()
 			.addOnSuccessListener { exec { callback.onSuccess(EmptyObject) } }
 			.addOnFailureListener { exec { callback.onFailure(it) } }
@@ -68,7 +94,7 @@ open class FirestoreMessageSource(private val chatId: String)
 					when {
 						error != null -> callback.onFailure(error)
 						snapshot != null -> callback.onSuccess(deserialize(snapshot))
-						else -> callback.onFailure(EmptyResultException())
+						else -> callback.onFailure(EmptyResultException)
 					}
 				}
 			}
@@ -80,5 +106,7 @@ open class FirestoreMessageSource(private val chatId: String)
 		}
 	}
 
-	override fun getChatId() = chatId
+	override fun attachListener(id: String, callback: RequestCallback<Message>): RepositorySubscription {
+		TODO("Not yet implemented")
+	}
 }

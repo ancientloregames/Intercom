@@ -4,33 +4,45 @@ import com.ancientlore.intercom.backend.RepositorySubscription
 import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.data.model.Chat
 import com.ancientlore.intercom.data.source.ChatSource
-import com.ancientlore.intercom.utils.Utils
+import com.ancientlore.intercom.data.source.EmptyResultException
 
 object DummyChatSource : ChatSource {
 
-	const val TAG = "DummyChatSource"
+	override fun getSourceId() = ""
 
 	override fun getAll(callback: RequestCallback<List<Chat>>) {
-		Utils.logError("$TAG.getAll")
+		callback.onFailure(EmptyResultException)
 	}
 	override fun getItem(id: String, callback: RequestCallback<Chat>) {
-		Utils.logError("$TAG.getItem")
+		callback.onFailure(EmptyResultException)
+	}
+
+	override fun addItems(items: List<Chat>, callback: RequestCallback<List<String>>) {
+		callback.onFailure(EmptyResultException)
 	}
 
 	override fun addItem(item: Chat, callback: RequestCallback<String>) {
-		Utils.logError("$TAG.addItem")
+		callback.onFailure(EmptyResultException)
 	}
 
-	override fun deleteItem(chatId: String, callback: RequestCallback<Any>) {
-		Utils.logError("$TAG.deleteItem")
+	override fun deleteItem(id: String, callback: RequestCallback<Any>) {
+		callback.onFailure(EmptyResultException)
 	}
 
 	override fun updateItem(item: Chat, callback: RequestCallback<Any>) {
-		Utils.logError("$TAG.updateItem")
+		callback.onFailure(EmptyResultException)
 	}
 
 	override fun attachListener(callback: RequestCallback<List<Chat>>): RepositorySubscription {
-		Utils.logError("$TAG.attachListener")
+		callback.onFailure(EmptyResultException)
+
+		return object : RepositorySubscription {
+			override fun remove() {}
+		}
+	}
+
+	override fun attachListener(id: String, callback: RequestCallback<Chat>): RepositorySubscription {
+		callback.onFailure(EmptyResultException)
 
 		return object : RepositorySubscription {
 			override fun remove() {}

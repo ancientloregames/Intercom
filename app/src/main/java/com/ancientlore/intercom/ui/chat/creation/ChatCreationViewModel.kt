@@ -44,7 +44,7 @@ class ChatCreationViewModel(listAdapter: ChatCreationAdapter)
 						title = contact.name,
 						iconUri = contact.iconUri,
 						chatType = Chat.TYPE_PRIVATE,
-						participants = listOf(userId, contact.id))
+						participants = listOf(userId, contact.getIdentity()))
 				)
 			}
 			override fun onCreateGroup() {

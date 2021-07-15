@@ -26,6 +26,8 @@ open class FirestoreChatSource protected constructor(private val userId: String)
 
 	override fun getWorkerThreadName() = "fsChatSource_thread"
 
+	override fun getSourceId() = userId
+
 	override fun getAll(callback: RequestCallback<List<Chat>>) {
 		userChats.get()
 			.addOnSuccessListener { exec { callback.onSuccess(deserialize(it)) } }
@@ -38,10 +40,29 @@ open class FirestoreChatSource protected constructor(private val userId: String)
 				exec {
 					deserialize(snapshot)
 						?.let { callback.onSuccess(it) }
-						?: callback.onFailure(EmptyResultException("no chat with id $id"))
+						?: callback.onFailure(EmptyResultException)
 				}
 			}
 			.addOnFailureListener { exec { callback.onFailure(it) } }
+	}
+
+	override fun addItems(items: List<Chat>, callback: RequestCallback<List<String>>) {
+		if (items.isEmpty()) {
+			callback.onSuccess(emptyList())
+			return
+		}
+		val remoteChats = ArrayList<String>(items.size)
+		val lastChatId = items.last().id
+		for (item in items) {
+			db.collection(CHATS).add(item)
+				.addOnSuccessListener {
+					remoteChats.add(it.id)
+					if (item.id == lastChatId) {
+						exec { callback.onSuccess(remoteChats) }
+					}
+				}
+				.addOnFailureListener { exec { callback.onFailure(it) } }
+		}
 	}
 
 	override fun addItem(item: Chat, callback: RequestCallback<String>) {
@@ -50,9 +71,9 @@ open class FirestoreChatSource protected constructor(private val userId: String)
 			.addOnFailureListener { exec { callback.onFailure(it) } }
 	}
 
-	override fun deleteItem(chatId: String, callback: RequestCallback<Any>) {
+	override fun deleteItem(id: String, callback: RequestCallback<Any>) {
 		db.collection(CHATS)
-			.document(chatId)
+			.document(id)
 			.get()
 			.addOnSuccessListener { snapshot ->
 				exec {
@@ -96,7 +117,7 @@ open class FirestoreChatSource protected constructor(private val userId: String)
 				exec {
 					if (error != null)
 						callback.onFailure(error)
-					else if (snapshot != null)
+					else if (snapshot != null && !snapshot.metadata.hasPendingWrites())
 						callback.onSuccess(deserialize(snapshot))
 				}
 			}
@@ -106,5 +127,9 @@ open class FirestoreChatSource protected constructor(private val userId: String)
 				registration.remove()
 			}
 		}
+	}
+
+	override fun attachListener(id: String, callback: RequestCallback<Chat>): RepositorySubscription {
+		TODO("Not yet implemented")
 	}
 }

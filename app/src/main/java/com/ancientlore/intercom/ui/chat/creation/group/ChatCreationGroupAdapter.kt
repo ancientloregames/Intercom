@@ -68,11 +68,11 @@ class ChatCreationGroupAdapter(context: Context,
 
 	override fun isUnique(item: Contact) = getItems().none { it.phone == item.phone }
 
-	fun findItemIndex(contactId: String) = getItems().indexOfFirst { it.id == contactId }
+	fun findItemIndex(contactId: String) = getItems().indexOfFirst { it.getIdentity() == contactId }
 
 	fun switchCheckBoxItem(item: Contact) {
 
-		findItemIndex(item.id)
+		findItemIndex(item.getIdentity())
 			.takeIf { it != -1 }
 			?.let {
 				item.checked = item.checked.not()

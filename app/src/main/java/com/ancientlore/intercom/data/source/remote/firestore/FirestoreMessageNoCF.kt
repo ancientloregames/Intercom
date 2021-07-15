@@ -30,15 +30,15 @@ class FirestoreMessageNoCF(chatId: String): FirestoreMessageSource(chatId) {
 			}
 	}
 
-	override fun addMessage(message: Message, callback: RequestCallback<String>) {
-		chatMessages.add(message)
+	override fun addItem(item: Message, callback: RequestCallback<String>) {
+		chatMessages.add(item)
 			.addOnSuccessListener {
 				if (chat == null) {
-					callback.onFailure(EmptyResultException("FirestoreMessageNoCF. No chat in repository"))
+					callback.onFailure(EmptyResultException)
 					return@addOnSuccessListener
 				}
 
-				val senderId = message.senderId
+				val senderId = item.senderId
 				val messageId = it.id
 
 				chatMessages.document(messageId)
@@ -50,13 +50,13 @@ class FirestoreMessageNoCF(chatId: String): FirestoreMessageSource(chatId) {
 
 				val userChatInfoUpdate = HashMap<String, Any>().apply {
 					put(FIELD_LAST_MSG_SENDER, senderId)
-					put(FIELD_LAST_MSG_TEXT, message.text)
+					put(FIELD_LAST_MSG_TEXT, item.text)
 					put(FIELD_LAST_MSG_TIME, FieldValue.serverTimestamp())
 				}
 
 				if (chat.participants.size == 2) {
 
-					val receiverId = if (message.senderId != chat.participants[0]) chat.participants[0] else chat.participants[1]
+					val receiverId = if (item.senderId != chat.participants[0]) chat.participants[0] else chat.participants[1]
 
 					db.collection(USERS)
 						.document(senderId)
@@ -77,10 +77,10 @@ class FirestoreMessageNoCF(chatId: String): FirestoreMessageSource(chatId) {
 						db.collection(USERS)
 							.document(receiverId)
 							.collection(CHATS)
-							.document(getChatId())
+							.document(getSourceId())
 							.set(userChatInfoUpdate, SetOptions.merge())
 							.addOnSuccessListener {
-								if (message.senderId == receiverId)
+								if (item.senderId == receiverId)
 									exec { callback.onSuccess(messageId) }
 							}
 							.addOnFailureListener { exec { callback.onFailure(it) } }

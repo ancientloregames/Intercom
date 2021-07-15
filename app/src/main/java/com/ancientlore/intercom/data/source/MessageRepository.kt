@@ -11,7 +11,10 @@ import com.ancientlore.intercom.utils.Utils
 class MessageRepository : MessageSource {
 
 	private var remoteSource: MessageSource = DummyMessageSource
+	private var localSource: MessageSource? = null
 	private val cacheSource = CacheMessageSource
+
+	override fun getSourceId() = remoteSource.getSourceId()
 
 	override fun getAll(callback: RequestCallback<List<Message>>) {
 
@@ -19,36 +22,69 @@ class MessageRepository : MessageSource {
 
 			override fun onSuccess(result: List<Message>) {
 				cacheSource.reset(result)
+				localSource?.addItems(result)
 				callback.onSuccess(result)
 			}
 			override fun onFailure(error: Throwable) {
 				Utils.logError(error)
-				cacheSource.getAll()
-					.takeIf { it.isNotEmpty() }
-					?.let { callback.onSuccess(it) }
-					?: callback.onFailure(EmptyResultException())
+				getAllFallback(callback)
 			}
 		})
 	}
 
-	override fun addMessage(message: Message, callback: RequestCallback<String>) {
+	override fun getItem(id: String, callback: RequestCallback<Message>) {
 
-		remoteSource.addMessage(message, object : RequestCallback<String> {
+		remoteSource.getItem(id, object : RequestCallback<Message> {
+
+			override fun onSuccess(result: Message) {
+				cacheSource.addItem(result)
+				localSource?.addItem(result)
+				callback.onSuccess(result)
+			}
+			override fun onFailure(error: Throwable) {
+				Utils.logError(error)
+				getItemFallback(id, callback)
+			}
+		})
+	}
+
+	override fun addItem(item: Message, callback: RequestCallback<String>) {
+
+		remoteSource.addItem(item, object : RequestCallback<String> {
 
 			override fun onSuccess(result: String) {
-				cacheSource.addItem(Message.createWithId(message, result))
+				item.id = result
+				cacheSource.addItem(item)
+				localSource?.addItem(item)
 				callback.onSuccess(result)
 			}
 			override fun onFailure(error: Throwable) { callback.onFailure(error) }
 		})
 	}
 
-	override fun deleteMessage(messageId: String, callback: RequestCallback<Any>) {
+	override fun addItems(items: List<Message>, callback: RequestCallback<List<String>>) {
 
-		remoteSource.deleteMessage(messageId, object : RequestCallback<Any> {
+		remoteSource.addItems(items, object : RequestCallback<List<String>> {
+
+			override fun onSuccess(result: List<String>) {
+				for (i in 0..result.size) {
+					items[i].id = result[i]
+				}
+				cacheSource.addItems(items)
+				localSource?.addItems(items)
+				callback.onSuccess(result)
+			}
+			override fun onFailure(error: Throwable) { callback.onFailure(error) }
+		})
+	}
+
+	override fun deleteItem(id: String, callback: RequestCallback<Any>) {
+
+		remoteSource.deleteItem(id, object : RequestCallback<Any> {
 
 			override fun onSuccess(result: Any) {
-				cacheSource.deleteItem(messageId)
+				cacheSource.deleteItem(id)
+				localSource?.deleteItem(id)
 				callback.onSuccess(result)
 			}
 			override fun onFailure(error: Throwable) { callback.onFailure(error) }
@@ -61,6 +97,7 @@ class MessageRepository : MessageSource {
 
 			override fun onSuccess(result: Any) {
 				cacheSource.updateMessageUri(messageId, uri)
+				localSource?.updateMessageUri(messageId, uri)
 				callback.onSuccess(result)
 			}
 			override fun onFailure(error: Throwable) { callback.onFailure(error) }
@@ -73,6 +110,7 @@ class MessageRepository : MessageSource {
 
 			override fun onSuccess(result: Any) {
 				cacheSource.setMessageStatusReceived(id)
+				localSource?.setMessageStatusReceived(id)
 				callback.onSuccess(result)
 			}
 			override fun onFailure(error: Throwable) { callback.onFailure(error) }
@@ -85,15 +123,94 @@ class MessageRepository : MessageSource {
 
 			override fun onSuccess(result: List<Message>) {
 				cacheSource.reset(result)
+				localSource?.addItems(result)
 				callback.onSuccess(result)
 			}
-			override fun onFailure(error: Throwable) { callback.onFailure(error) }
+			override fun onFailure(error: Throwable) {
+				Utils.logError(error)
+				getAllFallback(callback)
+			}
 		})
 	}
 
-	override fun getChatId() = remoteSource.getChatId()
+	override fun attachListener(id: String, callback: RequestCallback<Message>): RepositorySubscription {
+
+		return remoteSource.attachListener(id, object : RequestCallback<Message> {
+
+			override fun onSuccess(result: Message) {
+				cacheSource.addItem(result)
+				localSource?.addItem(result)
+				callback.onSuccess(result)
+			}
+			override fun onFailure(error: Throwable) {
+				Utils.logError(error)
+				getItemFallback(id, callback)
+			}
+		})
+	}
 
 	fun setRemoteSource(source: MessageSource) {
 		remoteSource = source
+
+		cacheSource.clear()
+		localSource?.let {
+			if (source.getSourceId() != it.getSourceId())
+				localSource = null
+		}
+	}
+
+	fun setLocalSource(source: MessageSource) {
+		localSource = source
+
+		if (source.getSourceId() != remoteSource.getSourceId()) {
+			cacheSource.clear()
+			remoteSource = DummyMessageSource
+		}
+	}
+
+	private fun getAllFallback(callback: RequestCallback<List<Message>>) {
+
+		cacheSource.getAll(object : RequestCallback<List<Message>> {
+
+			override fun onSuccess(result: List<Message>) {
+				callback.onSuccess(result)
+			}
+			override fun onFailure(error: Throwable) {
+				localSource
+					?.run { getAll(object : RequestCallback<List<Message>> {
+
+						override fun onSuccess(result: List<Message>) {
+							cacheSource.reset(result)
+							callback.onSuccess(result)
+						}
+						override fun onFailure(error: Throwable) {
+							callback.onFailure(EmptyResultException)
+						}
+					}) }
+			}
+		})
+	}
+
+	private fun getItemFallback(id: String, callback: RequestCallback<Message>) {
+
+		cacheSource.getItem(id, object : RequestCallback<Message> {
+
+			override fun onSuccess(result: Message) {
+				callback.onSuccess(result)
+			}
+			override fun onFailure(error: Throwable) {
+				localSource
+					?.run { getItem(id, object : RequestCallback<Message> {
+
+						override fun onSuccess(result: Message) {
+							cacheSource.addItem(result)
+							callback.onSuccess(result)
+						}
+						override fun onFailure(error: Throwable) {
+							callback.onFailure(EmptyResultException)
+						}
+					}) }
+			}
+		})
 	}
 }

@@ -3,22 +3,30 @@ package com.ancientlore.intercom.data.model
 import android.net.Uri
 import androidx.annotation.IntDef
 import androidx.annotation.StringDef
+import androidx.room.*
+import com.ancientlore.intercom.utils.Identifiable
 import com.google.firebase.firestore.Exclude
 import com.google.firebase.firestore.ServerTimestamp
 import java.text.DateFormat
 import java.text.DateFormat.SHORT
 import java.util.*
 
-data class Message(val id: String = "",
-                   @ServerTimestamp val timestamp: Date = Date(System.currentTimeMillis()),
-                   val senderId: String = "",
-                   val text: String = "",
-                   val info: String = "",
-                   val attachUrl: String = "",
-                   @Type val type: String = TYPE_TEXT,
-                   @Status val status: Int = STATUS_WAIT,
-                   @get:Exclude var progress: Int = -1)
-	: Comparable<Message> {
+@Entity(tableName = "messages",
+	indices = [
+		Index("chatId")
+	])
+data class Message(@field:ColumnInfo var id: String = "",
+                   @field:[ColumnInfo ServerTimestamp] var timestamp: Date? = null,
+                   @field:ColumnInfo var senderId: String = "",
+                   @field:ColumnInfo var text: String = "",
+                   @field:ColumnInfo var info: String = "",
+                   @field:ColumnInfo var attachUrl: String = "",
+                   @field:[ColumnInfo Type] var type: String = TYPE_TEXT,
+                   @field:[ColumnInfo Status] var status: Int = STATUS_WAIT,
+                   @field:[Exclude Ignore] var progress: Int = -1,
+                   @field:ColumnInfo @get:Exclude var chatId: String = "",
+                   @field:[PrimaryKey(autoGenerate = true) Exclude] var localId: Long = 0)// field "id" is unique only per chat
+	: Comparable<Message>, Identifiable<String> {
 
 	companion object {
     const val TYPE_TEXT = "text"
@@ -33,12 +41,6 @@ data class Message(val id: String = "",
 		fun createFromAudio(senderId: String, filePath: String) : Message {
 			return Message(senderId = senderId, attachUrl = filePath, type = TYPE_AUDIO)
 		}
-
-		fun createWithId(message: Message, id: String) : Message {
-			return Message(id, message.timestamp, message.senderId,
-				message.text, message.info, message.attachUrl,
-				message.type, message.status, message.progress)
-		}
   }
 
   constructor(senderId: String, fileData: FileData) : this(
@@ -52,13 +54,13 @@ data class Message(val id: String = "",
 	@Retention(AnnotationRetention.SOURCE)
 	annotation class Status
 
-  @delegate:Exclude @get:Exclude
+  @delegate:[Exclude Ignore] @get:[Exclude Ignore]
   val attachUri: Uri by lazy { if (attachUrl.isNotEmpty()) Uri.parse(attachUrl) else Uri.EMPTY }
 
-  @delegate:Exclude @get:Exclude
-  val formatedTime: String by lazy { DateFormat.getTimeInstance(SHORT).format(timestamp) }
+  @delegate:[Exclude Ignore] @get:[Exclude Ignore]
+  val formatedTime: String by lazy { if (timestamp != null) DateFormat.getTimeInstance(SHORT).format(timestamp) else "" }
 
-  override fun compareTo(other: Message) = timestamp.compareTo(other.timestamp)
+  override fun compareTo(other: Message) = timestamp?.compareTo(other.timestamp) ?: 0
 
 	override fun equals(other: Any?): Boolean {
 		if (this === other) return true
@@ -85,4 +87,7 @@ data class Message(val id: String = "",
 	}
 
 	fun contains(text: String) = this.text.contains(text, true)
+
+	@Exclude @Ignore
+	override fun getIdentity() = id
 }

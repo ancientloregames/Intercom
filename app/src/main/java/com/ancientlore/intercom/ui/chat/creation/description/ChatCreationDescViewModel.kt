@@ -61,7 +61,7 @@ class ChatCreationDescViewModel(listAdapter: ChatCreationDescAdapter)
 				title = groupName,
 				chatType = Chat.TYPE_GROUP,
 				iconUri = iconUri ?: Uri.EMPTY,
-				participants = listOf(userId).plus(contacts.map { it.id })
+				participants = listOf(userId).plus(contacts.map { it.getIdentity() })
 			))
 		}
 		else toastRequest.onNext(R.string.alert_error_name_required)

@@ -10,18 +10,23 @@ import com.ancientlore.intercom.utils.Utils
 object ChatRepository : ChatSource {
 
 	private var remoteSource: ChatSource = DummyChatSource
+	private var localSource: ChatSource? = null
 	private val cacheSource = CacheChatSource
+
+	override fun getSourceId() = remoteSource.getSourceId()
 
 	override fun getAll(callback: RequestCallback<List<Chat>>) {
 
 		remoteSource.getAll(object : RequestCallback<List<Chat>> {
+
 			override fun onSuccess(result: List<Chat>) {
 				cacheSource.reset(result)
+				localSource?.addItems(result)
 				callback.onSuccess(result)
 			}
 			override fun onFailure(error: Throwable) {
 				Utils.logError(error)
-				callback.onSuccess(cacheSource.getAll())
+				getAllFallback(callback)
 			}
 		})
 	}
@@ -31,14 +36,13 @@ object ChatRepository : ChatSource {
 		remoteSource.getItem(id, object : RequestCallback<Chat> {
 
 			override fun onSuccess(result: Chat) {
-				cacheSource.putItem(result)
+				cacheSource.addItem(result)
+				localSource?.addItem(result)
 				callback.onSuccess(result)
 			}
 			override fun onFailure(error: Throwable) {
 				Utils.logError(error)
-				cacheSource.getItem(id)
-					?.let { callback.onSuccess(it) }
-					?: callback.onFailure(EmptyResultException())
+				getItemFallback(id, callback)
 			}
 		})
 	}
@@ -48,27 +52,41 @@ object ChatRepository : ChatSource {
 		remoteSource.addItem(item, object : RequestCallback<String> {
 
 			override fun onSuccess(result: String) {
-				cacheSource.putItem(item)
+				item.id = result
+				cacheSource.addItem(item)
+				localSource?.addItem(item)
 				callback.onSuccess(result)
-
 			}
-			override fun onFailure(error: Throwable) {
-				callback.onFailure(error)
-			}
+			override fun onFailure(error: Throwable) { callback.onFailure(error) }
 		})
 	}
 
-	override fun deleteItem(chatId: String, callback: RequestCallback<Any>) {
+	override fun addItems(items: List<Chat>, callback: RequestCallback<List<String>>) {
 
-		remoteSource.deleteItem(chatId, object : RequestCallback<Any> {
+		remoteSource.addItems(items, object : RequestCallback<List<String>> {
 
-			override fun onSuccess(result: Any) {
-				cacheSource.deleteItem(chatId)
+			override fun onSuccess(result: List<String>) {
+				for (i in 0..result.size) {
+					items[i].id = result[i]
+				}
+				cacheSource.addItems(items)
+				localSource?.addItems(items)
 				callback.onSuccess(result)
 			}
-			override fun onFailure(error: Throwable) {
-				callback.onFailure(error)
+			override fun onFailure(error: Throwable) { callback.onFailure(error) }
+		})
+	}
+
+	override fun deleteItem(id: String, callback: RequestCallback<Any>) {
+
+		remoteSource.deleteItem(id, object : RequestCallback<Any> {
+
+			override fun onSuccess(result: Any) {
+				cacheSource.deleteItem(id)
+				localSource?.deleteItem(id)
+				callback.onSuccess(result)
 			}
+			override fun onFailure(error: Throwable) { callback.onFailure(error) }
 		})
 	}
 
@@ -78,11 +96,10 @@ object ChatRepository : ChatSource {
 
 			override fun onSuccess(result: Any) {
 				cacheSource.updateItem(item)
+				localSource?.updateItem(item)
 				callback.onSuccess(result)
 			}
-			override fun onFailure(error: Throwable) {
-				callback.onFailure(error)
-			}
+			override fun onFailure(error: Throwable) { callback.onFailure(error) }
 		})
 	}
 
@@ -92,15 +109,94 @@ object ChatRepository : ChatSource {
 
 			override fun onSuccess(result: List<Chat>) {
 				cacheSource.reset(result)
+				localSource?.addItems(result)
 				callback.onSuccess(result)
 			}
 			override fun onFailure(error: Throwable) {
-				callback.onFailure(error)
+				Utils.logError(error)
+				getAllFallback(callback)
+			}
+		})
+	}
+
+	override fun attachListener(id: String, callback: RequestCallback<Chat>): RepositorySubscription {
+
+		return remoteSource.attachListener(id, object : RequestCallback<Chat> {
+
+			override fun onSuccess(result: Chat) {
+				cacheSource.addItem(result)
+				localSource?.addItem(result)
+				callback.onSuccess(result)
+			}
+			override fun onFailure(error: Throwable) {
+				Utils.logError(error)
+				getItemFallback(id, callback)
 			}
 		})
 	}
 
 	fun setRemoteSource(source: ChatSource) {
 		remoteSource = source
+
+		cacheSource.clear()
+		localSource?.let {
+			if (source.getSourceId() != it.getSourceId())
+				localSource = null
+		}
+	}
+
+	fun setLocalSource(source: ChatSource) {
+		localSource = source
+
+		if (source.getSourceId() != remoteSource.getSourceId()) {
+			cacheSource.clear()
+			remoteSource = DummyChatSource
+		}
+	}
+
+	private fun getAllFallback(callback: RequestCallback<List<Chat>>) {
+
+		cacheSource.getAll(object : RequestCallback<List<Chat>> {
+
+			override fun onSuccess(result: List<Chat>) {
+				callback.onSuccess(result)
+			}
+			override fun onFailure(error: Throwable) {
+				localSource
+					?.run { getAll(object : RequestCallback<List<Chat>> {
+
+						override fun onSuccess(result: List<Chat>) {
+							cacheSource.reset(result)
+							callback.onSuccess(result)
+						}
+						override fun onFailure(error: Throwable) {
+							callback.onFailure(EmptyResultException)
+						}
+					}) }
+			}
+		})
+	}
+
+	private fun getItemFallback(id: String, callback: RequestCallback<Chat>) {
+
+		cacheSource.getItem(id, object : RequestCallback<Chat> {
+
+			override fun onSuccess(result: Chat) {
+				callback.onSuccess(result)
+			}
+			override fun onFailure(error: Throwable) {
+				localSource
+					?.run { getItem(id, object : RequestCallback<Chat> {
+
+						override fun onSuccess(result: Chat) {
+							cacheSource.addItem(result)
+							callback.onSuccess(result)
+						}
+						override fun onFailure(error: Throwable) {
+							callback.onFailure(EmptyResultException)
+						}
+					}) }
+			}
+		})
 	}
 }

@@ -178,7 +178,7 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 		guarantyChat {
 			showSendProgressField.set(true)
 			val message = Message(senderId = params.userId, text = text)
-			repository.addMessage(message, object : RequestCallback<String> {
+			repository.addItem(message, object : RequestCallback<String> {
 				override fun onSuccess(result: String) {
 					runOnUiThread {
 						showSendProgressField.set(false)
@@ -198,7 +198,7 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 				senderId = params.userId,
 				attachUrl = conpressed.toString(),
 				type = Message.TYPE_IMAGE)
-			repository.addMessage(message, object : RequestCallback<String> {
+			repository.addItem(message, object : RequestCallback<String> {
 				override fun onSuccess(messageId: String) {
 					App.backend.getStorageManager().uploadImage(fileData, chatId, object : ProgressRequestCallback<Uri> {
 						override fun onProgress(progress: Int) {
@@ -229,7 +229,7 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 			showSendProgressField.set(true)
 
 			val message = Message(params.userId, fileData)
-			repository.addMessage(message, object : RequestCallback<String> {
+			repository.addItem(message, object : RequestCallback<String> {
 
 				override fun onSuccess(messageId: String) {
 
@@ -262,7 +262,7 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 			showSendProgressField.set(true)
 
 			val message = Message.createFromAudio(params.userId, file.name)
-			repository.addMessage(message, object : RequestCallback<String> {
+			repository.addItem(message, object : RequestCallback<String> {
 
 				override fun onSuccess(messageId: String) {
 
@@ -295,7 +295,7 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 	}
 
 	fun handleDelete(message: Message) {
-		repository.deleteMessage(message.id, object : CrashlyticsRequestCallback<Any>() {
+		repository.deleteItem(message.id, object : CrashlyticsRequestCallback<Any>() {
 			override fun onSuccess(result: Any) {
 				toastRequest.onNext(R.string.message_deleted)
 			}
@@ -313,7 +313,7 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 
 	private fun guarantyChat(callback: Runnable1<String>) {
 
-		if (repository.getChatId() == null) {
+		if (repository.getSourceId().isEmpty()) {
 
 			val chat = Chat(
 				name = params.title,
@@ -341,13 +341,14 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 				}
 			})
 		}
-		else callback.run(repository.getChatId())
+		else callback.run(repository.getSourceId())
 	}
 
 	private fun initMessageRepository(chatId: String) {
-		repository.setRemoteSource(
-			App.backend.getDataSourceProvider()
-				.getMessageSource(chatId))
+		repository.apply {
+			setRemoteSource(App.backend.getDataSourceProvider().getMessageSource(chatId))
+			setLocalSource(App.frontend.getDataSourceProvider().getMessageSource(chatId))
+		}
 
 		repositorySub = repository.attachListener(object : CrashlyticsRequestCallback<List<Message>>() {
 			override fun onSuccess(result: List<Message>) {

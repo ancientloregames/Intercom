@@ -5,6 +5,8 @@ import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.multidex.MultiDexApplication
 import com.ancientlore.intercom.backend.firebase.FirebaseFactory
+import com.ancientlore.intercom.frontend.FrontendFactory
+import com.ancientlore.intercom.frontend.IntercomFrontendFactory
 
 class App : MultiDexApplication() {
 
@@ -16,6 +18,9 @@ class App : MultiDexApplication() {
 
 		val backend = FirebaseFactory
 
+		lateinit var frontend: FrontendFactory
+			private set
+
 		@SuppressLint("StaticFieldLeak")
 		lateinit var context: Context
 	}
@@ -23,11 +28,14 @@ class App : MultiDexApplication() {
 	override fun onCreate() {
 		try {
 			context = applicationContext
+			frontend = IntercomFrontendFactory(context)
 		} catch (ignore: Throwable) { }
 
 		super.onCreate()
 
-		if (context == null)
+		if (context == null) {
 			context = applicationContext
+			frontend = IntercomFrontendFactory(context)
+		}
 	}
 }
