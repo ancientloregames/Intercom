@@ -1,6 +1,7 @@
 package com.ancientlore.intercom.data.source
 
 import android.net.Uri
+import com.ancientlore.intercom.App
 import com.ancientlore.intercom.backend.RepositorySubscription
 import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.data.model.Message
@@ -14,6 +15,8 @@ class MessageRepository : MessageSource {
 	private var localSource: MessageSource? = null
 	private val cacheSource = CacheMessageSource
 
+	private val userId = App.backend.getAuthManager().getCurrentUser().id
+
 	override fun getSourceId() = remoteSource.getSourceId()
 
 	override fun getAll(callback: RequestCallback<List<Message>>) {
@@ -21,9 +24,19 @@ class MessageRepository : MessageSource {
 		remoteSource.getAll(object : RequestCallback<List<Message>> {
 
 			override fun onSuccess(result: List<Message>) {
-				cacheSource.reset(result)
-				localSource?.addItems(result)
-				callback.onSuccess(result)
+
+				App.frontend.getCryptoManager(userId).decryptMessages(result, object : RequestCallback<Any> {
+
+					override fun onSuccess(ignore: Any) {
+						cacheSource.reset(result)
+						localSource?.addItems(result)
+						callback.onSuccess(result)
+					}
+					override fun onFailure(error: Throwable) {
+						Utils.logError(error)
+						getAllFallback(callback)
+					}
+				})
 			}
 			override fun onFailure(error: Throwable) {
 				Utils.logError(error)
@@ -50,13 +63,19 @@ class MessageRepository : MessageSource {
 
 	override fun addItem(item: Message, callback: RequestCallback<String>) {
 
-		remoteSource.addItem(item, object : RequestCallback<String> {
+		App.frontend.getCryptoManager(item.senderId).encrypt(item, object : RequestCallback<Any> {
 
-			override fun onSuccess(result: String) {
-				item.id = result
-				cacheSource.addItem(item)
-				localSource?.addItem(item)
-				callback.onSuccess(result)
+			override fun onSuccess(result: Any) {
+				remoteSource.addItem(item, object : RequestCallback<String> {
+
+					override fun onSuccess(result: String) {
+						item.id = result
+						cacheSource.addItem(item)
+						localSource?.addItem(item)
+						callback.onSuccess(result)
+					}
+					override fun onFailure(error: Throwable) { callback.onFailure(error) }
+				})
 			}
 			override fun onFailure(error: Throwable) { callback.onFailure(error) }
 		})
@@ -122,9 +141,19 @@ class MessageRepository : MessageSource {
 		return remoteSource.attachListener(object : RequestCallback<List<Message>> {
 
 			override fun onSuccess(result: List<Message>) {
-				cacheSource.reset(result)
-				localSource?.addItems(result)
-				callback.onSuccess(result)
+
+				App.frontend.getCryptoManager(userId).decryptMessages(result, object : RequestCallback<Any> {
+
+					override fun onSuccess(ignore: Any) {
+						cacheSource.reset(result)
+						localSource?.addItems(result)
+						callback.onSuccess(result)
+					}
+					override fun onFailure(error: Throwable) {
+						Utils.logError(error)
+						getAllFallback(callback)
+					}
+				})
 			}
 			override fun onFailure(error: Throwable) {
 				Utils.logError(error)

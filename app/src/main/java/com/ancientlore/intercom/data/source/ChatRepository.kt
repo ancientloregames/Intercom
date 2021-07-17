@@ -1,5 +1,6 @@
 package com.ancientlore.intercom.data.source
 
+import com.ancientlore.intercom.App
 import com.ancientlore.intercom.backend.RepositorySubscription
 import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.data.model.Chat
@@ -20,9 +21,20 @@ object ChatRepository : ChatSource {
 		remoteSource.getAll(object : RequestCallback<List<Chat>> {
 
 			override fun onSuccess(result: List<Chat>) {
-				cacheSource.reset(result)
-				localSource?.addItems(result)
-				callback.onSuccess(result)
+
+				val userId = App.backend.getAuthManager().getCurrentUser().id
+				App.frontend.getCryptoManager(userId).decryptChats(result, object : RequestCallback<Any> {
+
+					override fun onSuccess(ignore: Any) {
+						cacheSource.reset(result)
+						localSource?.addItems(result)
+						callback.onSuccess(result)
+					}
+					override fun onFailure(error: Throwable) {
+						Utils.logError(error)
+						getAllFallback(callback)
+					}
+				})
 			}
 			override fun onFailure(error: Throwable) {
 				Utils.logError(error)
@@ -108,9 +120,20 @@ object ChatRepository : ChatSource {
 		return remoteSource.attachListener(object : RequestCallback<List<Chat>> {
 
 			override fun onSuccess(result: List<Chat>) {
-				cacheSource.reset(result)
-				localSource?.addItems(result)
-				callback.onSuccess(result)
+
+				val userId = App.backend.getAuthManager().getCurrentUser().id
+				App.frontend.getCryptoManager(userId).decryptChats(result, object : RequestCallback<Any> {
+
+					override fun onSuccess(ignore: Any) {
+						cacheSource.reset(result)
+						localSource?.addItems(result)
+						callback.onSuccess(result)
+					}
+					override fun onFailure(error: Throwable) {
+						Utils.logError(error)
+						getAllFallback(callback)
+					}
+				})
 			}
 			override fun onFailure(error: Throwable) {
 				Utils.logError(error)
