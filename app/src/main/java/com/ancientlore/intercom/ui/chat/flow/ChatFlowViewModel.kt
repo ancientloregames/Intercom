@@ -55,6 +55,8 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 
 	private var inputManager: MessageInputManager? = null
 
+	private var receiverId: String? = null
+
 	fun init(context: Context) {
 		when {
 			params.chatId.isNotEmpty() -> {
@@ -177,7 +179,10 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 	private fun sendMessage(text: String) {
 		guarantyChat {
 			showSendProgressField.set(true)
-			val message = Message(senderId = params.userId, text = text)
+			val message = Message(
+				senderId = params.userId,
+				text = text,
+				receiverId = receiverId)
 			repository.addItem(message, object : RequestCallback<String> {
 				override fun onSuccess(result: String) {
 					runOnUiThread {
@@ -369,6 +374,8 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 	}
 
 	private fun observeContactOnlineStatus(context: Context, contactId: String) {
+		this.receiverId = contactId
+
 		contactRepSub = UserRepository.attachListener(contactId, object : CrashlyticsRequestCallback<User>() {
 
 			override fun onSuccess(conterpart: User) {

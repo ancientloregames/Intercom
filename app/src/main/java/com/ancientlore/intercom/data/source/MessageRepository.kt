@@ -8,6 +8,7 @@ import com.ancientlore.intercom.data.model.Message
 import com.ancientlore.intercom.data.source.cache.CacheMessageSource
 import com.ancientlore.intercom.data.source.dummy.DummyMessageSource
 import com.ancientlore.intercom.utils.Utils
+import java.util.*
 
 class MessageRepository : MessageSource {
 
@@ -45,6 +46,10 @@ class MessageRepository : MessageSource {
 		})
 	}
 
+	override fun getAllByIds(ids: Array<String>, callback: RequestCallback<List<Message>>) {
+		callback.onFailure(EmptyResultException)
+	}
+
 	override fun getItem(id: String, callback: RequestCallback<Message>) {
 
 		remoteSource.getItem(id, object : RequestCallback<Message> {
@@ -63,15 +68,20 @@ class MessageRepository : MessageSource {
 
 	override fun addItem(item: Message, callback: RequestCallback<String>) {
 
+		// Advanced encryption protocols like Signal make user messages unencryptable by user himself,
+		// hence need to store them unencrypted locally
+		val originalMessage = item.clone()
+
 		App.frontend.getCryptoManager(item.senderId).encrypt(item, object : RequestCallback<Any> {
 
 			override fun onSuccess(result: Any) {
 				remoteSource.addItem(item, object : RequestCallback<String> {
 
 					override fun onSuccess(result: String) {
-						item.id = result
-						cacheSource.addItem(item)
-						localSource?.addItem(item)
+						originalMessage.id = result
+						originalMessage.timestamp = Date(System.currentTimeMillis()) // FIXME dummy
+						cacheSource.addItem(originalMessage)
+						localSource?.addItem(originalMessage)
 						callback.onSuccess(result)
 					}
 					override fun onFailure(error: Throwable) { callback.onFailure(error) }

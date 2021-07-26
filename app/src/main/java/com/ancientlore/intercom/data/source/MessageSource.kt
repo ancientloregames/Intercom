@@ -7,6 +7,8 @@ import com.ancientlore.intercom.data.model.Message
 
 interface MessageSource : DataSource<String, Message> {
 
+	fun getAllByIds(ids: Array<String>, callback: RequestCallback<List<Message>>)
+
 	fun updateMessageUri(messageId: String, uri: Uri, callback: RequestCallback<Any> = RequestCallbackAny)
 
 	fun setMessageStatusReceived(id: String, callback: RequestCallback<Any> = RequestCallbackAny)

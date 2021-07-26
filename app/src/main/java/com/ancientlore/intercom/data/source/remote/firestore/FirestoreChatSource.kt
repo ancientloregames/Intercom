@@ -117,7 +117,7 @@ open class FirestoreChatSource protected constructor(private val userId: String)
 				exec {
 					if (error != null)
 						callback.onFailure(error)
-					else if (snapshot != null && !snapshot.metadata.hasPendingWrites())
+					else if (snapshot != null)
 						callback.onSuccess(deserialize(snapshot))
 				}
 			}

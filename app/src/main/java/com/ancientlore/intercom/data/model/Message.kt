@@ -25,7 +25,9 @@ data class Message(@field:ColumnInfo var id: String = "",
                    @field:[ColumnInfo Status] var status: Int = STATUS_WAIT,
                    @field:[Exclude Ignore] var progress: Int = -1,
                    @field:ColumnInfo @get:Exclude var chatId: String = "",
-                   @field:[PrimaryKey(autoGenerate = true) Exclude] var localId: Long = 0)// field "id" is unique only per chat
+                   @field:[PrimaryKey(autoGenerate = true) Exclude] var localId: Long = 0,// field "id" is unique only per chat
+                   @field:[Exclude Ignore] var receiverId: String? = null // FIXME for e2e encryption. Need refactor
+)
 	: Comparable<Message>, Identifiable<String> {
 
 	companion object {
@@ -90,4 +92,8 @@ data class Message(@field:ColumnInfo var id: String = "",
 
 	@Exclude @Ignore
 	override fun getIdentity() = id
+
+	fun clone(): Message {
+		return Message(id, timestamp, senderId, text, info, attachUrl, type, status, progress, chatId, localId, receiverId)
+	}
 }

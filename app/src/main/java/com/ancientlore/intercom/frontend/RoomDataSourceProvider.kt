@@ -1,14 +1,12 @@
 package com.ancientlore.intercom.frontend
 
 import android.content.Context
-import com.ancientlore.intercom.backend.DataSourceProvider
-import com.ancientlore.intercom.data.source.ChatSource
-import com.ancientlore.intercom.data.source.ContactSource
-import com.ancientlore.intercom.data.source.MessageSource
-import com.ancientlore.intercom.data.source.UserSource
+import com.ancientlore.intercom.data.source.*
+import com.ancientlore.intercom.data.source.local.SignalPrivateKeySource
+import com.ancientlore.intercom.data.source.local.pref.SharedPrefSignalSource
 import com.ancientlore.intercom.data.source.local.room.*
 
-class RoomDataSourceProvider(context: Context) : DataSourceProvider {
+class RoomDataSourceProvider(private val context: Context) : LocalDataSourceProvider {
 
 	private val db = IntercomDatabase.getInstance(context)
 
@@ -27,4 +25,6 @@ class RoomDataSourceProvider(context: Context) : DataSourceProvider {
 	override fun getContactSource(userId: String): ContactSource {
 		return RoomContactSource(userId, db.contactDao())
 	}
+
+	override fun getSignalKeychainSource(userId: String): SignalPrivateKeySource = SharedPrefSignalSource(context)
 }

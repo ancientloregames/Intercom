@@ -44,11 +44,11 @@ data class Chat(@field:PrimaryKey var id: String = "",
 	val lastMsgDate: String by lazy { if (lastMsgTime != null) dateFormat.format(lastMsgTime) else "" }
 
 	// TODO maybe shouldn't exclude from room
-	@field:[Exclude Ignore]
+	@field:[Exclude Ignore] @get:[Exclude Ignore] @set:[Exclude Ignore]
 	var localName: String? = null
 
 	// TODO maybe shouldn't exclude from room
-	@field:[Exclude Ignore]
+	@field:[Exclude Ignore] @get:[Exclude Ignore] @set:[Exclude Ignore]
 	var lastMsgSenderLocalName: String? = null
 
 	override fun equals(other: Any?): Boolean {
@@ -99,6 +99,6 @@ data class Chat(@field:PrimaryKey var id: String = "",
 				|| localName?.contains(text, true) == true
 	}
 
-	@Exclude @Ignore
+	@[Exclude Ignore]
 	override fun getIdentity() = id
 }

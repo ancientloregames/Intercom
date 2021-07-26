@@ -15,6 +15,10 @@ object DummyMessageSource : MessageSource {
 		callback.onFailure(EmptyResultException)
 	}
 
+	override fun getAllByIds(ids: Array<String>, callback: RequestCallback<List<Message>>) {
+		callback.onFailure(EmptyResultException)
+	}
+
 	override fun getItem(id: String, callback: RequestCallback<Message>) {
 		callback.onFailure(EmptyResultException)
 	}

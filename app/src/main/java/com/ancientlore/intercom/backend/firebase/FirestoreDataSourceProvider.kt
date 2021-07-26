@@ -1,10 +1,11 @@
 package com.ancientlore.intercom.backend.firebase
 
-import com.ancientlore.intercom.backend.DataSourceProvider
+import com.ancientlore.intercom.backend.RemoteDataSourceProvider
 import com.ancientlore.intercom.data.source.remote.firestore.*
+import com.ancientlore.intercom.data.source.remote.firestore.FirestoreSignalSource
 
 object FirestoreDataSourceProvider
-	: DataSourceProvider {
+	: RemoteDataSourceProvider {
 
 	override fun getUserSource(userId: String) = FirestoreUserSource(userId)
 
@@ -13,4 +14,6 @@ object FirestoreDataSourceProvider
 	override fun getMessageSource(chatId: String) = FirestoreMessageNoCF(chatId)
 
 	override fun getContactSource(userId: String) = FirestoreContactSource.getInstance(userId)
+
+	override fun getSignalKeychainSource(userId: String) = FirestoreSignalSource(userId)
 }

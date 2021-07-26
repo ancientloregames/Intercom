@@ -11,26 +11,24 @@ class MessagingService: FirebaseMessagingService() {
 
 	private val manager: NotificationManager = NotificationManager.getInstance(this)
 
-	override fun onMessageReceived(remoteMessage: RemoteMessage?) {
+	override fun onMessageReceived(remoteMessage: RemoteMessage) {
 		super.onMessageReceived(remoteMessage)
 
-		if (MainActivity.isInBackground && remoteMessage?.data != null) {
+		if (MainActivity.isInBackground) {
 			val message = JsonUtils.deserialize(remoteMessage.data, PushMessage::class.java)
 			manager.showNotification(message)
 		}
 	}
 
-	override fun onNewToken(newToken: String?) {
-		newToken?.let { token ->
-			App.backend.getAuthManager().getCurrentUser()
-				?.let { user ->
-					if (!UserRepository.hasRemoteSource()) {
-						val remoteSource = App.backend.getDataSourceProvider().getUserSource(user.id)
-						UserRepository.setRemoteSource(remoteSource)
-					}
-
-					UserRepository.updateNotificationToken(token)
+	override fun onNewToken(newToken: String) {
+		App.backend.getAuthManager().getCurrentUser()
+			?.let { user ->
+				if (!UserRepository.hasRemoteSource()) {
+					val remoteSource = App.backend.getDataSourceProvider().getUserSource(user.id)
+					UserRepository.setRemoteSource(remoteSource)
 				}
-		}
+
+				UserRepository.updateNotificationToken(newToken)
+			}
 	}
 }

@@ -5,6 +5,7 @@ object C {
 	const val USERS = "users"
 	const val MESSAGES = "messages"
 	const val CONTACTS = "contacts"
+	const val CRYPTOS = "crypto"
 
 	const val FIELD_FCM_TOKEN = "token"
 

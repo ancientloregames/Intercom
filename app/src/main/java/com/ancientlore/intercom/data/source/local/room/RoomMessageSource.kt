@@ -25,6 +25,17 @@ class RoomMessageSource(private val chatId: String,
 		}
 	}
 
+	override fun getAllByIds(ids: Array<String>, callback: RequestCallback<List<Message>>) {
+
+		exec {
+			val items = dao.getAllByIds(ids)
+			if (items.isNotEmpty())
+				callback.onSuccess(items)
+			else
+				callback.onFailure(EmptyResultException)
+		}
+	}
+
 	override fun getItem(id: String, callback: RequestCallback<Message>) {
 
 		exec {
