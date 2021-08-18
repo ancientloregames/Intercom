@@ -4,13 +4,14 @@ import android.content.Context
 import androidx.annotation.UiThread
 import androidx.databinding.ViewDataBinding
 import com.ancientlore.intercom.widget.MutableAdapter
+import java.util.*
 
 abstract class MutableRecyclerAdapter<I: Comparable<I>, H: BasicRecyclerAdapter.ViewHolder<I, B>, B: ViewDataBinding>(
 	context: Context,
 	items: MutableList<I> = mutableListOf(),
 	withHeader: Boolean = false,
 	withFooter: Boolean = false,
-	private var autoSort: Boolean = false)
+	protected var autoSort: Boolean = false)
 	: FilterableRecyclerAdapter<I, H, B>(context, items, withHeader, withFooter),
 	MutableAdapter<I> {
 
@@ -37,7 +38,7 @@ abstract class MutableRecyclerAdapter<I: Comparable<I>, H: BasicRecyclerAdapter.
 	override fun setItem(newItem: I, position: Int): Boolean {
 		if (isUnique(newItem) && isValidPosition(position)) {
 			mutableList.add(position, newItem)
-			notifyListItemInserted(itemCount - 1)
+			notifyListItemInserted(position)
 			return true
 		}
 
@@ -62,11 +63,46 @@ abstract class MutableRecyclerAdapter<I: Comparable<I>, H: BasicRecyclerAdapter.
 	}
 
 	@UiThread
+	override fun prependItems(newItems: List<I>): Boolean {
+
+		if (newItems.isEmpty())
+			return true
+
+		val items =
+			if (autoSort) newItems.sorted()
+			else newItems
+
+		// TODO maybe should check uniqueness
+		fullList.addAll(0, items)
+
+		if (currentConstraint.isEmpty()) {
+			mutableList.addAll(0, items)
+			notifyListItemRangeInserted(0, items.size)
+			return true
+		}
+		else {
+			val setisfactoryNewItems = LinkedList<I>().apply {
+				for (candidate in items) {
+					if (filter.satisfy(candidate, currentConstraint))
+						add(candidate)
+				}
+			}
+			if (setisfactoryNewItems.isNotEmpty()) {
+				mutableList.addAll(0, setisfactoryNewItems)
+				notifyListItemRangeInserted(0, setisfactoryNewItems.size)
+				return true
+			}
+		}
+
+		return false
+	}
+
+	@UiThread
 	override fun appendItem(newItem: I): Boolean {
 		if (currentConstraint.isEmpty() || filter.satisfy(newItem, currentConstraint)) {
 			if (isUnique(newItem)) {
 				mutableList.add(newItem)
-				notifyListItemInserted(itemCount - 1)
+				notifyListItemInserted(getLastItemPosition())
 				return true
 			}
 		}
@@ -74,6 +110,34 @@ abstract class MutableRecyclerAdapter<I: Comparable<I>, H: BasicRecyclerAdapter.
 		if (isUnique(newItem)) {
 			fullList.add(newItem)
 			return true
+		}
+
+		return false
+	}
+
+	@UiThread
+	override fun appendItems(newItems: List<I>): Boolean {
+		// TODO maybe should check uniqueness
+		fullList.addAll(newItems)
+
+		val startPos = itemCount
+		if (currentConstraint.isEmpty()) {
+			mutableList.addAll(newItems)
+			notifyListItemRangeInserted(startPos, getLastItemPosition())
+			return true
+		}
+		else {
+			val setisfactoryNewItems = LinkedList<I>().apply {
+				for (candidate in newItems) {
+					if (filter.satisfy(candidate, currentConstraint))
+						add(candidate)
+				}
+			}
+			if (setisfactoryNewItems.isNotEmpty()) {
+				mutableList.addAll(setisfactoryNewItems)
+				notifyListItemRangeInserted(startPos, getLastItemPosition())
+				return true
+			}
 		}
 
 		return false

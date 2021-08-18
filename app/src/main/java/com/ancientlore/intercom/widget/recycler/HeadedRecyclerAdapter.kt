@@ -124,7 +124,7 @@ abstract class HeadedRecyclerAdapter<I: Comparable<I>, H: BasicRecyclerAdapter.V
 
 	private fun getFirstItemPosition() = if (withHeader) 1 else getFirstViewPosition()
 
-	private fun getLastItemPosition() = itemCount - 1
+	protected fun getLastItemPosition() = itemCount - 1
 
 	private fun getItemPosition(viewPosition: Int) = if (withHeader) viewPosition - 1 else viewPosition
 
