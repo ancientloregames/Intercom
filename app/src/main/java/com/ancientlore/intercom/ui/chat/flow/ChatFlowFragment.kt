@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.widget.Toolbar
+import androidx.recyclerview.widget.RecyclerView
 import com.ancientlore.intercom.C
 import com.ancientlore.intercom.C.ICON_DIR_PATH
 import com.ancientlore.intercom.R
@@ -87,6 +88,18 @@ class ChatFlowFragment : FilterableFragment<ChatFlowViewModel, ChatFlowUiBinding
 
 		with(listView) {
 			adapter = ChatFlowAdapter(params.userId, requireContext())
+
+			addOnScrollListener(object : RecyclerView.OnScrollListener() {
+				override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+					super.onScrollStateChanged(recyclerView, newState)
+					if (!recyclerView.canScrollVertically(-1)
+						&& recyclerView.scrollState == RecyclerView.SCROLL_STATE_IDLE
+						&& adapter!!.itemCount != 0) {
+						viewModel.onScrolledToTop()
+					}
+				}
+			})
+
 			enableChatBehavior()
 		}
 	}

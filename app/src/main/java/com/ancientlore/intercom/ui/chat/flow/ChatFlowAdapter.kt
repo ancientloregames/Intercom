@@ -3,6 +3,7 @@ package com.ancientlore.intercom.ui.chat.flow
 import android.content.Context
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.ViewGroup
 import android.widget.SeekBar
 import androidx.annotation.CallSuper
@@ -14,9 +15,12 @@ import androidx.databinding.ObservableInt
 import androidx.databinding.ViewDataBinding
 import com.ancientlore.intercom.App
 import com.ancientlore.intercom.BR
+import com.ancientlore.intercom.C
+import com.ancientlore.intercom.C.INVALID_INDEX
 import com.ancientlore.intercom.R
 import com.ancientlore.intercom.backend.ProgressRequestCallback
 import com.ancientlore.intercom.data.model.Message
+import com.ancientlore.intercom.data.source.ListChanges
 import com.ancientlore.intercom.databinding.*
 import com.ancientlore.intercom.manager.MediaPlayerManager
 import com.ancientlore.intercom.manager.MediaPlayerManager.STATUS_PAUSED
@@ -32,11 +36,13 @@ import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import java.io.File
 import java.lang.RuntimeException
+import kotlin.collections.ArrayList
 
 class ChatFlowAdapter(private val userId: String,
                       context: Context,
                       items: MutableList<Message> = mutableListOf())
-	: MutableRecyclerAdapter<Message, ChatFlowAdapter.ViewHolder, ViewDataBinding>(context, items) {
+	: MutableRecyclerAdapter<Message, ChatFlowAdapter.ViewHolder, ViewDataBinding>
+		(context, items, autoSort = true) {
 
 	private companion object {
 		private const val VIEW_TYPE_USER = 0
@@ -119,6 +125,42 @@ class ChatFlowAdapter(private val userId: String,
 			holder.bind(payloads[0] as Bundle)
 		else
 			holder.bind(item)
+	}
+
+	@UiThread
+	fun applyChanges(changes: ListChanges<Message>) {
+
+		val updatedList = ArrayList(fullList)
+
+		val iter = updatedList.listIterator()
+		while (iter.hasNext()) {
+			val listItem = iter.next()
+
+			val removeIndex = changes.removeList.indexOfFirst { it.id == listItem.id }
+			if (removeIndex != INVALID_INDEX) {
+				Log.d("ChatFlow", "remove: ${listItem.text}")
+				iter.remove()
+				changes.removeList.removeAt(removeIndex)
+				continue
+			}
+
+			val updateIndex = changes.modifyList.indexOfFirst { it.id == listItem.id }
+			if (updateIndex != INVALID_INDEX) {
+				Log.d("ChatFlow", "update: ${listItem.text}")
+				val updatedItem = changes.modifyList[updateIndex]
+				iter.set(updatedItem)
+				changes.modifyList.removeAt(updateIndex)
+				continue
+			}
+
+			if (changes.removeList.isEmpty() && changes.modifyList.isEmpty())
+				break
+		}
+
+		updatedList.addAll(changes.addList)
+		updatedList.addAll(changes.modifyList) // if they weren't removed, they are to be added
+
+		super.setItems(updatedList)
 	}
 
 	override fun isTheSame(first: Message, second: Message) = first == second
@@ -384,13 +426,14 @@ class ChatFlowAdapter(private val userId: String,
 		override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any? {
 			val oldMessage = oldItems[oldItemPosition]
 			val newMessage = newItems[newItemPosition]
+			Log.d(C.DEFAULT_LOG_TAG, "getChangePayload: ${oldMessage.status} to ${newMessage.status}")
 
 			val bundle = Bundle().apply {
 				if (newMessage.attachUrl != oldMessage.attachUrl)
 					putString(KEY_URL, newMessage.attachUrl)
 				if (newMessage.text != oldMessage.text)
 					putString(KEY_TEXT, newMessage.text)
-				if (newMessage.status != oldMessage.status)
+				if (newMessage.status > oldMessage.status)
 					putInt(KEY_STATUS, newMessage.status)
 			}
 

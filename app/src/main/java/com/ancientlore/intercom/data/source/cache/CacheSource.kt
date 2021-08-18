@@ -42,6 +42,12 @@ abstract class CacheSource<I, T: Identifiable<I>> : DataSource<I, T> {
 		cache.remove(id)
 	}
 
+	fun deleteItems(items: List<Identifiable<I>>) {
+		for (item in items) {
+			cache.remove(item.getIdentity())
+		}
+	}
+
 	fun clear() = cache.clear()
 
 	fun reset(newItems: List<T>) {

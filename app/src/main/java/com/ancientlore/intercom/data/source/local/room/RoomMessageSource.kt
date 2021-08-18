@@ -1,14 +1,23 @@
 package com.ancientlore.intercom.data.source.local.room
 
 import android.net.Uri
+import com.ancientlore.intercom.C
 import com.ancientlore.intercom.backend.RepositorySubscription
 import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.data.model.Message
 import com.ancientlore.intercom.data.source.EmptyResultException
+import com.ancientlore.intercom.data.source.ListChanges
 import com.ancientlore.intercom.data.source.MessageSource
+import com.ancientlore.intercom.utils.Utils
 
 class RoomMessageSource(private val chatId: String,
                         private val dao: RoomMessageDao) : RoomSource(), MessageSource {
+
+	private var paginationLimit: Long = C.DEF_MSG_PAGINATION_LIMIT
+	private var currentPageOffset: Long = 0
+
+	@Volatile
+	private var paginationCompleted: Boolean = false
 
 	override fun getWorkerThreadName() = "roomMessageSource_thread"
 
@@ -33,6 +42,26 @@ class RoomMessageSource(private val chatId: String,
 				callback.onSuccess(items)
 			else
 				callback.onFailure(EmptyResultException)
+		}
+	}
+
+	override fun getNextPage(callback: RequestCallback<List<Message>>) { // TODO need tests
+
+		if (paginationCompleted) {
+			callback.onSuccess(emptyList())
+			return
+		}
+
+		exec {
+			val nextPageMessages = dao.getWithLimit(chatId, paginationLimit, currentPageOffset)
+			if (nextPageMessages.isNotEmpty()) {
+				currentPageOffset += nextPageMessages.size
+				callback.onSuccess(nextPageMessages)
+			}
+			else {
+				paginationCompleted = true
+				callback.onSuccess(emptyList())
+			}
 		}
 	}
 
@@ -83,6 +112,17 @@ class RoomMessageSource(private val chatId: String,
 		exec {
 			dao.setStatusReceived(id, chatId)
 		}
+	}
+
+	override fun setPaginationLimit(limit: Long) {
+		if (limit > 1)
+			this.paginationLimit = limit
+		else
+			Utils.logError("Pagination limit must be > 1")
+	}
+
+	override fun attachChangeListener(callback: RequestCallback<ListChanges<Message>>): RepositorySubscription {
+		TODO("Not yet implemented")
 	}
 
 	override fun attachListener(callback: RequestCallback<List<Message>>): RepositorySubscription {

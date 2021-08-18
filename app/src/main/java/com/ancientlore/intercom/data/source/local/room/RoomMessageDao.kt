@@ -10,6 +10,9 @@ interface RoomMessageDao {
 	@Query("SELECT * FROM messages WHERE chatId = :chatId ORDER BY id DESC")
 	fun getAll(chatId: String): List<Message>
 
+	@Query("SELECT * FROM messages WHERE chatId = :chatId ORDER BY id DESC LIMIT :limit OFFSET :offset")
+	fun getWithLimit(chatId: String, limit: Long, offset: Long): List<Message>
+
 	@Query("SELECT * FROM messages WHERE chatId = :chatId AND id = :msgId")
 	fun getById(msgId: String, chatId: String): Message?
 

@@ -3,9 +3,11 @@ package com.ancientlore.intercom.ui.chat.flow
 import android.content.Context
 import android.media.MediaRecorder
 import android.net.Uri
+import android.util.Log
 import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableField
 import com.ancientlore.intercom.App
+import com.ancientlore.intercom.C
 import com.ancientlore.intercom.EmptyObject
 import com.ancientlore.intercom.R
 import com.ancientlore.intercom.backend.*
@@ -56,6 +58,8 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 	private var inputManager: MessageInputManager? = null
 
 	private var receiverId: String? = null
+
+	private var paginationCompleted = false
 
 	fun init(context: Context) {
 		when {
@@ -307,6 +311,11 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 		})
 	}
 
+	fun onScrolledToTop() {
+		if (paginationCompleted.not())
+			loadNextPage()
+	}
+
 	private fun onFailureSendingMessage(error: Throwable) {
 		if (error !is EmptyResultException)
 			Utils.logError(error)
@@ -355,12 +364,17 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 			setLocalSource(App.frontend.getDataSourceProvider().getMessageSource(chatId))
 		}
 
-		repositorySub = repository.attachListener(object : CrashlyticsRequestCallback<List<Message>>() {
-			override fun onSuccess(result: List<Message>) {
+		loadNextPage()
+		repositorySub = repository.attachChangeListener(object : RequestCallback<ListChanges<Message>> {
+			override fun onSuccess(result: ListChanges<Message>) {
 				runOnUiThread {
-					listAdapter.setItems(result)
+					listAdapter.applyChanges(result)
 				}
-				updateMessagesStatus(result)
+				updateMessagesStatus(result.addList)
+			}
+			override fun onFailure(error: Throwable) {
+				if (error !is EmptyResultException)
+					Utils.logError(error)
 			}
 		})
 	}
@@ -369,6 +383,7 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 		messages
 			.filter { it.status != Message.STATUS_RECEIVED && it.senderId != params.userId }
 			.forEach {
+				Log.d(C.DEFAULT_LOG_TAG, "updateMessagesStatus ${it.text}")
 				repository.setMessageStatusReceived(it.id)
 			}
 	}
@@ -386,6 +401,20 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 						actionBarSubtitleField.set(context.getString(R.string.last_seen,
 							conterpart.lastSeenDate))
 				}
+			}
+		})
+	}
+
+	private fun loadNextPage() {
+
+		repository.getNextPage(object: CrashlyticsRequestCallback<List<Message>>() {
+
+			override fun onSuccess(result: List<Message>) {
+				runOnUiThread {
+					if (result.isNotEmpty())
+						listAdapter.prependItems(result)
+				}
+				updateMessagesStatus(result)
 			}
 		})
 	}

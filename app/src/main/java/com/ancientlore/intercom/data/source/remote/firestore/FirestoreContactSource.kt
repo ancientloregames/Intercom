@@ -122,6 +122,7 @@ class FirestoreContactSource private constructor(private val userId: String)
 
 			userContacts.document(item.phone)
 				.set(HashMap<String, Any>().apply {
+					put(FIELD_ICON_URL, item.phone)
 					if (item.name.isNotEmpty())
 						put(FIELD_NAME, item.name)
 					if (item.iconUrl.isNotEmpty())

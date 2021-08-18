@@ -2,12 +2,15 @@ package com.ancientlore.intercom.data.source
 
 import android.net.Uri
 import com.ancientlore.intercom.App
+import com.ancientlore.intercom.C
+import com.ancientlore.intercom.backend.CrashlyticsRequestCallback
 import com.ancientlore.intercom.backend.RepositorySubscription
 import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.data.model.Message
 import com.ancientlore.intercom.data.source.cache.CacheMessageSource
 import com.ancientlore.intercom.data.source.dummy.DummyMessageSource
 import com.ancientlore.intercom.utils.Utils
+import java.lang.RuntimeException
 import java.util.*
 
 class MessageRepository : MessageSource {
@@ -15,6 +18,8 @@ class MessageRepository : MessageSource {
 	private var remoteSource: MessageSource = DummyMessageSource
 	private var localSource: MessageSource? = null
 	private val cacheSource = CacheMessageSource
+
+	private var paginationLimit = C.DEF_MSG_PAGINATION_LIMIT
 
 	private val userId = App.backend.getAuthManager().getCurrentUser().id
 
@@ -42,6 +47,32 @@ class MessageRepository : MessageSource {
 			override fun onFailure(error: Throwable) {
 				Utils.logError(error)
 				getAllFallback(callback)
+			}
+		})
+	}
+
+	override fun getNextPage(callback: RequestCallback<List<Message>>) {
+
+		remoteSource.getNextPage(object : RequestCallback<List<Message>> {
+
+			override fun onSuccess(result: List<Message>) {
+
+				App.frontend.getCryptoManager(userId).decryptMessages(result, object : RequestCallback<Any> {
+
+					override fun onSuccess(ignore: Any) {
+						cacheSource.addItems(result)
+						localSource?.addItems(result)
+						callback.onSuccess(result)
+					}
+					override fun onFailure(error: Throwable) {
+						Utils.logError(error)
+						getNextPageFallback(callback)
+					}
+				})
+			}
+			override fun onFailure(error: Throwable) {
+				Utils.logError(error)
+				getNextPageFallback(callback)
 			}
 		})
 	}
@@ -146,6 +177,36 @@ class MessageRepository : MessageSource {
 		})
 	}
 
+	override fun attachChangeListener(callback: RequestCallback<ListChanges<Message>>): RepositorySubscription {
+
+		return remoteSource.attachChangeListener(object : CrashlyticsRequestCallback<ListChanges<Message>>() {
+
+			override fun onSuccess(result: ListChanges<Message>) {
+
+				val messagesToDecrypt = result.addList.plus(result.modifyList)
+				App.frontend.getCryptoManager(userId).decryptMessages(messagesToDecrypt, object : RequestCallback<Any> {
+
+					override fun onSuccess(ignore: Any) {
+						callback.onSuccess(result)
+
+						cacheSource.deleteItems(result.removeList)
+						//TODO localSource?.deleteItems(result.removeList)
+
+						cacheSource.addItems(result.addList)
+						localSource?.addItems(result.addList)
+
+						cacheSource.addItems(result.modifyList)
+						localSource?.addItems(result.modifyList)
+					}
+					override fun onFailure(error: Throwable) {
+						Utils.logError(error)
+						// TODO
+					}
+				})
+			}
+		})
+	}
+
 	override fun attachListener(callback: RequestCallback<List<Message>>) : RepositorySubscription {
 
 		return remoteSource.attachListener(object : RequestCallback<List<Message>> {
@@ -188,8 +249,20 @@ class MessageRepository : MessageSource {
 		})
 	}
 
+	override fun setPaginationLimit(limit: Long) {
+		if (limit > 1) {
+			this.paginationLimit = limit
+			remoteSource.setPaginationLimit(limit)
+			localSource?.setPaginationLimit(limit)
+		}
+		else Utils.logError("Pagination limit must be > 1")
+	}
+
 	fun setRemoteSource(source: MessageSource) {
 		remoteSource = source
+
+		source.setPaginationLimit(paginationLimit)
+		cacheSource.setPaginationLimit(paginationLimit)
 
 		cacheSource.clear()
 		localSource?.let {
@@ -200,6 +273,8 @@ class MessageRepository : MessageSource {
 
 	fun setLocalSource(source: MessageSource) {
 		localSource = source
+
+		source.setPaginationLimit(paginationLimit)
 
 		if (source.getSourceId() != remoteSource.getSourceId()) {
 			cacheSource.clear()
@@ -228,6 +303,11 @@ class MessageRepository : MessageSource {
 					}) }
 			}
 		})
+	}
+
+	private fun getNextPageFallback(callback: RequestCallback<List<Message>>) {
+		callback.onFailure(RuntimeException("Fallback not implemented"))
+		// TODO from cache or local source
 	}
 
 	private fun getItemFallback(id: String, callback: RequestCallback<Message>) {

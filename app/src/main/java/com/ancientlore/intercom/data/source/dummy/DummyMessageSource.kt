@@ -5,6 +5,7 @@ import com.ancientlore.intercom.backend.RepositorySubscription
 import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.data.model.Message
 import com.ancientlore.intercom.data.source.EmptyResultException
+import com.ancientlore.intercom.data.source.ListChanges
 import com.ancientlore.intercom.data.source.MessageSource
 
 object DummyMessageSource : MessageSource {
@@ -41,6 +42,17 @@ object DummyMessageSource : MessageSource {
 
 	override fun setMessageStatusReceived(id: String, callback: RequestCallback<Any>) {
 		callback.onFailure(EmptyResultException)
+	}
+
+	override fun getNextPage(callback: RequestCallback<List<Message>>) {
+		callback.onFailure(EmptyResultException)
+	}
+
+	override fun setPaginationLimit(limit: Long) {
+	}
+
+	override fun attachChangeListener(callback: RequestCallback<ListChanges<Message>>): RepositorySubscription {
+		TODO("Not yet implemented")
 	}
 
 	override fun attachListener(callback: RequestCallback<List<Message>>): RepositorySubscription {
