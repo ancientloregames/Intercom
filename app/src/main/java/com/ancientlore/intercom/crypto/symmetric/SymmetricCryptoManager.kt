@@ -8,9 +8,12 @@ import com.ancientlore.intercom.crypto.CryptoUtils
 import com.ancientlore.intercom.data.model.Chat
 import com.ancientlore.intercom.data.model.Message
 import com.ancientlore.intercom.utils.Utils
-import java.lang.Exception
+import java.io.UnsupportedEncodingException
+import java.security.InvalidKeyException
 import java.security.NoSuchAlgorithmException
+import javax.crypto.BadPaddingException
 import javax.crypto.Cipher
+import javax.crypto.IllegalBlockSizeException
 import javax.crypto.NoSuchPaddingException
 import javax.crypto.spec.SecretKeySpec
 
@@ -52,9 +55,13 @@ abstract class SymmetricCryptoManager: CryptoManager {
 		try {
 			val encryptedByte = cipher!!.doFinal(CryptoUtils.toBytes(string))
 			encrypted = CryptoUtils.encodeToString(encryptedByte)
-		} catch (e: Exception) {
-			/*  InvalidKeyException, BadPaddingException,
-			    IllegalBlockSizeException, UnsupportedEncodingException */
+		} catch (e: InvalidKeyException) {
+			Utils.logError(e)
+		} catch (e: BadPaddingException) {
+				Utils.logError(e)
+		} catch (e: IllegalBlockSizeException) {
+			Utils.logError(e)
+		} catch (e: UnsupportedEncodingException) {
 			Utils.logError(e)
 		}
 		return encrypted
@@ -67,9 +74,15 @@ abstract class SymmetricCryptoManager: CryptoManager {
 			val encryptedByte = CryptoUtils.decode(string)
 			val decryption = decipher!!.doFinal(encryptedByte)
 			decrypted = CryptoUtils.toString(decryption)
-		} catch (e: Exception) {
-			/*  InvalidKeyException, BadPaddingException,
-			    IllegalBlockSizeException, UnsupportedEncodingException */
+		} catch (e: InvalidKeyException) {
+			Utils.logError(e)
+		} catch (e: BadPaddingException) {
+			Utils.logError(e)
+		} catch (e: IllegalBlockSizeException) {
+			Utils.logError(e)
+		} catch (e: IllegalArgumentException) {
+			Utils.logError(e)
+		} catch (e: UnsupportedEncodingException) {
 			Utils.logError(e)
 		}
 		return decrypted
