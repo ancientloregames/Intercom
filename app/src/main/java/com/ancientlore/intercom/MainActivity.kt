@@ -174,7 +174,7 @@ class MainActivity : AppCompatActivity(),
 
 	override fun onCreateOptionsMenu(menu: Menu): Boolean {
 		toolbarMenuCallback?.run(menu)
-
+		toolbarMenuCallback = null
 		return true
 	}
 
