@@ -13,6 +13,9 @@ import android.view.inputmethod.InputMethodManager;
 import android.webkit.MimeTypeMap;
 
 import com.ancientlore.intercom.C;
+import com.google.i18n.phonenumbers.NumberParseException;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.google.i18n.phonenumbers.Phonenumber;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
@@ -198,6 +201,21 @@ public final class Utils
 		return phoneNumber != null
 				? new Regex(" |-").replace(phoneNumber, "")
 				: null;
+	}
+
+	public static String toHumanReadablePhone(String phoneNumber, @Nullable String region)
+	{
+		if (phoneNumber == null)
+			return null;
+
+		try {
+			PhoneNumberUtil pnu = PhoneNumberUtil.getInstance();
+			Phonenumber.PhoneNumber pn = pnu.parse(phoneNumber, region != null ? region : "ZZ");
+			return pnu.format(pn, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL);
+		} catch (NumberParseException e) {
+			logError(e);
+		}
+		return phoneNumber;
 	}
 
 	public static boolean showKeyboard(View view)

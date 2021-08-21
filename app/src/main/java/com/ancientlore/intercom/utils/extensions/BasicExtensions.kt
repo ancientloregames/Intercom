@@ -2,6 +2,7 @@ package com.ancientlore.intercom.utils.extensions
 
 import android.Manifest
 import android.app.Activity
+import android.content.ClipData
 import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
@@ -284,4 +285,10 @@ fun Context.getActionBarPixelSize() : Int {
 		.apply { theme.resolveAttribute(android.R.attr.actionBarSize, this, true) }) {
 		TypedValue.complexToDimensionPixelSize(data, resources.displayMetrics)
 	}
+}
+
+fun Context.putToClipboard(text: String, label: String = "") {
+	val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+	val clip = ClipData.newPlainText(label, text)
+	clipboard.primaryClip = clip
 }

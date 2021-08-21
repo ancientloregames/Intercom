@@ -20,6 +20,7 @@
 	<string name="enter">Enter</string>
 	<string name="error">Error</string>
 	<string name="success">Success</string>
+	<string name="icon">Icon</string>
 	
 	<string name="auth_name">Name</string>
 	<string name="auth_email">Email</string>
@@ -109,6 +110,7 @@
 	<string name="upload_finished">Upload finished</string>
 	<string name="upload_failed">Upload failed</string>
 	<string name="uploading">Uploading…</string>
+	<string name="loading">Loading…</string>
 
 	<string name="pin">Pin</string>
 	<string name="unpin">Unpin</string>
@@ -125,4 +127,11 @@
 	<string name="hangup">Hangup</string>
 	<string name="answer">Answer</string>
 	<string name="decline">Decline</string>
+
+	<string name="contact_detail">Contact Details</string>
+	<string name="contact_phone">Contact Phone</string>
+	<string name="not_specified">Not specified</string>
+	<string name="open_chat">Open chat</string>
+
+	<string name="text_copied">Text copied to clipboard</string>
 </resources>
