@@ -82,7 +82,8 @@ class FirestoreChatSourceNoCF private constructor(userId: String)
 								FIELD_NAME to item.name,
 								FIELD_TYPE to item.type,
 								FIELD_PIN to item.pin,
-								FIELD_MUTE to item.mute
+								FIELD_MUTE to item.mute,
+								FIELD_PARTICIPANTS to item.participants // TODO maybe better to user chats collection only (with indecies)
 							), SetOptions.merge())
 							.addOnSuccessListener {
 								if (item.initiatorId == participant)

@@ -38,9 +38,12 @@ import com.ancientlore.intercom.ui.call.offer.CallOfferFragment
 import com.ancientlore.intercom.ui.chat.creation.ChatCreationFragment
 import com.ancientlore.intercom.ui.chat.creation.description.ChatCreationDescFragment
 import com.ancientlore.intercom.ui.chat.creation.group.ChatCreationGroupFragment
+import com.ancientlore.intercom.ui.chat.detail.ChatDetailFragment
 import com.ancientlore.intercom.ui.chat.flow.ChatFlowFragment
 import com.ancientlore.intercom.ui.chat.flow.ChatFlowParams
 import com.ancientlore.intercom.ui.chat.list.ChatListFragment
+import com.ancientlore.intercom.ui.contact.detail.ContactDetailFragment
+import com.ancientlore.intercom.ui.contact.detail.ContactDetailParams
 import com.ancientlore.intercom.ui.contact.list.ContactListFragment
 import com.ancientlore.intercom.ui.settings.SettingsFragment
 import com.ancientlore.intercom.utils.*
@@ -304,6 +307,24 @@ class MainActivity : AppCompatActivity(),
 		}
 	}
 
+	override fun openChatDetail(params: ChatFlowParams) {
+		runOnUiThread {
+			supportFragmentManager.beginTransaction()
+				.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_right)
+				.add(R.id.modalContainer, ChatDetailFragment.newInstance(params))
+				.commitNow()
+		}
+	}
+
+	override fun openContactDetail(params: ContactDetailParams) {
+		runOnUiThread {
+			supportFragmentManager.beginTransaction()
+				.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_right)
+				.add(R.id.modalContainer, ContactDetailFragment.newInstance(params))
+				.commitNow()
+		}
+	}
+
 	override fun openCallOffer(calleeId: String) {
 		requestPermissionCalls { granted ->
 			if (granted)
@@ -450,18 +471,18 @@ class MainActivity : AppCompatActivity(),
 
 	private fun initRepositories(userId: String) {
 		val remoteDataSourceProvider = App.backend.getDataSourceProvider()
-		val localDataSourceProvider = App.frontend.getDataSourceProvider()
+		//val localDataSourceProvider = App.frontend.getDataSourceProvider()
 		UserRepository.apply {
 			setRemoteSource(remoteDataSourceProvider.getUserSource(userId))
-			setLocalSource(localDataSourceProvider.getUserSource(userId))
+			//setLocalSource(localDataSourceProvider.getUserSource(userId))
 		}
 		ChatRepository.apply {
 			setRemoteSource(remoteDataSourceProvider.getChatSource(userId))
-			setLocalSource(localDataSourceProvider.getChatSource(userId))
+			//setLocalSource(localDataSourceProvider.getChatSource(userId))
 		}
 		ContactRepository.apply {
 			setRemoteSource(remoteDataSourceProvider.getContactSource(userId))
-			setLocalSource(localDataSourceProvider.getContactSource(userId))
+			//setLocalSource(localDataSourceProvider.getContactSource(userId))
 		}
 	}
 

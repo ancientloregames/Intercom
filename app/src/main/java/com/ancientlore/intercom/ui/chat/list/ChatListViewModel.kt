@@ -41,7 +41,7 @@ class ChatListViewModel(listAdapter: ChatListAdapter)
 
 				val participants = if (chat.type == TYPE_PRIVATE) {
 					listOf(userId, chat.name)
-				} else emptyList()
+				} else chat.participants
 
 				chatOpenSub.onNext(ChatFlowParams(
 					userId = userId,

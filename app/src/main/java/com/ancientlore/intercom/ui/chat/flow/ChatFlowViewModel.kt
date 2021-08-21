@@ -15,6 +15,7 @@ import com.ancientlore.intercom.data.model.*
 import com.ancientlore.intercom.data.model.Chat.Companion.TYPE_PRIVATE
 import com.ancientlore.intercom.data.source.*
 import com.ancientlore.intercom.ui.FilterableViewModel
+import com.ancientlore.intercom.ui.contact.detail.ContactDetailParams
 import com.ancientlore.intercom.utils.Runnable1
 import com.ancientlore.intercom.utils.Utils
 import com.ancientlore.intercom.utils.extensions.createAudioMessageFile
@@ -51,7 +52,9 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 
 	private val uploadIconSub = PublishSubject.create<String>() // Chat Id
 
-	private val openChatDetailSub = PublishSubject.create<Any>()
+	private val openChatDetailSub = PublishSubject.create<ChatFlowParams>()
+
+	private val openContactDetailSubj = PublishSubject.create<ContactDetailParams>()
 
 	private var contactRepSub: RepositorySubscription? = null
 
@@ -65,11 +68,16 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 		when {
 			params.chatId.isNotEmpty() -> {
 				initMessageRepository(params.chatId)
+				loadNextPage()
 
 				/*FIXME should reorganized db structure. separate chat description and chat messages*/
 				if (params.chatType == TYPE_PRIVATE) {
 					val contactId = params.participants.first { it != params.userId }
 					observeContactOnlineStatus(context, contactId)
+				}
+				else {
+					actionBarSubtitleField.set(context.getString(R.string.member_count,
+						params.participants.size))
 				}
 			}
 			params.chatType == TYPE_PRIVATE -> {
@@ -77,11 +85,14 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 				ChatRepository.getItem(contactId, object : CrashlyticsRequestCallback<Chat>() {
 					override fun onSuccess(chat: Chat) {
 						initMessageRepository(chat.id)
+						loadNextPage()
 					}
 				})
 				observeContactOnlineStatus(context, contactId)
 			}
 			params.participants.size > 2 -> {
+				actionBarSubtitleField.set(context.getString(R.string.member_count,
+					params.participants.size))
 			}
 			else -> {
 				val error = RuntimeException("Chat Flow Ui has been opened with no chat neither contacts ids")
@@ -158,9 +169,22 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 
 	fun observeUploadIcon() = uploadIconSub as Observable<String>
 
+	fun observeOpenChatDetail() = openChatDetailSub as Observable<ChatFlowParams>
+
+	fun observeOpenContactDetail() = openContactDetailSubj as Observable<ContactDetailParams>
+
 	fun onAttachButtonCliked() = openAttachMenuSubj.onNext(EmptyObject)
 
-	fun onActionBarCliked() = openChatDetailSub.onNext(EmptyObject)
+	fun onActionBarCliked() { // TODO really need to separate private and group chats
+		if (params.chatType == TYPE_PRIVATE)
+			openContactDetailSubj.onNext(ContactDetailParams(
+				receiverId!!,
+				params.title,
+				params.iconUri.toString(),
+				true))
+		else
+			openChatDetailSub.onNext(params)
+	}
 
 	fun onSendButtonClicked() {
 		messageText.takeIf { it.isNotBlank() }
@@ -361,10 +385,9 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 	private fun initMessageRepository(chatId: String) {
 		repository.apply {
 			setRemoteSource(App.backend.getDataSourceProvider().getMessageSource(chatId))
-			setLocalSource(App.frontend.getDataSourceProvider().getMessageSource(chatId))
+			//setLocalSource(App.frontend.getDataSourceProvider().getMessageSource(chatId))
 		}
 
-		loadNextPage()
 		repositorySub = repository.attachChangeListener(object : RequestCallback<ListChanges<Message>> {
 			override fun onSuccess(result: ListChanges<Message>) {
 				runOnUiThread {

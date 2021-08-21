@@ -94,7 +94,7 @@ class ChatFlowFragment : FilterableFragment<ChatFlowViewModel, ChatFlowUiBinding
 					super.onScrollStateChanged(recyclerView, newState)
 					if (!recyclerView.canScrollVertically(-1)
 						&& recyclerView.scrollState == RecyclerView.SCROLL_STATE_IDLE
-						&& adapter!!.itemCount != 0) {
+						&& adapter!!.itemCount > 1) {
 						viewModel.onScrolledToTop()
 					}
 				}
@@ -165,6 +165,10 @@ class ChatFlowFragment : FilterableFragment<ChatFlowViewModel, ChatFlowUiBinding
 			.subscribe { recordAudio() })
 		subscriptions.add(viewModel.observeUploadIcon()
 			.subscribe { uploadIcon(it) })
+		subscriptions.add(viewModel.observeOpenChatDetail()
+			.subscribe { navigator?.openChatDetail(params) })
+		subscriptions.add(viewModel.observeOpenContactDetail()
+			.subscribe { navigator?.openContactDetail(it) })
 	}
 
 	override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

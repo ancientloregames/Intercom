@@ -56,7 +56,7 @@ class ContactListFragment : FilterableFragment<ContactListViewModel, ContactList
 
 		subscriptions.add(viewModel.observeOpenContactDetail()
 			.subscribe {
-				// TODO open contact detail not closing this ui
+				navigator?.openContactDetail(it)
 			})
 	}
 }
