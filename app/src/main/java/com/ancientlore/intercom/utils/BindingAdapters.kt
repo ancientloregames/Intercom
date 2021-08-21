@@ -3,7 +3,9 @@ package com.ancientlore.intercom.utils
 import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.net.Uri
+import android.util.TypedValue
 import android.view.View
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.SeekBar
 import androidx.annotation.DrawableRes
@@ -175,4 +177,25 @@ fun onProgressChanged(view: SeekBar, action: Runnable) {
 		override fun onStartTrackingTouch(seekBar: SeekBar?) {}
 		override fun onStopTrackingTouch(seekBar: SeekBar?) {}
 	})
+}
+
+@BindingAdapter("mutable")
+fun setMutableEditText(editText: EditText, mutable: Boolean) {
+	if (mutable) {
+		editText.context
+			?.run {
+				val typedValue = TypedValue()
+				theme.resolveAttribute(android.R.attr.editTextBackground, typedValue, true)
+				editText.setBackgroundResource(typedValue.resourceId)
+			}
+		editText.isClickable = true
+		editText.isFocusable = true
+		editText.isFocusableInTouchMode = true
+	}
+	else {
+		editText.setBackgroundColor(Color.TRANSPARENT)
+		editText.isClickable = false
+		editText.isFocusable = false
+		editText.isFocusableInTouchMode = false
+	}
 }

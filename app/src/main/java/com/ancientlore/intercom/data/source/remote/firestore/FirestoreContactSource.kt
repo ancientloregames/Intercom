@@ -13,6 +13,7 @@ import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_NAME
 import com.ancientlore.intercom.data.source.remote.firestore.C.USERS
 import com.ancientlore.intercom.utils.SingletonHolder
 import com.ancientlore.intercom.utils.Utils
+import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.SetOptions
 import java.lang.RuntimeException
 import kotlin.collections.HashMap
@@ -81,7 +82,27 @@ class FirestoreContactSource private constructor(private val userId: String)
 	}
 
 	override fun getItem(id: String, callback: RequestCallback<Contact>) {
-		TODO("Not yet implemented")
+
+		db.collection(USERS)
+			.document(id)
+			.get()
+			.addOnSuccessListener {
+				exec {
+					deserialize(it)
+						?.let { callback.onSuccess(it) }
+						?: callback.onFailure(EmptyResultException)
+				}
+			}
+			.addOnFailureListener { exec { callback.onFailure(it) } }
+	}
+
+	override fun getItems(ids: List<String>, callback: RequestCallback<List<Contact>>) {
+
+		db.collection(USERS)
+			.whereIn(FieldPath.documentId(), ids)
+			.get()
+			.addOnSuccessListener { exec { callback.onSuccess(deserialize(it)) } }
+			.addOnFailureListener { exec { callback.onFailure(it) } }
 	}
 
 	override fun deleteItem(id: String, callback: RequestCallback<Any>) {

@@ -26,6 +26,10 @@ object DummyContactSource : ContactSource {
 		callback.onFailure(EmptyResultException)
 	}
 
+	override fun getItems(ids: List<String>, callback: RequestCallback<List<Contact>>) {
+		callback.onFailure(EmptyResultException)
+	}
+
 	override fun deleteItem(id: String, callback: RequestCallback<Any>) {
 		callback.onFailure(EmptyResultException)
 	}

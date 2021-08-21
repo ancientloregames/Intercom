@@ -22,7 +22,7 @@ object C {
 	const val FIELD_LAST_SEEN = "lastSeenTime"
 	const val FIELD_ONLINE = "online"
 
-	const val FIELD_LAST_MSG_SENDER = "lastMsgSender"
+	const val FIELD_LAST_MSG_SENDER = "lastMsgSenderId"
 	const val FIELD_LAST_MSG_TEXT = "lastMsgText"
 	const val FIELD_LAST_MSG_TIME = "lastMsgTime"
 

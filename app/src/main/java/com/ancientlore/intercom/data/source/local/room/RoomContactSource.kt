@@ -73,6 +73,10 @@ class RoomContactSource(private val userId: String,
 		}
 	}
 
+	override fun getItems(ids: List<String>, callback: RequestCallback<List<Contact>>) {
+		TODO("Not yet implemented")
+	}
+
 	override fun attachListener(callback: RequestCallback<List<Contact>>): RepositorySubscription {
 		TODO("Not yet implemented")
 	}

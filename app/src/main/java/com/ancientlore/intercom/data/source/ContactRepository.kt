@@ -47,6 +47,30 @@ object ContactRepository : ContactSource {
 		})
 	}
 
+	override fun getItems(ids: List<String>, callback: RequestCallback<List<Contact>>) {
+
+		remoteSource.getItems(ids, object : RequestCallback<List<Contact>> {
+
+			override fun onSuccess(result: List<Contact>) {
+				cacheSource.addItems(result)
+				localSource?.addItems(result)
+				callback.onSuccess(result)
+			}
+			override fun onFailure(error: Throwable) {
+				Utils.logError(error)
+				cacheSource.getItems(ids, object : RequestCallback<List<Contact>> {
+
+					override fun onSuccess(result: List<Contact>) {
+						callback.onSuccess(result)
+					}
+					override fun onFailure(error: Throwable) {
+						callback.onSuccess(emptyList())
+					}
+				})
+			}
+		})
+	}
+
 	override fun addItem(item: Contact, callback: RequestCallback<String>) {
 
 		remoteSource.addItem(item, object : RequestCallback<String> {

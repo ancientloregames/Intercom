@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+		xmlns:app="http://schemas.android.com/apk/res-auto"
+		xmlns:tools="http://schemas.android.com/tools"
+		>
+	<data>
+		<variable
+				name="ui"
+				type="com.ancientlore.intercom.ui.chat.detail.ChatDetailViewModel"/>
+	</data>
+
+	<com.ancientlore.intercom.view.SwipableLayout
+			android:id="@+id/swipableLayout"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent">
+
+		<androidx.constraintlayout.widget.ConstraintLayout
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:clickable="true"
+				android:background="@android:color/white">
+
+			<com.google.android.material.appbar.AppBarLayout
+					android:id="@+id/appbar"
+					android:layout_width="0dp"
+					android:layout_height="wrap_content"
+					app:layout_constraintStart_toStartOf="parent"
+					app:layout_constraintEnd_toEndOf="parent"
+					app:layout_constraintTop_toTopOf="parent"
+					app:layout_constraintBottom_toTopOf="@+id/iconView"
+					android:theme="@style/AppTheme.AppBarOverlay">
+
+				<androidx.appcompat.widget.Toolbar
+						android:id="@+id/toolbar"
+						android:layout_width="match_parent"
+						android:layout_height="?attr/actionBarSize"
+						android:background="?attr/colorPrimary"
+						app:popupTheme="@style/AppTheme.PopupOverlay"
+						app:title="@string/chat_details"
+						tools:subtitle="10 members"
+						tools:navigationIcon="drawable/ic_nav_back"
+						/>
+
+			</com.google.android.material.appbar.AppBarLayout>
+
+			<ImageView
+					android:id="@+id/iconView"
+					android:layout_width="60dp"
+					android:layout_height="60dp"
+					android:layout_margin="10dp"
+					android:src="@{ui.chatIconField}"
+					android:clickable="@{ui.allowModification}"
+					app:asCircle="@{true}"
+					app:abbrText="@{ui.chatNameField}"
+					app:abbrSize="@{@dimen/chatListIconTextSize}"
+					app:abbrTextColor="@{@android:color/white}"
+					app:abbrBackColor="@{@color/colorPrimaryDark}"
+					app:backgroundColor="@color/colorPrimaryDark"
+					app:layout_constraintTop_toBottomOf="@id/appbar"
+					app:layout_constraintStart_toStartOf="parent"
+					app:layout_constraintEnd_toStartOf="@id/nameView"
+					app:layout_constraintBottom_toTopOf="@id/participantCountView"
+					android:onClick="@{() -> ui.onIconClicked()}"
+					tools:srcCompat="@drawable/ic_avatar"
+					/>
+
+			<ImageView
+					android:layout_width="60dp"
+					android:layout_height="60dp"
+					android:layout_margin="10dp"
+					android:scaleType="centerInside"
+					android:clickable="false"
+					android:focusable="false"
+					android:focusableInTouchMode="false"
+					android:visibility="@{ui.allowModification}"
+					app:srcCompat="@drawable/ic_add_photo_24dp"
+					app:tint="#80FFFFFF"
+					app:layout_constraintTop_toBottomOf="@id/appbar"
+					app:layout_constraintStart_toStartOf="parent"
+					app:layout_constraintEnd_toStartOf="@id/nameView"
+					app:layout_constraintBottom_toTopOf="@id/participantCountView"
+					android:contentDescription="@string/icon"
+					/>
+
+			<EditText
+					android:id="@+id/nameView"
+					android:layout_width="0dp"
+					android:layout_height="wrap_content"
+					android:hint="@string/group_name_field_hint"
+					android:text="@={ui.chatNameField}"
+					android:textSize="22dp"
+					android:inputType="textPersonName"
+					android:imeOptions="actionDone"
+					app:mutable="@{ui.allowModification}"
+					app:layout_constraintTop_toBottomOf="@id/appbar"
+					app:layout_constraintEnd_toEndOf="parent"
+					app:layout_constraintStart_toEndOf="@id/iconView"
+					app:layout_constraintBottom_toTopOf="@id/participantCountView"
+					/>
+
+
+			<TextView
+					android:id="@+id/participantCountView"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:text="@string/participants"
+					android:textColor="@color/settingsItemTextColor"
+					android:textStyle="bold"
+					android:textSize="14sp"
+					android:paddingStart="20dp"
+					android:paddingLeft="20dp"
+					android:paddingTop="5dp"
+					android:paddingBottom="5dp"
+					android:background="#ddd"
+					app:layout_constraintBottom_toTopOf="@id/listView"
+					app:layout_constraintStart_toStartOf="parent"
+					app:layout_constraintEnd_toEndOf="parent"
+					app:layout_constraintTop_toBottomOf="@id/iconView"
+					/>
+
+			<androidx.recyclerview.widget.RecyclerView
+					android:id="@+id/listView"
+					android:layout_width="0dp"
+					android:layout_height="0dp"
+					app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+					app:layout_constraintTop_toBottomOf="@+id/participantCountView"
+					app:layout_constraintEnd_toEndOf="parent"
+					app:layout_constraintBottom_toBottomOf="parent"
+					app:layout_constraintStart_toStartOf="parent"
+					tools:listitem="@layout/chat_creation_desc_item"
+					/>
+
+			<com.google.android.material.floatingactionbutton.FloatingActionButton
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_margin="@dimen/floatingButtonIndent"
+					android:onClick="@{() -> ui.onDoneClicked()}"
+					android:tint="@android:color/white"
+					android:visibility="@{ui.modified}"
+					app:srcCompat="@drawable/ic_check_24dp"
+					app:backgroundTint="@android:color/holo_blue_light"
+					app:layout_constraintBottom_toBottomOf="parent"
+					app:layout_constraintEnd_toEndOf="parent"
+					/>
+
+			<FrameLayout
+					android:layout_width="match_parent"
+					android:layout_height="match_parent"
+					android:background="#81FFFFFF"
+					android:clickable="true"
+					android:visibility="@{ui.showProcess}"
+					tools:visibility="gone"
+				>
+
+				<com.ancientlore.intercom.view.ColoredProgressBar
+						android:layout_width="50dp"
+						android:layout_height="50dp"
+						android:layout_gravity="center"
+						app:color="@android:color/darker_gray"
+						/>
+			</FrameLayout>
+
+		</androidx.constraintlayout.widget.ConstraintLayout>
+	</com.ancientlore.intercom.view.SwipableLayout>
+</layout>

@@ -28,6 +28,16 @@ abstract class CacheSource<I, T: Identifiable<I>> : DataSource<I, T> {
 			?: callback.onFailure(EmptyResultException)
 	}
 
+	fun getItems(ids: List<I>, callback: RequestCallback<List<T>>) {
+
+		val result = cache.filter { ids.contains(it.key) }.values.toList()
+
+		if (result.isNotEmpty())
+			callback.onSuccess(result)
+		else
+			callback.onFailure(EmptyResultException)
+	}
+
 	override fun addItem(item: T, callback: RequestCallback<I>) {
 		cache[item.getIdentity()] = item
 	}
