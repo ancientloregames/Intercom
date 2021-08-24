@@ -19,20 +19,20 @@ data class User(@field:ColumnInfo var name: String = "",
                 @field:ColumnInfo var lastSeenTime: Date? = null,
                 @field:ColumnInfo var online: Boolean = false,
                 @field:ColumnInfo var token: String = "",
-                @field:[Exclude Ignore] val dummy: Boolean = false)
+                @field:Ignore @get:Exclude val dummy: Boolean = false)
   : Identifiable<String> {
 
   companion object {
     private val dateFormat = DateFormat.getTimeInstance(DateFormat.SHORT)
   }
 
-  @get:[Exclude Ignore]
+  @get:Exclude @get:Ignore
   val id get() = phone
 
-  @delegate:[Exclude Ignore] @get:[Exclude Ignore]
+  @delegate:Exclude @delegate:Ignore @get:Exclude @get:Ignore
   val iconUri: Uri by lazy { Uri.parse(iconUrl) }
 
-  @delegate:[Exclude Ignore] @get:[Exclude Ignore]
+  @delegate:Exclude @delegate:Ignore @get:Exclude @get:Ignore
   val lastSeenDate: String by lazy { if (lastSeenTime != null) dateFormat.format(lastSeenTime) else "" }
 
   @Exclude @Ignore

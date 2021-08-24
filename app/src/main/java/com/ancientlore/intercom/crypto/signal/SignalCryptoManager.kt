@@ -77,12 +77,12 @@ class SignalCryptoManager(private val userId: String): CryptoManager {
 	override fun encrypt(message: Message, callback: RequestCallback<Any>) {
 		logger.d("Encrypting a message")
 
-		if (message.receiverId == null) {
+		if (message.receivers.isEmpty()) {
 			callback.onSuccess(EmptyObject)
 			return
 		}
 
-		val remoteUserId = message.receiverId!!
+		val remoteUserId = message.receivers.first { it != userId }
 
 		if (signalSession == null || signalSession!!.remoteUserName != remoteUserId) {
 			logger.d("Creating a session")

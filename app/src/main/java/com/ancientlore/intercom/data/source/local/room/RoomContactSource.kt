@@ -70,6 +70,8 @@ class RoomContactSource(private val userId: String,
 				dao.updateName(item.phone, item.name)
 			if (item.iconUrl.isNotEmpty())
 				dao.updateIconUrl(item.phone, item.iconUrl)
+			if (item.chatId.isNotEmpty())
+				dao.updateIconUrl(item.phone, item.chatId)
 		}
 	}
 

@@ -10,6 +10,8 @@ object CacheContactSource : CacheSource<String, Contact>() {
 				it.name = item.name
 			if (item.iconUrl.isNotEmpty())
 				it.iconUrl = item.iconUrl
+			if (item.chatId.isNotEmpty())
+				it.chatId = item.chatId
 		}
 	}
 

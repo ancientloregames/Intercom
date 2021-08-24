@@ -13,8 +13,9 @@ import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_LAST_MSG_TI
 import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_NAME
 import com.ancientlore.intercom.utils.SingletonHolder
 import com.google.firebase.firestore.SetOptions
+import java.lang.RuntimeException
 
-open class FirestoreChatSource protected constructor(private val userId: String)
+open class FirestoreChatSource protected constructor(protected val userId: String)
 	: FirestoreSource<Chat>(), ChatSource {
 
 	internal companion object : SingletonHolder<FirestoreChatSource, String>(
@@ -130,6 +131,25 @@ open class FirestoreChatSource protected constructor(private val userId: String)
 	}
 
 	override fun attachListener(id: String, callback: RequestCallback<Chat>): RepositorySubscription {
-		TODO("Not yet implemented")
+
+		val registration = userChats
+			.document(id)
+			.addSnapshotListener { snapshot, error ->
+				exec {
+					when {
+						error != null -> callback.onFailure(error)
+						snapshot != null -> deserialize(snapshot)
+							?.let { callback.onSuccess(it) }
+							?: callback.onFailure(RuntimeException("Failed to deserialize chat: $id"))
+						else -> callback.onFailure(EmptyResultException)
+					}
+				}
+			}
+
+		return object : RepositorySubscription {
+			override fun remove() {
+				registration.remove()
+			}
+		}
 	}
 }

@@ -35,4 +35,7 @@ interface RoomContactDao {
 
 	@Query("UPDATE contacts SET iconUrl = :url WHERE phone = :id")
 	fun updateIconUrl(id: String, url: String)
+
+	@Query("UPDATE contacts SET chatId = :chatId WHERE phone = :id")
+	fun updateChatId(id: String, chatId: String)
 }

@@ -65,40 +65,18 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 	private var paginationCompleted = false
 
 	fun init(context: Context) {
-		when {
-			params.chatId.isNotEmpty() -> {
-				initMessageRepository(params.chatId)
-				loadNextPage()
 
-				/*FIXME should reorganized db structure. separate chat description and chat messages*/
-				if (params.chatType == TYPE_PRIVATE) {
-					val contactId = params.participants.first { it != params.userId }
-					observeContactOnlineStatus(context, contactId)
-				}
-				else {
-					actionBarSubtitleField.set(context.getString(R.string.member_count,
-						params.participants.size))
-				}
+		if (params.chatId.isNotEmpty()) {
+			initMessageRepository(params.chatId)
+			loadNextPage {
+
+				attachRepositoryChangeListener()
 			}
-			params.chatType == TYPE_PRIVATE -> {
-				val contactId = params.participants.first { it != params.userId }
-				ChatRepository.getItem(contactId, object : CrashlyticsRequestCallback<Chat>() {
-					override fun onSuccess(chat: Chat) {
-						initMessageRepository(chat.id)
-						loadNextPage()
-					}
-				})
-				observeContactOnlineStatus(context, contactId)
-			}
-			params.participants.size > 2 -> {
-				actionBarSubtitleField.set(context.getString(R.string.member_count,
-					params.participants.size))
-			}
-			else -> {
-				val error = RuntimeException("Chat Flow Ui has been opened with no chat neither contacts ids")
-				Utils.logError(error)
-				throw error
-			}
+		}
+
+		if (params.chatType == TYPE_PRIVATE) {
+			val contactId = params.participants.first { it != params.userId }
+			observeContactOnlineStatus(context, contactId)
 		}
 	}
 
@@ -156,6 +134,9 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 	override fun clean() {
 		openAttachMenuSubj.onComplete()
 		recordAudioSubj.onComplete()
+		uploadIconSub.onComplete()
+		openChatDetailSub.onComplete()
+		openContactDetailSubj.onComplete()
 		inputManager?.onStop()
 		contactRepSub?.remove()
 		repositorySub?.remove()
@@ -210,7 +191,7 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 			val message = Message(
 				senderId = params.userId,
 				text = text,
-				receiverId = receiverId)
+				receivers = params.participants)
 			repository.addItem(message, object : RequestCallback<String> {
 				override fun onSuccess(result: String) {
 					runOnUiThread {
@@ -230,7 +211,8 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 			val message = Message(
 				senderId = params.userId,
 				attachUrl = conpressed.toString(),
-				type = Message.TYPE_IMAGE)
+				type = Message.TYPE_IMAGE,
+				receivers = params.participants)
 			repository.addItem(message, object : RequestCallback<String> {
 				override fun onSuccess(messageId: String) {
 					App.backend.getStorageManager().uploadImage(fileData, chatId, object : ProgressRequestCallback<Uri> {
@@ -261,7 +243,13 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 		guarantyChat { chatId ->
 			showSendProgressField.set(true)
 
-			val message = Message(params.userId, fileData)
+			val message = Message(
+				senderId = params.userId,
+				text = fileData.name,
+				info = fileData.getInfo(),
+				attachUrl = fileData.uri.toString(),
+				type = Message.TYPE_FILE,
+				receivers = params.participants)
 			repository.addItem(message, object : RequestCallback<String> {
 
 				override fun onSuccess(messageId: String) {
@@ -294,7 +282,11 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 		guarantyChat { chatId ->
 			showSendProgressField.set(true)
 
-			val message = Message.createFromAudio(params.userId, file.name)
+			val message = Message(
+				senderId = params.userId,
+				attachUrl = file.name,
+				type = Message.TYPE_AUDIO,
+				receivers = params.participants)
 			repository.addItem(message, object : RequestCallback<String> {
 
 				override fun onSuccess(messageId: String) {
@@ -358,13 +350,14 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 				iconUrl = params.iconUri.toString(),
 				initiatorId = params.userId,
 				participants = params.participants,
-				type = if (params.participants.size == 2) Chat.TYPE_PRIVATE else Chat.TYPE_GROUP,
+				type = params.chatType,
 				pin = false,
 				mute = false)
 
 			ChatRepository.addItem(chat, object : RequestCallback<String> {
 				override fun onSuccess(id: String) {
 					initMessageRepository(id)
+					attachRepositoryChangeListener()
 
 					if (params.iconUri.isInternal())
 						uploadIconSub.onNext(id)
@@ -387,6 +380,9 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 			setRemoteSource(App.backend.getDataSourceProvider().getMessageSource(chatId))
 			//setLocalSource(App.frontend.getDataSourceProvider().getMessageSource(chatId))
 		}
+	}
+
+	private fun attachRepositoryChangeListener() {
 
 		repositorySub = repository.attachChangeListener(object : RequestCallback<ListChanges<Message>> {
 			override fun onSuccess(result: ListChanges<Message>) {
@@ -428,7 +424,7 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 		})
 	}
 
-	private fun loadNextPage() {
+	private fun loadNextPage(onLoaded: Runnable? = null) {
 
 		repository.getNextPage(object: CrashlyticsRequestCallback<List<Message>>() {
 
@@ -438,6 +434,8 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 						listAdapter.prependItems(result)
 				}
 				updateMessagesStatus(result)
+
+				onLoaded?.run()
 			}
 		})
 	}

@@ -43,6 +43,7 @@ class ChatCreationViewModel(listAdapter: ChatCreationAdapter)
 						userId = userId,
 						title = contact.name,
 						iconUri = contact.iconUri,
+						chatId = contact.chatId,
 						chatType = Chat.TYPE_PRIVATE,
 						participants = listOf(userId, contact.getIdentity()))
 				)

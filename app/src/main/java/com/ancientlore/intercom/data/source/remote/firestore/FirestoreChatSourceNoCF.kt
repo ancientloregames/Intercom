@@ -4,12 +4,12 @@ import com.ancientlore.intercom.EmptyObject
 import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.data.model.Chat
 import com.ancientlore.intercom.data.model.Chat.Companion.TYPE_PRIVATE
+import com.ancientlore.intercom.data.model.Contact
 import com.ancientlore.intercom.data.source.ChatSource
+import com.ancientlore.intercom.data.source.ContactRepository
 import com.ancientlore.intercom.data.source.remote.firestore.C.CHATS
 import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_ICON_URL
-import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_ID
-import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_LAST_MSG_TEXT
-import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_LAST_MSG_TIME
+import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_INITIATOR_ID
 import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_MUTE
 import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_NAME
 import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_PARTICIPANTS
@@ -17,10 +17,9 @@ import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_PIN
 import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_TYPE
 import com.ancientlore.intercom.data.source.remote.firestore.C.USERS
 import com.ancientlore.intercom.utils.SingletonHolder
-import com.google.firebase.firestore.FieldValue
+import com.ancientlore.intercom.utils.Utils
 import com.google.firebase.firestore.SetOptions
 import java.lang.RuntimeException
-import java.util.*
 import kotlin.collections.HashMap
 
 class FirestoreChatSourceNoCF private constructor(userId: String)
@@ -30,22 +29,25 @@ class FirestoreChatSourceNoCF private constructor(userId: String)
 		{ userId -> FirestoreChatSourceNoCF(userId) })
 
 	override fun addItem(item: Chat, callback: RequestCallback<String>) {
-		db.collection(CHATS).add(item)
+		db.collection(CHATS)
+			.document()
+			.get()
 			.addOnSuccessListener { doc ->
 
 				val chatId = doc.id
 
 				if (item.type == TYPE_PRIVATE) {
+					val contactId = item.participants.first { it != item.initiatorId }
+					ContactRepository.update(Contact(phone = contactId, chatId = chatId))
+
 					db.collection(USERS)
 						.document(item.participants[0])
 						.collection(CHATS)
-						.document(item.participants[1])
+						.document(chatId)
 						.set(hashMapOf(
-							FIELD_ID to chatId,
 							FIELD_ICON_URL to item.iconUrl,
-							FIELD_LAST_MSG_TEXT to "",
-							FIELD_LAST_MSG_TIME to Date(0),
 							FIELD_NAME to item.participants[1],
+							FIELD_PARTICIPANTS to item.participants,
 							FIELD_TYPE to item.type,
 							FIELD_PIN to item.pin,
 							FIELD_MUTE to item.mute
@@ -55,13 +57,11 @@ class FirestoreChatSourceNoCF private constructor(userId: String)
 					db.collection(USERS)
 						.document(item.participants[1])
 						.collection(CHATS)
-						.document(item.participants[0])
+						.document(chatId)
 						.set(hashMapOf(
-							FIELD_ID to chatId,
 							FIELD_ICON_URL to item.iconUrl,
-							FIELD_LAST_MSG_TEXT to "",
-							FIELD_LAST_MSG_TIME to Date(0),
 							FIELD_NAME to item.participants[0],
+							FIELD_PARTICIPANTS to item.participants,
 							FIELD_TYPE to item.type,
 							FIELD_PIN to item.pin,
 							FIELD_MUTE to item.mute
@@ -69,40 +69,42 @@ class FirestoreChatSourceNoCF private constructor(userId: String)
 						.addOnFailureListener { exec { callback.onFailure(it) } }
 				}
 				else {
+					val changeMap = hashMapOf(
+						FIELD_NAME to item.name,
+						FIELD_ICON_URL to item.iconUrl,
+						FIELD_INITIATOR_ID to item.initiatorId,
+						FIELD_PARTICIPANTS to item.participants,
+						FIELD_TYPE to item.type,
+						FIELD_PIN to item.pin,
+						FIELD_MUTE to item.mute
+					)
+
 					for (participant in item.participants) {
 						db.collection(USERS)
 							.document(participant)
 							.collection(CHATS)
 							.document(chatId)
-							.set(hashMapOf(
-								FIELD_ID to chatId,
-								FIELD_ICON_URL to item.iconUrl,
-								FIELD_LAST_MSG_TEXT to "",
-								FIELD_LAST_MSG_TIME to FieldValue.serverTimestamp(),
-								FIELD_NAME to item.name,
-								FIELD_TYPE to item.type,
-								FIELD_PIN to item.pin,
-								FIELD_MUTE to item.mute,
-								FIELD_PARTICIPANTS to item.participants // TODO maybe better to user chats collection only (with indecies)
-							), SetOptions.merge())
+							.set(changeMap, SetOptions.merge())
 							.addOnSuccessListener {
-								if (item.initiatorId == participant)
+								if (participant == item.initiatorId)
 									exec { callback.onSuccess(chatId) }
 							}
-							.addOnFailureListener { exec { callback.onFailure(it) } }
+							.addOnFailureListener {
+								if (participant == item.initiatorId)
+									exec { callback.onFailure(it) }
+								else
+									Utils.logError(it)
+							}
 					}
 				}
 			}
 			.addOnFailureListener { exec { callback.onFailure(it) } }
 	}
 
-	//FIXME this looks ugly. Need to separate Chat and UserChat models
 	override fun updateItem(item: Chat, callback: RequestCallback<Any>) {
 		if (item.id.isNotEmpty()) {
 
 			if (item.pin != null || item.mute != null) {
-
-				val chatId = if (item.type == TYPE_PRIVATE) item.name else item.id
 
 				val userChatChangeMap = HashMap<String, Any>().apply {
 					if (item.pin != null)
@@ -111,7 +113,7 @@ class FirestoreChatSourceNoCF private constructor(userId: String)
 						put(FIELD_MUTE, item.mute!!)
 				}
 				userChats
-					.document(chatId)
+					.document(item.id)
 					.set(userChatChangeMap, SetOptions.merge())
 					.addOnSuccessListener { exec { callback.onSuccess(EmptyObject) } }
 					.addOnFailureListener { exec { callback.onFailure(it) } }
@@ -131,34 +133,22 @@ class FirestoreChatSourceNoCF private constructor(userId: String)
 					.document(item.id)
 					.set(changeMap, SetOptions.merge())
 					.addOnSuccessListener {
-						if (item.type == TYPE_PRIVATE) {
+						for (participant in item.participants) {
 							db.collection(USERS)
-								.document(item.participants[0])
+								.document(participant)
 								.collection(CHATS)
-								.document(item.participants[1])
+								.document(item.id)
 								.set(changeMap, SetOptions.merge())
-								.addOnSuccessListener { exec { callback.onSuccess(EmptyObject) } }
-								.addOnFailureListener { exec { callback.onFailure(it) } }
-							db.collection(USERS)
-								.document(item.participants[1])
-								.collection(CHATS)
-								.document(item.participants[0])
-								.set(changeMap, SetOptions.merge())
-								.addOnFailureListener { exec { callback.onFailure(it) } }
-						}
-						else {
-							for (participant in item.participants) {
-								db.collection(USERS)
-									.document(participant)
-									.collection(CHATS)
-									.document(item.id)
-									.set(changeMap, SetOptions.merge())
-									.addOnSuccessListener {
-										if (item.initiatorId == participant)
-											exec { callback.onSuccess(EmptyObject) }
-									}
-									.addOnFailureListener { exec { callback.onFailure(it) } }
-							}
+								.addOnSuccessListener {
+									if (participant == item.initiatorId)
+										exec { callback.onSuccess(EmptyObject) }
+								}
+								.addOnFailureListener {
+									if (participant == item.initiatorId)
+										exec { callback.onFailure(it) }
+									else
+										Utils.logError(it)
+								}
 						}
 					}
 					.addOnFailureListener { exec { callback.onFailure(it) } }

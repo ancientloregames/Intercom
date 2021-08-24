@@ -32,7 +32,8 @@ class ContactListViewModel(listAdapter: ContactListAdapter)
 					contact.phone,
 					contact.name,
 					contact.iconUrl,
-					false
+					false,
+					contact.chatId
 				))
 			}
 		})

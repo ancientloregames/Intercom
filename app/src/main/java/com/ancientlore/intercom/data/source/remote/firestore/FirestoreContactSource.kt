@@ -8,8 +8,10 @@ import com.ancientlore.intercom.data.source.ContactSource
 import com.ancientlore.intercom.backend.RepositorySubscription
 import com.ancientlore.intercom.data.source.EmptyResultException
 import com.ancientlore.intercom.data.source.remote.firestore.C.CONTACTS
+import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_CHAT_ID
 import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_ICON_URL
 import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_NAME
+import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_PHONE
 import com.ancientlore.intercom.data.source.remote.firestore.C.USERS
 import com.ancientlore.intercom.utils.SingletonHolder
 import com.ancientlore.intercom.utils.Utils
@@ -129,6 +131,8 @@ class FirestoreContactSource private constructor(private val userId: String)
 						put(FIELD_NAME, contact.name)
 					if (contact.iconUrl.isNotEmpty())
 						put(FIELD_ICON_URL, contact.iconUrl)
+					if (contact.chatId.isNotEmpty())
+						put(FIELD_CHAT_ID, contact.chatId)
 				}, SetOptions.merge())
 				.addOnSuccessListener {
 					if (contact.phone == lastContactPhone)
@@ -141,13 +145,24 @@ class FirestoreContactSource private constructor(private val userId: String)
 	override fun update(item: Contact, callback: RequestCallback<Any>) {
 		if (item.phone.isNotEmpty()) {
 
+			if (item.chatId.isNotEmpty()) {
+				db.collection(USERS)
+					.document(item.phone)
+					.collection(CONTACTS)
+					.document(userId)
+					.set(hashMapOf(FIELD_CHAT_ID to item.chatId), SetOptions.merge())
+					.addOnFailureListener { Utils.logError(it) }
+			}
+
 			userContacts.document(item.phone)
 				.set(HashMap<String, Any>().apply {
-					put(FIELD_ICON_URL, item.phone)
+					put(FIELD_PHONE, item.phone)
 					if (item.name.isNotEmpty())
 						put(FIELD_NAME, item.name)
 					if (item.iconUrl.isNotEmpty())
 						put(FIELD_ICON_URL, item.iconUrl)
+					if (item.chatId.isNotEmpty())
+						put(FIELD_CHAT_ID, item.chatId)
 				}, SetOptions.merge())
 				.addOnSuccessListener { exec { callback.onSuccess(EmptyObject) } }
 				.addOnFailureListener { exec { callback.onFailure(it) } }

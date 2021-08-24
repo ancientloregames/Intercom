@@ -6,14 +6,16 @@ import android.os.Parcelable
 data class ContactDetailParams(val id: String,
                                val name: String,
                                val iconUrl: String,
-                               val openedFromChat: Boolean)
+                               val openedFromChat: Boolean,
+                               val chatId: String? = null)
 	: Parcelable {
 
 	constructor(parcel: Parcel) : this(
 		parcel.readString(),
 		parcel.readString(),
 		parcel.readString(),
-		parcel.readByte() != 0.toByte()
+		parcel.readByte() != 0.toByte(),
+		parcel.readString()
 	)
 
 	override fun writeToParcel(parcel: Parcel, flags: Int) {
@@ -21,6 +23,7 @@ data class ContactDetailParams(val id: String,
 		parcel.writeString(name)
 		parcel.writeString(iconUrl)
 		parcel.writeByte(if (openedFromChat) 1 else 0)
+		parcel.writeString(chatId)
 	}
 
 	override fun describeContents() = 0

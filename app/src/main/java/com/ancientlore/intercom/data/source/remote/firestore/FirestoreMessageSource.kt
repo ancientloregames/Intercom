@@ -22,7 +22,7 @@ import com.google.firebase.firestore.Query
 import java.util.*
 import kotlin.collections.ArrayList
 
-open class FirestoreMessageSource(private val chatId: String)
+open class FirestoreMessageSource(protected val chatId: String)
 	: FirestoreSource<Message>(), MessageSource {
 
 	protected val chatMessages get() = db.collection(CHATS).document(chatId).collection(MESSAGES)

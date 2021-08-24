@@ -93,6 +93,7 @@ class ContactDetailViewModel(private val params: ContactDetailParams)
 				userId = userId,
 				title = params.name,
 				iconUri = Uri.parse(params.iconUrl),
+				chatId = params.chatId ?: "",
 				chatType = Chat.TYPE_PRIVATE,
 				participants = listOf(userId, params.id)))
 		}

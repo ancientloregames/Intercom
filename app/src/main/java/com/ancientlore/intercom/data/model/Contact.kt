@@ -6,8 +6,6 @@ import android.os.Parcelable
 import androidx.room.*
 import com.ancientlore.intercom.utils.Identifiable
 import com.google.firebase.firestore.Exclude
-import java.text.DateFormat
-import java.util.*
 
 @Entity(tableName = "contacts",
   indices = [
@@ -17,7 +15,7 @@ data class Contact(@field:PrimaryKey var phone: String = "",
                    @field:ColumnInfo var name: String = "",
                    @field:ColumnInfo var chatId: String = "",
                    @field:ColumnInfo var iconUrl: String = "",
-                   @field:[ColumnInfo Exclude] var userId: String = "")
+                   @field:ColumnInfo @get:Exclude var userId: String = "")
   : Comparable<Contact>, Parcelable, Identifiable<String> {
 
   companion object CREATOR : Parcelable.Creator<Contact> {
@@ -31,10 +29,10 @@ data class Contact(@field:PrimaryKey var phone: String = "",
     }
   }
 
-  @delegate:[Exclude Ignore] @get:[Exclude Ignore]
+  @delegate:Exclude @delegate:Ignore @get:Exclude @get:Ignore
   val iconUri: Uri by lazy { Uri.parse(iconUrl) }
 
-  @field:[Exclude Ignore]
+  @field:Ignore @get:Exclude
   var checked: Boolean = false
 
   constructor(parcel: Parcel) : this(

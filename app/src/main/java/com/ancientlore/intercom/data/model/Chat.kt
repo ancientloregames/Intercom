@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.annotation.IntDef
 import androidx.room.*
 import com.ancientlore.intercom.utils.Identifiable
+import com.google.firebase.firestore.DocumentId
 import com.google.firebase.firestore.Exclude
 import java.text.SimpleDateFormat
 import java.util.*
@@ -12,7 +13,7 @@ import java.util.*
 	indices = [
 		Index("userId")
 	])
-data class Chat(@field:PrimaryKey var id: String = "",
+data class Chat(@field:PrimaryKey @DocumentId var id: String = "",
                 @field:ColumnInfo var name: String = "",
                 @field:ColumnInfo var iconUrl: String = "",
                 @field:ColumnInfo var initiatorId: String = "",
@@ -23,7 +24,7 @@ data class Chat(@field:PrimaryKey var id: String = "",
                 @field:[ColumnInfo Type] var type: Int = TYPE_PRIVATE,
                 @field:ColumnInfo var pin: Boolean? = null,
                 @field:ColumnInfo var mute: Boolean? = null,
-                @field:[ColumnInfo Exclude] var userId: String = "")
+                @field:ColumnInfo @get:Exclude var userId: String = "")
 	: Comparable<Chat>, Identifiable<String> {
 
 	companion object {
@@ -37,18 +38,18 @@ data class Chat(@field:PrimaryKey var id: String = "",
 	@Retention(AnnotationRetention.SOURCE)
 	annotation class Type
 
-	@delegate:[Exclude Ignore] @get:[Exclude Ignore]
+	@delegate:Exclude @delegate:Ignore @get:Exclude @get:Ignore
 	val iconUri: Uri by lazy { Uri.parse(iconUrl) }
 
-	@delegate:[Exclude Ignore] @get:[Exclude Ignore]
+	@delegate:Exclude @delegate:Ignore @get:Exclude @get:Ignore
 	val lastMsgDate: String by lazy { if (lastMsgTime != null) dateFormat.format(lastMsgTime) else "" }
 
 	// TODO maybe shouldn't exclude from room
-	@field:[Exclude Ignore] @get:[Exclude Ignore] @set:[Exclude Ignore]
+	@field:Exclude @field:Ignore @get:Exclude @get:Ignore
 	var localName: String? = null
 
 	// TODO maybe shouldn't exclude from room
-	@field:[Exclude Ignore] @get:[Exclude Ignore] @set:[Exclude Ignore]
+	@field:Exclude @field:Ignore @get:Exclude @get:Ignore
 	var lastMsgSenderLocalName: String? = null
 
 	override fun equals(other: Any?): Boolean {
