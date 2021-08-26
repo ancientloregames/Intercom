@@ -1,5 +1,6 @@
 package com.ancientlore.intercom.ui.contact.list
 
+import androidx.databinding.ObservableBoolean
 import com.ancientlore.intercom.backend.RepositorySubscription
 import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.data.model.Contact
@@ -13,6 +14,8 @@ import io.reactivex.subjects.PublishSubject
 
 class ContactListViewModel(listAdapter: ContactListAdapter)
 	: FilterableViewModel<ContactListAdapter>(listAdapter) {
+
+	val contactListIsEmpty = ObservableBoolean(false)
 
 	private val openContactDetailSub = PublishSubject.create<ContactDetailParams>()
 
@@ -41,6 +44,7 @@ class ContactListViewModel(listAdapter: ContactListAdapter)
 		repositorySub = ContactRepository.attachListener(object : RequestCallback<List<Contact>>{
 			override fun onSuccess(result: List<Contact>) {
 				runOnUiThread {
+					contactListIsEmpty.set(result.isEmpty())
 					listAdapter.setItems(result)
 				}
 			}

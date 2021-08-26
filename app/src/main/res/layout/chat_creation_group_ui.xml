@@ -46,7 +46,7 @@
 			<androidx.recyclerview.widget.RecyclerView
 					android:id="@+id/selectedListView"
 					android:layout_width="0dp"
-					android:layout_height="wrap_content"
+					android:layout_height="100dp"
 					android:orientation="horizontal"
 					app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
 					app:layout_constraintTop_toBottomOf="@+id/appbar"
@@ -55,12 +55,35 @@
 					tools:listitem="@layout/chat_creation_group_selected_item"
 					/>
 
+			<TextView
+					android:id="@+id/emptySelectionHint"
+					android:layout_width="0dp"
+					android:layout_height="100dp"
+					app:layout_constraintTop_toBottomOf="@+id/appbar"
+					app:layout_constraintEnd_toEndOf="parent"
+					app:layout_constraintStart_toStartOf="parent"
+					android:visibility="@{!ui.hasSelection}"
+					android:gravity="center"
+					android:text="@string/group_empty_hint"
+					android:textSize="18sp"
+				/>
+
+			<View
+					android:id="@+id/selectionDivider"
+					android:layout_width="match_parent"
+					android:layout_height="0.5dp"
+					android:background="@color/settingsItemDividerColor"
+					app:layout_constraintTop_toBottomOf="@+id/selectedListView"
+					app:layout_constraintEnd_toEndOf="parent"
+					app:layout_constraintStart_toStartOf="parent"
+					/>
+
 			<androidx.recyclerview.widget.RecyclerView
 					android:id="@+id/listView"
 					android:layout_width="0dp"
 					android:layout_height="0dp"
 					app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-					app:layout_constraintTop_toBottomOf="@+id/selectedListView"
+					app:layout_constraintTop_toBottomOf="@+id/selectionDivider"
 					app:layout_constraintEnd_toEndOf="parent"
 					app:layout_constraintBottom_toBottomOf="parent"
 					app:layout_constraintStart_toStartOf="parent"
@@ -72,6 +95,7 @@
 					android:layout_height="wrap_content"
 					android:layout_margin="@dimen/floatingButtonIndent"
 					android:onClick="@{() -> ui.onNextClicked()}"
+					android:visibility="@{ui.hasSelection}"
 					app:srcCompat="@drawable/ic_arrow_right_24dp"
 					android:tint="@android:color/white"
 					app:backgroundTint="@android:color/holo_blue_light"

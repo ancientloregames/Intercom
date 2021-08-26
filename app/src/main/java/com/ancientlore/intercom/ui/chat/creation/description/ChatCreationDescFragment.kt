@@ -12,6 +12,8 @@ import com.ancientlore.intercom.databinding.ChatCreationDescUiBinding
 import com.ancientlore.intercom.ui.FilterableFragment
 import com.ancientlore.intercom.utils.ToolbarManager
 import com.ancientlore.intercom.utils.Utils
+import com.ancientlore.intercom.utils.extensions.showKeyboard
+import kotlinx.android.synthetic.main.chat_creation_desc_ui.*
 import kotlinx.android.synthetic.main.chat_creation_desc_ui.listView
 import kotlinx.android.synthetic.main.chat_creation_desc_ui.swipableLayout
 import kotlinx.android.synthetic.main.chat_creation_desc_ui.toolbar
@@ -66,6 +68,8 @@ class ChatCreationDescFragment : FilterableFragment<ChatCreationDescViewModel, C
 		swipableLayout.setListener { close() }
 
 		listView.adapter = ChatCreationDescAdapter(requireContext())
+
+		Utils.runOnUiThread({ nameView.showKeyboard() }, 200)
 	}
 
 	override fun initViewModel(viewModel: ChatCreationDescViewModel) {

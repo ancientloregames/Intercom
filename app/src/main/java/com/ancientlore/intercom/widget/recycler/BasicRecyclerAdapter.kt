@@ -37,6 +37,8 @@ abstract class BasicRecyclerAdapter<I, H: BasicRecyclerAdapter.ViewHolder<I, B>,
 
 	fun isEmpty() = items.isEmpty()
 
+	fun isNotEmpty() = !isEmpty()
+
 	protected fun getItems() = items
 
 	protected fun getItem(pos: Int) = if (isValidPosition(pos)) items[pos] else null

@@ -54,6 +54,16 @@
 					tools:listitem="@layout/contact_list_item"
 					/>
 
+			<TextView
+					style="@style/defaultEmptyListHint"
+					android:layout_width="0dp"
+					android:layout_height="0dp"
+					android:visibility="@{ui.contactListIsEmpty}"
+					app:layout_constraintBottom_toBottomOf="parent"
+					app:layout_constraintEnd_toEndOf="parent"
+					app:layout_constraintStart_toStartOf="parent"
+					app:layout_constraintTop_toBottomOf="@+id/appbar" />
+
 		</androidx.constraintlayout.widget.ConstraintLayout>
 	</com.ancientlore.intercom.view.SwipableLayout>
 </layout>

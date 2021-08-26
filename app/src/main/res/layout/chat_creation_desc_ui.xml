@@ -79,11 +79,14 @@
 					android:layout_height="wrap_content"
 					android:hint="@string/group_name_field_hint"
 					android:text="@={ui.groupNameField}"
+					android:inputType="textPersonName"
 					app:layout_constraintTop_toBottomOf="@id/appbar"
 					app:layout_constraintEnd_toEndOf="parent"
 					app:layout_constraintStart_toEndOf="@id/iconView"
 					app:layout_constraintBottom_toTopOf="@id/dividerView"
-				/>
+				>
+				<requestFocus />
+			</EditText>
 
 			<View
 					android:id="@+id/dividerView"
@@ -115,6 +118,7 @@
 					android:onClick="@{() -> ui.onNextClicked()}"
 					app:srcCompat="@drawable/ic_check_24dp"
 					android:tint="@android:color/white"
+					android:visibility="@{ui.groupNameField.length() > 0}"
 					app:backgroundTint="@android:color/holo_blue_light"
 					app:layout_constraintBottom_toBottomOf="parent"
 					app:layout_constraintEnd_toEndOf="parent"

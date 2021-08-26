@@ -22,8 +22,7 @@
 					android:layout_width="match_parent"
 					android:layout_height="match_parent"
 					android:scaleType="centerCrop"
-					android:src="@drawable/chat_bg"
-				/>
+					android:src="@drawable/chat_bg" />
 
 			<com.google.android.material.appbar.AppBarLayout
 					android:id="@+id/appbar"
@@ -155,7 +154,9 @@
 						android:inputType="textCapSentences|textMultiLine"
 						android:maxLines="4"
 						android:text="@={ui.textField}"
-				/>
+						>
+					<requestFocus />
+				</EditText>
 			</LinearLayout>
 
 			<LinearLayout

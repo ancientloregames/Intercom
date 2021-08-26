@@ -39,16 +39,22 @@
 
 			</com.google.android.material.appbar.AppBarLayout>
 
-			<com.ancientlore.intercom.view.CircleImageView
+			<ImageView
 					android:id="@+id/iconView"
 					android:layout_width="100dp"
 					android:layout_height="100dp"
-					android:layout_marginTop="15dp"
 					android:layout_gravity="center"
+					android:layout_marginTop="15dp"
 					android:src="@{ui.userIconField}"
+					app:asCircle="@{true}"
+					app:abbrText="@{ui.userNameField}"
+					app:abbrSize="@{@dimen/settingsUserNameAbSize}"
+					app:abbrTextColor="@{@android:color/white}"
+					app:abbrBackColor="@{@color/colorPrimaryDark}"
+					app:backgroundColor="@color/colorPrimaryDark"
 					tools:backgroundColor="@color/colorPrimaryDark"
-					tools:tint="@android:color/white"
 					tools:srcCompat="@drawable/ic_avatar"
+					android:contentDescription="@string/icon"
 					/>
 
 			<TextView

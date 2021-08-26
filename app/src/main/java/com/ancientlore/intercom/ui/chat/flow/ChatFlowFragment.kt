@@ -24,14 +24,12 @@ import com.ancientlore.intercom.utils.ImageUtils
 import com.ancientlore.intercom.utils.Runnable1
 import com.ancientlore.intercom.utils.ToolbarManager
 import com.ancientlore.intercom.utils.Utils
-import com.ancientlore.intercom.utils.extensions.enableChatBehavior
-import com.ancientlore.intercom.utils.extensions.getAppCacheDir
-import com.ancientlore.intercom.utils.extensions.getFileData
-import com.ancientlore.intercom.utils.extensions.openFile
+import com.ancientlore.intercom.utils.extensions.*
 import com.ancientlore.intercom.view.MessageInputManager
 import com.ancientlore.intercom.widget.list.simple.SimpleListItem
-import kotlinx.android.synthetic.main.chat_flow_ui.*
+import kotlinx.android.synthetic.main.chat_flow_ui.textInput
 import kotlinx.android.synthetic.main.chat_flow_ui.listView
+import kotlinx.android.synthetic.main.chat_flow_ui.swipableLayout
 import kotlinx.android.synthetic.main.chat_flow_ui.toolbar
 import java.io.File
 
@@ -102,6 +100,9 @@ class ChatFlowFragment : FilterableFragment<ChatFlowViewModel, ChatFlowUiBinding
 
 			enableChatBehavior()
 		}
+
+		Utils.runOnUiThread({ textInput.showKeyboard() }, 200)
+
 	}
 
 	override fun onOptionsItemSelected(item: MenuItem): Boolean {

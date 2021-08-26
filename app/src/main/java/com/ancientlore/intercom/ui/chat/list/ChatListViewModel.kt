@@ -1,5 +1,6 @@
 package com.ancientlore.intercom.ui.chat.list
 
+import androidx.databinding.ObservableBoolean
 import com.ancientlore.intercom.App
 import com.ancientlore.intercom.EmptyObject
 import com.ancientlore.intercom.backend.CrashlyticsRequestCallback
@@ -18,6 +19,8 @@ import java.util.*
 
 class ChatListViewModel(listAdapter: ChatListAdapter)
 	: FilterableViewModel<ChatListAdapter>(listAdapter) {
+
+	val chatListIsEmpty = ObservableBoolean(false)
 
 	private val chatCreationSub = PublishSubject.create<Any>()
 	private val chatOpenSub = PublishSubject.create<ChatFlowParams>()
@@ -72,6 +75,7 @@ class ChatListViewModel(listAdapter: ChatListAdapter)
 					override fun onSuccess(chats: List<Chat>) {
 						assignPrivateChatNames(chats, contacts)
 						runOnUiThread {
+							chatListIsEmpty.set(chats.isEmpty())
 							listAdapter.setItems(chats)
 						}
 					}

@@ -1,5 +1,6 @@
 package com.ancientlore.intercom.ui.chat.creation.group
 
+import androidx.databinding.ObservableBoolean
 import com.ancientlore.intercom.backend.RepositorySubscription
 import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.data.model.Contact
@@ -14,6 +15,8 @@ class ChatCreationGroupViewModel(listAdapter: ChatCreationGroupAdapter,
                                  private val selectedListAdapter: ChatCreationSelectedAdapter)
 	: FilterableViewModel<ChatCreationGroupAdapter>(listAdapter) {
 
+	val hasSelection = ObservableBoolean(false)
+
 	private val openNextSub = PublishSubject.create<List<Contact>>()
 
 	private var repositorySub: RepositorySubscription? = null
@@ -26,6 +29,8 @@ class ChatCreationGroupViewModel(listAdapter: ChatCreationGroupAdapter,
 				selectedListAdapter.deleteItem(contact)
 			else
 				selectedListAdapter.prependItem(contact)
+
+			hasSelection.set(selectedListAdapter.isNotEmpty())
 		}
 	}
 
@@ -34,6 +39,8 @@ class ChatCreationGroupViewModel(listAdapter: ChatCreationGroupAdapter,
 
 			selectedListAdapter.deleteItem(contact)
 			listAdapter.switchCheckBoxItem(contact)
+
+			hasSelection.set(selectedListAdapter.isNotEmpty())
 		}
 	}
 

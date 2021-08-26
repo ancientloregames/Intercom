@@ -52,7 +52,40 @@
 				tools:listitem="@layout/chat_list_item"
 		/>
 
+		<TextView
+				android:layout_width="0dp"
+				android:layout_height="0dp"
+				android:text="@string/chat_list_empty_hint"
+				android:visibility="@{ui.chatListIsEmpty}"
+				app:layout_constraintBottom_toTopOf="@+id/createChatButton"
+				app:layout_constraintTop_toBottomOf="@+id/appbar"
+				app:layout_constraintEnd_toEndOf="parent"
+				app:layout_constraintStart_toStartOf="parent"
+				style="@style/defaultEmptyListHint"
+			/>
+
+		<TextView
+				android:layout_width="0dp"
+				android:layout_height="56dp"
+				android:gravity="end|center_vertical"
+				android:layout_marginBottom="@dimen/floatingButtonIndent"
+				android:layout_marginStart="6dp"
+				android:layout_marginEnd="6dp"
+				android:text="@string/create_chat_hint"
+				android:textSize="15sp"
+				android:textColor="@color/defaultGreyColor"
+				android:drawableEnd="@drawable/ic_arrow_right_24dp"
+				android:drawablePadding="8dp"
+				android:visibility="@{ui.chatListIsEmpty}"
+				app:layout_constraintStart_toStartOf="parent"
+				app:layout_constraintEnd_toStartOf="@+id/createChatButton"
+				app:layout_constraintBottom_toBottomOf="parent"
+				app:layout_constraintTop_toTopOf="@id/createChatButton"
+				style="@style/onelineTextField"
+			/>
+
 		<com.google.android.material.floatingactionbutton.FloatingActionButton
+				android:id="@+id/createChatButton"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:layout_margin="@dimen/floatingButtonIndent"

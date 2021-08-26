@@ -6,6 +6,7 @@ import androidx.annotation.ColorInt
 import androidx.annotation.Px
 import androidx.core.content.ContextCompat
 import androidx.databinding.ObservableField
+import com.ancientlore.intercom.App
 import com.ancientlore.intercom.BR
 import com.ancientlore.intercom.R
 import com.ancientlore.intercom.widget.recycler.BasicRecyclerAdapter
@@ -64,6 +65,11 @@ class ChatListAdapter(context: Context,
 	class ViewHolder(binding: ChatListItemBinding)
 		: BasicRecyclerAdapter.ViewHolder<Chat, ChatListItemBinding>(binding) {
 
+		companion object {
+
+			val userId: String by lazy { App.backend.getAuthManager().getCurrentUser().id }
+		}
+
 		interface Listener {
 			fun onItemClicked()
 			fun onItemLongClicked()
@@ -87,12 +93,15 @@ class ChatListAdapter(context: Context,
 		@ColorInt
 		private val senderTextColor: Int
 
+		private val selfDescriptor: String
+
 		init {
 			binding.setVariable(BR.chat, this)
 
 			iconColor = ContextCompat.getColor(context, R.color.chatIconBackColor)
 			senderTextColor = ContextCompat.getColor(context, R.color.chatIconBackColor)
 			iconTextSize = resources.getDimensionPixelSize(R.dimen.chatListIconTextSize)
+			selfDescriptor = context.getString(R.string.you)
 		}
 
 		override fun bind(data: Chat) {
@@ -103,8 +112,10 @@ class ChatListAdapter(context: Context,
 			titleField.set(name)
 
 			if (data.participants.size > 2) {
-				val senderName = (data.lastMsgSenderLocalName ?: data.lastMsgSenderId) + ':'
-				val message = "$senderName ${data.lastMsgText}".setColorRegion(senderName, senderTextColor)
+				val senderName = if (data.lastMsgSenderId == userId)
+					selfDescriptor
+				else (data.lastMsgSenderLocalName ?: data.lastMsgSenderId)
+				val message = "$senderName: ${data.lastMsgText}".setColorRegion(senderName, senderTextColor)
 				messageField.set(message)
 			}
 			else messageField.set(data.lastMsgText)

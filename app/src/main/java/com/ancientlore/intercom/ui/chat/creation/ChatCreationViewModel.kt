@@ -1,5 +1,6 @@
 package com.ancientlore.intercom.ui.chat.creation
 
+import androidx.databinding.ObservableBoolean
 import com.ancientlore.intercom.App
 import com.ancientlore.intercom.EmptyObject
 import com.ancientlore.intercom.backend.RepositorySubscription
@@ -16,6 +17,8 @@ import io.reactivex.subjects.PublishSubject
 
 class ChatCreationViewModel(listAdapter: ChatCreationAdapter)
 	: FilterableViewModel<ChatCreationAdapter>(listAdapter) {
+
+	val contactListIsEmpty = ObservableBoolean(false)
 
 	private val openChatSub = PublishSubject.create<ChatFlowParams>()
 	private val createGroupSub = PublishSubject.create<Any>()
@@ -62,6 +65,7 @@ class ChatCreationViewModel(listAdapter: ChatCreationAdapter)
 		repositorySub = ContactRepository.attachListener(object : RequestCallback<List<Contact>> {
 			override fun onSuccess(result: List<Contact>) {
 				runOnUiThread {
+					contactListIsEmpty.set(result.isEmpty())
 					listAdapter.setItems(result)
 				}
 				updateContactCountSub.onNext(result.size)
