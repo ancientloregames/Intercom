@@ -4,6 +4,7 @@ import android.content.Context
 import android.media.MediaRecorder
 import android.net.Uri
 import android.util.Log
+import androidx.annotation.IntDef
 import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableField
 import com.ancientlore.intercom.App
@@ -15,6 +16,7 @@ import com.ancientlore.intercom.data.model.*
 import com.ancientlore.intercom.data.model.Chat.Companion.TYPE_PRIVATE
 import com.ancientlore.intercom.data.source.*
 import com.ancientlore.intercom.ui.FilterableViewModel
+import com.ancientlore.intercom.ui.call.CallViewModel
 import com.ancientlore.intercom.ui.contact.detail.ContactDetailParams
 import com.ancientlore.intercom.utils.Runnable1
 import com.ancientlore.intercom.utils.Utils
@@ -29,6 +31,15 @@ import java.io.File
 class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
                         private val params: ChatFlowParams)
 	: FilterableViewModel<ChatFlowAdapter>(listAdapter) {
+
+	companion object {
+		const val OPTION_AUDIO_CALL = 0
+		const val OPTION_VIDEO_CALL = 1
+	}
+
+	@IntDef(OPTION_AUDIO_CALL, OPTION_VIDEO_CALL)
+	@Retention(AnnotationRetention.SOURCE)
+	annotation class Option
 
 	val textField = ObservableField("")
 
@@ -55,6 +66,10 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 	private val openChatDetailSub = PublishSubject.create<ChatFlowParams>()
 
 	private val openContactDetailSubj = PublishSubject.create<ContactDetailParams>()
+
+	private val makeAudioCallSubj = PublishSubject.create<CallViewModel.Params>()
+
+	private val makeVideoCallSubj = PublishSubject.create<CallViewModel.Params>()
 
 	private var contactRepSub: RepositorySubscription? = null
 
@@ -137,6 +152,8 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 		uploadIconSub.onComplete()
 		openChatDetailSub.onComplete()
 		openContactDetailSubj.onComplete()
+		makeAudioCallSubj.onComplete()
+		makeVideoCallSubj.onComplete()
 		inputManager?.onStop()
 		contactRepSub?.remove()
 		repositorySub?.remove()
@@ -155,6 +172,10 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 	fun observeOpenContactDetail() = openContactDetailSubj as Observable<ContactDetailParams>
 
 	fun onAttachButtonCliked() = openAttachMenuSubj.onNext(EmptyObject)
+
+	fun observeMakeAudioCallRequest() = makeAudioCallSubj as Observable<CallViewModel.Params>
+
+	fun observeMakeVideoCallRequest() = makeVideoCallSubj as Observable<CallViewModel.Params>
 
 	fun onActionBarCliked() { // TODO really need to separate private and group chats
 		if (params.chatType == TYPE_PRIVATE)
@@ -330,6 +351,23 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 	fun onScrolledToTop() {
 		if (paginationCompleted.not())
 			loadNextPage()
+	}
+
+	fun onOptionSelected(@Option selectedId: Int) {
+		when (selectedId) {
+			OPTION_AUDIO_CALL -> makeAudioCallSubj.onNext(
+				CallViewModel.Params(
+					receiverId!!,
+					params.title,
+					params.iconUri.toString()
+				))
+			OPTION_VIDEO_CALL -> makeVideoCallSubj.onNext(
+				CallViewModel.Params(
+					receiverId!!,
+					params.title,
+					params.iconUri.toString()
+				))
+		}
 	}
 
 	private fun onFailureSendingMessage(error: Throwable) {

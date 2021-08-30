@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+		xmlns:app="http://schemas.android.com/apk/res-auto"
+		xmlns:tools="http://schemas.android.com/tools"
+		>
+	<data>
+		<variable
+				name="ui"
+				type="com.ancientlore.intercom.ui.call.answer.audio.AudioCallAnswerViewModel"/>
+	</data>
+	<RelativeLayout
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:background="@color/colorPrimary"
+			android:clickable="true"
+			>
+
+		<RelativeLayout
+				android:id="@+id/callAnswerPanel"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:layout_alignParentBottom="true"
+				android:layout_gravity="center_horizontal|bottom"
+				android:orientation="horizontal"
+				android:visibility="@{ui.showAnswerPanelField}">
+
+			<ImageButton xmlns:android="http://schemas.android.com/apk/res/android"
+					xmlns:app="http://schemas.android.com/apk/res-auto"
+					android:id="@+id/answerButton"
+					android:layout_width="@dimen/callRoundButtonSize"
+					android:layout_height="@dimen/callRoundButtonSize"
+					android:layout_alignParentStart="true"
+					android:layout_alignParentBottom="true"
+					android:layout_marginStart="90dp"
+					android:layout_marginLeft="90dp"
+					android:layout_marginBottom="25dp"
+					android:background="@drawable/bg_call_answer"
+					android:contentDescription="@string/answer"
+					android:onClick="@{() -> ui.onAnswerCall()}"
+					app:srcCompat="@drawable/ic_call_answer_24dp" />
+
+			<ImageButton xmlns:android="http://schemas.android.com/apk/res/android"
+					xmlns:app="http://schemas.android.com/apk/res-auto"
+					android:id="@+id/declineButton"
+					android:layout_width="@dimen/callRoundButtonSize"
+					android:layout_height="@dimen/callRoundButtonSize"
+					android:layout_marginEnd="90dp"
+					android:layout_marginRight="90dp"
+					android:layout_marginBottom="25dp"
+					android:layout_alignParentBottom="true"
+					android:layout_alignParentEnd="true"
+					android:background="@drawable/bg_call_decline"
+					android:contentDescription="@string/decline"
+					android:onClick="@{() -> ui.onDeclineCall()}"
+					app:srcCompat="@drawable/ic_call_decline_24dp" />
+		</RelativeLayout>
+
+		<LinearLayout
+				android:id="@+id/callInfoPanel"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:gravity="center"
+				android:orientation="vertical">
+
+			<TextView
+					android:id="@+id/collocutorName"
+					style="@style/onelineTextField"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_marginTop="30dp"
+					android:text="@{ui.collocutorNameField}"
+					android:textColor="@android:color/white"
+					android:textSize="24sp"
+					android:textStyle="bold"
+					tools:text="Collocutor Name" />
+
+			<Chronometer
+					android:id="@+id/chronometer"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_marginTop="15dp"
+					android:format="%s"
+					android:gravity="center_vertical"
+					android:textColor="@android:color/white"
+					android:textSize="18sp"
+					android:visibility="gone"
+					tools:visibility="visible" />
+		</LinearLayout>
+
+		<ImageView
+				android:id="@+id/iconView"
+				android:layout_width="150dp"
+				android:layout_height="150dp"
+				android:layout_centerInParent="true"
+				android:src="@{ui.collocutorIconField}"
+				app:abbrBackColor="@{@color/colorPrimaryDark}"
+				app:abbrSize="@{@dimen/settingsUserNameAbSize}"
+				app:abbrText="@{ui.collocutorNameField}"
+				app:abbrTextColor="@{@android:color/white}"
+				app:asCircle="@{true}"
+				android:contentDescription="@string/icon"
+				tools:src="@tools:sample/avatars" />
+
+		<FrameLayout
+				android:id="@+id/callControlPanel"
+				android:layout_width="match_parent"
+				android:layout_height="85dp"
+				android:layout_alignParentBottom="true"
+				android:visibility="@{!ui.showAnswerPanelField}"
+				>
+
+			<Button
+					android:layout_width="220dp"
+					android:layout_height="50dp"
+					android:layout_gravity="center_horizontal"
+					android:background="@drawable/bg_call_hangup"
+					android:contentDescription="@string/hangup"
+					android:text="@string/hangup"
+					android:onClick="@{() -> ui.onHangupCall()}"
+					android:textColor="@android:color/white" />
+		</FrameLayout>
+
+	</RelativeLayout>
+</layout>

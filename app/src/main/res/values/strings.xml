@@ -130,10 +130,13 @@
 	<string name="delete">Delete</string>
 	<string name="message_deleted">Message deleted</string>
 
-	<string name="call">Call</string>
+	<string name="audio_call">Audio Call</string>
+	<string name="call">Video Call</string>
 	<string name="hangup">Hangup</string>
 	<string name="answer">Answer</string>
 	<string name="decline">Decline</string>
+	<string name="warn_call_answer_no_perm">%s tried to call you but you\'ve rejected permission request</string>
+	<string name="warn_call_offer_no_perm">You tried to call %s but didn\'t grant permissions</string>
 
 	<string name="chat_details">Chat Details</string>
 	<string name="participants">Participants</string>

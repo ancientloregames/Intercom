@@ -20,6 +20,7 @@ abstract class WebrtcCallManager : CallManager<SurfaceViewRenderer> {
 
 		const val FIELD_SDP = "sdp"
 		const val FIELD_CALLER_ID = "callerId"
+		const val FIELD_CALL_TYPE = "callType"
 		const val FIELD_ID = "id"
 		const val FIELD_LABEL = "label"
 		const val FIELD_CANDIDATE = "candidate"
@@ -137,19 +138,32 @@ abstract class WebrtcCallManager : CallManager<SurfaceViewRenderer> {
 
 		init(SessionDescription.Type.OFFER, params)
 
-		Logging.d(TAG, "createOffer: ${params.targetId}")
+		sendOffer(params.targetId, Offer.CALL_TYPE_VIDEO)
+	}
+
+	override fun call(params: CallManager.AudioCallParams) {
+
+		init(SessionDescription.Type.OFFER, params)
+
+		sendOffer(params.targetId, Offer.CALL_TYPE_AUDIO)
+	}
+
+	private fun sendOffer(targetId: String, callType: Int) {
+
+		Logging.d(TAG, "createOffer: $targetId")
 		peerConnection!!.createOffer(object : SimpleSdpObserver() {
 			override fun onCreateSuccess(sessionDescription: SessionDescription) {
 				Logging.d(TAG, "onCreateSuccess: ${sessionDescription.type}")
 				peerConnection!!.setLocalDescription(SimpleSdpObserver(), sessionDescription)
 
-				sendOffer(params.targetId, hashMapOf(
+				sendOffer(targetId, hashMapOf(
 					FIELD_CALLER_ID to userId,
+					FIELD_CALL_TYPE to callType,
 					FIELD_SDP to sessionDescription.description
 				))
 				candidateListenerSub?.remove()
 				candidateListenerSub = attachCandidateListener(
-					params.targetId,
+					targetId,
 					sessionDescription.type,
 					object : CrashlyticsRequestCallback<Candidate>(TAG) {
 						override fun onSuccess(result: Candidate) {
@@ -160,7 +174,7 @@ abstract class WebrtcCallManager : CallManager<SurfaceViewRenderer> {
 		}, sdpMediaConstraints)
 
 		answerListenerSub?.remove()
-		answerListenerSub = attachAnswerListener(params.targetId, object : CrashlyticsRequestCallback<Answer>() {
+		answerListenerSub = attachAnswerListener(targetId, object : CrashlyticsRequestCallback<Answer>() {
 			override fun onSuccess(result: Answer) {
 				onAnswer(result)
 			}
@@ -172,23 +186,35 @@ abstract class WebrtcCallManager : CallManager<SurfaceViewRenderer> {
 
 		init(SessionDescription.Type.ANSWER, params)
 
+		sendAnswer(params.targetId, sdp)
+	}
+
+	override fun answer(params: CallManager.AudioCallParams, sdp: String) {
+
+		init(SessionDescription.Type.ANSWER, params)
+
+		sendAnswer(params.targetId, sdp)
+	}
+
+	private fun sendAnswer(targetId: String, sdp: String) {
+
 		Logging.d(TAG, "onOffer: setRemoteDescription")
 		peerConnection!!.setRemoteDescription(
 			SimpleSdpObserver(),
 			SessionDescription(SessionDescription.Type.OFFER, sdp))
 
-		Logging.d(TAG, "createAnswer: ${params.targetId}")
+		Logging.d(TAG, "createAnswer: $targetId")
 		peerConnection!!.createAnswer(object : SimpleSdpObserver() {
 			override fun onCreateSuccess(sessionDescription: SessionDescription) {
 				Logging.d(TAG, "onCreateSuccess: ${sessionDescription.type}")
 				peerConnection!!.setLocalDescription(SimpleSdpObserver(), sessionDescription)
 
-				sendAnswer(params.targetId, hashMapOf(
+				sendAnswer(targetId, hashMapOf(
 					FIELD_SDP to sessionDescription.description
 				))
 				candidateListenerSub?.remove()
 				candidateListenerSub = attachCandidateListener(
-					params.targetId,
+					targetId,
 					sessionDescription.type,
 					object : CrashlyticsRequestCallback<Candidate>(TAG) {
 						override fun onSuccess(result: Candidate) {
@@ -197,6 +223,71 @@ abstract class WebrtcCallManager : CallManager<SurfaceViewRenderer> {
 					})
 			}
 		}, MediaConstraints())
+	}
+
+	private fun init(type: SessionDescription.Type, params: CallManager.AudioCallParams) {
+
+		localAudioTrack = factory.createAudioTrack(TRACK_LOCAL_AUDIO_ID,
+			factory.createAudioSource(MediaConstraints()))
+
+		val pcObserver: PeerConnection.Observer = object : PeerConnection.Observer {
+			override fun onSignalingChange(signalingState: PeerConnection.SignalingState) {
+				Logging.d(TAG, "onSignalingChange: ${signalingState.name}")
+			}
+			override fun onIceConnectionChange(iceConnectionState: PeerConnection.IceConnectionState) {
+				Logging.d(TAG, "onIceConnectionChange: ${iceConnectionState.name}")
+
+				when (iceConnectionState) {
+					PeerConnection.IceConnectionState.CONNECTED -> connectionListener?.onConnected()
+					PeerConnection.IceConnectionState.DISCONNECTED -> connectionListener?.onDisconnected()
+					else -> {}
+				}
+			}
+			override fun onIceConnectionReceivingChange(b: Boolean) {
+				Logging.d(TAG, "onIceConnectionReceivingChange: $b")
+			}
+			override fun onIceGatheringChange(iceGatheringState: PeerConnection.IceGatheringState) {
+				Logging.d(TAG, "onIceGatheringChange: $iceGatheringState")
+			}
+			override fun onIceCandidate(iceCandidate: IceCandidate) {
+				Logging.d(TAG, "onIceCandidate: ${iceCandidate.sdpMid}")
+
+				sendCandidate(params.targetId, type, hashMapOf(
+					FIELD_LABEL to iceCandidate.sdpMLineIndex,
+					FIELD_ID to iceCandidate.sdpMid,
+					FIELD_CANDIDATE to iceCandidate.sdp
+				))
+			}
+			override fun onIceCandidatesRemoved(iceCandidates: Array<IceCandidate>) {
+				Logging.d(TAG, "onIceCandidatesRemoved: ${iceCandidates.size}")
+			}
+			override fun onAddStream(mediaStream: MediaStream) {
+				Logging.d(TAG, "onAddStream: ${mediaStream.id}")
+				val remoteAudioTrack = mediaStream.audioTracks[0]
+				remoteAudioTrack.setEnabled(true)
+			}
+			override fun onRemoveStream(mediaStream: MediaStream) {
+				Logging.d(TAG, "onRemoveStream: ${mediaStream.id}")
+			}
+			override fun onDataChannel(dataChannel: DataChannel) {
+				Logging.d(TAG, "onDataChannel: ${dataChannel.label()}")
+			}
+			override fun onRenegotiationNeeded() {
+				Logging.d(TAG, "onRenegotiationNeeded")
+			}
+			override fun onStandardizedIceConnectionChange(newState: PeerConnection.IceConnectionState) {
+				Logging.d(TAG, "onStandardizedIceConnectionChange: ${newState.name}")
+			}
+		}
+
+		val rtcConfig = PeerConnection.RTCConfiguration(iceServers)
+
+		peerConnection = factory.createPeerConnection(rtcConfig, pcObserver)
+
+		factory.createLocalMediaStream(MEDIA_STREAM_LABLE).run {
+			addTrack(localAudioTrack)
+			peerConnection!!.addStream(this)
+		}
 	}
 
 	private fun init(type: SessionDescription.Type, params: CallManager.CallParams<SurfaceViewRenderer>) {

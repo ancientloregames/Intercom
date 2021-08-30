@@ -18,6 +18,8 @@ import com.ancientlore.intercom.dialog.bottomsheet.list.ListBottomSheetDialog
 import com.ancientlore.intercom.service.ChatIconUploadService
 import com.ancientlore.intercom.service.FileUploadService
 import com.ancientlore.intercom.ui.FilterableFragment
+import com.ancientlore.intercom.ui.chat.flow.ChatFlowViewModel.Companion.OPTION_AUDIO_CALL
+import com.ancientlore.intercom.ui.chat.flow.ChatFlowViewModel.Companion.OPTION_VIDEO_CALL
 import com.ancientlore.intercom.ui.dialog.attach.AttachBottomSheetDialog
 import com.ancientlore.intercom.ui.dialog.option.message.MessageOptionMenuDialog
 import com.ancientlore.intercom.utils.ImageUtils
@@ -60,7 +62,11 @@ class ChatFlowFragment : FilterableFragment<ChatFlowViewModel, ChatFlowUiBinding
 
 	override fun getToolbar(): Toolbar = toolbar
 
-	override fun getToolbarMenuResId() = R.menu.chat_flow_menu
+	override fun getToolbarMenuResId(): Int {
+		return if (params.chatType == Chat.TYPE_PRIVATE) // TODO really need to separate entities
+			R.menu.chat_flow_menu
+		else R.menu.chat_flow_group_menu
+	}
 
 	override fun getLayoutResId() = R.layout.chat_flow_ui
 
@@ -107,11 +113,12 @@ class ChatFlowFragment : FilterableFragment<ChatFlowViewModel, ChatFlowUiBinding
 
 	override fun onOptionsItemSelected(item: MenuItem): Boolean {
 		return when (item.itemId) {
-			R.id.call -> {
-				if (params.chatType == Chat.TYPE_PRIVATE) {
-					val contactId = params.participants.first { it != params.userId }
-					navigator?.openCallOffer(contactId)
-				}
+			R.id.audioCall -> {
+				viewModel.onOptionSelected(OPTION_AUDIO_CALL)
+				true
+			}
+			R.id.videoCall -> {
+				viewModel.onOptionSelected(OPTION_VIDEO_CALL)
 				true
 			}
 			else -> super.onOptionsItemSelected(item)
@@ -136,6 +143,14 @@ class ChatFlowFragment : FilterableFragment<ChatFlowViewModel, ChatFlowUiBinding
 		subscriptions.add(listAdapter.observeOptionMenuOpen()
 			.subscribe {
 				openMessageMenu(it)
+			})
+		subscriptions.add(viewModel.observeMakeAudioCallRequest()
+			.subscribe {
+				navigator?.openAudioCallOffer(it)
+			})
+		subscriptions.add(viewModel.observeMakeVideoCallRequest()
+			.subscribe {
+				navigator?.openVideoCallOffer(it)
 			})
 
 		if (permissionManager!!.allowedAudioMessage())

@@ -9,9 +9,15 @@ interface CallManager<T> {
 	                         val localVideoView: T,
 	                         val remoteVideoView: T)
 
+	data class AudioCallParams(val targetId: String)
+
 	fun call(params: CallParams<T>)
 
+	fun call(params: AudioCallParams)
+
 	fun answer(params: CallParams<T>, sdp: String) //FIXME second arg looks reductant. merge with params?
+
+	fun answer(params: AudioCallParams, sdp: String)
 
 	fun hungup() : Boolean
 

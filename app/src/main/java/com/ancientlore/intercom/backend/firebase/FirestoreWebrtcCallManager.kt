@@ -77,9 +77,10 @@ object FirestoreWebrtcCallManager : WebrtcCallManager() {
 								DocumentChange.Type.MODIFIED -> {
 									Logging.d(TAG, "Firestore.onNewOffer")
 									val callerId = dc.document.data[FIELD_CALLER_ID]
+									val callType = dc.document.data[FIELD_CALL_TYPE]
 									val sdp = dc.document.data[FIELD_SDP]
-									if (callerId is String && sdp is String) {
-										callback.onSuccess(Offer(callerId, sdp))
+									if (callerId is String && callType is Number && sdp is String) {
+										callback.onSuccess(Offer(callerId, callType.toInt(), sdp))
 									}
 									else
 										callback.onFailure(RuntimeException("Wrong offer params"))
@@ -109,7 +110,9 @@ object FirestoreWebrtcCallManager : WebrtcCallManager() {
 					return@addSnapshotListener
 				}
 				else if (snapshot != null) {
-					if (!snapshot.metadata.isFromCache && !snapshot.metadata.hasPendingWrites()) {
+					if (!snapshot.metadata.isFromCache
+						&& !snapshot.metadata.hasPendingWrites()
+						&& snapshot.exists()) {
 						Logging.d(TAG, "Firestore.onNewAnswer")
 						val sdp = snapshot.get(FIELD_SDP)
 						if (sdp is String) {

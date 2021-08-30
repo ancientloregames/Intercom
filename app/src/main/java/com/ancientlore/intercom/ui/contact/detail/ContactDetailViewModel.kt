@@ -11,6 +11,7 @@ import com.ancientlore.intercom.data.model.Chat
 import com.ancientlore.intercom.data.model.User
 import com.ancientlore.intercom.data.source.UserRepository
 import com.ancientlore.intercom.ui.BasicViewModel
+import com.ancientlore.intercom.ui.call.CallViewModel
 import com.ancientlore.intercom.ui.chat.flow.ChatFlowParams
 import com.ancientlore.intercom.utils.Utils
 import io.reactivex.Observable
@@ -21,10 +22,11 @@ class ContactDetailViewModel(private val params: ContactDetailParams)
 	: BasicViewModel() {
 
 	companion object {
-		const val OPTION_CALL = 1
+		const val OPTION_AUDIO_CALL = 0
+		const val OPTION_VIDEO_CALL = 1
 	}
 
-	@IntDef(OPTION_CALL)
+	@IntDef(OPTION_AUDIO_CALL, OPTION_VIDEO_CALL)
 	@Retention(AnnotationRetention.SOURCE)
 	annotation class Option
 
@@ -38,8 +40,10 @@ class ContactDetailViewModel(private val params: ContactDetailParams)
 
 	private val putToClipboardSubj = PublishSubject.create<String>()
 	private val openChatFlowSubj = PublishSubject.create<ChatFlowParams>()
-	private val makeCallSubj = PublishSubject.create<String>()
 	private val closeSubj = PublishSubject.create<Any>()
+
+	private val makeAudioCallSubj = PublishSubject.create<CallViewModel.Params>()
+	private val makeVideoCallSubj = PublishSubject.create<CallViewModel.Params>()
 
 	init {
 		UserRepository.getItem(params.id, object : CrashlyticsRequestCallback<User>() {
@@ -59,7 +63,8 @@ class ContactDetailViewModel(private val params: ContactDetailParams)
 	override fun clean() {
 		putToClipboardSubj.onComplete()
 		openChatFlowSubj.onComplete()
-		makeCallSubj.onComplete()
+		makeAudioCallSubj.onComplete()
+		makeVideoCallSubj.onComplete()
 		closeSubj.onComplete()
 
 		super.clean()
@@ -101,7 +106,18 @@ class ContactDetailViewModel(private val params: ContactDetailParams)
 
 	fun onOptionSelected(@Option selectedId: Int) {
 		when (selectedId) {
-			OPTION_CALL -> makeCallSubj.onNext(params.id)
+			OPTION_AUDIO_CALL -> makeAudioCallSubj.onNext(
+				CallViewModel.Params(
+					params.id,
+					params.name,
+					params.iconUrl
+				))
+			OPTION_VIDEO_CALL -> makeVideoCallSubj.onNext(
+				CallViewModel.Params(
+					params.id,
+					params.name,
+					params.iconUrl
+				))
 		}
 	}
 
@@ -109,7 +125,9 @@ class ContactDetailViewModel(private val params: ContactDetailParams)
 
 	fun observeOpenChatFlowRequest() = openChatFlowSubj as Observable<ChatFlowParams>
 
-	fun observeMakeCallRequest() = makeCallSubj as Observable<String>
+	fun observeMakeAudioCallRequest() = makeAudioCallSubj as Observable<CallViewModel.Params>
+
+	fun observeMakeVideoCallRequest() = makeVideoCallSubj as Observable<CallViewModel.Params>
 
 	fun observeCloseRequest() = closeSubj as Observable<Any>
 }

@@ -8,7 +8,7 @@ import androidx.appcompat.widget.Toolbar
 import com.ancientlore.intercom.R
 import com.ancientlore.intercom.databinding.ContactDetailUiBinding
 import com.ancientlore.intercom.ui.BasicFragment
-import com.ancientlore.intercom.ui.contact.detail.ContactDetailViewModel.Companion.OPTION_CALL
+import com.ancientlore.intercom.ui.contact.detail.ContactDetailViewModel.Companion.OPTION_VIDEO_CALL
 import com.ancientlore.intercom.utils.ToolbarManager
 import com.ancientlore.intercom.utils.extensions.putToClipboard
 import kotlinx.android.synthetic.main.contact_detail_ui.*
@@ -69,9 +69,13 @@ class ContactDetailFragment : BasicFragment<ContactDetailViewModel, ContactDetai
 			.subscribe {
 				navigator?.openChatFlow(it)
 			})
-		subscriptions.add(viewModel.observeMakeCallRequest()
+		subscriptions.add(viewModel.observeMakeAudioCallRequest()
 			.subscribe {
-				navigator?.openCallOffer(it)
+				navigator?.openAudioCallOffer(it)
+			})
+		subscriptions.add(viewModel.observeMakeVideoCallRequest()
+			.subscribe {
+				navigator?.openVideoCallOffer(it)
 			})
 		subscriptions.add(viewModel.observeCloseRequest()
 			.subscribe {
@@ -81,8 +85,12 @@ class ContactDetailFragment : BasicFragment<ContactDetailViewModel, ContactDetai
 
 	override fun onOptionsItemSelected(item: MenuItem): Boolean {
 		return when (item.itemId) {
-			R.id.call -> {
-				viewModel.onOptionSelected(OPTION_CALL)
+			R.id.audioCall -> {
+				viewModel.onOptionSelected(OPTION_VIDEO_CALL)
+				true
+			}
+			R.id.videoCall -> {
+				viewModel.onOptionSelected(OPTION_VIDEO_CALL)
 				true
 			}
 			else -> super.onOptionsItemSelected(item)

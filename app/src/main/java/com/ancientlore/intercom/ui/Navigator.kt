@@ -7,6 +7,7 @@ import com.ancientlore.intercom.backend.auth.PhoneAuthParams
 import com.ancientlore.intercom.data.model.Contact
 import com.ancientlore.intercom.data.model.User
 import com.ancientlore.intercom.data.model.call.Offer
+import com.ancientlore.intercom.ui.call.CallViewModel
 import com.ancientlore.intercom.ui.chat.flow.ChatFlowParams
 import com.ancientlore.intercom.ui.contact.detail.ContactDetailParams
 import com.ancientlore.intercom.utils.Runnable1
@@ -26,7 +27,8 @@ interface Navigator {
 	fun openChatDetail(params: ChatFlowParams)
 	fun openContactDetail(params: ContactDetailParams)
 
-	fun openCallOffer(calleeId: String)
+	fun openAudioCallOffer(params: CallViewModel.Params)
+	fun openVideoCallOffer(params: CallViewModel.Params)
 	fun openCallAnswer(offer: Offer)
 
 	fun onSuccessfullAuth(user: User)

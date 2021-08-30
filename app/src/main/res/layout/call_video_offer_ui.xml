@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+		xmlns:app="http://schemas.android.com/apk/res-auto"
+		xmlns:tools="http://schemas.android.com/tools"
+		>
+	<data>
+		<variable
+				name="ui"
+				type="com.ancientlore.intercom.ui.call.offer.video.VideoCallOfferViewModel"/>
+	</data>
+	<RelativeLayout
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:background="@color/colorPrimary"
+			android:onClick="@{() -> ui.onScreenClick()}"
+			android:clickable="true"
+			>
+
+		<org.webrtc.SurfaceViewRenderer
+				android:id="@+id/remoteVideoRenderer"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				tools:visibility="invisible" />
+
+		<org.webrtc.SurfaceViewRenderer
+				android:id="@+id/localVideoRenderer"
+				android:layout_width="100dp"
+				android:layout_height="150dp"
+				android:layout_alignParentEnd="true"
+				android:layout_alignParentRight="true"
+				android:layout_marginTop="60dp"
+				android:layout_marginEnd="10dp"
+				android:layout_marginRight="10dp"
+				tools:visibility="invisible" />
+
+		<LinearLayout
+				android:id="@+id/callInfoPanel"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:gravity="center"
+				android:orientation="vertical">
+
+			<TextView
+					android:id="@+id/collocutorName"
+					style="@style/onelineTextField"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_marginTop="30dp"
+					android:text="@{ui.collocutorNameField}"
+					android:textColor="@android:color/white"
+					android:textSize="24sp"
+					android:textStyle="bold"
+					tools:text="Collocutor Name" />
+
+			<Chronometer
+					android:id="@+id/chronometer"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_marginTop="15dp"
+					android:format="%s"
+					android:gravity="center_vertical"
+					android:textColor="@android:color/white"
+					android:textSize="18sp"
+					android:visibility="gone"
+					tools:visibility="visible" />
+		</LinearLayout>
+
+		<ImageView
+				android:id="@+id/iconView"
+				android:layout_width="150dp"
+				android:layout_height="150dp"
+				android:layout_centerInParent="true"
+				android:src="@{ui.collocutorIconField}"
+				android:visibility="@{ui.showIconField}"
+				android:contentDescription="@string/icon"
+				app:abbrBackColor="@{@color/colorPrimaryDark}"
+				app:abbrSize="@{@dimen/settingsUserNameAbSize}"
+				app:abbrText="@{ui.collocutorNameField}"
+				app:abbrTextColor="@{@android:color/white}"
+				app:asCircle="@{true}"
+				tools:src="@tools:sample/avatars" />
+
+		<FrameLayout
+				android:id="@+id/callControlPanel"
+				android:layout_width="match_parent"
+				android:layout_height="85dp"
+				android:layout_alignParentBottom="true"
+				>
+
+			<Button
+					android:layout_width="220dp"
+					android:layout_height="50dp"
+					android:layout_gravity="center_horizontal"
+					android:background="@drawable/bg_call_hangup"
+					android:contentDescription="@string/hangup"
+					android:text="@string/hangup"
+					android:textColor="@android:color/white"
+					android:onClick="@{() -> ui.onHangupCall()}"
+					/>
+		</FrameLayout>
+
+	</RelativeLayout>
+</layout>

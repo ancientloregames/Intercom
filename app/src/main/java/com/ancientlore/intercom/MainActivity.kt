@@ -20,6 +20,7 @@ import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import com.ancientlore.intercom.C.DEFAULT_LOG_TAG
 import com.ancientlore.intercom.backend.CrashlyticsRequestCallback
+import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.backend.auth.PhoneAuthParams
 import com.ancientlore.intercom.data.model.Contact
 import com.ancientlore.intercom.data.model.User
@@ -33,8 +34,13 @@ import com.ancientlore.intercom.ui.auth.email.login.EmailLoginFragment
 import com.ancientlore.intercom.ui.auth.email.signup.EmailSignupFragment
 import com.ancientlore.intercom.ui.auth.phone.login.PhoneLoginFragment
 import com.ancientlore.intercom.ui.auth.phone.check.PhoneCheckFragment
-import com.ancientlore.intercom.ui.call.answer.CallAnswerFragment
-import com.ancientlore.intercom.ui.call.offer.CallOfferFragment
+import com.ancientlore.intercom.ui.call.CallViewModel
+import com.ancientlore.intercom.ui.call.CallAnswerParams
+import com.ancientlore.intercom.ui.call.CallFragment
+import com.ancientlore.intercom.ui.call.answer.audio.AudioCallAnswerFragment
+import com.ancientlore.intercom.ui.call.offer.audio.AudioCallOfferFragment
+import com.ancientlore.intercom.ui.call.answer.video.VideoCallAnswerFragment
+import com.ancientlore.intercom.ui.call.offer.video.VideoCallOfferFragment
 import com.ancientlore.intercom.ui.chat.creation.ChatCreationFragment
 import com.ancientlore.intercom.ui.chat.creation.description.ChatCreationDescFragment
 import com.ancientlore.intercom.ui.chat.creation.group.ChatCreationGroupFragment
@@ -325,15 +331,29 @@ class MainActivity : AppCompatActivity(),
 		}
 	}
 
-	override fun openCallOffer(calleeId: String) {
-		requestPermissionCalls { granted ->
+	override fun openAudioCallOffer(params: CallViewModel.Params) {
+		requestPermissionAudioCalls { granted ->
 			if (granted)
-			runOnUiThread {
-				supportFragmentManager.beginTransaction()
-					.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_right)
-					.add(R.id.modalContainer, CallOfferFragment.newInstance(calleeId))
-					.commitNow()
-			}
+				runOnUiThread {
+					supportFragmentManager.beginTransaction()
+						.setCustomAnimations(R.anim.center_scale_fade_in, R.anim.center_scale_fade_out)
+						.add(R.id.modalContainer, AudioCallOfferFragment.newInstance(params))
+						.commitNow()
+				}
+			else showToast(getString(R.string.warn_call_offer_no_perm, params.name))
+		}
+	}
+
+	override fun openVideoCallOffer(params: CallViewModel.Params) {
+		requestPermissionVideoCalls { granted ->
+			if (granted)
+				runOnUiThread {
+					supportFragmentManager.beginTransaction()
+						.setCustomAnimations(R.anim.center_scale_fade_in, R.anim.center_scale_fade_out)
+						.add(R.id.modalContainer, VideoCallOfferFragment.newInstance(params))
+						.commitNow()
+				}
+			else showToast(getString(R.string.warn_call_offer_no_perm, params.name))
 		}
 	}
 
@@ -370,13 +390,63 @@ class MainActivity : AppCompatActivity(),
 	}
 
 	override fun openCallAnswer(offer: Offer) {
-		requestPermissionCalls { granted ->
-			if (granted) {
-				supportFragmentManager.beginTransaction()
-					.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_right)
-					.add(R.id.modalContainer, CallAnswerFragment.newInstance(offer))
-					.commitNow()
+		ContactRepository.getItem(offer.callerId, object: RequestCallback<Contact> {
+
+			override fun onSuccess(result: Contact) {
+				openCallAnswerInner(offer, result)
 			}
+			override fun onFailure(error: Throwable) {
+				Utils.logError(error)
+				openCallAnswerInner(offer)
+			}
+		})
+	}
+
+	private fun openCallAnswerInner(offer: Offer, contact: Contact? = null) {
+		when(offer.callType) {
+			Offer.CALL_TYPE_AUDIO -> {
+				requestPermissionAudioCalls { granted ->
+					if (granted) {
+						openCallAnswerInner(
+							AudioCallAnswerFragment.newInstance(
+								CallAnswerParams(
+									offer.callerId,
+									offer.sdp,
+									contact?.name,
+									contact?.iconUrl
+								)))
+					}
+					else showToast(getString(R.string.warn_call_answer_no_perm, contact?.name ?: offer.callerId))
+				}
+			}
+			Offer.CALL_TYPE_VIDEO -> {
+				requestPermissionVideoCalls { granted ->
+					if (granted) {
+						openCallAnswerInner(
+							VideoCallAnswerFragment.newInstance(
+								CallAnswerParams(
+									offer.callerId,
+									offer.sdp,
+									contact?.name,
+									contact?.iconUrl
+								)))
+					}
+					else showToast(getString(R.string.warn_call_answer_no_perm, contact?.name ?: offer.callerId))
+				}
+			}
+			else -> {
+				Utils.logError("Call offer from ${offer.callerId} came with unknown callType ${offer.callType}")
+			}
+		}
+	}
+
+	private fun openCallAnswerInner(callFragment: CallFragment<*,*>) {
+		runOnUiThread {
+			hideKeyboard()
+			supportFragmentManager.beginTransaction()
+				.setCustomAnimations(R.anim.center_scale_fade_in, R.anim.center_scale_fade_out)
+				.add(R.id.modalContainer, callFragment)
+				.commitNow()
 		}
 	}
 
@@ -416,8 +486,19 @@ class MainActivity : AppCompatActivity(),
 			ActivityCompat.requestPermissions(this, permissions, PERM_AUDIO_MESSAGES)
 		}
 	}
-	fun requestPermissionCalls(onResult: Runnable1<Boolean>) {
-		if (allowedCalls())
+
+	fun requestPermissionAudioCalls(onResult: Runnable1<Boolean>) {
+		if (allowedAudioCalls())
+			onResult.run(true)
+		else {
+			permRequestCallback = onResult
+			val permissions = arrayOf(Manifest.permission.RECORD_AUDIO)
+			ActivityCompat.requestPermissions(this, permissions, PERM_CALLS)
+		}
+	}
+
+	fun requestPermissionVideoCalls(onResult: Runnable1<Boolean>) {
+		if (allowedVideoCalls())
 			onResult.run(true)
 		else {
 			permRequestCallback = onResult
@@ -431,7 +512,9 @@ class MainActivity : AppCompatActivity(),
 				&& checkPermission(Manifest.permission.RECORD_AUDIO)
 	}
 
-	fun allowedCalls(): Boolean {
+	private fun allowedAudioCalls(): Boolean = checkPermission(Manifest.permission.RECORD_AUDIO)
+
+	private fun allowedVideoCalls(): Boolean {
 		return checkPermission(Manifest.permission.CAMERA)
 				&& checkPermission(Manifest.permission.RECORD_AUDIO)
 	}
@@ -515,6 +598,12 @@ class MainActivity : AppCompatActivity(),
 	private fun showToast(@StringRes textResId: Int) {
 		runOnUiThread {
 			Toast.makeText(this, textResId, Toast.LENGTH_LONG).show()
+		}
+	}
+
+	private fun showToast(text: String) {
+		runOnUiThread {
+			Toast.makeText(this, text, Toast.LENGTH_LONG).show()
 		}
 	}
 }
