@@ -4,6 +4,7 @@
         xmlns:tools="http://schemas.android.com/tools"
 >
 	<data>
+		<import type="android.view.View" />
 		<variable
 				name="ui"
 				type="com.ancientlore.intercom.ui.chat.list.ChatListViewModel"/>
@@ -14,6 +15,7 @@
 			tools:context=".ui.chatlist.ChatListFragment"
 			android:background="@android:color/white"
 			android:clickable="true"
+			android:visibility="@{ui.chatListFirstLoad ? View.VISIBLE : View.INVISIBLE}"
 	>
 
 		<com.google.android.material.appbar.AppBarLayout

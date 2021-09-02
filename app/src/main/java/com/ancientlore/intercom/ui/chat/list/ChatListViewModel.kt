@@ -22,6 +22,8 @@ class ChatListViewModel(listAdapter: ChatListAdapter)
 
 	val chatListIsEmpty = ObservableBoolean(false)
 
+	val chatListFirstLoad = ObservableBoolean(false)
+
 	private val chatCreationSub = PublishSubject.create<Any>()
 	private val chatOpenSub = PublishSubject.create<ChatFlowParams>()
 	private val openChatMenuSub = PublishSubject.create<Chat>()
@@ -73,11 +75,18 @@ class ChatListViewModel(listAdapter: ChatListAdapter)
 			override fun onSuccess(contacts: List<Contact>) {
 				repositorySub = ChatRepository.attachListener(object : CrashlyticsRequestCallback<List<Chat>>() {
 					override fun onSuccess(chats: List<Chat>) {
+
 						assignPrivateChatNames(chats, contacts)
 						runOnUiThread {
 							chatListIsEmpty.set(chats.isEmpty())
 							listAdapter.setItems(chats)
+							chatListFirstLoad.set(true)
 						}
+					}
+					override fun onFailure(error: Throwable) {
+						super.onFailure(error)
+						chatListFirstLoad.set(true)
+						chatListIsEmpty.set(true)
 					}
 				})
 			}
