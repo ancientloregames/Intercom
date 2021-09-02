@@ -30,6 +30,11 @@ class ContactDetailFragment : BasicFragment<ContactDetailViewModel, ContactDetai
 	private val params : ContactDetailParams by lazy { arguments?.getParcelable<ContactDetailParams>(ARG_PARAMS)
 		?: throw RuntimeException("Contact params are a mandotory arg") }
 
+	override fun onBackPressed(): Boolean {
+		close()
+		return true
+	}
+
 	override fun getLayoutResId(): Int = R.layout.contact_detail_ui
 
 	override fun createViewModel() = ContactDetailViewModel(params)

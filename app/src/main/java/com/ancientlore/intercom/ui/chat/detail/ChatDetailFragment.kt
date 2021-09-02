@@ -35,6 +35,11 @@ class ChatDetailFragment : FilterableFragment<ChatDetailViewModel, ChatDetailUiB
 	private val params : ChatFlowParams by lazy { arguments?.getParcelable<ChatFlowParams>(ARG_PARAMS)
 		?: throw RuntimeException("Chat params are a mandotory arg") }
 
+	override fun onBackPressed(): Boolean {
+		close()
+		return true
+	}
+
 	override fun getToolbar(): Toolbar = toolbar
 
 	override fun getLayoutResId(): Int = R.layout.chat_detail_ui
