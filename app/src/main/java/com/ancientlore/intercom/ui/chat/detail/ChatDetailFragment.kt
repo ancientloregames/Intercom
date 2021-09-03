@@ -61,7 +61,7 @@ class ChatDetailFragment : FilterableFragment<ChatDetailViewModel, ChatDetailUiB
 			setSubtitle(getString(R.string.member_count, params.participants.size))
 		}
 
-		swipableLayout.setListener { close() }
+		swipableLayout.setListener { close(false) }
 
 		listView.adapter = ChatCreationDescAdapter(requireContext())
 	}

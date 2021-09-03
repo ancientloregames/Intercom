@@ -65,7 +65,7 @@ class ChatCreationDescFragment : FilterableFragment<ChatCreationDescViewModel, C
 			setSubtitle(getString(R.string.member_count, contacts.size))
 		}
 
-		swipableLayout.setListener { close() }
+		swipableLayout.setListener { close(false) }
 
 		listView.adapter = ChatCreationDescAdapter(requireContext())
 

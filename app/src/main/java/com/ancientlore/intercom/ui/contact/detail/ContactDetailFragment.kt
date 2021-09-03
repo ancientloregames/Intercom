@@ -59,7 +59,7 @@ class ContactDetailFragment : BasicFragment<ContactDetailViewModel, ContactDetai
 			setHasOptionsMenu(true)
 		}
 
-		swipableLayout.setListener { close() }
+		swipableLayout.setListener { close(false) }
 	}
 
 	override fun initViewModel(viewModel: ContactDetailViewModel) {

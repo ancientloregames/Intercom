@@ -12,9 +12,16 @@ import androidx.annotation.StringRes
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
 import com.ancientlore.intercom.MainActivity
+import com.ancientlore.intercom.R
 import com.ancientlore.intercom.utils.PermissionManager
+import com.ancientlore.intercom.utils.Utils
+import com.ancientlore.intercom.widget.SimpleAnimationListener
 import io.reactivex.internal.disposables.ListCompositeDisposable
 import java.lang.RuntimeException
+
+import android.content.res.Resources
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 
 abstract class BasicFragment<VM : BasicViewModel, B : ViewDataBinding> : Fragment(), MainActivity.BackButtonHandler {
 
@@ -29,6 +36,9 @@ abstract class BasicFragment<VM : BasicViewModel, B : ViewDataBinding> : Fragmen
 
 	protected val permissionManager get() = activity as PermissionManager?
 
+	@Volatile
+	private var isClosing = false
+
 	@LayoutRes
 	protected abstract fun getLayoutResId(): Int
 
@@ -37,6 +47,10 @@ abstract class BasicFragment<VM : BasicViewModel, B : ViewDataBinding> : Fragmen
 	protected abstract fun bind(view: View, viewModel: VM)
 
 	protected abstract fun initViewModel(viewModel: VM)
+
+	open fun getOpenAnimation(): Int = R.anim.slide_in_right
+
+	open fun getCloseAnimation(): Int = R.anim.slide_out_right
 
 	final override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedState: Bundle?): View {
 		return inflater.inflate(getLayoutResId(), container, false)
@@ -69,6 +83,7 @@ abstract class BasicFragment<VM : BasicViewModel, B : ViewDataBinding> : Fragmen
 
 	override fun onDestroyView() {
 		subscriptions.clear()
+		viewModel.clean()
 		super.onDestroyView()
 	}
 
@@ -89,8 +104,33 @@ abstract class BasicFragment<VM : BasicViewModel, B : ViewDataBinding> : Fragmen
 	}
 
 	@CallSuper
-	protected open fun close() {
-		viewModel.clean()
-		navigator?.closeFragment(this)
+	protected open fun close(animate: Boolean = true) {
+		if (isClosing)
+			return
+		isClosing = true
+
+		if (!animate || context == null)
+			closeNow()
+
+		try {
+			AnimationUtils.loadAnimation(context, getCloseAnimation())
+				.run {
+					setAnimationListener(object : SimpleAnimationListener() {
+						override fun onAnimationEnd(animation: Animation?) {
+							super.onAnimationEnd(animation)
+							closeNow()
+						}
+					})
+					view?.startAnimation(this)
+					start()
+				}
+		} catch (e: Resources.NotFoundException) {
+			Utils.logError(e)
+			closeNow()
+		}
+	}
+
+	protected fun closeNow() {
+		navigator?.closeFragment(this@BasicFragment)
 	}
 }

@@ -11,6 +11,7 @@ import androidx.annotation.CallSuper
 import androidx.annotation.RawRes
 import androidx.databinding.ViewDataBinding
 import com.ancientlore.intercom.App
+import com.ancientlore.intercom.R
 import com.ancientlore.intercom.ui.BasicFragment
 import com.ancientlore.intercom.utils.Utils
 import java.lang.Exception
@@ -35,6 +36,10 @@ abstract class CallFragment<VM : CallViewModel, B : ViewDataBinding>  : BasicFra
 	abstract fun getControlPanelView(): View
 
 	abstract fun getChronometer(): Chronometer
+
+	override fun getOpenAnimation(): Int = R.anim.center_scale_fade_in
+
+	override fun getCloseAnimation(): Int = R.anim.center_scale_fade_out
 
 	@RawRes
 	abstract fun getCallSound(): Int

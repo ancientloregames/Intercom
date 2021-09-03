@@ -31,6 +31,10 @@ class SettingsFragment : BasicFragment<SettingsViewModel, SettingsUiBinding>()  
 		return true
 	}
 
+	override fun getOpenAnimation(): Int = R.anim.slide_in_bottom
+
+	override fun getCloseAnimation(): Int = R.anim.slide_out_bottom
+
 	override fun getLayoutResId() = R.layout.settings_ui
 
 	override fun createViewModel() = SettingsViewModel(App.backend.getAuthManager().getCurrentUser())
@@ -62,7 +66,7 @@ class SettingsFragment : BasicFragment<SettingsViewModel, SettingsUiBinding>()  
 				}
 			}
 
-		swipableLayout.setListener { close() }
+		swipableLayout.setListener { close(false) }
 	}
 
 	override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

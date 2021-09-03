@@ -88,7 +88,7 @@ class ChatFlowFragment : FilterableFragment<ChatFlowViewModel, ChatFlowUiBinding
 			//setLogo(params.iconUri, getFallbackActionBarIcon())
 		}
 
-		swipableLayout.setListener { close() }
+		swipableLayout.setListener { close(false) }
 
 		with(listView) {
 			adapter = ChatFlowAdapter(params.userId, requireContext())

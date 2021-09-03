@@ -42,7 +42,7 @@ class ChatCreationGroupFragment : FilterableFragment<ChatCreationGroupViewModel,
 			enableBackButton { close() }
 		}
 
-		swipableLayout.setListener { close() }
+		swipableLayout.setListener { close(false) }
 
 		listView.adapter = ChatCreationGroupAdapter(requireContext())
 		selectedListView.adapter = ChatCreationSelectedAdapter(requireContext())

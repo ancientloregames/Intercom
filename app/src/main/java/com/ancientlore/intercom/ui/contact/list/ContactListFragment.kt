@@ -22,6 +22,10 @@ class ContactListFragment : FilterableFragment<ContactListViewModel, ContactList
 		return true
 	}
 
+	override fun getOpenAnimation(): Int = R.anim.slide_in_bottom
+
+	override fun getCloseAnimation(): Int = R.anim.slide_out_bottom
+
 	override fun getToolbar(): Toolbar = toolbar
 
 	override fun getToolbarMenuResId() = R.menu.contact_list_menu
@@ -42,7 +46,7 @@ class ContactListFragment : FilterableFragment<ContactListViewModel, ContactList
 			enableBackButton { close() }
 		}
 
-		swipableLayout.setListener { close() }
+		swipableLayout.setListener { close(false) }
 
 		listView.adapter = ContactListAdapter(requireContext())
 	}

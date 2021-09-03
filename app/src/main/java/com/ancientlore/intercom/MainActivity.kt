@@ -219,9 +219,10 @@ class MainActivity : AppCompatActivity(),
 		tryObserveDeviceContacts { success ->
 			if (success) {
 				runOnUiThread {
+					val fragment = ContactListFragment.newInstance()
 					supportFragmentManager.beginTransaction()
-						.setCustomAnimations(R.anim.slide_in_bottom, R.anim.slide_out_bottom)
-						.replace(R.id.modalContainer, ContactListFragment.newInstance())
+						.setCustomAnimations(fragment.getOpenAnimation(), fragment.getCloseAnimation())
+						.replace(R.id.modalContainer, fragment)
 						.commitNow()
 				}
 			} else {
@@ -234,9 +235,10 @@ class MainActivity : AppCompatActivity(),
 		tryObserveDeviceContacts { success ->
 			if (success) {
 				runOnUiThread {
+					val fragment = ChatCreationFragment.newInstance()
 					supportFragmentManager.beginTransaction()
-						.setCustomAnimations(R.anim.slide_in_bottom, R.anim.slide_out_bottom)
-						.replace(R.id.modalContainer, ChatCreationFragment.newInstance())
+						.setCustomAnimations(fragment.getOpenAnimation(), fragment.getCloseAnimation())
+						.replace(R.id.modalContainer, fragment)
 						.commitNow()
 				}
 			} else {
@@ -247,9 +249,10 @@ class MainActivity : AppCompatActivity(),
 
 	override fun openChatFlow(params: ChatFlowParams) {
 		runOnUiThread {
+			val fragment = ChatFlowFragment.newInstance(params)
 			supportFragmentManager.beginTransaction()
-				.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_right)
-				.replace(R.id.modalContainer, ChatFlowFragment.newInstance(params))
+				.setCustomAnimations(fragment.getOpenAnimation(), fragment.getCloseAnimation())
+				.replace(R.id.modalContainer, fragment)
 				.commitNowAllowingStateLoss()
 		}
 	}
@@ -288,45 +291,50 @@ class MainActivity : AppCompatActivity(),
 
 	override fun openSettings() {
 		runOnUiThread {
+			val fragment = SettingsFragment.newInstance()
 			supportFragmentManager.beginTransaction()
-				.setCustomAnimations(R.anim.slide_in_bottom, R.anim.slide_out_bottom)
-				.replace(R.id.modalContainer, SettingsFragment.newInstance())
+				.setCustomAnimations(fragment.getOpenAnimation(), fragment.getCloseAnimation())
+				.replace(R.id.modalContainer, fragment)
 				.commitNow()
 		}
 	}
 
 	override fun openChatCreationGroup() {
 		runOnUiThread {
+			val fragment = ChatCreationGroupFragment.newInstance()
 			supportFragmentManager.beginTransaction()
-				.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_right)
-				.add(R.id.modalContainer, ChatCreationGroupFragment.newInstance())
+				.setCustomAnimations(fragment.getOpenAnimation(), fragment.getCloseAnimation())
+				.add(R.id.modalContainer, fragment)
 				.commitNow()
 		}
 	}
 
 	override fun openChatCreationDesc(contacts: List<Contact>) {
 		runOnUiThread {
+			val fragment = ChatCreationDescFragment.newInstance(contacts)
 			supportFragmentManager.beginTransaction()
-				.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_right)
-				.add(R.id.modalContainer, ChatCreationDescFragment.newInstance(contacts))
+				.setCustomAnimations(fragment.getOpenAnimation(), fragment.getCloseAnimation())
+				.add(R.id.modalContainer, fragment)
 				.commitNow()
 		}
 	}
 
 	override fun openChatDetail(params: ChatFlowParams) {
 		runOnUiThread {
+			val fragment = ChatDetailFragment.newInstance(params)
 			supportFragmentManager.beginTransaction()
-				.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_right)
-				.add(R.id.modalContainer, ChatDetailFragment.newInstance(params))
+				.setCustomAnimations(fragment.getOpenAnimation(), fragment.getCloseAnimation())
+				.add(R.id.modalContainer, fragment)
 				.commitNow()
 		}
 	}
 
 	override fun openContactDetail(params: ContactDetailParams) {
 		runOnUiThread {
+			val fragment = ContactDetailFragment.newInstance(params)
 			supportFragmentManager.beginTransaction()
-				.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_right)
-				.add(R.id.modalContainer, ContactDetailFragment.newInstance(params))
+				.setCustomAnimations(fragment.getOpenAnimation(), fragment.getCloseAnimation())
+				.add(R.id.modalContainer, fragment)
 				.commitNow()
 		}
 	}
@@ -335,9 +343,10 @@ class MainActivity : AppCompatActivity(),
 		requestPermissionAudioCalls { granted ->
 			if (granted)
 				runOnUiThread {
+					val fragment = AudioCallOfferFragment.newInstance(params)
 					supportFragmentManager.beginTransaction()
-						.setCustomAnimations(R.anim.center_scale_fade_in, R.anim.center_scale_fade_out)
-						.add(R.id.modalContainer, AudioCallOfferFragment.newInstance(params))
+						.setCustomAnimations(fragment.getOpenAnimation(), fragment.getCloseAnimation())
+						.add(R.id.modalContainer, fragment)
 						.commitNow()
 				}
 			else showToast(getString(R.string.warn_call_offer_no_perm, params.name))
@@ -348,9 +357,10 @@ class MainActivity : AppCompatActivity(),
 		requestPermissionVideoCalls { granted ->
 			if (granted)
 				runOnUiThread {
+					val fragment = VideoCallOfferFragment.newInstance(params)
 					supportFragmentManager.beginTransaction()
-						.setCustomAnimations(R.anim.center_scale_fade_in, R.anim.center_scale_fade_out)
-						.add(R.id.modalContainer, VideoCallOfferFragment.newInstance(params))
+						.setCustomAnimations(fragment.getOpenAnimation(), fragment.getCloseAnimation())
+						.add(R.id.modalContainer, fragment)
 						.commitNow()
 				}
 			else showToast(getString(R.string.warn_call_offer_no_perm, params.name))
