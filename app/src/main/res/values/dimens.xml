@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+	<dimen name="splashLogoIndent">160dp</dimen>
+	<dimen name="splashFooterIndent">60dp</dimen>
+
 	<dimen name="actionBarLogoIndent">5dp</dimen>
 
 	<dimen name="floatingButtonIndent">16dp</dimen>

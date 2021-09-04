@@ -3,13 +3,13 @@
 
 	<item android:drawable="@android:color/white" />
 
-	<item>
-		<bitmap android:src="@drawable/ic_splash_logo"
-				android:gravity="center"/>
+	<item android:top="@dimen/splashLogoIndent">
+		<bitmap android:src="@drawable/ic_splash_logo_80dp"
+				android:gravity="top"/>
 	</item>
 
-	<item android:bottom="80dp">
-		<bitmap android:src="@drawable/ic_splash_dev"
+	<item android:bottom="@dimen/splashFooterIndent">
+		<bitmap android:src="@drawable/ic_splash_footer_64dp"
 			android:gravity="bottom" />
 	</item>
 
