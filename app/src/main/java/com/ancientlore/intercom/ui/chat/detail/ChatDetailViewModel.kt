@@ -29,6 +29,7 @@ class ChatDetailViewModel(listAdapter: ChatCreationDescAdapter,
 	val allowModification = ObservableBoolean(false) // TODO finish implementing feature (update chat flow state)
 	val modified = ObservableBoolean(false)
 
+	private val openImageViewerSubj = PublishSubject.create<Uri>()
 	private val openGallarySubj = PublishSubject.create<Any>()
 	private val closeSubj = PublishSubject.create<Any>()
 
@@ -57,7 +58,16 @@ class ChatDetailViewModel(listAdapter: ChatCreationDescAdapter,
 		super.clean()
 	}
 
-	fun onIconClicked() = openGallarySubj.onNext(EmptyObject)
+	fun onIconClicked() {
+		if (allowModification.get()) {
+			openGallarySubj.onNext(EmptyObject)
+		}
+		else {
+			val chatIconUri = chatIconField.get()
+			if (chatIconUri != null && chatIconUri != Uri.EMPTY)
+				openImageViewerSubj.onNext(chatIconUri!!)
+		}
+	}
 
 	fun onDoneClicked() {
 		showProcess.set(true)
@@ -87,6 +97,8 @@ class ChatDetailViewModel(listAdapter: ChatCreationDescAdapter,
 		chatIconField.set(uri)
 		modified.set(true)
 	}
+
+	fun openImageViewerRequest() = openImageViewerSubj as io.reactivex.Observable<Uri>
 
 	fun observeOpenGallaryRequest() = openGallarySubj as io.reactivex.Observable<Any>
 

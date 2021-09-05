@@ -49,7 +49,6 @@
 					android:layout_height="60dp"
 					android:layout_margin="10dp"
 					android:src="@{ui.chatIconField}"
-					android:clickable="@{ui.allowModification}"
 					app:asCircle="@{true}"
 					app:abbrText="@{ui.chatNameField}"
 					app:abbrSize="@{@dimen/chatListIconTextSize}"

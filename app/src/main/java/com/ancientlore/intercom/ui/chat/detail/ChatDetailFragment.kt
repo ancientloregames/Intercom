@@ -71,6 +71,10 @@ class ChatDetailFragment : FilterableFragment<ChatDetailViewModel, ChatDetailUiB
 			.subscribe {
 				openGallery()
 			})
+		subscriptions.add(viewModel.openImageViewerRequest()
+			.subscribe {
+				navigator?.openImageViewer(it)
+			})
 		subscriptions.add(viewModel.observeCloseRequest()
 			.subscribe {
 				close()

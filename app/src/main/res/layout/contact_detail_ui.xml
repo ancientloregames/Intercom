@@ -62,6 +62,7 @@
 							android:layout_height="100dp"
 							android:layout_gravity="center"
 							android:layout_marginTop="15dp"
+							android:onClick="@{() -> ui.onContactIconClicked()}"
 							android:src="@{ui.contactIconField}"
 							app:asCircle="@{true}"
 							app:abbrText="@{ui.contactNameField}"

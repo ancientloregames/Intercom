@@ -51,6 +51,7 @@ import com.ancientlore.intercom.ui.chat.list.ChatListFragment
 import com.ancientlore.intercom.ui.contact.detail.ContactDetailFragment
 import com.ancientlore.intercom.ui.contact.detail.ContactDetailParams
 import com.ancientlore.intercom.ui.contact.list.ContactListFragment
+import com.ancientlore.intercom.ui.image.viewer.ImageViewerFragment
 import com.ancientlore.intercom.ui.settings.SettingsFragment
 import com.ancientlore.intercom.utils.*
 import com.ancientlore.intercom.utils.NotificationManager.Companion.ACTION_OPEN_FROM_PUSH
@@ -332,6 +333,16 @@ class MainActivity : AppCompatActivity(),
 	override fun openContactDetail(params: ContactDetailParams) {
 		runOnUiThread {
 			val fragment = ContactDetailFragment.newInstance(params)
+			supportFragmentManager.beginTransaction()
+				.setCustomAnimations(fragment.getOpenAnimation(), fragment.getCloseAnimation())
+				.add(R.id.modalContainer, fragment)
+				.commitNow()
+		}
+	}
+
+	override fun openImageViewer(uri: Uri) {
+		runOnUiThread {
+			val fragment = ImageViewerFragment.newInstance(uri)
 			supportFragmentManager.beginTransaction()
 				.setCustomAnimations(fragment.getOpenAnimation(), fragment.getCloseAnimation())
 				.add(R.id.modalContainer, fragment)

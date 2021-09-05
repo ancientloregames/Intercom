@@ -45,6 +45,7 @@
 					android:layout_height="100dp"
 					android:layout_gravity="center"
 					android:layout_marginTop="15dp"
+					android:onClick="@{() -> ui.onUserIconClicked()}"
 					android:src="@{ui.userIconField}"
 					app:asCircle="@{true}"
 					app:abbrText="@{ui.userNameField}"
@@ -100,7 +101,7 @@
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
 					android:orientation="vertical"
-					android:background="@drawable/bg_ripple_effect_gray"
+					android:background="?android:attr/selectableItemBackground"
 					android:onClick="@{() -> ui.onChangeUserNameClicked()}">
 
 				<TextView
@@ -129,7 +130,7 @@
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
 					android:orientation="vertical"
-					android:background="@drawable/bg_ripple_effect_gray"
+					android:background="?android:attr/selectableItemBackground"
 					android:onClick="@{() -> ui.onChangeUserStatusClicked()}">
 
 				<TextView

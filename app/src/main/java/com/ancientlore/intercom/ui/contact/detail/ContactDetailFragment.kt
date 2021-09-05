@@ -1,5 +1,6 @@
 package com.ancientlore.intercom.ui.contact.detail
 
+import android.net.Uri
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
@@ -8,6 +9,7 @@ import androidx.appcompat.widget.Toolbar
 import com.ancientlore.intercom.R
 import com.ancientlore.intercom.databinding.ContactDetailUiBinding
 import com.ancientlore.intercom.ui.BasicFragment
+import com.ancientlore.intercom.ui.contact.detail.ContactDetailViewModel.Companion.OPTION_AUDIO_CALL
 import com.ancientlore.intercom.ui.contact.detail.ContactDetailViewModel.Companion.OPTION_VIDEO_CALL
 import com.ancientlore.intercom.utils.ToolbarManager
 import com.ancientlore.intercom.utils.extensions.putToClipboard
@@ -82,6 +84,10 @@ class ContactDetailFragment : BasicFragment<ContactDetailViewModel, ContactDetai
 			.subscribe {
 				navigator?.openVideoCallOffer(it)
 			})
+		subscriptions.add(viewModel.openImageRequest()
+			.subscribe {
+				navigator?.openImageViewer(Uri.parse(it))
+			})
 		subscriptions.add(viewModel.observeCloseRequest()
 			.subscribe {
 				close()
@@ -91,7 +97,7 @@ class ContactDetailFragment : BasicFragment<ContactDetailViewModel, ContactDetai
 	override fun onOptionsItemSelected(item: MenuItem): Boolean {
 		return when (item.itemId) {
 			R.id.audioCall -> {
-				viewModel.onOptionSelected(OPTION_VIDEO_CALL)
+				viewModel.onOptionSelected(OPTION_AUDIO_CALL)
 				true
 			}
 			R.id.videoCall -> {

@@ -37,6 +37,8 @@ class SettingsViewModel(private val user: User)
 
 	private val openGallerySub = PublishSubject.create<Any>()
 
+	private val openImageViewerSubj = PublishSubject.create<Uri>()
+
 	@Px
 	private var abbrSize: Int = 0
 	@ColorInt
@@ -100,6 +102,12 @@ class SettingsViewModel(private val user: User)
 		super.clean()
 	}
 
+	fun onUserIconClicked() {
+		userIconField.get()
+			?.takeIf { it is Uri && it != Uri.EMPTY }
+			?.let { openImageViewerSubj.onNext(it as Uri) }
+	}
+
 	fun onSetProfilePhotoClicked() = openGallerySub.onNext(EmptyObject)
 
 	fun onChangeUserNameClicked() {
@@ -121,6 +129,8 @@ class SettingsViewModel(private val user: User)
 	}
 
 	fun observeOpenGalleryRequest() = openGallerySub as Observable<*>
+
+	fun openImageViewerRequest() = openImageViewerSubj as Observable<Uri>
 
 	fun handleSelectedProfileIcon(fileData: FileData) {
 

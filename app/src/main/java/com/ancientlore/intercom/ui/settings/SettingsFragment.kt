@@ -55,6 +55,9 @@ class SettingsFragment : BasicFragment<SettingsViewModel, SettingsUiBinding>()  
 
 		subscriptions.add(viewModel.observeOpenGalleryRequest()
 			.subscribe { openGallery() })
+
+		subscriptions.add(viewModel.openImageViewerRequest()
+			.subscribe { navigator?.openImageViewer(it) })
 	}
 
 	override fun initView(view: View, savedInstanceState: Bundle?) {

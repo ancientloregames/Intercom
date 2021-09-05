@@ -1,5 +1,6 @@
 package com.ancientlore.intercom.ui
 
+import android.net.Uri
 import android.view.Menu
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
@@ -30,6 +31,8 @@ interface Navigator {
 	fun openAudioCallOffer(params: CallViewModel.Params)
 	fun openVideoCallOffer(params: CallViewModel.Params)
 	fun openCallAnswer(offer: Offer)
+
+	fun openImageViewer(uri: Uri)
 
 	fun onSuccessfullAuth(user: User)
 	fun closeFragment(fragment: Fragment)

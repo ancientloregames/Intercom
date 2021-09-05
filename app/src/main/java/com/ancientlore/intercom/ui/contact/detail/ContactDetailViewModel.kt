@@ -39,6 +39,7 @@ class ContactDetailViewModel(private val params: ContactDetailParams)
 	val userInfoLoaded = ObservableBoolean(false)
 
 	private val putToClipboardSubj = PublishSubject.create<String>()
+	private val openImageSubj = PublishSubject.create<String>()
 	private val openChatFlowSubj = PublishSubject.create<ChatFlowParams>()
 	private val closeSubj = PublishSubject.create<Any>()
 
@@ -68,6 +69,11 @@ class ContactDetailViewModel(private val params: ContactDetailParams)
 		closeSubj.onComplete()
 
 		super.clean()
+	}
+
+	fun onContactIconClicked() {
+		if (params.iconUrl.isNotEmpty())
+			openImageSubj.onNext(params.iconUrl)
 	}
 
 	fun onContactPhoneClicked() {
@@ -124,6 +130,8 @@ class ContactDetailViewModel(private val params: ContactDetailParams)
 	fun observePutToClipboardRequest() = putToClipboardSubj as Observable<String>
 
 	fun observeOpenChatFlowRequest() = openChatFlowSubj as Observable<ChatFlowParams>
+
+	fun openImageRequest() = openImageSubj as Observable<String>
 
 	fun observeMakeAudioCallRequest() = makeAudioCallSubj as Observable<CallViewModel.Params>
 
