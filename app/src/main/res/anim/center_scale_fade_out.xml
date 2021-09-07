@@ -4,7 +4,7 @@
 			android:duration="@integer/defaultShowHideAnimationDuration" />
 	<scale
 			android:fromXScale="1" android:fromYScale="1"
-			android:toXScale="0" android:toYScale="0"
+			android:toXScale="90%p" android:toYScale="90%p"
 			android:pivotX="50%" android:pivotY="50%"
 			android:duration="@integer/defaultShowHideAnimationDuration" />
 </set>
