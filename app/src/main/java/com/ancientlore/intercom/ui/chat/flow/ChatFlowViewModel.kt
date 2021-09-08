@@ -155,6 +155,8 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 		makeAudioCallSubj.onComplete()
 		makeVideoCallSubj.onComplete()
 		inputManager?.onStop()
+		inputManager?.setListener(null)
+		inputManager = null
 		contactRepSub?.remove()
 		repositorySub?.remove()
 

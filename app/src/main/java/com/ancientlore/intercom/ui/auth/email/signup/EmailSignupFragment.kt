@@ -1,5 +1,6 @@
 package com.ancientlore.intercom.ui.auth.email.signup
 
+import android.os.Bundle
 import android.view.View
 import com.ancientlore.intercom.R
 import com.ancientlore.intercom.backend.auth.AuthCallback
@@ -21,17 +22,14 @@ class EmailSignupFragment : AuthFragment<EmailSignupViewModel, EmailSignupUiBind
 
 	override fun getLayoutResId() = R.layout.email_signup_ui
 
+	override fun createDataBinding(view: View) = EmailSignupUiBinding.bind(view)
+
 	override fun createViewModel() = EmailSignupViewModel()
 
-	override fun bind(view: View, viewModel: EmailSignupViewModel) {
-		dataBinding = EmailSignupUiBinding.bind(view)
+	override fun init(viewModel: EmailSignupViewModel, savedState: Bundle?) {
+		super.init(viewModel, savedState)
+
 		dataBinding.viewModel = viewModel
-	}
-
-	override fun initViewModel(viewModel: EmailSignupViewModel) {}
-
-	override fun observeViewModel(viewModel: EmailSignupViewModel) {
-		super.observeViewModel(viewModel)
 
 		subscriptions.add(viewModel.observeLoginRequest()
 			.subscribe { openLoginForm() })

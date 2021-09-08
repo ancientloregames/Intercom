@@ -12,7 +12,7 @@ import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 
 class ChatCreationGroupViewModel(listAdapter: ChatCreationGroupAdapter,
-                                 private val selectedListAdapter: ChatCreationSelectedAdapter)
+                                 val selectedListAdapter: ChatCreationSelectedAdapter)
 	: FilterableViewModel<ChatCreationGroupAdapter>(listAdapter) {
 
 	val hasSelection = ObservableBoolean(false)

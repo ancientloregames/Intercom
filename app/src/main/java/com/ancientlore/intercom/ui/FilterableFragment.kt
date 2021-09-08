@@ -2,10 +2,9 @@ package com.ancientlore.intercom.ui
 
 import android.os.Bundle
 import android.view.Menu
-import android.view.View
 import android.widget.SearchView
-import androidx.annotation.CallSuper
 import androidx.annotation.MenuRes
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.databinding.ViewDataBinding
 import com.ancientlore.intercom.R
@@ -13,10 +12,12 @@ import com.ancientlore.intercom.utils.Runnable1
 
 abstract class FilterableFragment<VM : FilterableViewModel<*>, B : ViewDataBinding> : BasicFragment<VM, B>() {
 
+	private var search: SearchView? = null
+
 	private val menuCallback = Runnable1<Menu> { menu ->
 		activity?.menuInflater?.inflate(getToolbarMenuResId(), menu)
-		val search = menu.findItem(R.id.search).actionView as SearchView
-		search.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+		search = menu.findItem(R.id.search).actionView as SearchView
+		search!!.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
 			override fun onQueryTextSubmit(query: String?): Boolean {
 				query?.let { constraint ->
 					viewModel.filter(constraint)
@@ -39,10 +40,16 @@ abstract class FilterableFragment<VM : FilterableViewModel<*>, B : ViewDataBindi
 	@MenuRes
 	abstract fun getToolbarMenuResId() : Int
 
-	@CallSuper
-	override fun initView(view: View, savedInstanceState: Bundle?) {
-		super.initView(view, savedInstanceState)
+	override fun init(viewModel: VM, savedState: Bundle?) {
+		super.init(viewModel, savedState)
 
 		navigator?.createToolbarMenu(getToolbar(), menuCallback)
+	}
+
+	override fun onDestroyView() {
+		setHasOptionsMenu(false)
+		search?.setOnQueryTextListener(null)
+		(activity as AppCompatActivity).setSupportActionBar(null)
+		super.onDestroyView()
 	}
 }

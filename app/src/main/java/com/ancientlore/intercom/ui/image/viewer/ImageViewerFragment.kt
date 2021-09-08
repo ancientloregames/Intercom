@@ -31,25 +31,21 @@ class ImageViewerFragment
 		arguments?.getParcelable<Uri>(ARG_IMAGE_URI)
 		?: throw RuntimeException("Image uri is a mandotory arg") }
 
-	override fun onBackPressed(): Boolean {
-		close()
-		return true
-	}
-
 	override fun getOpenAnimation(): Int = R.anim.center_scale_fade_in
 
 	override fun getCloseAnimation(): Int = R.anim.center_scale_fade_out
 
 	override fun getLayoutResId(): Int = R.layout.image_viewer_ui
 
+	override fun createDataBinding(view: View) = ImageViewerUiBinding.bind(view)
+
 	override fun createViewModel() = ImageViewerViewModel(imageUri)
 
-	override fun bind(view: View, viewModel: ImageViewerViewModel) {
-		dataBinding = ImageViewerUiBinding.bind(view)
-		dataBinding.ui = viewModel
-	}
+	override fun init(viewModel: ImageViewerViewModel, savedState: Bundle?) {
+		super.init(viewModel, savedState)
 
-	override fun initViewModel(viewModel: ImageViewerViewModel) {
+		dataBinding.ui = viewModel
+
 		subscriptions.add(viewModel.closeRequest()
 			.subscribe {
 				close()

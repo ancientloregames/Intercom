@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
-import androidx.appcompat.widget.Toolbar
 import com.ancientlore.intercom.R
 import com.ancientlore.intercom.databinding.ContactDetailUiBinding
 import com.ancientlore.intercom.ui.BasicFragment
@@ -13,7 +12,6 @@ import com.ancientlore.intercom.ui.contact.detail.ContactDetailViewModel.Compani
 import com.ancientlore.intercom.ui.contact.detail.ContactDetailViewModel.Companion.OPTION_VIDEO_CALL
 import com.ancientlore.intercom.utils.ToolbarManager
 import com.ancientlore.intercom.utils.extensions.putToClipboard
-import kotlinx.android.synthetic.main.contact_detail_ui.*
 
 class ContactDetailFragment : BasicFragment<ContactDetailViewModel, ContactDetailUiBinding>() {
 
@@ -32,39 +30,31 @@ class ContactDetailFragment : BasicFragment<ContactDetailViewModel, ContactDetai
 	private val params : ContactDetailParams by lazy { arguments?.getParcelable<ContactDetailParams>(ARG_PARAMS)
 		?: throw RuntimeException("Contact params are a mandotory arg") }
 
-	override fun onBackPressed(): Boolean {
-		close()
-		return true
-	}
-
 	override fun getLayoutResId(): Int = R.layout.contact_detail_ui
+
+	override fun createDataBinding(view: View) = ContactDetailUiBinding.bind(view)
 
 	override fun createViewModel() = ContactDetailViewModel(params)
 
-	override fun bind(view: View, viewModel: ContactDetailViewModel) {
-		dataBinding = ContactDetailUiBinding.bind(view)
-		dataBinding.ui = viewModel
-	}
+	override fun init(viewModel: ContactDetailViewModel, savedState: Bundle?) {
+		super.init(viewModel, savedState)
 
-	override fun initView(view: View, savedInstanceState: Bundle?) {
-		super.initView(view, savedInstanceState)
+		dataBinding.ui = viewModel
 
 		navigator?.run {
-			createToolbarMenu(toolbar) { menu ->
+			createToolbarMenu(dataBinding.toolbar) { menu ->
 				activity?.menuInflater?.inflate(R.menu.contact_detail_menu, menu)
 			}
 
-			ToolbarManager(toolbar as Toolbar).apply {
+			ToolbarManager(dataBinding.toolbar).apply {
 				enableBackButton { close() }
 			}
 
 			setHasOptionsMenu(true)
 		}
 
-		swipableLayout.setListener { close(false) }
-	}
+		dataBinding.swipableLayout.setListener { close(false) }
 
-	override fun initViewModel(viewModel: ContactDetailViewModel) {
 		subscriptions.add(viewModel.observePutToClipboardRequest()
 			.subscribe {
 				context?.run {
@@ -92,6 +82,12 @@ class ContactDetailFragment : BasicFragment<ContactDetailViewModel, ContactDetai
 			.subscribe {
 				close()
 			})
+	}
+
+	override fun onDestroyView() {
+		dataBinding.toolbar.setNavigationOnClickListener(null)
+		dataBinding.swipableLayout.setListener(null)
+		super.onDestroyView()
 	}
 
 	override fun onOptionsItemSelected(item: MenuItem): Boolean {

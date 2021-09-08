@@ -13,10 +13,6 @@ import com.ancientlore.intercom.ui.FilterableFragment
 import com.ancientlore.intercom.utils.ToolbarManager
 import com.ancientlore.intercom.utils.Utils
 import com.ancientlore.intercom.utils.extensions.showKeyboard
-import kotlinx.android.synthetic.main.chat_creation_desc_ui.*
-import kotlinx.android.synthetic.main.chat_creation_desc_ui.listView
-import kotlinx.android.synthetic.main.chat_creation_desc_ui.swipableLayout
-import kotlinx.android.synthetic.main.chat_creation_desc_ui.toolbar
 import java.lang.RuntimeException
 
 class ChatCreationDescFragment : FilterableFragment<ChatCreationDescViewModel, ChatCreationDescUiBinding>() {
@@ -36,48 +32,36 @@ class ChatCreationDescFragment : FilterableFragment<ChatCreationDescViewModel, C
 		}
 	}
 
-	override fun onBackPressed(): Boolean {
-		close()
-		return true
-	}
-
 	private val contacts: List<Contact> by lazy { arguments?.getParcelableArrayList(ARG_CONTACTS)
 		?: throw RuntimeException("Contacts list is a mandotory arg") }
 
-	override fun getToolbar(): Toolbar = toolbar
+	override fun getToolbar(): Toolbar = dataBinding.toolbar
 
 	override fun getToolbarMenuResId() = R.menu.chat_creation_desc_menu
 
 	override fun getLayoutResId() = R.layout.chat_creation_desc_ui
 
-	override fun createViewModel() = ChatCreationDescViewModel(listView.adapter as ChatCreationDescAdapter)
+	override fun createDataBinding(view: View) = ChatCreationDescUiBinding.bind(view)
 
-	override fun bind(view: View, viewModel: ChatCreationDescViewModel) {
-		dataBinding = ChatCreationDescUiBinding.bind(view)
+	override fun createViewModel() =
+		ChatCreationDescViewModel(
+			ChatCreationDescAdapter(requireContext()))
+
+	override fun init(viewModel: ChatCreationDescViewModel, savedState: Bundle?) {
+		super.init(viewModel, savedState)
+
 		dataBinding.ui = viewModel
-	}
 
-	override fun initView(view: View, savedInstanceState: Bundle?) {
-		super.initView(view, savedInstanceState)
-
-		ToolbarManager(toolbar as Toolbar).apply {
+		ToolbarManager(dataBinding.toolbar).apply {
 			enableBackButton { close() }
 			setSubtitle(getString(R.string.member_count, contacts.size))
 		}
 
-		swipableLayout.setListener { close(false) }
+		dataBinding.swipableLayout.setListener { close(false) }
 
-		listView.adapter = ChatCreationDescAdapter(requireContext())
+		dataBinding.listView.adapter = viewModel.listAdapter
 
-		Utils.runOnUiThread({ nameView.showKeyboard() }, 200)
-	}
-
-	override fun initViewModel(viewModel: ChatCreationDescViewModel) {
 		viewModel.init(contacts)
-	}
-
-	override fun observeViewModel(viewModel: ChatCreationDescViewModel) {
-		super.observeViewModel(viewModel)
 
 		subscriptions.add(viewModel.observeCreateChatRequest()
 			.subscribe {
@@ -87,6 +71,14 @@ class ChatCreationDescFragment : FilterableFragment<ChatCreationDescViewModel, C
 			.subscribe {
 				openGallery()
 			})
+
+		Utils.runOnUiThread({ dataBinding.nameView.showKeyboard() }, 200)
+	}
+
+	override fun onDestroyView() {
+		dataBinding.toolbar.setNavigationOnClickListener(null)
+		dataBinding.swipableLayout.setListener(null)
+		super.onDestroyView()
 	}
 
 	override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {

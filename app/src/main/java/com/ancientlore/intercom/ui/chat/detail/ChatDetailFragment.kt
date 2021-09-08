@@ -14,7 +14,6 @@ import com.ancientlore.intercom.ui.chat.creation.description.ChatCreationDescFra
 import com.ancientlore.intercom.ui.chat.flow.ChatFlowParams
 import com.ancientlore.intercom.utils.ToolbarManager
 import com.ancientlore.intercom.utils.Utils
-import kotlinx.android.synthetic.main.chat_detail_ui.*
 
 class ChatDetailFragment : FilterableFragment<ChatDetailViewModel, ChatDetailUiBinding>() {
 
@@ -35,38 +34,32 @@ class ChatDetailFragment : FilterableFragment<ChatDetailViewModel, ChatDetailUiB
 	private val params : ChatFlowParams by lazy { arguments?.getParcelable<ChatFlowParams>(ARG_PARAMS)
 		?: throw RuntimeException("Chat params are a mandotory arg") }
 
-	override fun onBackPressed(): Boolean {
-		close()
-		return true
-	}
-
-	override fun getToolbar(): Toolbar = toolbar
+	override fun getToolbar(): Toolbar = dataBinding.toolbar
 
 	override fun getLayoutResId(): Int = R.layout.chat_detail_ui
 
 	override fun getToolbarMenuResId() = R.menu.chat_creation_desc_menu
 
-	override fun createViewModel() = ChatDetailViewModel(listView.adapter as ChatCreationDescAdapter, params)
+	override fun createDataBinding(view: View) = ChatDetailUiBinding.bind(view)
 
-	override fun bind(view: View, viewModel: ChatDetailViewModel) {
-		dataBinding = ChatDetailUiBinding.bind(view)
+	override fun createViewModel() = ChatDetailViewModel(
+		ChatCreationDescAdapter(requireContext()),
+		params)
+
+	override fun init(viewModel: ChatDetailViewModel, savedState: Bundle?) {
+		super.init(viewModel, savedState)
+
 		dataBinding.ui = viewModel
-	}
 
-	override fun initView(view: View, savedInstanceState: Bundle?) {
-		super.initView(view, savedInstanceState)
-
-		ToolbarManager(toolbar as Toolbar).apply {
+		ToolbarManager(dataBinding.toolbar).apply {
 			enableBackButton { close() }
 			setSubtitle(getString(R.string.member_count, params.participants.size))
 		}
 
-		swipableLayout.setListener { close(false) }
+		dataBinding.swipableLayout.setListener { close(false) }
 
-		listView.adapter = ChatCreationDescAdapter(requireContext())
-	}
+		dataBinding.listView.adapter = viewModel.listAdapter
 
-	override fun initViewModel(viewModel: ChatDetailViewModel) {
 		subscriptions.add(viewModel.observeOpenGallaryRequest()
 			.subscribe {
 				openGallery()
@@ -79,6 +72,12 @@ class ChatDetailFragment : FilterableFragment<ChatDetailViewModel, ChatDetailUiB
 			.subscribe {
 				close()
 			})
+	}
+
+	override fun onDestroyView() {
+		dataBinding.toolbar.setNavigationOnClickListener(null)
+		dataBinding.swipableLayout.setListener(null)
+		super.onDestroyView()
 	}
 
 	override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {

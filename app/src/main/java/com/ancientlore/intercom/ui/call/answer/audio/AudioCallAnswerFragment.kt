@@ -9,7 +9,6 @@ import com.ancientlore.intercom.backend.CallManager
 import com.ancientlore.intercom.databinding.CallAudioAnswerUiBinding
 import com.ancientlore.intercom.ui.call.CallAnswerParams
 import com.ancientlore.intercom.ui.call.answer.CallAnswerFragment
-import kotlinx.android.synthetic.main.call_audio_answer_ui.*
 import java.lang.RuntimeException
 
 class AudioCallAnswerFragment
@@ -32,23 +31,22 @@ class AudioCallAnswerFragment
 		arguments?.getParcelable<CallAnswerParams>(ARG_PARAMS)
 			?: throw RuntimeException("Params are a mandotory arg") }
 
-	override fun getInfoPanelView(): View = callInfoPanel
+	override fun getInfoPanelView(): View = dataBinding.callInfoPanel
 
-	override fun getControlPanelView(): View = callControlPanel
+	override fun getControlPanelView(): View = dataBinding.callControlPanel
 
-	override fun getChronometer(): Chronometer = chronometer
+	override fun getChronometer(): Chronometer = dataBinding.chronometer
 
 	override fun getLayoutResId(): Int = R.layout.call_audio_answer_ui
 
+	override fun createDataBinding(view: View) = CallAudioAnswerUiBinding.bind(view)
+
 	override fun createViewModel() = AudioCallAnswerViewModel(params)
 
-	override fun bind(view: View, viewModel: AudioCallAnswerViewModel) {
-		dataBinding = CallAudioAnswerUiBinding.bind(view)
-		dataBinding.ui = viewModel
-	}
+	override fun init(viewModel: AudioCallAnswerViewModel, savedState: Bundle?) {
+		super.init(viewModel, savedState)
 
-	override fun initViewModel(viewModel: AudioCallAnswerViewModel) {
-		super.initViewModel(viewModel)
+		dataBinding.ui = viewModel
 
 		subscriptions.add(viewModel.turnOnProximitySensorRequest()
 			.subscribe { turnOnProximitySensor() })

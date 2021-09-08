@@ -29,10 +29,6 @@ import com.ancientlore.intercom.utils.Utils
 import com.ancientlore.intercom.utils.extensions.*
 import com.ancientlore.intercom.view.MessageInputManager
 import com.ancientlore.intercom.widget.list.simple.SimpleListItem
-import kotlinx.android.synthetic.main.chat_flow_ui.textInput
-import kotlinx.android.synthetic.main.chat_flow_ui.listView
-import kotlinx.android.synthetic.main.chat_flow_ui.swipableLayout
-import kotlinx.android.synthetic.main.chat_flow_ui.toolbar
 import java.io.File
 
 class ChatFlowFragment : FilterableFragment<ChatFlowViewModel, ChatFlowUiBinding>() {
@@ -55,12 +51,7 @@ class ChatFlowFragment : FilterableFragment<ChatFlowViewModel, ChatFlowUiBinding
 	private val params : ChatFlowParams by lazy { arguments?.getParcelable<ChatFlowParams>(ARG_PARAMS)
 		?: throw RuntimeException("Chat id is a mandotory arg") }
 
-	override fun onBackPressed(): Boolean {
-		close()
-		return true
-	}
-
-	override fun getToolbar(): Toolbar = toolbar
+	override fun getToolbar(): Toolbar = dataBinding.toolbar
 
 	override fun getToolbarMenuResId(): Int {
 		return if (params.chatType == Chat.TYPE_PRIVATE) // TODO really need to separate entities
@@ -70,28 +61,27 @@ class ChatFlowFragment : FilterableFragment<ChatFlowViewModel, ChatFlowUiBinding
 
 	override fun getLayoutResId() = R.layout.chat_flow_ui
 
-	override fun createViewModel() = ChatFlowViewModel(listView.adapter as ChatFlowAdapter, params)
+	override fun createDataBinding(view: View) = ChatFlowUiBinding.bind(view)
 
-	override fun bind(view: View, viewModel: ChatFlowViewModel) {
-		dataBinding = ChatFlowUiBinding.bind(view)
+	override fun createViewModel() = ChatFlowViewModel(
+		ChatFlowAdapter(params.userId, requireContext()),
+		params)
+
+	override fun init(viewModel: ChatFlowViewModel, savedState: Bundle?) {
+		super.init(viewModel, savedState)
+
 		dataBinding.ui = viewModel
-	}
-
-	override fun initView(view: View, savedInstanceState: Bundle?) {
-		super.initView(view, savedInstanceState)
 
 		setHasOptionsMenu(true)
 
-		ToolbarManager(toolbar as Toolbar).apply {
-			//setTitle(params.title)
+		ToolbarManager(dataBinding.toolbar).apply {
 			enableBackButton { close() }
-			//setLogo(params.iconUri, getFallbackActionBarIcon())
 		}
 
-		swipableLayout.setListener { close(false) }
+		dataBinding.swipableLayout.setListener { close(false) }
 
-		with(listView) {
-			adapter = ChatFlowAdapter(params.userId, requireContext())
+		with(dataBinding.listView) {
+			adapter = viewModel.listAdapter
 
 			addOnScrollListener(object : RecyclerView.OnScrollListener() {
 				override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
@@ -107,8 +97,50 @@ class ChatFlowFragment : FilterableFragment<ChatFlowViewModel, ChatFlowUiBinding
 			enableChatBehavior()
 		}
 
-		Utils.runOnUiThread({ textInput.showKeyboard() }, 200)
+		viewModel.init(context!!)
 
+		subscriptions.add(viewModel.listAdapter.observeFileOpen()
+			.subscribe {
+				context?.openFile(it)
+			})
+		subscriptions.add(viewModel.listAdapter.observeImageOpen()
+			.subscribe {
+				// TODO create custom image viewer fragment
+				context?.openFile(it)
+			})
+		subscriptions.add(viewModel.listAdapter.observeOptionMenuOpen()
+			.subscribe {
+				openMessageMenu(it)
+			})
+		subscriptions.add(viewModel.observeMakeAudioCallRequest()
+			.subscribe {
+				navigator?.openAudioCallOffer(it)
+			})
+		subscriptions.add(viewModel.observeMakeVideoCallRequest()
+			.subscribe {
+				navigator?.openVideoCallOffer(it)
+			})
+		subscriptions.add(viewModel.observeAttachMenuOpen()
+			.subscribe { openAttachMenu() })
+		subscriptions.add(viewModel.observeAudioRecord()
+			.subscribe { recordAudio() })
+		subscriptions.add(viewModel.observeUploadIcon()
+			.subscribe { uploadIcon(it) })
+		subscriptions.add(viewModel.observeOpenChatDetail()
+			.subscribe { navigator?.openChatDetail(params) })
+		subscriptions.add(viewModel.observeOpenContactDetail()
+			.subscribe { navigator?.openContactDetail(it) })
+
+		if (permissionManager!!.allowedAudioMessage())
+			viewModel.attachInputPanelManager(MessageInputManager(view!!))
+
+		Utils.runOnUiThread({ dataBinding.textInput.showKeyboard() }, 200)
+	}
+
+	override fun onDestroyView() {
+		dataBinding.toolbar.setNavigationOnClickListener(null)
+		dataBinding.swipableLayout.setListener(null)
+		super.onDestroyView()
 	}
 
 	override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -123,68 +155,6 @@ class ChatFlowFragment : FilterableFragment<ChatFlowViewModel, ChatFlowUiBinding
 			}
 			else -> super.onOptionsItemSelected(item)
 		}
-	}
-
-	override fun initViewModel(viewModel: ChatFlowViewModel) {
-		context?. let {
-			viewModel.init(it)
-		}
-
-		val listAdapter = listView.adapter as ChatFlowAdapter
-		subscriptions.add(listAdapter.observeFileOpen()
-			.subscribe {
-				context?.openFile(it)
-			})
-		subscriptions.add(listAdapter.observeImageOpen()
-			.subscribe {
-				// TODO create custom image viewer fragment
-				context?.openFile(it)
-			})
-		subscriptions.add(listAdapter.observeOptionMenuOpen()
-			.subscribe {
-				openMessageMenu(it)
-			})
-		subscriptions.add(viewModel.observeMakeAudioCallRequest()
-			.subscribe {
-				navigator?.openAudioCallOffer(it)
-			})
-		subscriptions.add(viewModel.observeMakeVideoCallRequest()
-			.subscribe {
-				navigator?.openVideoCallOffer(it)
-			})
-
-		if (permissionManager!!.allowedAudioMessage())
-			viewModel.attachInputPanelManager(MessageInputManager(view!!))
-	}
-
-	private fun openMessageMenu(message: Message) {
-		activity?.run {
-
-			val dialog = MessageOptionMenuDialog.newInstance()
-
-			dialog.listener = object : MessageOptionMenuDialog.Listener {
-				override fun onDeleteClicked() {
-					viewModel.handleDelete(message)
-				}
-			}
-
-			dialog.show(supportFragmentManager)
-		}
-	}
-
-	override fun observeViewModel(viewModel: ChatFlowViewModel) {
-		super.observeViewModel(viewModel)
-
-		subscriptions.add(viewModel.observeAttachMenuOpen()
-			.subscribe { openAttachMenu() })
-		subscriptions.add(viewModel.observeAudioRecord()
-			.subscribe { recordAudio() })
-		subscriptions.add(viewModel.observeUploadIcon()
-			.subscribe { uploadIcon(it) })
-		subscriptions.add(viewModel.observeOpenChatDetail()
-			.subscribe { navigator?.openChatDetail(params) })
-		subscriptions.add(viewModel.observeOpenContactDetail()
-			.subscribe { navigator?.openContactDetail(it) })
 	}
 
 	override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -227,6 +197,21 @@ class ChatFlowFragment : FilterableFragment<ChatFlowViewModel, ChatFlowUiBinding
 	private fun getIntentResult(intent: Intent) : Uri {
 		// TODO multiple selection case (clipData)
 		return intent.data ?: Uri.EMPTY
+	}
+
+	private fun openMessageMenu(message: Message) {
+		activity?.run {
+
+			val dialog = MessageOptionMenuDialog.newInstance()
+
+			dialog.listener = object : MessageOptionMenuDialog.Listener {
+				override fun onDeleteClicked() {
+					viewModel.handleDelete(message)
+				}
+			}
+
+			dialog.show(supportFragmentManager)
+		}
 	}
 
 	private fun openAttachMenu() {

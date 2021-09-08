@@ -37,28 +37,25 @@ class PhoneCheckFragment
 
 	override fun getLayoutResId() = R.layout.phone_check_ui
 
+	override fun createDataBinding(view: View) = PhoneCheckUiBinding.bind(view)
+
 	override fun createViewModel() = PhoneCheckViewModel()
 
-	override fun bind(view: View, viewModel: PhoneCheckViewModel) {
-		dataBinding = PhoneCheckUiBinding.bind(view)
-		dataBinding.viewModel = viewModel
-	}
+	override fun init(viewModel: PhoneCheckViewModel, savedState: Bundle?) {
+		super.init(viewModel, savedState)
 
-	override fun initViewModel(viewModel: PhoneCheckViewModel) {
+		dataBinding.viewModel = viewModel
+
 		auth?.loginViaPhone(params, object : RequestCallback<User> {
 			override fun onSuccess(result: User) {
 				onSuccessfulAuth(result)
 			}
 			override fun onFailure(error: Throwable) {
-				runOnUiThread(Runnable {
+				runOnUiThread {
 					Toast.makeText(context, R.string.verification_failure_msg, LENGTH_LONG).show()
-				})
+				}
 			}
 		})
-	}
-
-	override fun observeViewModel(viewModel: PhoneCheckViewModel) {
-		super.observeViewModel(viewModel)
 
 		subscriptions.add(viewModel.observeEnterRequest()
 			.subscribe { verifyCode(it) })

@@ -10,7 +10,6 @@ import com.ancientlore.intercom.backend.CallManager
 import com.ancientlore.intercom.databinding.CallVideoAnswerUiBinding
 import com.ancientlore.intercom.ui.call.CallAnswerParams
 import com.ancientlore.intercom.ui.call.answer.CallAnswerFragment
-import kotlinx.android.synthetic.main.call_video_answer_ui.*
 import java.lang.RuntimeException
 
 class VideoCallAnswerFragment
@@ -35,15 +34,13 @@ class VideoCallAnswerFragment
 
 	private var hudAnimationDuration: Long = 200
 
-	override fun getInfoPanelView(): View = callInfoPanel
+	override fun getInfoPanelView(): View = dataBinding.callInfoPanel
 
-	override fun getControlPanelView(): View = callControlPanel
+	override fun getControlPanelView(): View = dataBinding.callControlPanel
 
-	override fun getChronometer(): Chronometer = chronometer
+	override fun getChronometer(): Chronometer = dataBinding.chronometer
 
 	override fun getLayoutResId(): Int = R.layout.call_video_answer_ui
-
-	override fun createViewModel() = VideoCallAnswerViewModel(params)
 
 	override fun onAttach(context: Context) {
 		super.onAttach(context)
@@ -51,13 +48,14 @@ class VideoCallAnswerFragment
 		hudAnimationDuration = context.resources.getInteger(R.integer.defaultShowHideAnimationDuration).toLong()
 	}
 
-	override fun bind(view: View, viewModel: VideoCallAnswerViewModel) {
-		dataBinding = CallVideoAnswerUiBinding.bind(view)
-		dataBinding.ui = viewModel
-	}
+	override fun createDataBinding(view: View) = CallVideoAnswerUiBinding.bind(view)
 
-	override fun initViewModel(viewModel: VideoCallAnswerViewModel) {
-		super.initViewModel(viewModel)
+	override fun createViewModel() = VideoCallAnswerViewModel(params)
+
+	override fun init(viewModel: VideoCallAnswerViewModel, savedState: Bundle?) {
+		super.init(viewModel, savedState)
+
+		dataBinding.ui = viewModel
 
 		audioManager.isSpeakerphoneOn = true
 
@@ -89,9 +87,10 @@ class VideoCallAnswerFragment
 			setCallConnectionListener(viewModel)
 			answer(
 				CallManager.CallParams(
-				params.targetId,
-				localVideoRenderer,
-				remoteVideoRenderer), params.sdp)
+					params.targetId,
+					dataBinding.localVideoRenderer,
+					dataBinding.remoteVideoRenderer),
+				params.sdp)
 		}
 	}
 

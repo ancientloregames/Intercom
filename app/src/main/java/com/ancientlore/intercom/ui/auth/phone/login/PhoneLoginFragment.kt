@@ -1,5 +1,6 @@
 package com.ancientlore.intercom.ui.auth.phone.login
 
+import android.os.Bundle
 import android.view.View
 import com.ancientlore.intercom.BuildConfig
 import com.ancientlore.intercom.R
@@ -34,18 +35,14 @@ class PhoneLoginFragment
 
 	override fun getLayoutResId() = R.layout.phone_login_ui
 
+	override fun createDataBinding(view: View) = PhoneLoginUiBinding.bind(view)
+
 	override fun createViewModel() = PhoneLoginViewModel()
 
-	override fun bind(view: View, viewModel: PhoneLoginViewModel) {
-		dataBinding = PhoneLoginUiBinding.bind(view)
+	override fun init(viewModel: PhoneLoginViewModel, savedState: Bundle?) {
+		super.init(viewModel, savedState)
+
 		dataBinding.viewModel = viewModel
-	}
-
-	override fun initViewModel(viewModel: PhoneLoginViewModel) {
-	}
-
-	override fun observeViewModel(viewModel: PhoneLoginViewModel) {
-		super.observeViewModel(viewModel)
 
 		subscriptions.add(viewModel.observeLoginSuccessEvent()
 			.subscribe { onLoginSuccess(it) })

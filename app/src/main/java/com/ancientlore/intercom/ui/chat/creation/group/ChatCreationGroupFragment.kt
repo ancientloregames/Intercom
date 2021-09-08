@@ -7,7 +7,6 @@ import com.ancientlore.intercom.R
 import com.ancientlore.intercom.databinding.ChatCreationGroupUiBinding
 import com.ancientlore.intercom.ui.FilterableFragment
 import com.ancientlore.intercom.utils.ToolbarManager
-import kotlinx.android.synthetic.main.chat_creation_group_ui.*
 
 class ChatCreationGroupFragment : FilterableFragment<ChatCreationGroupViewModel, ChatCreationGroupUiBinding>() {
 
@@ -15,49 +14,43 @@ class ChatCreationGroupFragment : FilterableFragment<ChatCreationGroupViewModel,
 		fun newInstance() = ChatCreationGroupFragment()
 	}
 
-	override fun onBackPressed(): Boolean {
-		close()
-		return true
-	}
-
-	override fun getToolbar(): Toolbar = toolbar
+	override fun getToolbar(): Toolbar = dataBinding.toolbar
 
 	override fun getToolbarMenuResId() = R.menu.chat_creation_group_menu
 
 	override fun getLayoutResId() = R.layout.chat_creation_group_ui
 
+	override fun createDataBinding(view: View) = ChatCreationGroupUiBinding.bind(view)
+
 	override fun createViewModel() = ChatCreationGroupViewModel(
-		listView.adapter as ChatCreationGroupAdapter,
-		selectedListView.adapter as ChatCreationSelectedAdapter)
+		ChatCreationGroupAdapter(requireContext()),
+		ChatCreationSelectedAdapter(requireContext()))
 
-	override fun bind(view: View, viewModel: ChatCreationGroupViewModel) {
-		dataBinding = ChatCreationGroupUiBinding.bind(view)
+	override fun init(viewModel: ChatCreationGroupViewModel, savedState: Bundle?) {
+		super.init(viewModel, savedState)
+
 		dataBinding.ui = viewModel
-	}
 
-	override fun initView(view: View, savedInstanceState: Bundle?) {
-		super.initView(view, savedInstanceState)
-
-		ToolbarManager(toolbar as Toolbar).apply {
+		ToolbarManager(dataBinding.toolbar).apply {
 			enableBackButton { close() }
 		}
 
-		swipableLayout.setListener { close(false) }
+		dataBinding.swipableLayout.setListener { close(false) }
 
-		listView.adapter = ChatCreationGroupAdapter(requireContext())
-		selectedListView.adapter = ChatCreationSelectedAdapter(requireContext())
-	}
+		dataBinding.listView.adapter = viewModel.listAdapter
+		dataBinding.selectedListView.adapter = viewModel.selectedListAdapter
 
-	override fun initViewModel(viewModel: ChatCreationGroupViewModel) {
 		viewModel.init()
-	}
-
-	override fun observeViewModel(viewModel: ChatCreationGroupViewModel) {
-		super.observeViewModel(viewModel)
 
 		subscriptions.add(viewModel.observeNextRequest()
 			.subscribe {
 				navigator?.openChatCreationDesc(it)
 			})
+	}
+
+	override fun onDestroyView() {
+		dataBinding.toolbar.setNavigationOnClickListener(null)
+		dataBinding.swipableLayout.setListener(null)
+		super.onDestroyView()
 	}
 }

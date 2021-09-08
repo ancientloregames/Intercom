@@ -3,6 +3,7 @@ package com.ancientlore.intercom.ui.call
 import android.content.Context
 import android.media.AudioManager
 import android.media.MediaPlayer
+import android.os.Bundle
 import android.os.PowerManager
 import android.os.SystemClock
 import android.view.View
@@ -69,7 +70,8 @@ abstract class CallFragment<VM : CallViewModel, B : ViewDataBinding>  : BasicFra
 	}
 
 	@CallSuper
-	override fun initViewModel(viewModel: VM) {
+	override fun init(viewModel: VM, savedState: Bundle?) {
+		super.init(viewModel, savedState)
 
 		mediaPlayer.run {
 			isLooping = true

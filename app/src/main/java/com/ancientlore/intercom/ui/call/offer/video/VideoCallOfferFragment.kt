@@ -10,7 +10,6 @@ import com.ancientlore.intercom.backend.CallManager
 import com.ancientlore.intercom.databinding.CallVideoOfferUiBinding
 import com.ancientlore.intercom.ui.call.CallViewModel
 import com.ancientlore.intercom.ui.call.offer.CallOfferFragment
-import kotlinx.android.synthetic.main.call_video_offer_ui.*
 import java.lang.RuntimeException
 
 class VideoCallOfferFragment
@@ -35,15 +34,13 @@ class VideoCallOfferFragment
 
 	private var hudAnimationDuration: Long = 200
 
-	override fun getInfoPanelView(): View = callInfoPanel
+	override fun getInfoPanelView(): View = dataBinding.callInfoPanel
 
-	override fun getControlPanelView(): View = callControlPanel
+	override fun getControlPanelView(): View = dataBinding.callControlPanel
 
-	override fun getChronometer(): Chronometer = chronometer
+	override fun getChronometer(): Chronometer = dataBinding.chronometer
 
 	override fun getLayoutResId() = R.layout.call_video_offer_ui
-
-	override fun createViewModel() = VideoCallOfferViewModel(params)
 
 	override fun onAttach(context: Context) {
 		super.onAttach(context)
@@ -51,13 +48,14 @@ class VideoCallOfferFragment
 		hudAnimationDuration = context.resources.getInteger(R.integer.defaultShowHideAnimationDuration).toLong()
 	}
 
-	override fun bind(view: View, viewModel: VideoCallOfferViewModel) {
-		dataBinding = CallVideoOfferUiBinding.bind(view)
-		dataBinding.ui = viewModel
-	}
+	override fun createDataBinding(view: View) = CallVideoOfferUiBinding.bind(view)
 
-	override fun initViewModel(viewModel: VideoCallOfferViewModel) {
-		super.initViewModel(viewModel)
+	override fun createViewModel() = VideoCallOfferViewModel(params)
+
+	override fun init(viewModel: VideoCallOfferViewModel, savedState: Bundle?) {
+		super.init(viewModel, savedState)
+
+		dataBinding.ui = viewModel
 
 		audioManager.isSpeakerphoneOn = true
 
@@ -65,8 +63,8 @@ class VideoCallOfferFragment
 			setCallConnectionListener(viewModel)
 			call(CallManager.CallParams(
 				params.targetId,
-				localVideoRenderer,
-				remoteVideoRenderer
+				dataBinding.localVideoRenderer,
+				dataBinding.remoteVideoRenderer
 			))
 		}
 

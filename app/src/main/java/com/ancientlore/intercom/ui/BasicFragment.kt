@@ -25,8 +25,6 @@ import android.view.animation.AnimationUtils
 
 abstract class BasicFragment<VM : BasicViewModel, B : ViewDataBinding> : Fragment(), MainActivity.BackButtonHandler {
 
-	override fun onBackPressed() = false
-
 	protected lateinit var viewModel: VM
 	protected lateinit var dataBinding: B
 
@@ -42,48 +40,49 @@ abstract class BasicFragment<VM : BasicViewModel, B : ViewDataBinding> : Fragmen
 	@LayoutRes
 	protected abstract fun getLayoutResId(): Int
 
+	protected abstract fun createDataBinding(view: View): B
+
 	protected abstract fun createViewModel(): VM
 
-	protected abstract fun bind(view: View, viewModel: VM)
-
-	protected abstract fun initViewModel(viewModel: VM)
+	override fun onBackPressed(): Boolean {
+		close()
+		return true
+	}
 
 	open fun getOpenAnimation(): Int = R.anim.slide_in_right
 
 	open fun getCloseAnimation(): Int = R.anim.slide_out_right
 
+	override fun onAttach(context: Context) {
+		if (context !is Navigator || context !is PermissionManager)
+			throw RuntimeException("Context must implement the Navigator and PermissionManager interfaces")
+		super.onAttach(context)
+	}
+
 	final override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedState: Bundle?): View {
 		return inflater.inflate(getLayoutResId(), container, false)
 	}
 
-	override fun onAttach(context: Context) {
-		if (context !is Navigator)
-			RuntimeException("Context must implement the Navigator interface")
-		super.onAttach(context)
-	}
-
 	final override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-		initView(view, savedInstanceState)
+
+		dataBinding = createDataBinding(view)
 
 		viewModel = createViewModel()
 
-		bind(view, viewModel)
-
-		initViewModel(viewModel)
-		observeViewModel(viewModel)
+		init(viewModel, savedInstanceState)
 	}
 
 	@CallSuper
-	protected open fun observeViewModel(viewModel: VM) {
+	protected open fun init(viewModel: VM, savedState: Bundle?) {
+
 		subscriptions.add(viewModel.observeToastRequest()
 			.subscribe { showToast(it) })
 	}
 
-	protected open fun initView(view: View, savedInstanceState: Bundle?) {}
-
 	override fun onDestroyView() {
 		subscriptions.clear()
 		viewModel.clean()
+		dataBinding.unbind()
 		super.onDestroyView()
 	}
 
@@ -103,8 +102,7 @@ abstract class BasicFragment<VM : BasicViewModel, B : ViewDataBinding> : Fragmen
 		}
 	}
 
-	@CallSuper
-	protected open fun close(animate: Boolean = true) {
+	protected fun close(animate: Boolean = true) {
 		if (isClosing)
 			return
 		isClosing = true

@@ -254,7 +254,7 @@ class MessageInputManager(view: View) {
 		attachmentButton.visibility = visiblitiy
 	}
 
-	fun setListener(listener: Listener) {
+	fun setListener(listener: Listener? = null) {
 		this.listener = listener
 	}
 }

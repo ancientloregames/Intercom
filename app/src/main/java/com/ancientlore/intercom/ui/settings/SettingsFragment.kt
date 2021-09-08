@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import androidx.appcompat.widget.Toolbar
 import com.ancientlore.intercom.App
 import com.ancientlore.intercom.C
 import com.ancientlore.intercom.R
@@ -15,7 +14,6 @@ import com.ancientlore.intercom.utils.ToolbarManager
 import com.ancientlore.intercom.utils.Utils
 import com.ancientlore.intercom.utils.extensions.getAppCacheDir
 import com.ancientlore.intercom.utils.extensions.getFileData
-import kotlinx.android.synthetic.main.settings_ui.*
 import java.io.File
 
 class SettingsFragment : BasicFragment<SettingsViewModel, SettingsUiBinding>()  {
@@ -26,32 +24,32 @@ class SettingsFragment : BasicFragment<SettingsViewModel, SettingsUiBinding>()  
 		fun newInstance() = SettingsFragment()
 	}
 
-	override fun onBackPressed(): Boolean {
-		close()
-		return true
-	}
-
 	override fun getOpenAnimation(): Int = R.anim.slide_in_bottom
 
 	override fun getCloseAnimation(): Int = R.anim.slide_out_bottom
 
 	override fun getLayoutResId() = R.layout.settings_ui
 
+	override fun createDataBinding(view: View) = SettingsUiBinding.bind(view)
+
 	override fun createViewModel() = SettingsViewModel(App.backend.getAuthManager().getCurrentUser())
 
-	override fun bind(view: View, viewModel: SettingsViewModel) {
-		dataBinding = SettingsUiBinding.bind(view)
+	override fun init(viewModel: SettingsViewModel, savedState: Bundle?) {
+		super.init(viewModel, savedState)
+
 		dataBinding.ui = viewModel
-	}
 
-	override fun initViewModel(viewModel: SettingsViewModel) {
-		context?.run {
-			viewModel.init(this)
-		}
-	}
+		navigator
+			?.apply {
+				createToolbarMenu(dataBinding.toolbar)
+				ToolbarManager(dataBinding.toolbar).apply {
+					enableBackButton { close() }
+				}
+			}
 
-	override fun observeViewModel(viewModel: SettingsViewModel) {
-		super.observeViewModel(viewModel)
+		dataBinding.swipableLayout.setListener { close(false) }
+
+		viewModel.init(context!!)
 
 		subscriptions.add(viewModel.observeOpenGalleryRequest()
 			.subscribe { openGallery() })
@@ -60,16 +58,10 @@ class SettingsFragment : BasicFragment<SettingsViewModel, SettingsUiBinding>()  
 			.subscribe { navigator?.openImageViewer(it) })
 	}
 
-	override fun initView(view: View, savedInstanceState: Bundle?) {
-		navigator
-			?.apply {
-				createToolbarMenu(toolbar)
-				ToolbarManager(toolbar as Toolbar).apply {
-					enableBackButton { close() }
-				}
-			}
-
-		swipableLayout.setListener { close(false) }
+	override fun onDestroyView() {
+		dataBinding.toolbar.setNavigationOnClickListener(null)
+		dataBinding.swipableLayout.setListener(null)
+		super.onDestroyView()
 	}
 
 	override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

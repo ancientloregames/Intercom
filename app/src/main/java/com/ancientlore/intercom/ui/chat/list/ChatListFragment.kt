@@ -12,7 +12,6 @@ import com.ancientlore.intercom.ui.FilterableFragment
 import com.ancientlore.intercom.ui.chat.flow.ChatFlowParams
 import com.ancientlore.intercom.ui.dialog.option.chat.ChatOptionMenuDialog
 import com.ancientlore.intercom.ui.dialog.option.chat.ChatOptionMenuParams
-import kotlinx.android.synthetic.main.chat_list_ui.*
 
 class ChatListFragment : FilterableFragment<ChatListViewModel, ChatListUiBinding>() {
 
@@ -20,25 +19,27 @@ class ChatListFragment : FilterableFragment<ChatListViewModel, ChatListUiBinding
 		fun newInstance() = ChatListFragment()
 	}
 
-	override fun getToolbar(): Toolbar = toolbar
+	override fun getToolbar(): Toolbar = dataBinding.toolbar
 
 	override fun getToolbarMenuResId() = R.menu.chat_list_menu
 
 	override fun getLayoutResId() = R.layout.chat_list_ui
 
-	override fun createViewModel() = ChatListViewModel(listView.adapter as ChatListAdapter)
+	override fun createDataBinding(view: View) = ChatListUiBinding.bind(view)
 
-	override fun bind(view: View, viewModel: ChatListViewModel) {
-		dataBinding = ChatListUiBinding.bind(view)
+	override fun createViewModel() = ChatListViewModel(
+		ChatListAdapter(requireContext()))
+
+	override fun init(viewModel: ChatListViewModel, savedState: Bundle?) {
+		super.init(viewModel, savedState)
+
 		dataBinding.ui = viewModel
-	}
 
-	override fun initViewModel(viewModel: ChatListViewModel) {
+		setHasOptionsMenu(true)
+
+		dataBinding.listView.adapter = viewModel.listAdapter
+
 		viewModel.init()
-	}
-
-	override fun observeViewModel(viewModel: ChatListViewModel) {
-		super.observeViewModel(viewModel)
 
 		subscriptions.add(viewModel.observeChatCreationRequest()
 			.subscribe { openChatCreation() })
@@ -46,14 +47,6 @@ class ChatListFragment : FilterableFragment<ChatListViewModel, ChatListUiBinding
 			.subscribe { openChatFlow(it) })
 		subscriptions.add(viewModel.observeOpenChatMenuRequest()
 			.subscribe { openChatMenu(it) })
-	}
-
-	override fun initView(view: View, savedInstanceState: Bundle?) {
-		super.initView(view, savedInstanceState)
-
-		setHasOptionsMenu(true)
-
-		listView.adapter = ChatListAdapter(requireContext())
 	}
 
 	override fun onOptionsItemSelected(item: MenuItem): Boolean {

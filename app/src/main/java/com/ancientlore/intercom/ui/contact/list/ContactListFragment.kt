@@ -7,9 +7,6 @@ import com.ancientlore.intercom.R
 import com.ancientlore.intercom.databinding.ContactListUiBinding
 import com.ancientlore.intercom.ui.FilterableFragment
 import com.ancientlore.intercom.utils.ToolbarManager
-import kotlinx.android.synthetic.main.contact_list_ui.listView
-import kotlinx.android.synthetic.main.contact_list_ui.swipableLayout
-import kotlinx.android.synthetic.main.contact_list_ui.toolbar
 
 class ContactListFragment : FilterableFragment<ContactListViewModel, ContactListUiBinding>() {
 
@@ -17,50 +14,45 @@ class ContactListFragment : FilterableFragment<ContactListViewModel, ContactList
 		fun newInstance() = ContactListFragment()
 	}
 
-	override fun onBackPressed(): Boolean {
-		close()
-		return true
-	}
-
 	override fun getOpenAnimation(): Int = R.anim.slide_in_bottom
 
 	override fun getCloseAnimation(): Int = R.anim.slide_out_bottom
 
-	override fun getToolbar(): Toolbar = toolbar
+	override fun getToolbar(): Toolbar = dataBinding.toolbar
 
 	override fun getToolbarMenuResId() = R.menu.contact_list_menu
 
 	override fun getLayoutResId() = R.layout.contact_list_ui
 
-	override fun createViewModel() = ContactListViewModel(listView.adapter as ContactListAdapter)
+	override fun createDataBinding(view: View) = ContactListUiBinding.bind(view)
 
-	override fun bind(view: View, viewModel: ContactListViewModel) {
-		dataBinding = ContactListUiBinding.bind(view)
+	override fun createViewModel() = ContactListViewModel(
+		ContactListAdapter(requireContext()))
+
+	override fun init(viewModel: ContactListViewModel, savedState: Bundle?) {
+		super.init(viewModel, savedState)
+
 		dataBinding.ui = viewModel
-	}
 
-	override fun initView(view: View, savedInstanceState: Bundle?) {
-		super.initView(view, savedInstanceState)
+		viewModel.init()
 
-		ToolbarManager(toolbar as Toolbar).apply {
+		ToolbarManager(dataBinding.toolbar).apply {
 			enableBackButton { close() }
 		}
 
-		swipableLayout.setListener { close(false) }
+		dataBinding.swipableLayout.setListener { close(false) }
 
-		listView.adapter = ContactListAdapter(requireContext())
-	}
-
-	override fun initViewModel(viewModel: ContactListViewModel) {
-		viewModel.init()
-	}
-
-	override fun observeViewModel(viewModel: ContactListViewModel) {
-		super.observeViewModel(viewModel)
+		dataBinding.listView.adapter = viewModel.listAdapter
 
 		subscriptions.add(viewModel.observeOpenContactDetail()
 			.subscribe {
 				navigator?.openContactDetail(it)
 			})
+	}
+
+	override fun onDestroyView() {
+		dataBinding.toolbar.setNavigationOnClickListener(null)
+		dataBinding.swipableLayout.setListener(null)
+		super.onDestroyView()
 	}
 }

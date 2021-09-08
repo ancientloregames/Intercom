@@ -9,7 +9,6 @@ import com.ancientlore.intercom.R
 import com.ancientlore.intercom.databinding.ChatCreationUiBinding
 import com.ancientlore.intercom.ui.FilterableFragment
 import com.ancientlore.intercom.utils.ToolbarManager
-import kotlinx.android.synthetic.main.chat_creation_ui.*
 
 class ChatCreationFragment : FilterableFragment<ChatCreationViewModel, ChatCreationUiBinding>() {
 
@@ -17,42 +16,32 @@ class ChatCreationFragment : FilterableFragment<ChatCreationViewModel, ChatCreat
 		fun newInstance() = ChatCreationFragment()
 	}
 
-	override fun onBackPressed(): Boolean {
-		close()
-		return true
-	}
-
-	override fun getToolbar(): Toolbar = toolbar
+	override fun getToolbar(): Toolbar = dataBinding.toolbar
 
 	override fun getToolbarMenuResId() = R.menu.chat_creation_menu
 
 	override fun getLayoutResId() = R.layout.chat_creation_ui
 
-	override fun createViewModel() = ChatCreationViewModel(listView.adapter as ChatCreationAdapter)
+	override fun createDataBinding(view: View) = ChatCreationUiBinding.bind(view)
 
-	override fun bind(view: View, viewModel: ChatCreationViewModel) {
-		dataBinding = ChatCreationUiBinding.bind(view)
+	override fun createViewModel() =
+		ChatCreationViewModel(
+			ChatCreationAdapter(requireContext()))
+
+	override fun init(viewModel: ChatCreationViewModel, savedState: Bundle?) {
+		super.init(viewModel, savedState)
+
 		dataBinding.ui = viewModel
-	}
 
-	override fun initView(view: View, savedInstanceState: Bundle?) {
-		super.initView(view, savedInstanceState)
-
-		ToolbarManager(toolbar as Toolbar).apply {
+		ToolbarManager(dataBinding.toolbar).apply {
 			enableBackButton { close() }
 		}
 
-		swipableLayout.setListener { close(false) }
+		dataBinding.swipableLayout.setListener { close(false) }
 
-		listView.adapter = ChatCreationAdapter(requireContext())
-	}
+		dataBinding.listView.adapter = viewModel.listAdapter
 
-	override fun initViewModel(viewModel: ChatCreationViewModel) {
 		viewModel.init()
-	}
-
-	override fun observeViewModel(viewModel: ChatCreationViewModel) {
-		super.observeViewModel(viewModel)
 
 		subscriptions.add(viewModel.observeChatOpen()
 			.subscribe {
@@ -72,9 +61,15 @@ class ChatCreationFragment : FilterableFragment<ChatCreationViewModel, ChatCreat
 		subscriptions.add(viewModel.observeUpdateContactCount()
 			.subscribe {
 				runOnUiThread {
-					(toolbar as Toolbar).subtitle = getString(R.string.contact_count, it)
+					dataBinding.toolbar.subtitle = getString(R.string.contact_count, it)
 				}
 			})
+	}
+
+	override fun onDestroyView() {
+		dataBinding.toolbar.setNavigationOnClickListener(null)
+		dataBinding.swipableLayout.setListener(null)
+		super.onDestroyView()
 	}
 
 	private fun addContact() {
