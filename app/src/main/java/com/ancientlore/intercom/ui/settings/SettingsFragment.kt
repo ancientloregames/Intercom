@@ -1,9 +1,12 @@
 package com.ancientlore.intercom.ui.settings
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.widget.EditText
+import androidx.core.content.ContextCompat
 import com.ancientlore.intercom.App
 import com.ancientlore.intercom.C
 import com.ancientlore.intercom.R
@@ -14,6 +17,7 @@ import com.ancientlore.intercom.utils.ToolbarManager
 import com.ancientlore.intercom.utils.Utils
 import com.ancientlore.intercom.utils.extensions.getAppCacheDir
 import com.ancientlore.intercom.utils.extensions.getFileData
+import com.ancientlore.intercom.utils.extensions.showKeyboard
 import java.io.File
 
 class SettingsFragment : BasicFragment<SettingsViewModel, SettingsUiBinding>()  {
@@ -37,6 +41,8 @@ class SettingsFragment : BasicFragment<SettingsViewModel, SettingsUiBinding>()  
 	override fun init(viewModel: SettingsViewModel, savedState: Bundle?) {
 		super.init(viewModel, savedState)
 
+		val context = context!!
+
 		dataBinding.ui = viewModel
 
 		navigator
@@ -49,13 +55,57 @@ class SettingsFragment : BasicFragment<SettingsViewModel, SettingsUiBinding>()  
 
 		dataBinding.swipableLayout.setListener { close(false) }
 
-		viewModel.init(context!!)
+		viewModel.init(
+			context.resources.getDimensionPixelSize(R.dimen.settingsUserNameAbSize),
+			ContextCompat.getColor(context, R.color.colorPrimaryDark))
+
+		val editNameView = EditText(context).apply {
+			setHint(R.string.dialog_edit_user_name_hint)
+		}
+		val editNameDialog = AlertDialog.Builder(context)
+			.setTitle(R.string.dialog_edit_user_name_title)
+			.setMessage(R.string.dialog_edit_user_name_message)
+			.setView(editNameView)
+			.setPositiveButton(R.string.ok) { _, _ ->
+				viewModel.updateUserName(
+					editNameView.text.toString())
+			}
+			.setNegativeButton(R.string.cancel, null)
+			.create()
+
+		val editStatusView = EditText(context).apply {
+			setHint(R.string.dialog_edit_user_name_hint)
+		}
+		val editStatusDialog = AlertDialog.Builder(context)
+			.setTitle(R.string.dialog_edit_user_status_title)
+			.setMessage(R.string.dialog_edit_user_status_message)
+			.setView(editStatusView)
+			.setPositiveButton(R.string.ok) { _, _ ->
+				viewModel.updateUserStatus(
+					editStatusView.text.toString())
+			}
+			.setNegativeButton(R.string.cancel, null)
+			.create()
 
 		subscriptions.add(viewModel.observeOpenGalleryRequest()
 			.subscribe { openGallery() })
 
 		subscriptions.add(viewModel.openImageViewerRequest()
 			.subscribe { navigator?.openImageViewer(it) })
+
+		subscriptions.add(viewModel.showNameEditorRequest()
+			.subscribe {
+				editNameView.setText(it)
+				editNameDialog?.show()
+				Utils.runOnUiThread({ editNameView.showKeyboard() }, 20)
+			})
+
+		subscriptions.add(viewModel.showStatusEditorRequest()
+			.subscribe {
+				editStatusView.setText(it)
+				editStatusDialog?.show()
+				Utils.runOnUiThread({ editStatusView.showKeyboard() }, 20)
+			})
 	}
 
 	override fun onDestroyView() {
@@ -127,6 +177,16 @@ class SettingsFragment : BasicFragment<SettingsViewModel, SettingsUiBinding>()  
 					}
 				}
 			}
+		}
+	}
+
+	override fun getToastStringRes(toastId: Int): Int {
+		return when (toastId) {
+			SettingsViewModel.TOAST_INVALID_NAME -> R.string.alert_error_invalid_name
+			SettingsViewModel.TOAST_INVALID_STATUS -> R.string.alert_error_invalid_user_status
+			SettingsViewModel.TOAST_ERR_CHANGE_NAME -> R.string.alert_error_change_name
+			SettingsViewModel.TOAST_ERR_CHANGE_STATUS -> R.string.alert_error_change_user_status
+			else -> super.getToastStringRes(toastId)
 		}
 	}
 }

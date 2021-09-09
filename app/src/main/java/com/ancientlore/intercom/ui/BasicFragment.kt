@@ -76,7 +76,11 @@ abstract class BasicFragment<VM : BasicViewModel, B : ViewDataBinding> : Fragmen
 	protected open fun init(viewModel: VM, savedState: Bundle?) {
 
 		subscriptions.add(viewModel.observeToastRequest()
-			.subscribe { showToast(it) })
+			.subscribe {
+				val stringRes = getToastStringRes(it)
+				if (stringRes != -1)
+					showToast(stringRes)
+			})
 	}
 
 	override fun onDestroyView() {
@@ -89,6 +93,9 @@ abstract class BasicFragment<VM : BasicViewModel, B : ViewDataBinding> : Fragmen
 	protected fun runOnUiThread(action: Runnable) {
 		activity?.runOnUiThread(action)
 	}
+
+	@StringRes
+	protected open fun getToastStringRes(toastId: Int): Int  = -1
 
 	protected fun showToast(@StringRes textResId: Int, duration: Int = Toast.LENGTH_LONG) {
 		runOnUiThread {
