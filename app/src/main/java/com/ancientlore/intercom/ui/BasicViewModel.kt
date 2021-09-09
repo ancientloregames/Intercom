@@ -7,10 +7,12 @@ import io.reactivex.subjects.PublishSubject
 
 abstract class BasicViewModel : ViewModel() {
 
-	protected val toastRequest: PublishSubject<Int> = PublishSubject.create<Int>() // StringResId
+	protected val toastRequest: PublishSubject<Int> = PublishSubject.create()
 
 	fun observeToastRequest() = toastRequest as Observable<Int>
 
 	@CallSuper
-	open fun clean() {}
+	open fun clean() {
+		toastRequest.onComplete()
+	}
 }

@@ -99,6 +99,13 @@ class ChatCreationDescFragment : FilterableFragment<ChatCreationDescViewModel, C
 		}
 	}
 
+	override fun getToastStringRes(toastId: Int): Int {
+		return when (toastId) {
+			ChatCreationDescViewModel.TOAST_REQUIRED_NAME_ERR -> R.string.alert_error_name_required
+			else -> super.getToastStringRes(toastId)
+		}
+	}
+
 	private fun openGallery() {
 		permissionManager?.requestPermissionWriteStorage { granted ->
 			if (granted) {

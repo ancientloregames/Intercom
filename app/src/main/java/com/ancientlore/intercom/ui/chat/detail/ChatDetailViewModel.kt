@@ -5,7 +5,6 @@ import androidx.databinding.Observable
 import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableField
 import com.ancientlore.intercom.EmptyObject
-import com.ancientlore.intercom.R
 import com.ancientlore.intercom.backend.CrashlyticsRequestCallback
 import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.data.model.Chat
@@ -21,6 +20,10 @@ import io.reactivex.subjects.PublishSubject
 class ChatDetailViewModel(listAdapter: ChatCreationDescAdapter,
                           private val params: ChatFlowParams)
 	: FilterableViewModel<ChatCreationDescAdapter>(listAdapter) {
+
+	companion object {
+		const val TOAST_SET_PHOTO_ERR = 0
+	}
 
 	val chatIconField = ObservableField(params.iconUri)
 	val chatNameField = ObservableField(params.title)
@@ -88,7 +91,7 @@ class ChatDetailViewModel(listAdapter: ChatCreationDescAdapter,
 			}
 			override fun onFailure(error: Throwable) {
 				showProcess.set(false)
-				toastRequest.onNext(R.string.alert_error_set_photo)
+				toastRequest.onNext(TOAST_SET_PHOTO_ERR)
 			}
 		})
 	}

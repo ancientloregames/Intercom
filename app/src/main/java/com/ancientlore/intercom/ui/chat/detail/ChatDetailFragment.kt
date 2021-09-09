@@ -98,6 +98,13 @@ class ChatDetailFragment : FilterableFragment<ChatDetailViewModel, ChatDetailUiB
 		}
 	}
 
+	override fun getToastStringRes(toastId: Int): Int {
+		return when (toastId) {
+			ChatDetailViewModel.TOAST_SET_PHOTO_ERR -> R.string.alert_error_set_photo
+			else -> super.getToastStringRes(toastId)
+		}
+	}
+
 	private fun openGallery() {
 		permissionManager?.requestPermissionWriteStorage { granted ->
 			if (granted) {

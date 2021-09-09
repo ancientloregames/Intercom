@@ -4,7 +4,6 @@ import android.net.Uri
 import androidx.databinding.ObservableField
 import com.ancientlore.intercom.App
 import com.ancientlore.intercom.EmptyObject
-import com.ancientlore.intercom.R
 import com.ancientlore.intercom.data.model.Chat
 import com.ancientlore.intercom.data.model.Contact
 import com.ancientlore.intercom.ui.FilterableViewModel
@@ -14,6 +13,10 @@ import io.reactivex.subjects.PublishSubject
 
 class ChatCreationDescViewModel(listAdapter: ChatCreationDescAdapter)
 	: FilterableViewModel<ChatCreationDescAdapter>(listAdapter) {
+
+	companion object {
+		const val TOAST_REQUIRED_NAME_ERR = 0
+	}
 
 	val groupIconField = ObservableField(Uri.EMPTY)
 	val groupNameField = ObservableField("")
@@ -64,6 +67,6 @@ class ChatCreationDescViewModel(listAdapter: ChatCreationDescAdapter)
 				participants = listOf(userId).plus(contacts.map { it.getIdentity() })
 			))
 		}
-		else toastRequest.onNext(R.string.alert_error_name_required)
+		else toastRequest.onNext(TOAST_REQUIRED_NAME_ERR)
 	}
 }
