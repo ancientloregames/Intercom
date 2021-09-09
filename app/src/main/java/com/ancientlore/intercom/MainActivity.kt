@@ -112,11 +112,11 @@ class MainActivity : AppCompatActivity(),
 		isInBackground = false
 
 		if (firstResume.not()) {
-			firstResume = false
 			if (App.backend.getAuthManager().isLoggedIn()) {
 				UserRepository.updateOnlineStatus(true)
 			}
 		}
+		else firstResume = false
 
 		super.onResume()
 	}
