@@ -97,7 +97,6 @@ class ChatFlowFragment : FilterableFragment<ChatFlowViewModel, ChatFlowUiBinding
 			enableChatBehavior()
 		}
 
-		viewModel.init(context!!)
 
 		subscriptions.add(viewModel.listAdapter.observeFileOpen()
 			.subscribe {
@@ -130,6 +129,14 @@ class ChatFlowFragment : FilterableFragment<ChatFlowViewModel, ChatFlowUiBinding
 			.subscribe { navigator?.openChatDetail(params) })
 		subscriptions.add(viewModel.observeOpenContactDetail()
 			.subscribe { navigator?.openContactDetail(it) })
+		subscriptions.add(viewModel.setContactStatusOnlineRequest()
+			.subscribe {
+				viewModel.onContactStatusChanged(getString(R.string.online))
+			})
+		subscriptions.add(viewModel.setContactStatusLastSeenRequest()
+			.subscribe { lastSeen ->
+				viewModel.onContactStatusChanged(getString(R.string.last_seen, lastSeen))
+			})
 
 		if (permissionManager!!.allowedAudioMessage())
 			viewModel.attachInputPanelManager(MessageInputManager(view!!))
@@ -154,6 +161,15 @@ class ChatFlowFragment : FilterableFragment<ChatFlowViewModel, ChatFlowUiBinding
 				true
 			}
 			else -> super.onOptionsItemSelected(item)
+		}
+	}
+
+	override fun getToastStringRes(toastId: Int): Int {
+		return when (toastId) {
+			ChatFlowViewModel.TOAST_CHAT_CREATION_ERR -> R.string.alert_error_creating_chat
+			ChatFlowViewModel.TOAST_MSG_SEND_ERR -> R.string.message_deleted
+			ChatFlowViewModel.TOAST_MSG_DELETED -> R.string.alert_error_send_message
+			else -> super.getToastStringRes(toastId)
 		}
 	}
 

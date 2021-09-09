@@ -1,6 +1,5 @@
 package com.ancientlore.intercom.ui.chat.flow
 
-import android.content.Context
 import android.media.MediaRecorder
 import android.net.Uri
 import android.util.Log
@@ -10,7 +9,6 @@ import androidx.databinding.ObservableField
 import com.ancientlore.intercom.App
 import com.ancientlore.intercom.C
 import com.ancientlore.intercom.EmptyObject
-import com.ancientlore.intercom.R
 import com.ancientlore.intercom.backend.*
 import com.ancientlore.intercom.data.model.*
 import com.ancientlore.intercom.data.model.Chat.Companion.TYPE_PRIVATE
@@ -35,6 +33,10 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 	companion object {
 		const val OPTION_AUDIO_CALL = 0
 		const val OPTION_VIDEO_CALL = 1
+
+		const val TOAST_CHAT_CREATION_ERR = 0
+		const val TOAST_MSG_SEND_ERR = 1
+		const val TOAST_MSG_DELETED = 2
 	}
 
 	@IntDef(OPTION_AUDIO_CALL, OPTION_VIDEO_CALL)
@@ -71,6 +73,10 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 
 	private val makeVideoCallSubj = PublishSubject.create<CallViewModel.Params>()
 
+	private val setContactStatusOnlineSubj = PublishSubject.create<Any>()
+
+	private val setContactStatusLastSeenSubj = PublishSubject.create<String>()
+
 	private var contactRepSub: RepositorySubscription? = null
 
 	private var inputManager: MessageInputManager? = null
@@ -79,7 +85,7 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 
 	private var paginationCompleted = false
 
-	fun init(context: Context) {
+	init {
 
 		if (params.chatId.isNotEmpty()) {
 			initMessageRepository(params.chatId)
@@ -91,7 +97,7 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 
 		if (params.chatType == TYPE_PRIVATE) {
 			val contactId = params.participants.first { it != params.userId }
-			observeContactOnlineStatus(context, contactId)
+			observeContactOnlineStatus(contactId)
 		}
 	}
 
@@ -154,6 +160,9 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 		openContactDetailSubj.onComplete()
 		makeAudioCallSubj.onComplete()
 		makeVideoCallSubj.onComplete()
+		setContactStatusOnlineSubj.onComplete()
+		setContactStatusLastSeenSubj.onComplete()
+
 		inputManager?.onStop()
 		inputManager?.setListener(null)
 		inputManager = null
@@ -178,6 +187,10 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 	fun observeMakeAudioCallRequest() = makeAudioCallSubj as Observable<CallViewModel.Params>
 
 	fun observeMakeVideoCallRequest() = makeVideoCallSubj as Observable<CallViewModel.Params>
+
+	fun setContactStatusOnlineRequest() = setContactStatusOnlineSubj as Observable<Any>
+
+	fun setContactStatusLastSeenRequest() = setContactStatusLastSeenSubj as Observable<String>
 
 	fun onActionBarCliked() { // TODO really need to separate private and group chats
 		if (params.chatType == TYPE_PRIVATE)
@@ -345,7 +358,7 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 	fun handleDelete(message: Message) {
 		repository.deleteItem(message.id, object : CrashlyticsRequestCallback<Any>() {
 			override fun onSuccess(result: Any) {
-				toastRequest.onNext(R.string.message_deleted)
+				toastRequest.onNext(TOAST_MSG_DELETED)
 			}
 		})
 	}
@@ -378,7 +391,7 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 		runOnUiThread {
 			showSendProgressField.set(false)
 		}
-		toastRequest.onNext(R.string.alert_error_send_message)
+		toastRequest.onNext(TOAST_MSG_SEND_ERR)
 	}
 
 	private fun guarantyChat(callback: Runnable1<String>) {
@@ -408,7 +421,7 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 				}
 				override fun onFailure(error: Throwable) {
 					Utils.logError(error)
-					toastRequest.onNext(R.string.alert_error_creating_chat)
+					toastRequest.onNext(TOAST_CHAT_CREATION_ERR)
 				}
 			})
 		}
@@ -447,21 +460,24 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 			}
 	}
 
-	private fun observeContactOnlineStatus(context: Context, contactId: String) {
+	private fun observeContactOnlineStatus(contactId: String) {
 		this.receiverId = contactId
 
 		contactRepSub = UserRepository.attachListener(contactId, object : CrashlyticsRequestCallback<User>() {
 
-			override fun onSuccess(conterpart: User) {
-				runOnUiThread {
-					if (conterpart.online)
-						actionBarSubtitleField.set(context.getString(R.string.online))
-					else
-						actionBarSubtitleField.set(context.getString(R.string.last_seen,
-							conterpart.lastSeenDate))
+			override fun onSuccess(collocutor: User) {
+				if (collocutor.online)
+					setContactStatusOnlineSubj.onNext(EmptyObject)
+				else
+					setContactStatusLastSeenSubj.onNext(collocutor.lastSeenDate)
 				}
-			}
 		})
+	}
+
+	fun onContactStatusChanged(status: String) {
+		runOnUiThread {
+			actionBarSubtitleField.set(status)
+		}
 	}
 
 	private fun loadNextPage(onLoaded: Runnable? = null) {
