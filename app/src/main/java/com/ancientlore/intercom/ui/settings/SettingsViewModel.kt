@@ -60,6 +60,9 @@ class SettingsViewModel(private val user: User)
 
 	override fun clean() {
 		openGallerySub.onComplete()
+		openImageViewerSubj.onComplete()
+		showNameEditorSubj.onComplete()
+		showStatusEditorSubj.onComplete()
 
 		super.clean()
 	}
