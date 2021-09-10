@@ -23,14 +23,16 @@
 				android:layout_marginLeft="8dp"
 				android:layout_marginBottom="4dp">
 
-			<com.ancientlore.intercom.view.ChatImageView
+			<ImageView
 					android:id="@+id/imageView"
-					android:layout_width="250dp"
-					android:layout_height="250dp"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:maxHeight="250dp"
+					android:maxWidth="250dp"
 					android:adjustViewBounds="true"
 					android:src="@{message.imageUri}"
 					android:onClick="@{() -> message.onImageClick()}"
-					android:visibility="gone"
+					android:contentDescription="@string/image"
 					tools:visibility="visible"
 					tools:src="@drawable/chat_bg"
 			/>

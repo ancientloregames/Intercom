@@ -22,6 +22,7 @@
 	<string name="success">Success</string>
 	<string name="info">Info</string>
 	<string name="icon">Icon</string>
+	<string name="image">Image</string>
 	
 	<string name="auth_name">Name</string>
 	<string name="auth_email">Email</string>
