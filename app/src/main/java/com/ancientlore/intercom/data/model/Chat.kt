@@ -4,9 +4,9 @@ import android.net.Uri
 import androidx.annotation.IntDef
 import androidx.room.*
 import com.ancientlore.intercom.utils.Identifiable
+import com.ancientlore.intercom.utils.Utils
 import com.google.firebase.firestore.DocumentId
 import com.google.firebase.firestore.Exclude
-import java.text.SimpleDateFormat
 import java.util.*
 
 @Entity(tableName = "chats",
@@ -30,8 +30,6 @@ data class Chat(@field:PrimaryKey @DocumentId var id: String = "",
 	companion object {
 		const val TYPE_PRIVATE = 0
 		const val TYPE_GROUP = 1
-
-		private val dateFormat = SimpleDateFormat("MMM dd", Locale.getDefault())
 	}
 
 	@IntDef(TYPE_PRIVATE, TYPE_GROUP)
@@ -42,7 +40,7 @@ data class Chat(@field:PrimaryKey @DocumentId var id: String = "",
 	val iconUri: Uri by lazy { Uri.parse(iconUrl) }
 
 	@delegate:Exclude @delegate:Ignore @get:Exclude @get:Ignore
-	val lastMsgDate: String by lazy { if (lastMsgTime != null) dateFormat.format(lastMsgTime) else "" }
+	val lastMsgDate: String by lazy { Utils.toHumanReadableTime(lastMsgTime).toString() }
 
 	// TODO maybe shouldn't exclude from room
 	@field:Exclude @field:Ignore @get:Exclude @get:Ignore

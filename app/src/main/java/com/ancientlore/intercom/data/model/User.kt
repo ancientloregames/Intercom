@@ -6,6 +6,7 @@ import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import com.ancientlore.intercom.utils.Identifiable
+import com.ancientlore.intercom.utils.Utils
 import com.google.firebase.firestore.Exclude
 import java.text.DateFormat
 import java.util.*
@@ -33,7 +34,7 @@ data class User(@field:ColumnInfo var name: String = "",
   val iconUri: Uri by lazy { Uri.parse(iconUrl) }
 
   @delegate:Exclude @delegate:Ignore @get:Exclude @get:Ignore
-  val lastSeenDate: String by lazy { if (lastSeenTime != null) dateFormat.format(lastSeenTime) else "" }
+  val lastSeenDate: String by lazy {  Utils.toHumanReadableTime(lastSeenTime).toString() }
 
   @Exclude @Ignore
   override fun getIdentity() = phone

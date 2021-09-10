@@ -40,6 +40,8 @@ data class Message(@field:ColumnInfo @DocumentId var id: String = "",
 	  const val STATUS_WAIT = 0
 	  const val STATUS_SENT = 1
 	  const val STATUS_RECEIVED = 2
+
+		private val dateFormat = DateFormat.getTimeInstance(SHORT)
   }
 
 	@StringDef(TYPE_TEXT, TYPE_IMAGE)
@@ -54,7 +56,7 @@ data class Message(@field:ColumnInfo @DocumentId var id: String = "",
   val attachUri: Uri by lazy { if (attachUrl.isNotEmpty()) Uri.parse(attachUrl) else Uri.EMPTY }
 
 	@delegate:Exclude @delegate:Ignore @get:Exclude @get:Ignore
-  val formatedTime: String by lazy { if (timestamp != null) DateFormat.getTimeInstance(SHORT).format(timestamp) else "" }
+  val formatedTime: String by lazy { if (timestamp != null) dateFormat.format(timestamp) else "" }
 
   override fun compareTo(other: Message): Int {
 	  return if (timestamp != null && other.timestamp != null)

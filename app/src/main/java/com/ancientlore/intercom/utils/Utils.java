@@ -7,6 +7,7 @@ import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -25,6 +26,7 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Date;
 
 import kotlin.text.Regex;
 
@@ -216,6 +218,17 @@ public final class Utils
 			logError(e);
 		}
 		return phoneNumber;
+	}
+
+	public static CharSequence toHumanReadableTime(Date date)
+	{
+		return date != null ? toHumanReadableTime(date.getTime()) : "";
+	}
+
+	public static CharSequence toHumanReadableTime(long time)
+	{
+		return DateUtils.getRelativeTimeSpanString(time,
+				System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS);
 	}
 
 	public static boolean showKeyboard(View view)
