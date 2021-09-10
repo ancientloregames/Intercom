@@ -53,9 +53,9 @@ class ChatFlowAdapter(private val userId: String,
 		private const val VIEW_TYPE_AUDIO_OTHER = 5
 	}
 
-	private val openFile = PublishSubject.create<Uri>()
+	private val openFileSubj = PublishSubject.create<Uri>()
 
-	private val openImage = PublishSubject.create<Uri>()
+	private val openImageSubj = PublishSubject.create<Uri>()
 
 	private val openOptionMenuSubj = PublishSubject.create<Message>()
 
@@ -111,12 +111,12 @@ class ChatFlowAdapter(private val userId: String,
 		when (holder) {
 			is ItemViewHolder -> holder.imageClickListener = object : ItemViewHolder.ImageClickListener {
 				override fun onImageClick(uri: Uri) {
-					openImage.onNext(uri)
+					openImageSubj.onNext(uri)
 				}
 			}
 			is FileItemViewHolder -> holder.fileClickListener = object : FileItemViewHolder.FileClickListener {
 				override fun onItemClick() {
-					openFile.onNext(item.attachUri)
+					openFileSubj.onNext(item.attachUri)
 				}
 			}
 		}
@@ -441,11 +441,11 @@ class ChatFlowAdapter(private val userId: String,
 		}
 	}
 
-	fun observeFileOpen() = openFile as Observable<Uri>
+	fun fileOpenRequest() = openFileSubj as Observable<Uri>
 
-	fun observeImageOpen() = openImage as Observable<Uri>
+	fun imageOpenRequest() = openImageSubj as Observable<Uri>
 
-	fun observeOptionMenuOpen() = openOptionMenuSubj as Observable<Message>
+	fun optionMenuOpenRequest() = openOptionMenuSubj as Observable<Message>
 
 	inner class Filter: ListFilter() {
 		override fun satisfy(item: Message, candidate: String) = item.contains(candidate)

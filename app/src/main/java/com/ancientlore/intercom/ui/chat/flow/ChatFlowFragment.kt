@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.widget.Toolbar
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.ancientlore.intercom.C
 import com.ancientlore.intercom.C.ICON_DIR_PATH
@@ -83,52 +84,71 @@ class ChatFlowFragment : FilterableFragment<ChatFlowViewModel, ChatFlowUiBinding
 		with(dataBinding.listView) {
 			adapter = viewModel.listAdapter
 
+			enableChatBehavior()
+
 			addOnScrollListener(object : RecyclerView.OnScrollListener() {
+				private var prevLastVisibleItemPos: Int  = 0
+
 				override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
 					super.onScrollStateChanged(recyclerView, newState)
+
+					val lastVisibleItemPos = (recyclerView.layoutManager as LinearLayoutManager).findLastVisibleItemPosition()
+
+					if (lastVisibleItemPos != prevLastVisibleItemPos) {
+						prevLastVisibleItemPos = lastVisibleItemPos
+						viewModel.onLastVisibleItemChanged(lastVisibleItemPos)
+					}
+
 					if (!recyclerView.canScrollVertically(-1)
-						&& recyclerView.scrollState == RecyclerView.SCROLL_STATE_IDLE
+						&& newState == RecyclerView.SCROLL_STATE_IDLE
 						&& adapter!!.itemCount > 1) {
 						viewModel.onScrolledToTop()
 					}
 				}
 			})
-
-			enableChatBehavior()
 		}
 
-
-		subscriptions.add(viewModel.listAdapter.observeFileOpen()
+		subscriptions.add(viewModel.listAdapter.fileOpenRequest()
 			.subscribe {
 				context?.openFile(it)
 			})
-		subscriptions.add(viewModel.listAdapter.observeImageOpen()
+		subscriptions.add(viewModel.listAdapter.imageOpenRequest()
 			.subscribe {
 				// TODO create custom image viewer fragment
 				context?.openFile(it)
 			})
-		subscriptions.add(viewModel.listAdapter.observeOptionMenuOpen()
+		subscriptions.add(viewModel.listAdapter.optionMenuOpenRequest()
 			.subscribe {
 				openMessageMenu(it)
 			})
-		subscriptions.add(viewModel.observeMakeAudioCallRequest()
+		subscriptions.add(viewModel.makeAudioCallRequest()
 			.subscribe {
 				navigator?.openAudioCallOffer(it)
 			})
-		subscriptions.add(viewModel.observeMakeVideoCallRequest()
+		subscriptions.add(viewModel.makeVideoCallRequest()
 			.subscribe {
 				navigator?.openVideoCallOffer(it)
 			})
-		subscriptions.add(viewModel.observeAttachMenuOpen()
-			.subscribe { openAttachMenu() })
-		subscriptions.add(viewModel.observeAudioRecord()
-			.subscribe { recordAudio() })
-		subscriptions.add(viewModel.observeUploadIcon()
-			.subscribe { uploadIcon(it) })
-		subscriptions.add(viewModel.observeOpenChatDetail()
-			.subscribe { navigator?.openChatDetail(params) })
-		subscriptions.add(viewModel.observeOpenContactDetail()
-			.subscribe { navigator?.openContactDetail(it) })
+		subscriptions.add(viewModel.openAttachmentMenuRequest()
+			.subscribe {
+				openAttachMenu()
+			})
+		subscriptions.add(viewModel.recordAudioRequest()
+			.subscribe {
+				recordAudio()
+			})
+		subscriptions.add(viewModel.uploadIconRequest()
+			.subscribe {
+				uploadIcon(it)
+			})
+		subscriptions.add(viewModel.openChatDetailRequest()
+			.subscribe {
+				navigator?.openChatDetail(params)
+			})
+		subscriptions.add(viewModel.openContactDetailRequest()
+			.subscribe {
+				navigator?.openContactDetail(it)
+			})
 		subscriptions.add(viewModel.setContactStatusOnlineRequest()
 			.subscribe {
 				viewModel.onContactStatusChanged(getString(R.string.online))
@@ -136,6 +156,10 @@ class ChatFlowFragment : FilterableFragment<ChatFlowViewModel, ChatFlowUiBinding
 		subscriptions.add(viewModel.setContactStatusLastSeenRequest()
 			.subscribe { lastSeen ->
 				viewModel.onContactStatusChanged(getString(R.string.last_seen, lastSeen))
+			})
+		subscriptions.add(viewModel.scrollToPositionRequest()
+			.subscribe {
+				dataBinding.listView.smoothScrollToPosition(it)
 			})
 
 		if (permissionManager!!.allowedAudioMessage())

@@ -53,9 +53,13 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 
 	val showSendProgressField = ObservableBoolean(false)
 
+	val showScrollToBottom = ObservableBoolean(false)
+
 	private val repository = MessageRepository()
 
 	private var repositorySub: RepositorySubscription? = null
+
+	private var contactRepSub: RepositorySubscription? = null
 
 	private val messageText get() = textField.get()!!
 
@@ -63,9 +67,9 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 
 	private val recordAudioSubj = PublishSubject.create<Any>()
 
-	private val uploadIconSub = PublishSubject.create<String>() // Chat Id
+	private val uploadIconSubj = PublishSubject.create<String>() // Chat Id
 
-	private val openChatDetailSub = PublishSubject.create<ChatFlowParams>()
+	private val openChatDetailSubj = PublishSubject.create<ChatFlowParams>()
 
 	private val openContactDetailSubj = PublishSubject.create<ContactDetailParams>()
 
@@ -77,7 +81,7 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 
 	private val setContactStatusLastSeenSubj = PublishSubject.create<String>()
 
-	private var contactRepSub: RepositorySubscription? = null
+	private val srollToPositionSubj = PublishSubject.create<Int>()
 
 	private var inputManager: MessageInputManager? = null
 
@@ -155,8 +159,8 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 	override fun clean() {
 		openAttachMenuSubj.onComplete()
 		recordAudioSubj.onComplete()
-		uploadIconSub.onComplete()
-		openChatDetailSub.onComplete()
+		uploadIconSubj.onComplete()
+		openChatDetailSubj.onComplete()
 		openContactDetailSubj.onComplete()
 		makeAudioCallSubj.onComplete()
 		makeVideoCallSubj.onComplete()
@@ -172,25 +176,31 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 		super.clean()
 	}
 
-	fun observeAttachMenuOpen() = openAttachMenuSubj as Observable<Any>
+	// ----------- Rx Observables -----------
 
-	fun observeAudioRecord() = recordAudioSubj as Observable<Any>
+	fun openAttachmentMenuRequest() = openAttachMenuSubj as Observable<Any>
 
-	fun observeUploadIcon() = uploadIconSub as Observable<String>
+	fun recordAudioRequest() = recordAudioSubj as Observable<Any>
 
-	fun observeOpenChatDetail() = openChatDetailSub as Observable<ChatFlowParams>
+	fun uploadIconRequest() = uploadIconSubj as Observable<String>
 
-	fun observeOpenContactDetail() = openContactDetailSubj as Observable<ContactDetailParams>
+	fun openChatDetailRequest() = openChatDetailSubj as Observable<ChatFlowParams>
 
-	fun onAttachButtonCliked() = openAttachMenuSubj.onNext(EmptyObject)
+	fun openContactDetailRequest() = openContactDetailSubj as Observable<ContactDetailParams>
 
-	fun observeMakeAudioCallRequest() = makeAudioCallSubj as Observable<CallViewModel.Params>
+	fun makeAudioCallRequest() = makeAudioCallSubj as Observable<CallViewModel.Params>
 
-	fun observeMakeVideoCallRequest() = makeVideoCallSubj as Observable<CallViewModel.Params>
+	fun makeVideoCallRequest() = makeVideoCallSubj as Observable<CallViewModel.Params>
 
 	fun setContactStatusOnlineRequest() = setContactStatusOnlineSubj as Observable<Any>
 
 	fun setContactStatusLastSeenRequest() = setContactStatusLastSeenSubj as Observable<String>
+
+	fun scrollToPositionRequest() = srollToPositionSubj as Observable<Int>
+
+	// ----------- DataBinding Events -----------
+
+	fun onAttachButtonClicked() = openAttachMenuSubj.onNext(EmptyObject)
 
 	fun onActionBarCliked() { // TODO really need to separate private and group chats
 		if (params.chatType == TYPE_PRIVATE)
@@ -200,7 +210,7 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 				params.iconUri.toString(),
 				true))
 		else
-			openChatDetailSub.onNext(params)
+			openChatDetailSubj.onNext(params)
 	}
 
 	fun onSendButtonClicked() {
@@ -220,6 +230,10 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 	fun onCancelRecordButtonClicked() {
 		inputManager?.onCancel()
 	}
+
+	fun onSrollToBottomClicked() = srollToPositionSubj.onNext(listAdapter.itemCount - 1)
+
+	// ----------- Repository interactions (messages sending) -----------
 
 	private fun sendMessage(text: String) {
 		guarantyChat {
@@ -363,6 +377,15 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 		})
 	}
 
+	// ----------- Ui events handling -----------
+
+	fun onLastVisibleItemChanged(lastVisibleItemPos: Int) {
+		val show = lastVisibleItemPos < listAdapter.itemCount - 1
+		val currentState = showScrollToBottom.get()!!
+		if (currentState != show)
+			showScrollToBottom.set(show)
+	}
+
 	fun onScrolledToTop() {
 		if (paginationCompleted.not())
 			loadNextPage()
@@ -384,6 +407,14 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 				))
 		}
 	}
+
+	fun onContactStatusChanged(status: String) {
+		runOnUiThread {
+			actionBarSubtitleField.set(status)
+		}
+	}
+
+	// ----------- Private logics -----------
 
 	private fun onFailureSendingMessage(error: Throwable) {
 		if (error !is EmptyResultException)
@@ -413,7 +444,7 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 					attachRepositoryChangeListener()
 
 					if (params.iconUri.isInternal())
-						uploadIconSub.onNext(id)
+						uploadIconSubj.onNext(id)
 
 					runOnUiThread {
 						callback.run(id)
@@ -472,12 +503,6 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 					setContactStatusLastSeenSubj.onNext(collocutor.lastSeenDate)
 				}
 		})
-	}
-
-	fun onContactStatusChanged(status: String) {
-		runOnUiThread {
-			actionBarSubtitleField.set(status)
-		}
 	}
 
 	private fun loadNextPage(onLoaded: Runnable? = null) {

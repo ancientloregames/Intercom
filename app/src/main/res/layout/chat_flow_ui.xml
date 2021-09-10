@@ -114,10 +114,24 @@
 					android:layout_height="match_parent"
 					app:stackFromEnd="true"
 					app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-					tools:listitem="@layout/chat_flow_item_user"
 					android:layout_below="@+id/appbar"
 					android:layout_above="@+id/inputContainer"
 			/>
+
+			<com.google.android.material.floatingactionbutton.FloatingActionButton
+					android:id="@+id/srollToBottom"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_marginRight="7dp"
+					android:layout_marginBottom="70dp"
+					android:layout_alignParentBottom="true"
+					android:layout_alignParentEnd="true"
+					android:visibility="@{ui.showScrollToBottom}"
+					android:onClick="@{() -> ui.onSrollToBottomClicked()}"
+					app:srcCompat="@drawable/ic_chevron2_down_18dp"
+					app:backgroundTint="@android:color/white"
+					app:fabSize="mini"
+				/>
 
 			<LinearLayout
 					android:id="@+id/inputContainer"
@@ -134,7 +148,7 @@
 						android:layout_width="@dimen/chatInputMinHeight"
 						android:layout_height="@dimen/chatInputMinHeight"
 						android:padding="8dp"
-						android:onClick="@{() -> ui.onAttachButtonCliked()}"
+						android:onClick="@{() -> ui.onAttachButtonClicked()}"
 						android:contentDescription="@string/attachment"
 						app:srcCompat="@drawable/ic_clip"
 						android:tint="@color/inputHintColor"
