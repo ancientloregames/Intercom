@@ -157,6 +157,8 @@ class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
 	}
 
 	override fun clean() {
+		listAdapter.clean()
+
 		openAttachMenuSubj.onComplete()
 		recordAudioSubj.onComplete()
 		uploadIconSubj.onComplete()

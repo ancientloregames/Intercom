@@ -33,7 +33,9 @@ class ChatListViewModel(listAdapter: ChatListAdapter)
 	override fun clean() {
 		chatCreationSub.onComplete()
 		chatOpenSub.onComplete()
+		openChatMenuSub.onComplete()
 		repositorySub?.remove()
+		listAdapter.setListener(null)
 
 		super.clean()
 	}

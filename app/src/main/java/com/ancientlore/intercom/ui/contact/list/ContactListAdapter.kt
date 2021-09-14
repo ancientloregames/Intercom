@@ -49,7 +49,7 @@ class ContactListAdapter(context: Context,
 
 	override fun isUnique(item: Contact) = getItems().none { it.phone == item.phone }
 
-	fun setListener(listener: Listener) { this.listener = listener }
+	fun setListener(listener: Listener?) { this.listener = listener }
 
 	class ViewHolder(binding: ContactListItemBinding)
 		: BasicRecyclerAdapter.ViewHolder<Contact, ContactListItemBinding>(binding) {

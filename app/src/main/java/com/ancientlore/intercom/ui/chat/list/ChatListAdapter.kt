@@ -60,7 +60,7 @@ class ChatListAdapter(context: Context,
 
 	override fun createFilter() = Filter()
 
-	fun setListener(listener: Listener) { this.listener = listener }
+	fun setListener(listener: Listener?) { this.listener = listener }
 
 	class ViewHolder(binding: ChatListItemBinding)
 		: BasicRecyclerAdapter.ViewHolder<Chat, ChatListItemBinding>(binding) {

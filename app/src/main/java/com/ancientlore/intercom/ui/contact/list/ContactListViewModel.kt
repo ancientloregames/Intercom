@@ -24,6 +24,7 @@ class ContactListViewModel(listAdapter: ContactListAdapter)
 	override fun clean() {
 		openContactDetailSub.onComplete()
 		repositorySub?.remove()
+		listAdapter.setListener(null)
 
 		super.clean()
 	}

@@ -59,6 +59,12 @@ class ChatFlowAdapter(private val userId: String,
 
 	private val openOptionMenuSubj = PublishSubject.create<Message>()
 
+	fun clean() {
+		openFileSubj.onComplete()
+		openImageSubj.onComplete()
+		openOptionMenuSubj.onComplete()
+	}
+
 	override fun getDiffCallback(newItems: List<Message>) = DiffCallback(getItems(), newItems)
 
 	override fun getItemViewTypeInner(position: Int): Int {
