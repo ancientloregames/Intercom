@@ -20,8 +20,10 @@ import io.reactivex.internal.disposables.ListCompositeDisposable
 import java.lang.RuntimeException
 
 import android.content.res.Resources
+import android.util.Log
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import java.util.ArrayList
 
 abstract class BasicFragment<VM : BasicViewModel, B : ViewDataBinding> : Fragment(), MainActivity.BackButtonHandler {
 
@@ -57,6 +59,35 @@ abstract class BasicFragment<VM : BasicViewModel, B : ViewDataBinding> : Fragmen
 		if (context !is Navigator || context !is PermissionManager)
 			throw RuntimeException("Context must implement the Navigator and PermissionManager interfaces")
 		super.onAttach(context)
+	}
+
+	/**
+	 * SDK error that leads to the fragment leaking because of the ActionBar option menu handling
+	 * @see setHasOptionsMenu
+	 *
+	 * @see <a href="https://issuetracker.google.com/issues/131537919">Google issue tracker</a>
+	 */
+	override fun onDetach() {
+		super.onDetach()
+
+		fragmentManager?.let { fragmentManager ->
+			try {
+				with(fragmentManager.javaClass.getDeclaredField("mCreatedMenus")) {
+					isAccessible = true
+					val createdMenus = get(fragmentManager)
+					if (createdMenus is ArrayList<*>) {
+						if (createdMenus.remove(this@BasicFragment))
+							Log.d("Intercom", "Fragment successfully removed from the mCreatedMenus")
+					}
+				}
+			} catch (e: NoSuchFieldException) {
+				e.printStackTrace()
+			} catch (e: SecurityException) {
+				e.printStackTrace()
+			} catch (e: IllegalAccessException) {
+				e.printStackTrace()
+			}
+		}
 	}
 
 	final override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedState: Bundle?): View {
