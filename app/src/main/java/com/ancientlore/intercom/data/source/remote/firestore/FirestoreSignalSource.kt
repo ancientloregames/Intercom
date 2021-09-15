@@ -5,15 +5,15 @@ import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.data.model.crypto.SignalPublicKeys
 import com.ancientlore.intercom.data.source.EmptyResultException
 import com.ancientlore.intercom.data.source.remote.SignalPublicKeySource
-import com.ancientlore.intercom.utils.SingletonHolder
 
 class FirestoreSignalSource(private val userId: String)
 	: FirestoreSource<SignalPublicKeys>(), SignalPublicKeySource {
 
-	internal companion object : SingletonHolder<FirestoreSignalSource, String>(
-		{ userId -> FirestoreSignalSource(userId) })
-
 	private val userKeys get() = db.collection(C.CRYPTOS).document(userId)
+
+	override fun equals(other: Any?): Boolean {
+		return other is FirestoreSignalSource && other.userId == userId
+	}
 
 	override fun getObjectClass() = SignalPublicKeys::class.java
 

@@ -259,6 +259,12 @@ class MessageRepository : MessageSource {
 	}
 
 	fun setRemoteSource(source: MessageSource) {
+		if (remoteSource == source)
+			return
+
+		remoteSource.clean()
+		cacheSource.clear()
+
 		remoteSource = source
 
 		source.setPaginationLimit(paginationLimit)
@@ -266,18 +272,27 @@ class MessageRepository : MessageSource {
 
 		cacheSource.clear()
 		localSource?.let {
-			if (source.getSourceId() != it.getSourceId())
+			if (source.getSourceId() != it.getSourceId()) {
+				it.clean()
 				localSource = null
+			}
 		}
 	}
 
 	fun setLocalSource(source: MessageSource) {
+		if (localSource == source)
+			return
+
+		localSource?.clean()
+
 		localSource = source
 
 		source.setPaginationLimit(paginationLimit)
+		cacheSource.setPaginationLimit(paginationLimit)
 
 		if (source.getSourceId() != remoteSource.getSourceId()) {
 			cacheSource.clear()
+			remoteSource.clean()
 			remoteSource = DummyMessageSource
 		}
 	}

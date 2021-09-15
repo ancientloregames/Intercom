@@ -9,11 +9,11 @@ object FirestoreDataSourceProvider
 
 	override fun getUserSource(userId: String) = FirestoreUserSource(userId)
 
-	override fun getChatSource(userId: String) = FirestoreChatSourceNoCF.getInstance(userId)
+	override fun getChatSource(userId: String) = FirestoreChatSourceNoCF(userId)
 
-	override fun getMessageSource(chatId: String) = FirestoreMessageNoCF(chatId)
+	override fun getMessageSource(chatId: String) = FirestoreMessageSourceNoCF(chatId)
 
-	override fun getContactSource(userId: String) = FirestoreContactSource.getInstance(userId)
+	override fun getContactSource(userId: String) = FirestoreContactSource(userId)
 
 	override fun getSignalKeychainSource(userId: String) = FirestoreSignalSource(userId)
 }

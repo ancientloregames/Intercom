@@ -16,7 +16,7 @@ import com.google.firebase.firestore.SetOptions
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.RemoteMessage
 
-class FirestoreMessageNoCF(chatId: String): FirestoreMessageSource(chatId) {
+class FirestoreMessageSourceNoCF(chatId: String): FirestoreMessageSource(chatId) {
 
 	override fun addItem(item: Message, callback: RequestCallback<String>) {
 

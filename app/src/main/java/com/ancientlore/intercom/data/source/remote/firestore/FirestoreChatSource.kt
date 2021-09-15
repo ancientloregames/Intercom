@@ -11,17 +11,22 @@ import com.ancientlore.intercom.data.source.remote.firestore.C.USERS
 import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_ICON_URL
 import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_LAST_MSG_TIME
 import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_NAME
-import com.ancientlore.intercom.utils.SingletonHolder
 import com.google.firebase.firestore.SetOptions
 import java.lang.RuntimeException
 
 open class FirestoreChatSource protected constructor(protected val userId: String)
 	: FirestoreSource<Chat>(), ChatSource {
 
-	internal companion object : SingletonHolder<FirestoreChatSource, String>(
-		{ userId -> FirestoreChatSource(userId) })
-
 	protected val userChats get() = db.collection(USERS).document(userId).collection(CHATS)
+
+	override fun equals(other: Any?): Boolean {
+		return other is FirestoreChatSource && other.userId == userId
+	}
+
+	override fun clean() {
+		cleanInternal()
+		super.clean()
+	}
 
 	override fun getObjectClass() = Chat::class.java
 

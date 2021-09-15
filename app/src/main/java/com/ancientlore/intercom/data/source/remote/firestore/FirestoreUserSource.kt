@@ -26,6 +26,15 @@ open class FirestoreUserSource(private val userId: String)
 
 	protected val users get() = db.collection(USERS)
 
+	override fun equals(other: Any?): Boolean {
+		return other is FirestoreUserSource && other.userId == userId
+	}
+
+	override fun clean() {
+		cleanInternal()
+		super.clean()
+	}
+
 	override fun getObjectClass() = User::class.java
 
 	override fun getWorkerThreadName() = "fsUserSource_thread"

@@ -8,6 +8,8 @@ import com.ancientlore.intercom.utils.Identifiable
 
 interface DataSource<I, T: Identifiable<I>> {
 
+	fun clean() {}
+
 	fun getSourceId(): String  // for sources consistency check mainly
 
 	fun getAll(callback: RequestCallback<List<T>>)

@@ -37,4 +37,11 @@ object CacheMessageSource : CacheSource<String, Message>() {
 		}
 		else Utils.logError("Pagination limit must be > 1")
 	}
+
+	override fun clean() {
+		paginationLimit = C.DEF_MSG_PAGINATION_LIMIT
+		currentPageOffset = 0
+		paginationCompleted = false
+		super.clean()
+	}
 }

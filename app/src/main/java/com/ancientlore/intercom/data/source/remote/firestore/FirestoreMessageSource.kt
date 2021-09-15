@@ -34,6 +34,16 @@ open class FirestoreMessageSource(protected val chatId: String)
 	@Volatile
 	private var paginationCompleted = false
 
+	override fun equals(other: Any?): Boolean {
+		return other is FirestoreMessageSource && other.chatId == chatId
+	}
+
+	override fun clean() {
+		cleanInternal()
+		lastDocument = null
+		super.clean()
+	}
+
 	override fun getObjectClass() = Message::class.java
 
 	override fun getWorkerThreadName() = "fsMessageSource_thread"

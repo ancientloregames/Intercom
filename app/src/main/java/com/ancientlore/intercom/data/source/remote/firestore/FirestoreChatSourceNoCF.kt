@@ -16,17 +16,13 @@ import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_PARTICIPANT
 import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_PIN
 import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_TYPE
 import com.ancientlore.intercom.data.source.remote.firestore.C.USERS
-import com.ancientlore.intercom.utils.SingletonHolder
 import com.ancientlore.intercom.utils.Utils
 import com.google.firebase.firestore.SetOptions
 import java.lang.RuntimeException
 import kotlin.collections.HashMap
 
-class FirestoreChatSourceNoCF private constructor(userId: String)
+class FirestoreChatSourceNoCF(userId: String)
 	: FirestoreChatSource(userId), ChatSource {
-
-	internal companion object : SingletonHolder<FirestoreChatSourceNoCF, String>(
-		{ userId -> FirestoreChatSourceNoCF(userId) })
 
 	override fun addItem(item: Chat, callback: RequestCallback<String>) {
 		db.collection(CHATS)

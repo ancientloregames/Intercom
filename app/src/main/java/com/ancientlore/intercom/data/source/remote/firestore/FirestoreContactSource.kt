@@ -13,20 +13,25 @@ import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_ICON_URL
 import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_NAME
 import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_PHONE
 import com.ancientlore.intercom.data.source.remote.firestore.C.USERS
-import com.ancientlore.intercom.utils.SingletonHolder
 import com.ancientlore.intercom.utils.Utils
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.SetOptions
 import java.lang.RuntimeException
 import kotlin.collections.HashMap
 
-class FirestoreContactSource private constructor(private val userId: String)
+class FirestoreContactSource(private val userId: String)
 : FirestoreSource<Contact>(), ContactSource {
 
-	internal companion object : SingletonHolder<FirestoreContactSource, String>(
-		{ userId -> FirestoreContactSource(userId) })
-
 	private val userContacts get() = db.collection(USERS).document(userId).collection(CONTACTS)
+
+	override fun equals(other: Any?): Boolean {
+		return other is FirestoreContactSource && other.userId == userId
+	}
+
+	override fun clean() {
+		cleanInternal()
+		super.clean()
+	}
 
 	override fun getObjectClass() = Contact::class.java
 

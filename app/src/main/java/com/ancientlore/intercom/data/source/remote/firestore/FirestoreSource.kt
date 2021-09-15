@@ -37,4 +37,9 @@ abstract class FirestoreSource<T> {
 	protected fun exec(command: Runnable) {
 		service.execute(command)
 	}
+
+	protected fun cleanInternal() {
+		service.shutdown()
+		db.terminate()
+	}
 }

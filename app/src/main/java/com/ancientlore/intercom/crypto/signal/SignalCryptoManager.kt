@@ -10,14 +10,12 @@ import com.ancientlore.intercom.data.model.Message
 import com.ancientlore.intercom.data.model.crypto.SignalPrivateKeys
 import com.ancientlore.intercom.data.model.crypto.SignalPublicKeys
 import com.ancientlore.intercom.utils.Logger
-import com.ancientlore.intercom.utils.SingletonHolder
 import com.ancientlore.intercom.utils.Utils
 import java.util.*
 
 class SignalCryptoManager(private val userId: String): CryptoManager {
 
-	internal companion object : SingletonHolder<SignalCryptoManager, String>(
-		{ userId -> SignalCryptoManager(userId) }) {
+	companion object {
 
 		private val logger: Logger = Logger("Signal")
 	}

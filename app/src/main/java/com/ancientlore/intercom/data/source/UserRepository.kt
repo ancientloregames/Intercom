@@ -178,20 +178,34 @@ object UserRepository : UserSource {
 	}
 
 	fun setRemoteSource(source: UserSource) {
+		if (remoteSource == source)
+			return
+
+		remoteSource.clean()
+		cacheSource.clear()
+
 		remoteSource = source
 
 		cacheSource.clear()
 		localSource?.let {
-			if (source.getSourceId() != it.getSourceId())
+			if (source.getSourceId() != it.getSourceId()) {
+				it.clean()
 				localSource = null
+			}
 		}
 	}
 
 	fun setLocalSource(source: UserSource) {
+		if (localSource == source)
+			return
+
+		localSource?.clean()
+
 		localSource = source
 
 		if (source.getSourceId() != remoteSource.getSourceId()) {
 			cacheSource.clear()
+			remoteSource.clean()
 			remoteSource = DummyUserSource
 		}
 	}
