@@ -12,6 +12,10 @@ abstract class AuthFragment<VM : BasicViewModel, B : ViewDataBinding> : BasicFra
 
 	protected val auth get() = App.backend.getAuthManager()
 
+	override fun onBackPressed(): Boolean {
+		return false
+	}
+
 	abstract fun getAlertMessage(alertCode: Int): String
 
 	protected fun onSuccessfulAuth(user: User) {

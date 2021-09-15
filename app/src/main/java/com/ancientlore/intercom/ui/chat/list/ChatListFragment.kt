@@ -19,6 +19,10 @@ class ChatListFragment : FilterableFragment<ChatListViewModel, ChatListUiBinding
 		fun newInstance() = ChatListFragment()
 	}
 
+	override fun onBackPressed(): Boolean {
+		return false
+	}
+
 	override fun getToolbar(): Toolbar = dataBinding.toolbar
 
 	override fun getToolbarMenuResId() = R.menu.chat_list_menu
