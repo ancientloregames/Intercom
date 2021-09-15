@@ -11,6 +11,8 @@ interface CallManager<T> {
 
 	data class AudioCallParams(val targetId: String)
 
+	fun dispose()
+
 	fun call(params: CallParams<T>)
 
 	fun call(params: AudioCallParams)

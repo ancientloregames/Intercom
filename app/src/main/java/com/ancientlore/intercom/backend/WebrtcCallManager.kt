@@ -101,6 +101,25 @@ abstract class WebrtcCallManager : CallManager<SurfaceViewRenderer> {
 
 	abstract fun sendCandidate(targetId: String, type: SessionDescription.Type, candidate: HashMap<*,*>)
 
+	override fun dispose() {
+
+		peerConnection = null
+		localVideoTrack = null
+		localAudioTrack = null
+		videoCapturer = null
+		connectionListener = null
+
+		offerListenerSub?.remove()
+		offerListenerSub = null
+		answerListenerSub?.remove()
+		answerListenerSub = null
+		candidateListenerSub?.remove()
+		candidateListenerSub = null
+
+		rootEglBase.release()
+		factory.dispose()
+	}
+
 	override fun setCallConnectionListener(listener: CallConnectionListener?) {
 		this.connectionListener = listener
 	}
@@ -120,10 +139,14 @@ abstract class WebrtcCallManager : CallManager<SurfaceViewRenderer> {
 		answerListenerSub?.remove()
 		candidateListenerSub?.remove()
 
+		localVideoTrack = null
+		localAudioTrack = null
+
 		videoCapturer?.apply {
 			stopCapture()
 			dispose()
 		}
+		videoCapturer = null
 
 		return peerConnection?.run {
 			Logging.d(TAG, "hungup: dispose peerConnection")

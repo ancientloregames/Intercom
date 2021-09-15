@@ -135,6 +135,14 @@ class MainActivity : AppCompatActivity(),
 		super.onStop()
 	}
 
+	override fun onDestroy() {
+		App.backend.getCallManager().dispose()
+		DeviceContactsManager.unregisterUpdateListener(this)
+		DeviceContactsManager.disableObserver(applicationContext)
+		DeviceContactsManager.clean()
+		super.onDestroy()
+	}
+
 	private fun onFirstStart() {
 		user.takeIf { it.dummy.not() }
 			?.let { onSuccessfullAuth(it) }
@@ -611,7 +619,7 @@ class MainActivity : AppCompatActivity(),
 	private fun observeDeviceContacts() {
 
 		DeviceContactsManager.registerUpdateListener(this) //TODO unregister on logout (multiaccount mode)
-		DeviceContactsManager.enableObserver(this)
+		DeviceContactsManager.enableObserver(applicationContext)
 
 		onContactListUpdate(DeviceContactsManager.getContacts(this))
 	}

@@ -64,6 +64,12 @@ object DeviceContactsManager {
 		ContactsContract.Contacts.HAS_PHONE_NUMBER
 	)
 
+	fun clean() {
+		listeners.clear()
+		refreshHandler.removeCallbacksAndMessages(null)
+		refreshRunnable = null
+	}
+
 	fun enableObserver(context: Context) {
 		if (contactObserver == null) {
 			contactObserver = PhoneContactsObserver(context)
