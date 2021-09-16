@@ -70,11 +70,14 @@ data class Message(@field:ColumnInfo @DocumentId var id: String = "",
 
 		other as Message
 
-		return timestamp == other.timestamp
+		return id == other.id
+				&& timestamp == other.timestamp
 				&& status == other.status
 				&& senderId == other.senderId
 				&& attachUrl == other.attachUrl
 				&& progress == other.progress
+				&& text == other.text
+				&& info == other.info
 	}
 
 	override fun hashCode(): Int {
