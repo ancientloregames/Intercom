@@ -128,7 +128,8 @@
 					android:layout_alignParentEnd="true"
 					android:visibility="@{ui.showScrollToBottom}"
 					android:onClick="@{() -> ui.onSrollToBottomClicked()}"
-					app:srcCompat="@drawable/ic_chevron2_down_18dp"
+					app:srcCompat="@drawable/ic_chevron2_down_24dp"
+					android:tint="@color/defaultGreyColor"
 					app:backgroundTint="@android:color/white"
 					app:fabSize="mini"
 				/>
