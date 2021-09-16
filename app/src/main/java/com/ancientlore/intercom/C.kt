@@ -15,5 +15,5 @@ object C {
 
 	const val CALLS_LOG_TAG = "Calls"
 
-	const val DEF_MSG_PAGINATION_LIMIT = 7L // Approx. two full screens of oneliners
+	const val DEF_MSG_PAGINATION_LIMIT = 20L // Approx. two full screens of oneliners
 }
