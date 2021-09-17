@@ -82,8 +82,13 @@ class ChatListFragment : FilterableFragment<ChatListViewModel, ChatListUiBinding
 	private fun openChatMenu(chat: Chat) {
 		activity?.run {
 
+			val userId = App.backend.getAuthManager().getCurrentUserId()
+
 			val dialog = ChatOptionMenuDialog
-				.newInstance(ChatOptionMenuParams(pin = chat.pin == true, mute = chat.mute == true))
+				.newInstance(ChatOptionMenuParams( // TODO all params must be prepared and given by the viewModel
+					pin = chat.pin == true,
+					mute = chat.mute == true,
+					allowDelete = !chat.undeletable && chat.initiatorId == userId))
 
 			dialog.listener = object : ChatOptionMenuDialog.Listener {
 				override fun onPinClicked(pin: Boolean) {

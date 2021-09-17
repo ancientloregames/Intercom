@@ -21,15 +21,15 @@
 		<FrameLayout
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:paddingTop="20dp"
-				android:paddingBottom="20dp"
 				android:background="?android:attr/selectableItemBackground"
 				android:onClick="@{() -> ui.onPinClick()}">
 			<TextView
 					android:id="@+id/pinView"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:layout_gravity="center"
+					android:layout_gravity="center_horizontal"
+					android:paddingTop="20dp"
+					android:paddingBottom="20dp"
 					android:text="@{ui.params.pin ? @string/unpin : @string/pin}"
 					android:textColor="@color/defaultTextColor"
 					android:textSize="20sp"
@@ -42,23 +42,25 @@
 					style="@style/onelineTextField" />
 		</FrameLayout>
 
-		<View
-				android:layout_width="match_parent"
-				android:layout_height="0.5dp"
-				android:background="@color/defaultListItemDividerColor"
-				/>
-
 		<FrameLayout
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:paddingTop="20dp"
-				android:paddingBottom="20dp"
 				android:background="?android:attr/selectableItemBackground"
-				android:onClick="@{() -> ui.onMuteClick()}">
+				android:onClick="@{() -> ui.onMuteClick()}"
+				>
+
+			<View
+					android:layout_width="match_parent"
+					android:layout_height="0.5dp"
+					android:background="@color/defaultListItemDividerColor"
+					/>
+
 			<TextView
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:layout_gravity="center"
+					android:layout_gravity="center_horizontal"
+					android:paddingTop="20dp"
+					android:paddingBottom="20dp"
 					android:text="@{ui.params.mute ? @string/unmute : @string/mute}"
 					android:textColor="@color/defaultTextColor"
 					android:textSize="20sp"
@@ -72,23 +74,27 @@
 					/>
 		</FrameLayout>
 
-		<View
-				android:layout_width="match_parent"
-				android:layout_height="0.5dp"
-				android:background="@color/defaultListItemDividerColor"
-				/>
-
 		<FrameLayout
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:paddingTop="20dp"
-				android:paddingBottom="20dp"
 				android:background="?android:attr/selectableItemBackground"
-				android:onClick="@{() -> ui.onDeleteClick()}">
+				android:onClick="@{() -> ui.onDeleteClick()}"
+				android:visibility="@{ui.showDelete}"
+				>
+
+			<View
+					android:layout_width="match_parent"
+					android:layout_height="0.5dp"
+					android:layout_gravity="top"
+					android:background="@color/defaultListItemDividerColor"
+					/>
+
 			<TextView
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:layout_gravity="center"
+					android:layout_gravity="center_horizontal"
+					android:paddingTop="20dp"
+					android:paddingBottom="20dp"
 					android:text="@string/delete"
 					android:textColor="@color/deleteRedColor"
 					android:textSize="20sp"

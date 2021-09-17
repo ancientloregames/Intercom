@@ -9,6 +9,7 @@ import android.view.View
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.ancientlore.intercom.App
 import com.ancientlore.intercom.C
 import com.ancientlore.intercom.C.ICON_DIR_PATH
 import com.ancientlore.intercom.R
@@ -240,15 +241,19 @@ class ChatFlowFragment : FilterableFragment<ChatFlowViewModel, ChatFlowUiBinding
 	private fun openMessageMenu(message: Message) {
 		activity?.run {
 
-			val dialog = MessageOptionMenuDialog.newInstance()
+			val userId = App.backend.getAuthManager().getCurrentUserId()
+			//TODO temporary check. Change to ChatListFragment-like when more options will be added
+			if (message.undeletable.not() && message.senderId == userId) {
+				val dialog = MessageOptionMenuDialog.newInstance()
 
-			dialog.listener = object : MessageOptionMenuDialog.Listener {
-				override fun onDeleteClicked() {
-					viewModel.onDeleteMessageClick(message)
+				dialog.listener = object : MessageOptionMenuDialog.Listener {
+					override fun onDeleteClicked() {
+						viewModel.onMessageMenuOptionSelected(message, ChatFlowViewModel.ITEM_OPTION_DELETE)
+					}
 				}
-			}
 
-			dialog.show(supportFragmentManager)
+				dialog.show(supportFragmentManager)
+			}
 		}
 	}
 

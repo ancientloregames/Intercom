@@ -163,9 +163,7 @@ class ChatListViewModel(context: Context)
 
 	private fun tryDeleteChat(chat: Chat) {
 
-		val userId = App.backend.getAuthManager().getCurrentUser().id
-
-		if (chat.undeletable.not() && chat.initiatorId == userId) {
+		if (chat.undeletable.not()) {
 			ChatRepository.deleteItem(chat.id, object : CrashlyticsRequestCallback<Any>() {
 				override fun onSuccess(result: Any) {
 					toastRequest.onNext(TOAST_CHAT_DELETED)

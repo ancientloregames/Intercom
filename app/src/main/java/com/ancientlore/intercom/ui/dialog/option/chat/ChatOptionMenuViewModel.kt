@@ -1,11 +1,14 @@
 package com.ancientlore.intercom.ui.dialog.option.chat
 
+import androidx.databinding.ObservableBoolean
 import com.ancientlore.intercom.ui.BasicViewModel
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 
 class ChatOptionMenuViewModel(val params: ChatOptionMenuParams)
 	: BasicViewModel() {
+
+	val showDelete = ObservableBoolean(params.allowDelete)
 
 	private val onPinSubj = PublishSubject.create<Boolean>()
 	private val onMuteSubj = PublishSubject.create<Boolean>()

@@ -4,15 +4,18 @@ import android.os.Parcel
 import android.os.Parcelable
 
 data class ChatOptionMenuParams(val pin: Boolean,
-                                val mute: Boolean) : Parcelable {
+                                val mute: Boolean,
+                                val allowDelete: Boolean = false) : Parcelable {
 
 	constructor(parcel: Parcel) : this(
+		parcel.readByte() != 0.toByte(),
 		parcel.readByte() != 0.toByte(),
 		parcel.readByte() != 0.toByte()
 	)
 
 	override fun writeToParcel(parcel: Parcel, flags: Int) {
 		parcel.writeByte(if (pin) 1 else 0)
+		parcel.writeByte(if (mute) 1 else 0)
 		parcel.writeByte(if (mute) 1 else 0)
 	}
 

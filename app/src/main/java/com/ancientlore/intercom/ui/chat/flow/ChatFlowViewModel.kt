@@ -35,6 +35,8 @@ class ChatFlowViewModel(context: Context,
 		const val OPTION_AUDIO_CALL = 0
 		const val OPTION_VIDEO_CALL = 1
 
+		const val ITEM_OPTION_DELETE = 0
+
 		const val TOAST_CHAT_CREATION_ERR = 0
 		const val TOAST_MSG_SEND_ERR = 1
 		const val TOAST_MSG_DELETED = 2
@@ -45,6 +47,10 @@ class ChatFlowViewModel(context: Context,
 	@IntDef(OPTION_AUDIO_CALL, OPTION_VIDEO_CALL)
 	@Retention(AnnotationRetention.SOURCE)
 	annotation class Option
+
+	@IntDef(ITEM_OPTION_DELETE)
+	@Retention(AnnotationRetention.SOURCE)
+	annotation class ItemOption
 
 	val textField = ObservableField("")
 
@@ -374,11 +380,9 @@ class ChatFlowViewModel(context: Context,
 		}
 	}
 
-	fun onDeleteMessageClick(message: Message) {
+	private fun deleteMessage(message: Message) {
 
-		val userId = App.backend.getAuthManager().getCurrentUser().id
-
-		if (message.undeletable.not() && message.senderId == userId) {
+		if (message.undeletable.not()) {
 			repository.deleteItem(message.id, object : CrashlyticsRequestCallback<Any>() {
 				override fun onSuccess(result: Any) {
 					toastRequest.onNext(TOAST_MSG_DELETED)
@@ -428,6 +432,12 @@ class ChatFlowViewModel(context: Context,
 	fun onContactStatusChanged(status: String) {
 		runOnUiThread {
 			actionBarSubtitleField.set(status)
+		}
+	}
+
+	fun onMessageMenuOptionSelected(message: Message, @ItemOption id: Int) {
+		when (id) {
+			ITEM_OPTION_DELETE -> deleteMessage(message)
 		}
 	}
 
