@@ -38,6 +38,8 @@ class ChatFlowViewModel(context: Context,
 		const val TOAST_CHAT_CREATION_ERR = 0
 		const val TOAST_MSG_SEND_ERR = 1
 		const val TOAST_MSG_DELETED = 2
+		const val TOAST_MSG_DELETED_NOT = 3
+		const val TOAST_MSG_UNDELETABLE = 4
 	}
 
 	@IntDef(OPTION_AUDIO_CALL, OPTION_VIDEO_CALL)
@@ -372,12 +374,24 @@ class ChatFlowViewModel(context: Context,
 		}
 	}
 
-	fun handleDelete(message: Message) {
-		repository.deleteItem(message.id, object : CrashlyticsRequestCallback<Any>() {
-			override fun onSuccess(result: Any) {
-				toastRequest.onNext(TOAST_MSG_DELETED)
-			}
-		})
+	fun onDeleteMessageClick(message: Message) {
+
+		val userId = App.backend.getAuthManager().getCurrentUser().id
+
+		if (message.undeletable.not() && message.senderId == userId) {
+			repository.deleteItem(message.id, object : CrashlyticsRequestCallback<Any>() {
+				override fun onSuccess(result: Any) {
+					toastRequest.onNext(TOAST_MSG_DELETED)
+				}
+				override fun onFailure(error: Throwable) {
+					super.onFailure(error)
+					toastRequest.onNext(TOAST_MSG_DELETED_NOT)
+				}
+			})
+		}
+		else {
+			toastRequest.onNext(TOAST_MSG_UNDELETABLE)
+		}
 	}
 
 	// ----------- Ui events handling -----------

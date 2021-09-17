@@ -187,8 +187,10 @@ class ChatFlowFragment : FilterableFragment<ChatFlowViewModel, ChatFlowUiBinding
 	override fun getToastStringRes(toastId: Int): Int {
 		return when (toastId) {
 			ChatFlowViewModel.TOAST_CHAT_CREATION_ERR -> R.string.alert_error_creating_chat
-			ChatFlowViewModel.TOAST_MSG_SEND_ERR -> R.string.message_deleted
-			ChatFlowViewModel.TOAST_MSG_DELETED -> R.string.alert_error_send_message
+			ChatFlowViewModel.TOAST_MSG_SEND_ERR -> R.string.alert_error_send_message
+			ChatFlowViewModel.TOAST_MSG_DELETED -> R.string.message_deleted
+			ChatFlowViewModel.TOAST_MSG_DELETED_NOT -> R.string.message_deleted_not
+			ChatFlowViewModel.TOAST_MSG_UNDELETABLE -> R.string.alert_message_undeletable
 			else -> super.getToastStringRes(toastId)
 		}
 	}
@@ -242,7 +244,7 @@ class ChatFlowFragment : FilterableFragment<ChatFlowViewModel, ChatFlowUiBinding
 
 			dialog.listener = object : MessageOptionMenuDialog.Listener {
 				override fun onDeleteClicked() {
-					viewModel.handleDelete(message)
+					viewModel.onDeleteMessageClick(message)
 				}
 			}
 
@@ -251,13 +253,16 @@ class ChatFlowFragment : FilterableFragment<ChatFlowViewModel, ChatFlowUiBinding
 	}
 
 	private fun openAttachMenu() {
-		AttachBottomSheetDialog.newInstance().apply {
-			setListener(object : ListBottomSheetDialog.Listener {
-				override fun onItemSelected(item: SimpleListItem) {
-					onAttachMenuItemSelected(item.id)
-				}
-			})
-		}.show(fragmentManager!!)
+
+		activity?.run {
+			AttachBottomSheetDialog.newInstance().apply {
+				setListener(object : ListBottomSheetDialog.Listener {
+					override fun onItemSelected(item: SimpleListItem) {
+						onAttachMenuItemSelected(item.id)
+					}
+				})
+			}.show(supportFragmentManager)
+		}
 	}
 
 	private fun onAttachMenuItemSelected(id: Int) {

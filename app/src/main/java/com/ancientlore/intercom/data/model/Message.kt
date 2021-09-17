@@ -27,8 +27,8 @@ data class Message(@field:ColumnInfo @DocumentId var id: String = "",
                    @field:Ignore @get:Exclude var progress: Int = -1,
                    @field:ColumnInfo @get:Exclude var chatId: String = "",
                    @field:PrimaryKey(autoGenerate = true) @get:Exclude var localId: Long = 0,// field "id" is unique only per chat
-                   @field:Ignore @get:Exclude var receivers: List<String> = emptyList()
-)
+                   @field:Ignore @get:Exclude var receivers: List<String> = emptyList(),
+                   @field:ColumnInfo var undeletable: Boolean = false)
 	: Comparable<Message>, Identifiable<String> {
 
 	companion object {
@@ -78,6 +78,7 @@ data class Message(@field:ColumnInfo @DocumentId var id: String = "",
 				&& progress == other.progress
 				&& text == other.text
 				&& info == other.info
+				&& undeletable == other.undeletable
 	}
 
 	override fun hashCode(): Int {
@@ -87,7 +88,8 @@ data class Message(@field:ColumnInfo @DocumentId var id: String = "",
 		result = 31 * result + info.hashCode()
 		result = 31 * result + attachUrl.hashCode()
 		result = 31 * result + type.hashCode()
-		result = 31 * result + status
+		result = 31 * result + status.hashCode()
+		result = 31 * result + undeletable.hashCode()
 		return result
 	}
 
