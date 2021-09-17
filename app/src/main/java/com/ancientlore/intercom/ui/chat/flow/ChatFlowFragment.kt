@@ -64,9 +64,7 @@ class ChatFlowFragment : FilterableFragment<ChatFlowViewModel, ChatFlowUiBinding
 
 	override fun createDataBinding(view: View) = ChatFlowUiBinding.bind(view)
 
-	override fun createViewModel() = ChatFlowViewModel(
-		ChatFlowAdapter(params.userId, requireContext()),
-		params)
+	override fun createViewModel() = ChatFlowViewModel(requireContext(), params)
 
 	override fun init(viewModel: ChatFlowViewModel, savedState: Bundle?) {
 		super.init(viewModel, savedState)

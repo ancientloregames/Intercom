@@ -22,9 +22,7 @@ class ChatCreationGroupFragment : FilterableFragment<ChatCreationGroupViewModel,
 
 	override fun createDataBinding(view: View) = ChatCreationGroupUiBinding.bind(view)
 
-	override fun createViewModel() = ChatCreationGroupViewModel(
-		ChatCreationGroupAdapter(requireContext()),
-		ChatCreationSelectedAdapter(requireContext()))
+	override fun createViewModel() = ChatCreationGroupViewModel(requireContext())
 
 	override fun init(viewModel: ChatCreationGroupViewModel, savedState: Bundle?) {
 		super.init(viewModel, savedState)

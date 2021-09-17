@@ -1,5 +1,6 @@
 package com.ancientlore.intercom.ui.chat.creation.group
 
+import android.content.Context
 import androidx.databinding.ObservableBoolean
 import com.ancientlore.intercom.backend.RepositorySubscription
 import com.ancientlore.intercom.backend.RequestCallback
@@ -11,9 +12,10 @@ import com.ancientlore.intercom.utils.extensions.runOnUiThread
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 
-class ChatCreationGroupViewModel(listAdapter: ChatCreationGroupAdapter,
-                                 val selectedListAdapter: ChatCreationSelectedAdapter)
-	: FilterableViewModel<ChatCreationGroupAdapter>(listAdapter) {
+class ChatCreationGroupViewModel(context: Context)
+	: FilterableViewModel<ChatCreationGroupAdapter>(ChatCreationGroupAdapter(context)) {
+
+	val selectedListAdapter: ChatCreationSelectedAdapter = ChatCreationSelectedAdapter(context)
 
 	val hasSelection = ObservableBoolean(false)
 

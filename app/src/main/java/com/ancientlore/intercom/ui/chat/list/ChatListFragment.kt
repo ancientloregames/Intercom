@@ -31,8 +31,7 @@ class ChatListFragment : FilterableFragment<ChatListViewModel, ChatListUiBinding
 
 	override fun createDataBinding(view: View) = ChatListUiBinding.bind(view)
 
-	override fun createViewModel() = ChatListViewModel(
-		ChatListAdapter(requireContext()))
+	override fun createViewModel() = ChatListViewModel(requireContext())
 
 	override fun init(viewModel: ChatListViewModel, savedState: Bundle?) {
 		super.init(viewModel, savedState)

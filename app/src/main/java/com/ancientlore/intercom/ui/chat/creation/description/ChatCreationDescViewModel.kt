@@ -1,5 +1,6 @@
 package com.ancientlore.intercom.ui.chat.creation.description
 
+import android.content.Context
 import android.net.Uri
 import androidx.databinding.ObservableField
 import com.ancientlore.intercom.App
@@ -11,8 +12,8 @@ import com.ancientlore.intercom.ui.chat.flow.ChatFlowParams
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 
-class ChatCreationDescViewModel(listAdapter: ChatCreationDescAdapter)
-	: FilterableViewModel<ChatCreationDescAdapter>(listAdapter) {
+class ChatCreationDescViewModel(context: Context)
+	: FilterableViewModel<ChatCreationDescAdapter>(ChatCreationDescAdapter(context)) {
 
 	companion object {
 		const val TOAST_REQUIRED_NAME_ERR = 0

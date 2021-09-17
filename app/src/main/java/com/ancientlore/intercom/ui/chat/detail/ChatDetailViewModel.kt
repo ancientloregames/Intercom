@@ -1,5 +1,6 @@
 package com.ancientlore.intercom.ui.chat.detail
 
+import android.content.Context
 import android.net.Uri
 import androidx.databinding.Observable
 import androidx.databinding.ObservableBoolean
@@ -17,9 +18,9 @@ import com.ancientlore.intercom.ui.chat.flow.ChatFlowParams
 import com.ancientlore.intercom.utils.extensions.runOnUiThread
 import io.reactivex.subjects.PublishSubject
 
-class ChatDetailViewModel(listAdapter: ChatCreationDescAdapter,
+class ChatDetailViewModel(context: Context,
                           private val params: ChatFlowParams)
-	: FilterableViewModel<ChatCreationDescAdapter>(listAdapter) {
+	: FilterableViewModel<ChatCreationDescAdapter>(ChatCreationDescAdapter(context)) {
 
 	companion object {
 		const val TOAST_SET_PHOTO_ERR = 0

@@ -24,9 +24,7 @@ class ChatCreationFragment : FilterableFragment<ChatCreationViewModel, ChatCreat
 
 	override fun createDataBinding(view: View) = ChatCreationUiBinding.bind(view)
 
-	override fun createViewModel() =
-		ChatCreationViewModel(
-			ChatCreationAdapter(requireContext()))
+	override fun createViewModel() = ChatCreationViewModel(requireContext())
 
 	override fun init(viewModel: ChatCreationViewModel, savedState: Bundle?) {
 		super.init(viewModel, savedState)

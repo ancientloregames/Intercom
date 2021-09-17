@@ -1,5 +1,6 @@
 package com.ancientlore.intercom.ui.contact.list
 
+import android.content.Context
 import androidx.databinding.ObservableBoolean
 import com.ancientlore.intercom.backend.RepositorySubscription
 import com.ancientlore.intercom.backend.RequestCallback
@@ -12,8 +13,8 @@ import com.ancientlore.intercom.utils.extensions.runOnUiThread
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 
-class ContactListViewModel(listAdapter: ContactListAdapter)
-	: FilterableViewModel<ContactListAdapter>(listAdapter) {
+class ContactListViewModel(context: Context)
+	: FilterableViewModel<ContactListAdapter>(ContactListAdapter(context)) {
 
 	val contactListIsEmpty = ObservableBoolean(false)
 

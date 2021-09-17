@@ -1,5 +1,6 @@
 package com.ancientlore.intercom.ui.chat.creation
 
+import android.content.Context
 import androidx.databinding.ObservableBoolean
 import com.ancientlore.intercom.App
 import com.ancientlore.intercom.EmptyObject
@@ -15,8 +16,8 @@ import com.ancientlore.intercom.utils.extensions.runOnUiThread
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 
-class ChatCreationViewModel(listAdapter: ChatCreationAdapter)
-	: FilterableViewModel<ChatCreationAdapter>(listAdapter) {
+class ChatCreationViewModel(context: Context)
+	: FilterableViewModel<ChatCreationAdapter>(ChatCreationAdapter(context)) {
 
 	val contactListIsEmpty = ObservableBoolean(false)
 

@@ -9,7 +9,6 @@ import androidx.appcompat.widget.Toolbar
 import com.ancientlore.intercom.R
 import com.ancientlore.intercom.databinding.ChatDetailUiBinding
 import com.ancientlore.intercom.ui.FilterableFragment
-import com.ancientlore.intercom.ui.chat.creation.description.ChatCreationDescAdapter
 import com.ancientlore.intercom.ui.chat.creation.description.ChatCreationDescFragment
 import com.ancientlore.intercom.ui.chat.flow.ChatFlowParams
 import com.ancientlore.intercom.utils.ToolbarManager
@@ -43,7 +42,7 @@ class ChatDetailFragment : FilterableFragment<ChatDetailViewModel, ChatDetailUiB
 	override fun createDataBinding(view: View) = ChatDetailUiBinding.bind(view)
 
 	override fun createViewModel() = ChatDetailViewModel(
-		ChatCreationDescAdapter(requireContext()),
+		requireContext(),
 		params)
 
 	override fun init(viewModel: ChatDetailViewModel, savedState: Bundle?) {

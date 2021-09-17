@@ -26,8 +26,7 @@ class ContactListFragment : FilterableFragment<ContactListViewModel, ContactList
 
 	override fun createDataBinding(view: View) = ContactListUiBinding.bind(view)
 
-	override fun createViewModel() = ContactListViewModel(
-		ContactListAdapter(requireContext()))
+	override fun createViewModel() = ContactListViewModel(requireContext())
 
 	override fun init(viewModel: ContactListViewModel, savedState: Bundle?) {
 		super.init(viewModel, savedState)

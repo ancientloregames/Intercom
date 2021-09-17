@@ -1,5 +1,6 @@
 package com.ancientlore.intercom.ui.chat.flow
 
+import android.content.Context
 import android.media.MediaRecorder
 import android.net.Uri
 import android.util.Log
@@ -26,9 +27,9 @@ import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import java.io.File
 
-class ChatFlowViewModel(listAdapter: ChatFlowAdapter,
+class ChatFlowViewModel(context: Context,
                         private val params: ChatFlowParams)
-	: FilterableViewModel<ChatFlowAdapter>(listAdapter) {
+	: FilterableViewModel<ChatFlowAdapter>(ChatFlowAdapter(params.userId, context)) {
 
 	companion object {
 		const val OPTION_AUDIO_CALL = 0

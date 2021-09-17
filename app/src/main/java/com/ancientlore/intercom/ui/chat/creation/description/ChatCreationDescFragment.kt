@@ -43,9 +43,7 @@ class ChatCreationDescFragment : FilterableFragment<ChatCreationDescViewModel, C
 
 	override fun createDataBinding(view: View) = ChatCreationDescUiBinding.bind(view)
 
-	override fun createViewModel() =
-		ChatCreationDescViewModel(
-			ChatCreationDescAdapter(requireContext()))
+	override fun createViewModel() = ChatCreationDescViewModel(requireContext())
 
 	override fun init(viewModel: ChatCreationDescViewModel, savedState: Bundle?) {
 		super.init(viewModel, savedState)
