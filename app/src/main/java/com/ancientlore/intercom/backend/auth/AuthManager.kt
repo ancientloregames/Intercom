@@ -16,6 +16,7 @@ interface AuthManager {
 
 	fun logout()
 
+	fun getCurrentUserId() : String
 	fun getCurrentUser() : User
 	fun updateUserIconUri(uri: Uri, callback: RequestCallback<Any>? = null)
 	fun updateUserName(name: String, callback: RequestCallback<Any>? = null)

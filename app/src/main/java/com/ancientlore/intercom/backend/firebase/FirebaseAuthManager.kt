@@ -24,6 +24,10 @@ object FirebaseAuthManager : AuthManager {
 
 	override fun logout() = auth.signOut()
 
+	override fun getCurrentUserId(): String {
+		return auth.currentUser?.phoneNumber ?: ""
+	}
+
 	override fun isNeedPhoneCheck() = false
 
 	override fun getCurrentUser() : User {
