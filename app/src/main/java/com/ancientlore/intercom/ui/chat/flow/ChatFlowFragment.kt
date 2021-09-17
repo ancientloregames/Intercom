@@ -162,8 +162,6 @@ class ChatFlowFragment : FilterableFragment<ChatFlowViewModel, ChatFlowUiBinding
 
 		if (permissionManager!!.allowedAudioMessage())
 			viewModel.attachInputPanelManager(MessageInputManager(view!!))
-
-		Utils.runOnUiThread({ dataBinding.textInput.showKeyboard() }, 200)
 	}
 
 	override fun onDestroyView() {
