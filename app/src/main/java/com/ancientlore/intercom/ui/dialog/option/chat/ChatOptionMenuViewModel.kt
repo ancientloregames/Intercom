@@ -9,10 +9,12 @@ class ChatOptionMenuViewModel(val params: ChatOptionMenuParams)
 
 	private val onPinSubj = PublishSubject.create<Boolean>()
 	private val onMuteSubj = PublishSubject.create<Boolean>()
+	private val onDeleteSubj = PublishSubject.create<Boolean>()
 
 	override fun clean() {
 		onPinSubj.onComplete()
 		onMuteSubj.onComplete()
+		onDeleteSubj.onComplete()
 
 		super.clean()
 	}
@@ -21,7 +23,11 @@ class ChatOptionMenuViewModel(val params: ChatOptionMenuParams)
 
 	fun onMuteClick() = onMuteSubj.onNext(params.mute.not())
 
+	fun onDeleteClick() = onDeleteSubj.onNext(params.mute.not())
+
 	fun observePinClicked() = onPinSubj as Observable<Boolean>
 
 	fun observeMuteClicked() = onMuteSubj as Observable<Boolean>
+
+	fun deleteRequest() = onDeleteSubj as Observable<Boolean>
 }

@@ -152,4 +152,21 @@ class FirestoreChatSourceNoCF(userId: String)
 		}
 		else exec { callback.onFailure(RuntimeException("Chat id shouldn't be empty")) }
 	}
+
+	override fun deleteItem(id: String, callback: RequestCallback<Any>) {
+		db.collection(CHATS)
+			.document(id)
+			.delete()
+			.addOnSuccessListener {
+				exec {
+					db.collection(USERS)
+						.document(userId)
+						.collection(CHATS)
+						.document(id)
+						.delete()
+						.addOnSuccessListener { exec { callback.onSuccess(EmptyObject) } }
+				}
+			}
+			.addOnFailureListener { exec { callback.onFailure(it) } }
+	}
 }

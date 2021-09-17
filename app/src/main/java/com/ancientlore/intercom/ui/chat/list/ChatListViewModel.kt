@@ -1,6 +1,7 @@
 package com.ancientlore.intercom.ui.chat.list
 
 import android.content.Context
+import androidx.annotation.IntDef
 import androidx.databinding.ObservableBoolean
 import com.ancientlore.intercom.App
 import com.ancientlore.intercom.EmptyObject
@@ -20,6 +21,20 @@ import java.util.*
 
 class ChatListViewModel(context: Context)
 	: FilterableViewModel<ChatListAdapter>(ChatListAdapter(context)) {
+
+	companion object {
+		const val ITEM_OPTION_PIN = 0
+		const val ITEM_OPTION_MUTE = 1
+		const val ITEM_OPTION_DELETE = 2
+
+		const val TOAST_CHAT_DELETED = 0
+		const val TOAST_CHAT_DELETED_NOT = 1
+		const val TOAST_CHAT_UNDELETABLE = 2
+	}
+
+	@IntDef(ITEM_OPTION_PIN, ITEM_OPTION_MUTE, ITEM_OPTION_DELETE)
+	@Retention(AnnotationRetention.SOURCE)
+	annotation class ItemOption
 
 	val chatListIsEmpty = ObservableBoolean(false)
 
@@ -118,7 +133,15 @@ class ChatListViewModel(context: Context)
 		}
 	}
 
-	fun switchChatPin(chat: Chat) {
+	fun onChatMenuOptionSelected(chat: Chat, @ItemOption id: Int) {
+		when (id) {
+			ITEM_OPTION_PIN -> switchChatPin(chat)
+			ITEM_OPTION_MUTE -> switchChatMute(chat)
+			ITEM_OPTION_DELETE -> tryDeleteChat(chat)
+		}
+	}
+
+	private fun switchChatPin(chat: Chat) {
 		ChatRepository.updateItem(Chat(
 			id = chat.id,
 			name = chat.name,
@@ -128,7 +151,7 @@ class ChatListViewModel(context: Context)
 		))
 	}
 
-	fun switchChatMute(chat: Chat) {
+	private fun switchChatMute(chat: Chat) {
 		ChatRepository.updateItem(Chat(
 			id = chat.id,
 			name = chat.name,
@@ -136,5 +159,25 @@ class ChatListViewModel(context: Context)
 			mute = chat.mute?.not() ?: false,
 			participants = chat.participants
 		))
+	}
+
+	private fun tryDeleteChat(chat: Chat) {
+
+		val userId = App.backend.getAuthManager().getCurrentUser().id
+
+		if (chat.undeletable.not() && chat.initiatorId == userId) {
+			ChatRepository.deleteItem(chat.id, object : CrashlyticsRequestCallback<Any>() {
+				override fun onSuccess(result: Any) {
+					toastRequest.onNext(TOAST_CHAT_DELETED)
+				}
+				override fun onFailure(error: Throwable) {
+					super.onFailure(error)
+					toastRequest.onNext(TOAST_CHAT_DELETED_NOT)
+				}
+			})
+		}
+		else {
+			toastRequest.onNext(TOAST_CHAT_UNDELETABLE)
+		}
 	}
 }

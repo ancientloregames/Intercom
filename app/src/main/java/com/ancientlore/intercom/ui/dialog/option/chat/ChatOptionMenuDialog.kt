@@ -27,6 +27,7 @@ class ChatOptionMenuDialog: BasicOptionMenuDialog<ChatOptionMenuViewModel>() {
 	interface Listener {
 		fun onPinClicked(pin: Boolean)
 		fun onMuteClicked(pin: Boolean)
+		fun onDeleteClicked()
 	}
 	var listener: Listener? = null
 
@@ -54,6 +55,12 @@ class ChatOptionMenuDialog: BasicOptionMenuDialog<ChatOptionMenuViewModel>() {
 		subscriptions.add(viewModel.observeMuteClicked()
 			.subscribe {
 				listener?.onMuteClicked(it)
+				dismiss()
+			})
+
+		subscriptions.add(viewModel.deleteRequest()
+			.subscribe {
+				listener?.onDeleteClicked()
 				dismiss()
 			})
 	}

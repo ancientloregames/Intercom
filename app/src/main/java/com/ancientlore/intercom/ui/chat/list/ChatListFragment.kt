@@ -87,14 +87,26 @@ class ChatListFragment : FilterableFragment<ChatListViewModel, ChatListUiBinding
 
 			dialog.listener = object : ChatOptionMenuDialog.Listener {
 				override fun onPinClicked(pin: Boolean) {
-					viewModel.switchChatPin(chat)
+					viewModel.onChatMenuOptionSelected(chat, ChatListViewModel.ITEM_OPTION_PIN)
 				}
 				override fun onMuteClicked(pin: Boolean) {
-					viewModel.switchChatMute(chat)
+					viewModel.onChatMenuOptionSelected(chat, ChatListViewModel.ITEM_OPTION_MUTE)
+				}
+				override fun onDeleteClicked() {
+					viewModel.onChatMenuOptionSelected(chat, ChatListViewModel.ITEM_OPTION_DELETE)
 				}
 			}
 
 			dialog.show(supportFragmentManager, "ChatOptionMenuDialog")
+		}
+	}
+
+	override fun getToastStringRes(toastId: Int): Int {
+		return when (toastId) {
+			ChatListViewModel.TOAST_CHAT_DELETED -> R.string.chat_deleted
+			ChatListViewModel.TOAST_CHAT_DELETED_NOT -> R.string.chat_deleted_not
+			ChatListViewModel.TOAST_CHAT_UNDELETABLE -> R.string.alert_chat_undeletable
+			else -> return super.getToastStringRes(toastId)
 		}
 	}
 }

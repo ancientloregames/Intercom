@@ -63,6 +63,8 @@
 	<string name="alert_error_invalid_user_status">Inavalid status</string>
 	<string name="alert_error_send_message">Failed to send message</string>
 	<string name="alert_error_name_required">The name is required</string>
+	<string name="alert_chat_undeletable">This chat is marked as undeletable</string>
+	<string name="alert_message_undeletable">This message is marked as undeletable</string>
 
 	<string name="record">Record</string>
 	<string name="stop">Stop</string>
@@ -130,6 +132,9 @@
 
 	<string name="delete">Delete</string>
 	<string name="message_deleted">Message deleted</string>
+	<string name="chat_deleted">Chat deleted</string>
+	<string name="message_deleted_not">Failed to delete the message</string>
+	<string name="chat_deleted_not">Failed to delete the chat</string>
 
 	<string name="audio_call">Audio Call</string>
 	<string name="call">Video Call</string>

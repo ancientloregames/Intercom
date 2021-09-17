@@ -80,25 +80,8 @@ open class FirestoreChatSource protected constructor(protected val userId: Strin
 	override fun deleteItem(id: String, callback: RequestCallback<Any>) {
 		db.collection(CHATS)
 			.document(id)
-			.get()
-			.addOnSuccessListener { snapshot ->
-				exec {
-					deserialize(snapshot)
-						?.let { chat ->
-							db.collection(USERS)
-								.document(userId)
-								.collection(CHATS)
-								.document(
-									if (chat.name.isNotEmpty())
-										chat.name
-									else
-										chat.participants.first { it != userId })
-								.delete()
-								.addOnSuccessListener { exec { callback.onSuccess(EmptyObject) } }
-								.addOnFailureListener { exec { callback.onFailure(it) } }
-						}
-				}
-			}
+			.delete()
+			.addOnSuccessListener { exec { callback.onSuccess(EmptyObject) } }
 			.addOnFailureListener { exec { callback.onFailure(it) } }
 	}
 
