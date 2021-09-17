@@ -19,9 +19,7 @@ buildscript {
 
 allprojects {
     repositories {
-        maven {
-            url "https://repo1.maven.org/maven2/"
-        }
+        maven {url "https://repo1.maven.org/maven2/"}
         maven { url "https://www.jitpack.io" }
         mavenCentral()
         google()
@@ -37,8 +35,8 @@ ext {
 
     lifecycleVersion = '2.2.0'
     roomVersion = '2.3.0'
-    daggerVersion = '2.19'
-    glideVersion = '4.9.0'
+    daggerVersion = '2.38.1'
+    glideVersion = '4.12.0'
 }
 
 task clean(type: Delete) {
