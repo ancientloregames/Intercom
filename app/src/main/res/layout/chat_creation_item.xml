@@ -59,7 +59,7 @@
 		<View android:id="@+id/dividerView"
 				android:layout_width="match_parent"
 				android:layout_height="0.5dp"
-				android:background="@android:color/darker_gray"
+				android:background="@color/defaultListItemDividerColor"
 				app:layout_constraintEnd_toEndOf="parent"
 				app:layout_constraintStart_toStartOf="parent"
 				app:layout_constraintTop_toBottomOf="@id/subtitleView"
