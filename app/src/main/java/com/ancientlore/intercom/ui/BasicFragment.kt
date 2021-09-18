@@ -62,6 +62,10 @@ abstract class BasicFragment<VM : BasicViewModel, B : ViewDataBinding> : Fragmen
 	}
 
 	/**
+	 * FIXME  this method is no longer valid for the newer versions of the fragment library (1.2.0+)
+	 *        need to find a better one. Maybe to use the toolbar listeners directly and avoid using
+	 *        the activity option menu
+	 *
 	 * SDK error that leads to the fragment leaking because of the ActionBar option menu handling
 	 * @see setHasOptionsMenu
 	 *

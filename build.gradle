@@ -35,7 +35,7 @@ ext {
 
     lifecycleVersion = '2.2.0'
     roomVersion = '2.3.0'
-    daggerVersion = '2.38.1'
+    daggerVersion = '2.27'
     glideVersion = '4.12.0'
 }
 
