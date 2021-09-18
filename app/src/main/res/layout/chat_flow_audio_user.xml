@@ -21,13 +21,12 @@
 				android:background="@drawable/bg_msg_user"
 				android:onLongClick="@{() -> message.onLongClick()}">
 
-			<com.ancientlore.intercom.view.CircleImageView
+			<com.ancientlore.intercom.view.SimpleCircleImageView
 					android:id="@+id/imageView"
 					android:layout_width="50dp"
 					android:layout_height="50dp"
-					android:layout_marginEnd="8dp"
-					android:layout_marginRight="8dp"
 					android:onClick="@{() -> message.onItemClick()}"
+					android:scaleType="center"
 					app:tint="@android:color/white"
 					app:srcCompat="@{message.iconRes}"
 					app:backgroundColor="@color/chatFileIconBg"
@@ -37,7 +36,7 @@
 					tools:srcCompat="@drawable/ic_play"
 			/>
 
-			<ProgressBar
+			<com.ancientlore.intercom.view.ColoredProgressBar
 					android:id="@+id/progressView"
 					android:layout_width="50dp"
 					android:layout_height="50dp"
@@ -46,6 +45,7 @@
 					android:visibility="@{message.progressVisibility}"
 					android:clickable="true"
 					android:focusable="true"
+					app:color="@android:color/white"
 					tools:visibility="visible"
 					app:layout_constraintStart_toStartOf="parent"
 					app:layout_constraintTop_toTopOf="parent"

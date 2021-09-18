@@ -26,6 +26,7 @@ import com.ancientlore.intercom.view.MessageInputManager
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import java.io.File
+import java.lang.ref.WeakReference
 
 class ChatFlowViewModel(context: Context,
                         private val params: ChatFlowParams)
@@ -98,6 +99,8 @@ class ChatFlowViewModel(context: Context,
 
 	private var paginationCompleted = false
 
+	private var recordedAudioFileRef: WeakReference<File>? = null
+
 	init {
 
 		if (params.chatId.isNotEmpty()) {
@@ -143,12 +146,24 @@ class ChatFlowViewModel(context: Context,
 				outFile?.let { file ->
 					releaseRecorder()
 					handleAudioMessage(file)
+					outFile = null
+				}
+			}
+
+			override fun onCompleteContinuousRecording() {
+				outFile?.let { file ->
+					releaseRecorder()
+					recordedAudioFileRef = WeakReference(file)
 				}
 			}
 
 			override fun onCanceled() {
 				releaseRecorder()
-				outFile?.delete()
+				outFile?.run {
+					manager.onMessageSent()
+					delete()
+					outFile = null
+				}
 			}
 
 			private fun releaseRecorder() {
@@ -178,8 +193,7 @@ class ChatFlowViewModel(context: Context,
 		setContactStatusOnlineSubj.onComplete()
 		setContactStatusLastSeenSubj.onComplete()
 
-		inputManager?.onStop()
-		inputManager?.setListener(null)
+		inputManager?.dispose()
 		inputManager = null
 		contactRepSub?.remove()
 		repositorySub?.remove()
@@ -225,11 +239,17 @@ class ChatFlowViewModel(context: Context,
 	}
 
 	fun onSendButtonClicked() {
-		messageText.takeIf { it.isNotBlank() }
+		recordedAudioFileRef?.get()
 			?.let {
-				sendMessage(it)
-				textField.set("")
+				recordedAudioFileRef = null
+				handleAudioMessage(it)
 			}
+			?: messageText
+					.takeIf { it.isNotBlank() }
+					?.let {
+						sendMessage(it)
+						textField.set("")
+					}
 	}
 
 	fun onRecordButtonClicked() = recordAudioSubj.onNext(EmptyObject)
@@ -367,6 +387,7 @@ class ChatFlowViewModel(context: Context,
 								override fun onSuccess(result: Any) {
 									runOnUiThread {
 										showSendProgressField.set(false)
+										inputManager?.onMessageSent()
 									}
 								}
 								override fun onFailure(error: Throwable) { onFailureSendingMessage(error) }
@@ -448,6 +469,7 @@ class ChatFlowViewModel(context: Context,
 			Utils.logError(error)
 		runOnUiThread {
 			showSendProgressField.set(false)
+			inputManager?.onMessageSent()
 		}
 		toastRequest.onNext(TOAST_MSG_SEND_ERR)
 	}

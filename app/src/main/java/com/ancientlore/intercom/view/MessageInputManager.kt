@@ -20,6 +20,7 @@ class MessageInputManager(view: View) {
 	interface Listener {
 		fun onStarted()
 		fun onCompleted()
+		fun onCompleteContinuousRecording()
 		fun onCanceled()
 	}
 
@@ -134,6 +135,27 @@ class MessageInputManager(view: View) {
 		}
 	}
 
+	fun dispose() {
+		listener = null
+		audioButton.setOnTouchListener(null)
+		chronometer.stop()
+	}
+
+	fun onMessageSent() {
+		microphoneImage.visibility = View.INVISIBLE
+		stopButton.visibility = View.GONE
+		cancelButton.visibility = View.GONE
+		chronometer.visibility = View.INVISIBLE
+
+		sendButton.visibility = View.GONE
+		sendButton.animate()
+			.scaleX(0f).scaleY(0f)
+			.setDuration(100).setInterpolator(LinearInterpolator())
+			.start()
+
+		switchTextInput(true)
+	}
+
 	private fun translateX(x: Float) {
 		if (x > -cancelOffset) {
 			audioButton.translationX = x
@@ -165,6 +187,20 @@ class MessageInputManager(view: View) {
 	fun onStop() {
 		reset()
 		isLocked = false
+
+		chronometer.stop()
+
+		stopButton.visibility = View.GONE
+
+		sendButton.visibility = View.VISIBLE
+		sendButton.animate()
+			.scaleX(1f).scaleY(1f)
+			.setDuration(100).setInterpolator(LinearInterpolator())
+			.start()
+
+		audioButton.isEnabled = true
+
+		listener?.onCompleteContinuousRecording()
 	}
 
 	fun onCancel() {
@@ -188,6 +224,7 @@ class MessageInputManager(view: View) {
 
 	private fun onLock() {
 		isLocked = true
+		audioButton.isEnabled = false
 
 		reset()
 		stopButton.visibility = View.VISIBLE

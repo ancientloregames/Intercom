@@ -15,6 +15,8 @@
 	<attr name="abbrTextColor" format="color" />
 	<attr name="abbrBackColor" format="color" />
 
+	<attr name="backgroundColor" format="color"/>
+
 	<declare-styleable name="IconImageView">
 		<attr name="asCircle" />
 
@@ -36,7 +38,11 @@
 		<attr name="borderWidth" format="dimension" />
 		<attr name="borderColor" format="color" />
 		<attr name="borderOverlay" format="boolean" />
-		<attr name="backgroundColor" format="color"/>
+		<attr name="backgroundColor" />
+	</declare-styleable>
+
+	<declare-styleable name="SimpleCircleImageView">
+		<attr name="backgroundColor" />
 	</declare-styleable>
 
 	<declare-styleable name="DrawableCompatTextView">

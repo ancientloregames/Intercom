@@ -162,7 +162,7 @@ class ChatFlowFragment : FilterableFragment<ChatFlowViewModel, ChatFlowUiBinding
 			})
 
 		if (permissionManager!!.allowedAudioMessage())
-			viewModel.attachInputPanelManager(MessageInputManager(view!!))
+			viewModel.attachInputPanelManager(MessageInputManager(dataBinding.contentLayout))
 	}
 
 	override fun onDestroyView() {
@@ -307,7 +307,7 @@ class ChatFlowFragment : FilterableFragment<ChatFlowViewModel, ChatFlowUiBinding
 	private fun recordAudio() {
 		permissionManager?.requestPermissionAudioMessage(Runnable1 { granted ->
 			if (granted) {
-				viewModel.attachInputPanelManager(MessageInputManager(view!!))
+				viewModel.attachInputPanelManager(MessageInputManager(dataBinding.contentLayout))
 			}
 		})
 	}
