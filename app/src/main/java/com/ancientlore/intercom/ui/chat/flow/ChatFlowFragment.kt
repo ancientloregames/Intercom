@@ -111,12 +111,11 @@ class ChatFlowFragment : FilterableFragment<ChatFlowViewModel, ChatFlowUiBinding
 
 		subscriptions.add(viewModel.listAdapter.fileOpenRequest()
 			.subscribe {
-				context?.openFile(it)
+				navigator?.openFileViewer(it)
 			})
 		subscriptions.add(viewModel.listAdapter.imageOpenRequest()
 			.subscribe {
-				// TODO create custom image viewer fragment
-				context?.openFile(it)
+				navigator?.openImageViewer(it)
 			})
 		subscriptions.add(viewModel.listAdapter.optionMenuOpenRequest()
 			.subscribe {
@@ -161,6 +160,14 @@ class ChatFlowFragment : FilterableFragment<ChatFlowViewModel, ChatFlowUiBinding
 		subscriptions.add(viewModel.scrollToPositionRequest()
 			.subscribe {
 				dataBinding.listView.smoothScrollToPosition(it)
+			})
+		subscriptions.add(viewModel.pickFileRequest()
+			.subscribe {
+				navigator?.openFilePicker(INTENT_GET_FILES)
+			})
+		subscriptions.add(viewModel.pickImageRequest()
+			.subscribe {
+				navigator?.openImagePicker(INTENT_GET_IMAGES)
 			})
 
 		if (permissionManager!!.allowedAudioMessage())
@@ -274,36 +281,13 @@ class ChatFlowFragment : FilterableFragment<ChatFlowViewModel, ChatFlowUiBinding
 
 	private fun onAttachMenuItemSelected(id: Int) {
 		when (id) {
-			R.id.im_attach_picture -> openGallery()
-			R.id.im_attach_file -> openFilePicker()
+			R.id.im_attach_picture -> viewModel.onAttachMenuOptionSelected(ChatFlowViewModel.ATTACH_OPTION_IMAGE)
+			R.id.im_attach_file -> viewModel.onAttachMenuOptionSelected(ChatFlowViewModel.ATTACH_OPTION_FILE)
 			else -> {
 				showToast(R.string.error)
-				Utils.logError(RuntimeException("Error! Unknown attach source"))
+				Utils.logError(RuntimeException("Error! Unknown attach source: id $id"))
 			}
 		}
-	}
-
-	private fun openGallery() {
-		permissionManager?.requestPermissionWriteStorage(Runnable1 { granted ->
-			if (granted) {
-				// FIXME temporary solution (TODO make own gallery)
-				val intent = Intent(Intent.ACTION_GET_CONTENT)
-					.setType("image/*")
-				// TODO multiple selection .putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
-				startActivityForResult(intent, INTENT_GET_IMAGES)
-			}
-		})
-	}
-
-	private fun openFilePicker() {
-		permissionManager?.requestPermissionReadStorage(Runnable1 { granted ->
-			if (granted) {
-				val intent = Intent(Intent.ACTION_GET_CONTENT)
-					.setType("*/*")
-				// TODO multiple selection .putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
-				startActivityForResult(intent, INTENT_GET_FILES)
-			}
-		})
 	}
 
 	private fun recordAudio() {

@@ -38,6 +38,9 @@ class ChatFlowViewModel(context: Context,
 
 		const val ITEM_OPTION_DELETE = 0
 
+		const val ATTACH_OPTION_IMAGE = 0
+		const val ATTACH_OPTION_FILE = 1
+
 		const val TOAST_CHAT_CREATION_ERR = 0
 		const val TOAST_MSG_SEND_ERR = 1
 		const val TOAST_MSG_DELETED = 2
@@ -52,6 +55,10 @@ class ChatFlowViewModel(context: Context,
 	@IntDef(ITEM_OPTION_DELETE)
 	@Retention(AnnotationRetention.SOURCE)
 	annotation class ItemOption
+
+	@IntDef(ATTACH_OPTION_IMAGE, ATTACH_OPTION_FILE)
+	@Retention(AnnotationRetention.SOURCE)
+	annotation class AttachMenuOption
 
 	val textField = ObservableField("")
 
@@ -92,6 +99,10 @@ class ChatFlowViewModel(context: Context,
 	private val setContactStatusLastSeenSubj = PublishSubject.create<String>()
 
 	private val srollToPositionSubj = PublishSubject.create<Int>()
+
+	private val pickFileSubj = PublishSubject.create<EmptyObject>()
+
+	private val pickImageSubj = PublishSubject.create<EmptyObject>()
 
 	private var inputManager: MessageInputManager? = null
 
@@ -192,6 +203,9 @@ class ChatFlowViewModel(context: Context,
 		makeVideoCallSubj.onComplete()
 		setContactStatusOnlineSubj.onComplete()
 		setContactStatusLastSeenSubj.onComplete()
+		srollToPositionSubj.onComplete()
+		pickFileSubj.onComplete()
+		pickImageSubj.onComplete()
 
 		inputManager?.dispose()
 		inputManager = null
@@ -222,6 +236,10 @@ class ChatFlowViewModel(context: Context,
 	fun setContactStatusLastSeenRequest() = setContactStatusLastSeenSubj as Observable<String>
 
 	fun scrollToPositionRequest() = srollToPositionSubj as Observable<Int>
+
+	fun pickFileRequest() = pickFileSubj as Observable<Any>
+
+	fun pickImageRequest() = pickImageSubj as Observable<Any>
 
 	// ----------- DataBinding Events -----------
 
@@ -459,6 +477,13 @@ class ChatFlowViewModel(context: Context,
 	fun onMessageMenuOptionSelected(message: Message, @ItemOption id: Int) {
 		when (id) {
 			ITEM_OPTION_DELETE -> deleteMessage(message)
+		}
+	}
+
+	fun onAttachMenuOptionSelected(@AttachMenuOption id: Int) {
+		when (id) {
+			ATTACH_OPTION_FILE -> pickFileSubj.onNext(EmptyObject)
+			ATTACH_OPTION_IMAGE -> pickImageSubj.onNext(EmptyObject)
 		}
 	}
 

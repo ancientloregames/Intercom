@@ -88,7 +88,9 @@ class SettingsFragment : BasicFragment<SettingsViewModel, SettingsUiBinding>()  
 			.create()
 
 		subscriptions.add(viewModel.observeOpenGalleryRequest()
-			.subscribe { openGallery() })
+			.subscribe {
+				navigator?.openImagePicker(INTENT_GET_IMAGE)
+			})
 
 		subscriptions.add(viewModel.openImageViewerRequest()
 			.subscribe { navigator?.openImageViewer(it) })
@@ -159,25 +161,6 @@ class SettingsFragment : BasicFragment<SettingsViewModel, SettingsUiBinding>()  
 				else -> false
 			}
 		} ?: true
-	}
-
-	private fun openGallery() {
-		permissionManager?.requestPermissionWriteStorage { granted ->
-			if (granted) {
-				// FIXME temporary solution (TODO make own gallery)
-				activity
-					?.let {
-					val intent = Intent(Intent.ACTION_GET_CONTENT)
-						.setType("image/*")
-					if (intent.resolveActivity(it.packageManager) != null)
-						startActivityForResult(intent, INTENT_GET_IMAGE)
-					else {
-						Utils.logError("SettingsFragment.openGallery(): Device has no gallery")
-						showToast(R.string.alert_error_no_gallery)
-					}
-				}
-			}
-		}
 	}
 
 	override fun getToastStringRes(toastId: Int): Int {

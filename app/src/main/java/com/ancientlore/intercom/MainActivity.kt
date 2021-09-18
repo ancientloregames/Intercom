@@ -62,6 +62,7 @@ import com.ancientlore.intercom.utils.NotificationManager.Companion.EXTRA_CHAT_T
 import com.ancientlore.intercom.utils.extensions.checkPermission
 import com.ancientlore.intercom.utils.extensions.createChannel
 import com.ancientlore.intercom.utils.extensions.hideKeyboard
+import com.ancientlore.intercom.utils.extensions.openFile
 import java.util.*
 import java.util.concurrent.Executors
 
@@ -348,6 +349,13 @@ class MainActivity : AppCompatActivity(),
 		}
 	}
 
+	override fun openFileViewer(uri: Uri) {
+		// TODO maybe create custom file viewer fragment (at least for popular file types)
+		if (!openFile(uri)) {
+			showToast(R.string.alert_error_open_file)
+		}
+	}
+
 	override fun openImageViewer(uri: Uri) {
 		runOnUiThread {
 			val fragment = ImageViewerFragment.newInstance(uri)
@@ -355,6 +363,40 @@ class MainActivity : AppCompatActivity(),
 				.setCustomAnimations(fragment.getOpenAnimation(), fragment.getCloseAnimation())
 				.add(R.id.modalContainer, fragment)
 				.commitNow()
+		}
+	}
+
+	override fun openFilePicker(requestCode: Int) {
+		requestPermissionWriteStorage { granted ->
+			if (granted) {
+				// FIXME temporary solution (TODO add own file explorer)
+				val intent = Intent(Intent.ACTION_GET_CONTENT)
+					.setType("*/*")
+				// TODO multiple selection .putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+				if (intent.resolveActivity(packageManager) != null)
+					startActivityForResult(intent, requestCode)
+				else {
+					Utils.logError("No embedded file explorer")
+					showToast(R.string.alert_error_no_file_explorer)
+				}
+			}
+		}
+	}
+
+	override fun openImagePicker(requestCode: Int) {
+		requestPermissionWriteStorage { granted ->
+			if (granted) {
+				// FIXME temporary solution (TODO add own gallery)
+				val intent = Intent(Intent.ACTION_GET_CONTENT)
+					.setType("image/*")
+				// TODO multiple selection .putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+				if (intent.resolveActivity(packageManager) != null)
+					startActivityForResult(intent, requestCode)
+				else {
+					Utils.logError("No embedded gallery")
+					showToast(R.string.alert_error_no_gallery)
+				}
+			}
 		}
 	}
 

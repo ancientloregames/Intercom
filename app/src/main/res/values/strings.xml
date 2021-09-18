@@ -57,6 +57,7 @@
 	<string name="alert_error_attach_file">Failed to attach file</string>
 	<string name="alert_error_set_photo">Failed to set photo</string>
 	<string name="alert_error_no_gallery">Failed to open gallery</string>
+	<string name="alert_error_no_file_explorer">Failed to open file explorer</string>
 	<string name="alert_error_change_name">Failed to change the name</string>
 	<string name="alert_error_invalid_name">Inavalid name</string>
 	<string name="alert_error_change_user_status">Failed to change the status</string>
@@ -65,6 +66,7 @@
 	<string name="alert_error_name_required">The name is required</string>
 	<string name="alert_chat_undeletable">This chat is marked as undeletable</string>
 	<string name="alert_message_undeletable">This message is marked as undeletable</string>
+	<string name="alert_error_open_file">Failed to find an App to open the file</string>
 
 	<string name="record">Record</string>
 	<string name="stop">Stop</string>

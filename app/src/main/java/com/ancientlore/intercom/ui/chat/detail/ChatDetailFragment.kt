@@ -61,7 +61,7 @@ class ChatDetailFragment : FilterableFragment<ChatDetailViewModel, ChatDetailUiB
 
 		subscriptions.add(viewModel.observeOpenGallaryRequest()
 			.subscribe {
-				openGallery()
+				navigator?.openImagePicker(INTENT_GET_IMAGE)
 			})
 		subscriptions.add(viewModel.openImageViewerRequest()
 			.subscribe {
@@ -101,17 +101,6 @@ class ChatDetailFragment : FilterableFragment<ChatDetailViewModel, ChatDetailUiB
 		return when (toastId) {
 			ChatDetailViewModel.TOAST_SET_PHOTO_ERR -> R.string.alert_error_set_photo
 			else -> super.getToastStringRes(toastId)
-		}
-	}
-
-	private fun openGallery() {
-		permissionManager?.requestPermissionWriteStorage { granted ->
-			if (granted) {
-				// FIXME temporary solution (TODO make own gallery)
-				val intent = Intent(Intent.ACTION_GET_CONTENT)
-					.setType("image/*")
-				startActivityForResult(intent, INTENT_GET_IMAGE)
-			}
 		}
 	}
 }

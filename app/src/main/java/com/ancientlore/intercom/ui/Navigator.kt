@@ -32,7 +32,11 @@ interface Navigator {
 	fun openVideoCallOffer(params: CallViewModel.Params)
 	fun openCallAnswer(offer: Offer)
 
+	fun openFileViewer(uri: Uri)
 	fun openImageViewer(uri: Uri)
+
+	fun openFilePicker(requestCode: Int) // TODO make a custom file explorer
+	fun openImagePicker(requestCode: Int) // TODO make a custom gallery
 
 	fun onSuccessfullAuth(user: User)
 	fun closeFragment(fragment: Fragment)
