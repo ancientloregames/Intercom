@@ -106,6 +106,8 @@ class ChatFlowFragment : FilterableFragment<ChatFlowViewModel, ChatFlowUiBinding
 				}
 			})
 		}
+		// FIXME should set via viewModel
+		viewModel.onContactStatusChanged(getString(R.string.member_count, params.participants.size))
 
 		subscriptions.add(viewModel.listAdapter.fileOpenRequest()
 			.subscribe {
