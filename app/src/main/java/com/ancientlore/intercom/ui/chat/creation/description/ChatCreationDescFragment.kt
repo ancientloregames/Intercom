@@ -67,7 +67,7 @@ class ChatCreationDescFragment : FilterableFragment<ChatCreationDescViewModel, C
 			})
 		subscriptions.add(viewModel.observeOpenGallaryRequest()
 			.subscribe {
-				navigator?.openImagePicker(INTENT_GET_IMAGE)
+				navigator?.openImagePicker(this, INTENT_GET_IMAGE)
 			})
 
 		Utils.runOnUiThread({ dataBinding.nameView.showKeyboard() }, 200)

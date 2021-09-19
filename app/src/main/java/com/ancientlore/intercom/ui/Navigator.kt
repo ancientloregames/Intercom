@@ -28,6 +28,9 @@ interface Navigator {
 	fun openChatDetail(params: ChatFlowParams)
 	fun openContactDetail(params: ContactDetailParams)
 
+	fun openBroadcastList()
+	fun openBroadcastCreation()
+
 	fun openAudioCallOffer(params: CallViewModel.Params)
 	fun openVideoCallOffer(params: CallViewModel.Params)
 	fun openCallAnswer(offer: Offer)
@@ -35,8 +38,8 @@ interface Navigator {
 	fun openFileViewer(uri: Uri)
 	fun openImageViewer(uri: Uri)
 
-	fun openFilePicker(requestCode: Int) // TODO make a custom file explorer
-	fun openImagePicker(requestCode: Int) // TODO make a custom gallery
+	fun openFilePicker(target: Fragment, requestCode: Int) // TODO make a custom file explorer
+	fun openImagePicker(target: Fragment, requestCode: Int) // TODO make a custom gallery
 
 	fun onSuccessfullAuth(user: User)
 	fun closeFragment(fragment: Fragment)

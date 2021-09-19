@@ -168,11 +168,11 @@ class ChatFlowFragment : FilterableFragment<ChatFlowViewModel, ChatFlowUiBinding
 			})
 		subscriptions.add(viewModel.pickFileRequest()
 			.subscribe {
-				navigator?.openFilePicker(INTENT_GET_FILES)
+				navigator?.openFilePicker(this, INTENT_GET_FILES)
 			})
 		subscriptions.add(viewModel.pickImageRequest()
 			.subscribe {
-				navigator?.openImagePicker(INTENT_GET_IMAGES)
+				navigator?.openImagePicker(this, INTENT_GET_IMAGES)
 			})
 		subscriptions.add(viewModel.showSendButtonRequest()
 			.subscribe {

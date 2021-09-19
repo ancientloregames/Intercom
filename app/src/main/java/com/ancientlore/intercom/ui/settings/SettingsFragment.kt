@@ -89,7 +89,7 @@ class SettingsFragment : BasicFragment<SettingsViewModel, SettingsUiBinding>()  
 
 		subscriptions.add(viewModel.observeOpenGalleryRequest()
 			.subscribe {
-				navigator?.openImagePicker(INTENT_GET_IMAGE)
+				navigator?.openImagePicker(this, INTENT_GET_IMAGE)
 			})
 
 		subscriptions.add(viewModel.openImageViewerRequest()

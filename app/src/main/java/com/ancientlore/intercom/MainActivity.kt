@@ -34,6 +34,7 @@ import com.ancientlore.intercom.ui.auth.email.login.EmailLoginFragment
 import com.ancientlore.intercom.ui.auth.email.signup.EmailSignupFragment
 import com.ancientlore.intercom.ui.auth.phone.login.PhoneLoginFragment
 import com.ancientlore.intercom.ui.auth.phone.check.PhoneCheckFragment
+import com.ancientlore.intercom.ui.boadcast.list.BroadcastListFragment
 import com.ancientlore.intercom.ui.call.CallViewModel
 import com.ancientlore.intercom.ui.call.CallAnswerParams
 import com.ancientlore.intercom.ui.call.CallFragment
@@ -42,6 +43,7 @@ import com.ancientlore.intercom.ui.call.offer.audio.AudioCallOfferFragment
 import com.ancientlore.intercom.ui.call.answer.video.VideoCallAnswerFragment
 import com.ancientlore.intercom.ui.call.offer.video.VideoCallOfferFragment
 import com.ancientlore.intercom.ui.chat.creation.ChatCreationFragment
+import com.ancientlore.intercom.ui.boadcast.creation.BroadcastCreationFragment
 import com.ancientlore.intercom.ui.chat.creation.description.ChatCreationDescFragment
 import com.ancientlore.intercom.ui.chat.creation.group.ChatCreationGroupFragment
 import com.ancientlore.intercom.ui.chat.detail.ChatDetailFragment
@@ -349,6 +351,26 @@ class MainActivity : AppCompatActivity(),
 		}
 	}
 
+	override fun openBroadcastList() {
+		runOnUiThread {
+			val fragment = BroadcastListFragment.newInstance()
+			supportFragmentManager.beginTransaction()
+				.setCustomAnimations(fragment.getOpenAnimation(), fragment.getCloseAnimation())
+				.replace(R.id.modalContainer, fragment)
+				.commitNow()
+		}
+	}
+
+	override fun openBroadcastCreation() {
+		runOnUiThread {
+			val fragment = BroadcastCreationFragment.newInstance()
+			supportFragmentManager.beginTransaction()
+				.setCustomAnimations(fragment.getOpenAnimation(), fragment.getCloseAnimation())
+				.add(R.id.modalContainer, fragment)
+				.commitNow()
+		}
+	}
+
 	override fun openFileViewer(uri: Uri) {
 		// TODO maybe create custom file viewer fragment (at least for popular file types)
 		if (!openFile(uri)) {
@@ -366,7 +388,7 @@ class MainActivity : AppCompatActivity(),
 		}
 	}
 
-	override fun openFilePicker(requestCode: Int) {
+	override fun openFilePicker(target: Fragment, requestCode: Int) {
 		requestPermissionWriteStorage { granted ->
 			if (granted) {
 				// FIXME temporary solution (TODO add own file explorer)
@@ -374,7 +396,7 @@ class MainActivity : AppCompatActivity(),
 					.setType("*/*")
 				// TODO multiple selection .putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
 				if (intent.resolveActivity(packageManager) != null)
-					startActivityForResult(intent, requestCode)
+					startActivityFromFragment(target, intent, requestCode)
 				else {
 					Utils.logError("No embedded file explorer")
 					showToast(R.string.alert_error_no_file_explorer)
@@ -383,7 +405,7 @@ class MainActivity : AppCompatActivity(),
 		}
 	}
 
-	override fun openImagePicker(requestCode: Int) {
+	override fun openImagePicker(target: Fragment, requestCode: Int) {
 		requestPermissionWriteStorage { granted ->
 			if (granted) {
 				// FIXME temporary solution (TODO add own gallery)
@@ -391,7 +413,7 @@ class MainActivity : AppCompatActivity(),
 					.setType("image/*")
 				// TODO multiple selection .putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
 				if (intent.resolveActivity(packageManager) != null)
-					startActivityForResult(intent, requestCode)
+					startActivityFromFragment(target, intent, requestCode)
 				else {
 					Utils.logError("No embedded gallery")
 					showToast(R.string.alert_error_no_gallery)
