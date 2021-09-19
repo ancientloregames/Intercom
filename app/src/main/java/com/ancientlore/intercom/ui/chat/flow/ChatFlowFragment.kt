@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
+import android.view.animation.LinearInterpolator
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -52,6 +53,10 @@ class ChatFlowFragment : FilterableFragment<ChatFlowViewModel, ChatFlowUiBinding
 
 	private val params : ChatFlowParams by lazy { arguments?.getParcelable<ChatFlowParams>(ARG_PARAMS)
 		?: throw RuntimeException("Chat id is a mandotory arg") }
+
+	private val sendButtonAnimDuration: Long by lazy {
+		resources.getInteger(R.integer.defaultShowHideAnimationDuration).toLong()
+	}
 
 	override fun getToolbar(): Toolbar = dataBinding.toolbar
 
@@ -169,9 +174,31 @@ class ChatFlowFragment : FilterableFragment<ChatFlowViewModel, ChatFlowUiBinding
 			.subscribe {
 				navigator?.openImagePicker(INTENT_GET_IMAGES)
 			})
+		subscriptions.add(viewModel.showSendButtonRequest()
+			.subscribe {
+				showSendHideRecordButton(it)
+			})
 
 		if (permissionManager!!.allowedAudioMessage())
 			viewModel.attachInputPanelManager(MessageInputManager(dataBinding.contentLayout))
+	}
+
+	private fun showSendHideRecordButton(show: Boolean) {
+		if (show) {
+			if (dataBinding.sendButton.visibility == View.GONE) {
+				dataBinding.sendButton.animate()
+					.scaleX(1f).scaleY(1f)
+					.setDuration(sendButtonAnimDuration).setInterpolator(LinearInterpolator())
+					.withStartAction { dataBinding.sendButton.visibility = View.VISIBLE }
+					.start()
+			}
+		} else if (dataBinding.sendButton.visibility == View.VISIBLE) {
+			dataBinding.sendButton.animate()
+				.scaleX(0f).scaleY(0f)
+				.setDuration(sendButtonAnimDuration).setInterpolator(LinearInterpolator())
+				.withEndAction { dataBinding.sendButton.visibility = View.GONE }
+				.start()
+		}
 	}
 
 	override fun onDestroyView() {

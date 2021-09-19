@@ -170,6 +170,7 @@
 						android:inputType="textCapSentences|textMultiLine"
 						android:maxLines="4"
 						android:text="@={ui.textField}"
+						android:afterTextChanged="@{ui.onInputTextChanged}"
 						>
 					<requestFocus />
 				</EditText>

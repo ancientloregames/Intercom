@@ -2,14 +2,12 @@ package com.ancientlore.intercom.view
 
 import android.annotation.SuppressLint
 import android.os.SystemClock
-import android.text.Editable
 import android.view.MotionEvent
 import android.view.View
 import android.view.animation.*
 import android.widget.Chronometer
 import android.widget.EditText
 import com.ancientlore.intercom.R
-import com.ancientlore.intercom.widget.SimpleTextWatcher
 import kotlin.math.abs
 
 @SuppressLint("ClickableViewAccessibility")
@@ -52,24 +50,6 @@ class MessageInputManager(view: View) {
 	private var listener: Listener? = null
 
 	init {
-		textInput.addTextChangedListener(object : SimpleTextWatcher() {
-			override fun afterTextChanged(s: Editable) {
-				if (s.isEmpty() && sendButton.visibility != View.GONE) {
-					sendButton.visibility = View.GONE
-					sendButton.animate()
-						.scaleX(0f).scaleY(0f)
-						.setDuration(100).setInterpolator(LinearInterpolator())
-						.start()
-				} else if (sendButton.visibility != View.VISIBLE && !isLocked) {
-					sendButton.visibility = View.VISIBLE
-					sendButton.animate()
-						.scaleX(1f).scaleY(1f)
-						.setDuration(100).setInterpolator(LinearInterpolator())
-						.start()
-				}
-			}
-		})
-
 		audioButton.setOnTouchListener { button, motionEvent ->
 			when (motionEvent.action) {
 				MotionEvent.ACTION_DOWN -> {

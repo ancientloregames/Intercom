@@ -3,6 +3,7 @@ package com.ancientlore.intercom.ui.chat.flow
 import android.content.Context
 import android.media.MediaRecorder
 import android.net.Uri
+import android.text.Editable
 import android.util.Log
 import androidx.annotation.IntDef
 import androidx.databinding.ObservableBoolean
@@ -28,8 +29,10 @@ import io.reactivex.subjects.PublishSubject
 import java.io.File
 import java.lang.ref.WeakReference
 
-class ChatFlowViewModel(context: Context,
-                        private val params: ChatFlowParams)
+class ChatFlowViewModel(
+	context: Context,
+	private val params: ChatFlowParams,
+)
 	: FilterableViewModel<ChatFlowAdapter>(ChatFlowAdapter(params.userId, context)) {
 
 	companion object {
@@ -103,6 +106,8 @@ class ChatFlowViewModel(context: Context,
 	private val pickFileSubj = PublishSubject.create<EmptyObject>()
 
 	private val pickImageSubj = PublishSubject.create<EmptyObject>()
+
+	private val showSendButtonSubj = PublishSubject.create<Boolean>()
 
 	private var inputManager: MessageInputManager? = null
 
@@ -178,10 +183,11 @@ class ChatFlowViewModel(context: Context,
 			}
 
 			private fun releaseRecorder() {
-				if (recorder != null) {
+				recorder?.run {
 					try {
-						recorder!!.stop()
-						recorder!!.release()
+						stop()
+						reset()
+						release()
 						recorder = null
 					} catch (e: RuntimeException) {
 						Utils.logError(e)
@@ -241,7 +247,13 @@ class ChatFlowViewModel(context: Context,
 
 	fun pickImageRequest() = pickImageSubj as Observable<Any>
 
+	fun showSendButtonRequest() = showSendButtonSubj as Observable<Boolean>
+
 	// ----------- DataBinding Events -----------
+
+	fun onInputTextChanged(input: Editable) {
+		showSendButtonSubj.onNext(input.isNotEmpty())
+	}
 
 	fun onAttachButtonClicked() = openAttachMenuSubj.onNext(EmptyObject)
 
