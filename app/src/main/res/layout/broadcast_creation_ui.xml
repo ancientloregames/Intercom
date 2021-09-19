@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+		xmlns:app="http://schemas.android.com/apk/res-auto"
+		xmlns:tools="http://schemas.android.com/tools"
+		>
+	<data>
+		<variable
+				name="ui"
+				type="com.ancientlore.intercom.ui.boadcast.creation.BroadcastCreationViewModel"/>
+	</data>
+
+	<com.ancientlore.intercom.view.SwipableLayout
+			android:id="@+id/swipableLayout"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent">
+
+		<androidx.constraintlayout.widget.ConstraintLayout
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:clickable="true"
+				android:background="@android:color/white">
+
+			<com.google.android.material.appbar.AppBarLayout
+					android:id="@+id/appbar"
+					android:layout_width="0dp"
+					android:layout_height="wrap_content"
+					app:layout_constraintStart_toStartOf="parent"
+					app:layout_constraintEnd_toEndOf="parent"
+					app:layout_constraintTop_toTopOf="parent"
+					app:layout_constraintBottom_toTopOf="@+id/iconView"
+					android:theme="@style/AppTheme.AppBarOverlay">
+
+				<androidx.appcompat.widget.Toolbar
+						android:id="@+id/toolbar"
+						android:layout_width="match_parent"
+						android:layout_height="?attr/actionBarSize"
+						android:background="?attr/colorPrimary"
+						app:popupTheme="@style/AppTheme.PopupOverlay"
+						app:title="@string/new_broadcast"
+						tools:navigationIcon="drawable/ic_nav_back"
+						/>
+
+			</com.google.android.material.appbar.AppBarLayout>
+
+			<com.ancientlore.intercom.view.CircleImageView
+					android:id="@+id/iconView"
+					android:layout_width="150dp"
+					android:layout_height="150dp"
+					android:layout_margin="30dp"
+					android:src="@{ui.broadcastIconField}"
+					app:backgroundColor="@color/colorPrimaryDark"
+					app:layout_constraintTop_toBottomOf="@id/appbar"
+					app:layout_constraintEnd_toEndOf="parent"
+					app:layout_constraintStart_toStartOf="parent"
+					android:onClick="@{() -> ui.onIconClick()}"
+					/>
+
+			<ImageView
+					android:layout_width="60dp"
+					android:layout_height="60dp"
+					android:layout_margin="10dp"
+					android:scaleType="centerInside"
+					android:clickable="false"
+					android:focusable="false"
+					android:focusableInTouchMode="false"
+					app:srcCompat="@drawable/ic_add_photo_24dp"
+					app:tint="#80FFFFFF"
+					app:layout_constraintTop_toTopOf="@id/iconView"
+					app:layout_constraintEnd_toEndOf="parent"
+					app:layout_constraintStart_toStartOf="parent"
+					app:layout_constraintBottom_toBottomOf="@id/iconView"
+					/>
+
+			<EditText
+					android:id="@+id/nameView"
+					android:layout_width="0dp"
+					android:layout_height="wrap_content"
+					android:layout_margin="30dp"
+					android:hint="@string/broadcast_name_field_hint"
+					android:text="@={ui.broadcastTitleField}"
+					android:gravity="center"
+					android:inputType="textPersonName"
+					app:layout_constraintTop_toBottomOf="@id/iconView"
+					app:layout_constraintEnd_toEndOf="parent"
+					app:layout_constraintStart_toStartOf="parent"
+					>
+				<requestFocus />
+			</EditText>
+
+			<com.google.android.material.floatingactionbutton.FloatingActionButton
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_margin="@dimen/floatingButtonIndent"
+					android:onClick="@{() -> ui.onDoneButtonClick()}"
+					app:srcCompat="@drawable/ic_check_24dp"
+					android:tint="@android:color/white"
+					android:visibility="@{ui.broadcastTitleField.length() > 0}"
+					app:backgroundTint="@android:color/holo_blue_light"
+					app:layout_constraintBottom_toBottomOf="parent"
+					app:layout_constraintEnd_toEndOf="parent"
+					/>
+
+		</androidx.constraintlayout.widget.ConstraintLayout>
+	</com.ancientlore.intercom.view.SwipableLayout>
+</layout>

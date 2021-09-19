@@ -155,4 +155,9 @@
 	<string name="open_chat">Open chat</string>
 
 	<string name="text_copied">Text copied to clipboard</string>
+
+	<string name="broadcasts">Broadcasts</string>
+	<string name="create_broadcast">Create Broadcast</string>
+	<string name="new_broadcast">New Broadcast</string>
+	<string name="broadcast_name_field_hint">Enter broadcast name</string>
 </resources>

@@ -26,8 +26,10 @@ class FirestoreChatSourceNoCF(userId: String)
 
 	override fun addItem(item: Chat, callback: RequestCallback<String>) {
 		db.collection(CHATS)
-			.document()
-			.get()
+			.add(hashMapOf(
+				FIELD_NAME to item.name,
+				FIELD_TYPE to item.type
+			))
 			.addOnSuccessListener { doc ->
 
 				val chatId = doc.id

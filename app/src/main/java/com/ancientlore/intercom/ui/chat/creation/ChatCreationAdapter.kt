@@ -28,6 +28,7 @@ class ChatCreationAdapter(context: Context,
 		fun onContactSelected(contact: Contact)
 		fun onCreateGroup()
 		fun onAddContact()
+		fun onCreateBroadcast()
 	}
 
 	private var listener: Listener? = null
@@ -68,6 +69,11 @@ class ChatCreationAdapter(context: Context,
 				listener?.onAddContact()
 			}
 		}
+		holder.createBroadcastListener = object : HeaderViewHolder.CreateBroadcastListener {
+			override fun onClicked() {
+				listener?.onCreateBroadcast()
+			}
+		}
 	}
 
 	override fun bindItemViewHolder(holder: ViewHolder<ViewDataBinding>, position: Int, payloads: MutableList<Any>) {
@@ -87,7 +93,7 @@ class ChatCreationAdapter(context: Context,
 
 	override fun isUnique(item: Contact) = getItems().none { it.phone == item.phone }
 
-	fun setListener(listener: Listener) { this.listener = listener }
+	fun setListener(listener: Listener?) { this.listener = listener }
 
 	abstract class ViewHolder<B: ViewDataBinding>(binding: B)
 		: BasicRecyclerAdapter.ViewHolder<Contact, B>(binding) {
@@ -108,6 +114,11 @@ class ChatCreationAdapter(context: Context,
 		}
 		var addContactListener: AddContactListener? = null
 
+		interface CreateBroadcastListener {
+			fun onClicked()
+		}
+		var createBroadcastListener: CreateBroadcastListener? = null
+
 		init {
 			binding.setVariable(BR.ui, this)
 		}
@@ -115,6 +126,8 @@ class ChatCreationAdapter(context: Context,
 		override fun bind(data: Contact) {}
 
 		fun onAddContactClick() = addContactListener?.onClicked()
+
+		fun createBroadcastClick() = createBroadcastListener?.onClicked()
 	}
 
 	class FooterViewHolder(binding: ChatCreationFooterBinding)

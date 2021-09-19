@@ -62,6 +62,10 @@ class ChatListFragment : FilterableFragment<ChatListViewModel, ChatListUiBinding
 				navigator?.openContactList()
 				true
 			}
+			R.id.broadcasts -> {
+				navigator?.openBroadcastList()
+				true
+			}
 			R.id.settings -> {
 				navigator?.openSettings()
 				true

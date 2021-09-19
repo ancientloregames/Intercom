@@ -27,6 +27,18 @@
 				style="@style/settingsIconedTextItem" />
 
 		<TextView
+				android:id="@+id/createBroadcastView"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:gravity="center_vertical"
+				android:text="@string/create_broadcast"
+				android:drawableStart="@drawable/ic_broadcast_36dp"
+				android:drawableLeft="@drawable/ic_broadcast_36dp"
+				app:drawableTint="@color/settingsItemTextColor"
+				android:onClick="@{() -> ui.createBroadcastClick()}"
+				style="@style/settingsIconedTextItem" />
+
+		<TextView
 				android:id="@+id/addContactView"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"

@@ -33,6 +33,10 @@ object DummyChatSource : ChatSource {
 		callback.onFailure(EmptyResultException)
 	}
 
+	override fun getBroadcasts(callback: RequestCallback<List<Chat>>) {
+		callback.onFailure(EmptyResultException)
+	}
+
 	override fun attachListener(callback: RequestCallback<List<Chat>>): RepositorySubscription {
 		callback.onFailure(EmptyResultException)
 

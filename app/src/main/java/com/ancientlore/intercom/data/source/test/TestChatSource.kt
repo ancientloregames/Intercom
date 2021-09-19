@@ -119,4 +119,8 @@ abstract class TestChatSource: TestSource(), ChatSource {
 
 		return DummyRepositorySubscription
 	}
+
+	override fun getBroadcasts(callback: RequestCallback<List<Chat>>) {
+		TODO("Not yet implemented")
+	}
 }

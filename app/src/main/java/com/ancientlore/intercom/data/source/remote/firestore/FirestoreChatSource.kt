@@ -11,6 +11,7 @@ import com.ancientlore.intercom.data.source.remote.firestore.C.USERS
 import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_ICON_URL
 import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_LAST_MSG_TIME
 import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_NAME
+import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_TYPE
 import com.google.firebase.firestore.SetOptions
 import java.lang.RuntimeException
 
@@ -97,6 +98,14 @@ open class FirestoreChatSource protected constructor(protected val userId: Strin
 			.addOnSuccessListener { exec { callback.onSuccess(EmptyObject) } }
 			.addOnFailureListener { exec { callback.onFailure(it) }
 			}
+	}
+
+	override fun getBroadcasts(callback: RequestCallback<List<Chat>>) {
+		db.collection(CHATS)
+			.whereEqualTo(FIELD_TYPE, Chat.TYPE_BROADCAST)
+			.get()
+			.addOnSuccessListener { exec { callback.onSuccess(deserialize(it)) } }
+			.addOnFailureListener { exec { callback.onFailure(it) } }
 	}
 
 	override fun attachListener(callback: RequestCallback<List<Chat>>) : RepositorySubscription {

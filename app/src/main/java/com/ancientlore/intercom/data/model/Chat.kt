@@ -31,9 +31,10 @@ data class Chat(@field:PrimaryKey @DocumentId var id: String = "",
 	companion object {
 		const val TYPE_PRIVATE = 0
 		const val TYPE_GROUP = 1
+		const val TYPE_BROADCAST = 2
 	}
 
-	@IntDef(TYPE_PRIVATE, TYPE_GROUP)
+	@IntDef(TYPE_PRIVATE, TYPE_GROUP, TYPE_BROADCAST)
 	@Retention(AnnotationRetention.SOURCE)
 	annotation class Type
 

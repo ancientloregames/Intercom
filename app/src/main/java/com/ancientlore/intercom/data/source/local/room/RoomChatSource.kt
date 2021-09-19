@@ -71,6 +71,10 @@ class RoomChatSource(private val userId: String,
 		}
 	}
 
+	override fun getBroadcasts(callback: RequestCallback<List<Chat>>) {
+		TODO("Not yet implemented")
+	}
+
 	override fun attachListener(callback: RequestCallback<List<Chat>>): RepositorySubscription {
 		TODO("Not yet implemented")
 	}

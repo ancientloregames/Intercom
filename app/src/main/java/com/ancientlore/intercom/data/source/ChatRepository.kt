@@ -22,7 +22,7 @@ object ChatRepository : ChatSource {
 
 			override fun onSuccess(result: List<Chat>) {
 
-				val userId = App.backend.getAuthManager().getCurrentUser().id
+				val userId = App.backend.getAuthManager().getCurrentUserId()
 				App.frontend.getCryptoManager(userId).decryptChats(result, object : RequestCallback<Any> {
 
 					override fun onSuccess(ignore: Any) {
@@ -115,13 +115,28 @@ object ChatRepository : ChatSource {
 		})
 	}
 
+	override fun getBroadcasts(callback: RequestCallback<List<Chat>>) {
+
+		remoteSource.getBroadcasts(object : RequestCallback<List<Chat>> {
+
+			override fun onSuccess(result: List<Chat>) {
+				//TODO update local sources
+				callback.onSuccess(result)
+			}
+			override fun onFailure(error: Throwable) {
+				Utils.logError(error)
+				//TODO fallback
+			}
+		})
+	}
+
 	override fun attachListener(callback: RequestCallback<List<Chat>>) : RepositorySubscription {
 
 		return remoteSource.attachListener(object : RequestCallback<List<Chat>> {
 
 			override fun onSuccess(result: List<Chat>) {
 
-				val userId = App.backend.getAuthManager().getCurrentUser().id
+				val userId = App.backend.getAuthManager().getCurrentUserId()
 				App.frontend.getCryptoManager(userId).decryptChats(result, object : RequestCallback<Any> {
 
 					override fun onSuccess(ignore: Any) {

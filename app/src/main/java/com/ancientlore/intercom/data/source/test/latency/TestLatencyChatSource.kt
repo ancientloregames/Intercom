@@ -59,4 +59,8 @@ abstract class TestLatencyChatSource: TestChatSource(), LatencySource {
 
 		return DummyRepositorySubscription
 	}
+
+	override fun getBroadcasts(callback: RequestCallback<List<Chat>>) {
+		super.getBroadcasts(callback)
+	}
 }

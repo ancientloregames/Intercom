@@ -52,6 +52,10 @@ class ChatCreationFragment : FilterableFragment<ChatCreationViewModel, ChatCreat
 			.subscribe {
 				navigator?.openChatCreationGroup()
 			})
+		subscriptions.add(viewModel.createBroadcastRequest()
+			.subscribe {
+				navigator?.openBroadcastCreation()
+			})
 		subscriptions.add(viewModel.observeAddContact()
 			.subscribe {
 				addContact()
