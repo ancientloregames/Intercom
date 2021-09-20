@@ -9,9 +9,8 @@ import com.ancientlore.intercom.backend.CrashlyticsRequestCallback
 import com.ancientlore.intercom.backend.RepositorySubscription
 import com.ancientlore.intercom.data.model.Chat
 import com.ancientlore.intercom.data.model.Chat.Companion.TYPE_PRIVATE
-import com.ancientlore.intercom.data.model.Contact
 import com.ancientlore.intercom.data.source.ChatRepository
-import com.ancientlore.intercom.data.source.ContactRepository
+import com.ancientlore.intercom.manager.DeviceContactsManager
 import com.ancientlore.intercom.ui.FilterableViewModel
 import com.ancientlore.intercom.ui.chat.flow.ChatFlowParams
 import com.ancientlore.intercom.utils.extensions.runOnUiThread
@@ -56,7 +55,25 @@ class ChatListViewModel(context: Context)
 		super.clean()
 	}
 
-	fun init() {
+	fun init(contacts: List<DeviceContactsManager.Item>) {
+
+		repositorySub = ChatRepository.attachListener(object : CrashlyticsRequestCallback<List<Chat>>() {
+			override fun onSuccess(chats: List<Chat>) {
+
+				assignPrivateChatNames(chats, contacts)
+				runOnUiThread {
+					chatListIsEmpty.set(chats.isEmpty())
+					chatListFirstLoad.set(true)
+					listAdapter.setItems(chats)
+				}
+			}
+			override fun onFailure(error: Throwable) {
+				super.onFailure(error)
+				chatListIsEmpty.set(true)
+				chatListFirstLoad.set(true)
+			}
+		})
+
 		listAdapter.setListener(object : ChatListAdapter.Listener {
 			override fun onChatSelected(chat: Chat) {
 
@@ -78,7 +95,6 @@ class ChatListViewModel(context: Context)
 				openChatMenuSub.onNext(chat)
 			}
 		})
-		attachDataListener()
 	}
 
 	fun onCreateChatClicked() = chatCreationSub.onNext(EmptyObject)
@@ -87,31 +103,7 @@ class ChatListViewModel(context: Context)
 	fun observeChatOpenRequest() = chatOpenSub as Observable<ChatFlowParams>
 	fun observeOpenChatMenuRequest() = openChatMenuSub as Observable<Chat>
 
-	private fun attachDataListener() {
-		//TODO load chats independantly of contact list and assign names postpone
-		ContactRepository.getAll(object  : CrashlyticsRequestCallback<List<Contact>>() {
-			override fun onSuccess(contacts: List<Contact>) {
-				repositorySub = ChatRepository.attachListener(object : CrashlyticsRequestCallback<List<Chat>>() {
-					override fun onSuccess(chats: List<Chat>) {
-
-						assignPrivateChatNames(chats, contacts)
-						runOnUiThread {
-							chatListIsEmpty.set(chats.isEmpty())
-							listAdapter.setItems(chats)
-							chatListFirstLoad.set(true)
-						}
-					}
-					override fun onFailure(error: Throwable) {
-						super.onFailure(error)
-						chatListFirstLoad.set(true)
-						chatListIsEmpty.set(true)
-					}
-				})
-			}
-		})
-	}
-
-	private fun assignPrivateChatNames(chats: List<Chat>, contacts: List<Contact>) {
+	fun assignPrivateChatNames(chats: List<Chat>, contacts: List<DeviceContactsManager.Item>) {
 
 		val contactListTmp = LinkedList(contacts)
 		for (chat in chats) {
@@ -120,11 +112,11 @@ class ChatListViewModel(context: Context)
 			while (contactListIter.hasNext()) {
 				val contact = contactListIter.next()
 
-				if (chat.lastMsgSenderId == contact.phone) {
+				if (chat.lastMsgSenderId == contact.formatedMainNumber) {
 					chat.lastMsgSenderLocalName = contact.name
 				}
 
-				if (chat.name == contact.phone) {
+				if (chat.name == contact.formatedMainNumber) {
 					chat.localName = contact.name
 					contactListIter.remove()
 					break

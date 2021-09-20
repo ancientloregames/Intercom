@@ -8,6 +8,7 @@ import com.ancientlore.intercom.App
 import com.ancientlore.intercom.R
 import com.ancientlore.intercom.data.model.Chat
 import com.ancientlore.intercom.databinding.ChatListUiBinding
+import com.ancientlore.intercom.manager.DeviceContactsManager
 import com.ancientlore.intercom.ui.FilterableFragment
 import com.ancientlore.intercom.ui.chat.flow.ChatFlowParams
 import com.ancientlore.intercom.ui.dialog.option.chat.ChatOptionMenuDialog
@@ -42,7 +43,7 @@ class ChatListFragment : FilterableFragment<ChatListViewModel, ChatListUiBinding
 
 		dataBinding.listView.adapter = viewModel.listAdapter
 
-		viewModel.init()
+		viewModel.init(DeviceContactsManager.getContacts(requireContext()))
 
 		subscriptions.add(viewModel.observeChatCreationRequest()
 			.subscribe { openChatCreation() })
