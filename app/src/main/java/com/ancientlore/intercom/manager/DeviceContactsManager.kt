@@ -11,7 +11,12 @@ import android.util.Log
 import com.ancientlore.intercom.utils.Utils
 import com.ancientlore.intercom.utils.extensions.isPermissionGranted
 import com.ancientlore.intercom.utils.extensions.safeClose
+import io.reactivex.Single
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.util.*
+import kotlin.collections.ArrayList
 
 object DeviceContactsManager {
 
@@ -88,6 +93,16 @@ object DeviceContactsManager {
 
 	fun unregisterUpdateListener(listener: UpdateListener) = listeners.remove(listener)
 
+	fun getContactsAsync(context: Context): Single<List<Item>> {
+
+		return Single.create { callback ->
+			GlobalScope.launch(Dispatchers.Default) {
+				callback.onSuccess(getContacts(context))
+			}
+		}
+	}
+
+	@Synchronized
 	fun getContacts(context: Context): List<Item> {
 		if (contactListCache.isEmpty()) {
 			updateCache(context)

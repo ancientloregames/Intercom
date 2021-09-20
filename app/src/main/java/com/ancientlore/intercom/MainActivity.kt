@@ -88,9 +88,7 @@ class MainActivity : AppCompatActivity(),
 		fun onBackPressed(): Boolean
 	}
 
-	private val userContactExecutor = Executors.newSingleThreadExecutor{ //TODO terminate on logout (multiaccount mode)
-			run: Runnable? -> Thread(run, "exec_contactUpdate")
-	}
+	private val userContactExecutor = Executors.newSingleThreadExecutor(LoggingThreadFactory("exec_contactUpdate"))
 
 	private val user get() = App.backend.getAuthManager().getCurrentUser()
 
@@ -685,7 +683,9 @@ class MainActivity : AppCompatActivity(),
 		DeviceContactsManager.registerUpdateListener(this) //TODO unregister on logout (multiaccount mode)
 		DeviceContactsManager.enableObserver(applicationContext)
 
-		onContactListUpdate(DeviceContactsManager.getContacts(this))
+		userContactExecutor.execute {
+			onContactListUpdate(DeviceContactsManager.getContacts(this))
+		}
 	}
 
 	private fun showToast(@StringRes textResId: Int) {
