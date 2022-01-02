@@ -21,4 +21,6 @@
 	<dimen name="chatCreationGroupSelectedItemImageSize">65dp</dimen>
 
 	<dimen name="callRoundButtonSize">70dp</dimen>
+
+	<dimen name="newMsgCounterSize">10dp</dimen>
 </resources>

@@ -9,6 +9,7 @@ import com.ancientlore.intercom.data.source.remote.firestore.C.USERS
 import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_LAST_MSG_SENDER
 import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_LAST_MSG_TEXT
 import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_LAST_MSG_TIME
+import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_NEW_MSG_COUNT
 import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_STATUS
 import com.ancientlore.intercom.utils.Utils
 import com.google.firebase.firestore.FieldValue
@@ -30,7 +31,7 @@ class FirestoreMessageSourceNoCF(chatId: String): FirestoreMessageSource(chatId)
 					.set(HashMap<String, Any>().apply {
 						put(FIELD_STATUS, Message.STATUS_SENT)
 					}, SetOptions.merge())
-					.addOnFailureListener { exec { callback.onFailure(it) } }
+					.addOnFailureListener { e -> Utils.logError(e) }
 
 				val userChatInfoUpdate = HashMap<String, Any>().apply {
 					put(FIELD_LAST_MSG_SENDER, senderId)
@@ -38,22 +39,23 @@ class FirestoreMessageSourceNoCF(chatId: String): FirestoreMessageSource(chatId)
 					put(FIELD_LAST_MSG_TIME, FieldValue.serverTimestamp())
 				}
 
-				for (receiverId in item.receivers) {
+				db.collection(USERS)
+					.document(senderId)
+					.collection(CHATS)
+					.document(getSourceId())
+					.set(userChatInfoUpdate, SetOptions.merge())
+					.addOnSuccessListener { exec { callback.onSuccess(messageId) } }
+					.addOnFailureListener { e -> exec { callback.onFailure(e) } }
+
+				userChatInfoUpdate[FIELD_NEW_MSG_COUNT] = FieldValue.increment(1)
+
+				for (receiverId in item.receivers.minus(senderId)) {
 					db.collection(USERS)
 						.document(receiverId)
 						.collection(CHATS)
 						.document(getSourceId())
 						.set(userChatInfoUpdate, SetOptions.merge())
-						.addOnSuccessListener {
-							if (item.senderId == receiverId)
-								exec { callback.onSuccess(messageId) }
-						}
-						.addOnFailureListener { e ->
-							if (item.senderId == receiverId)
-								exec { callback.onFailure(e) }
-							else
-								Utils.logError(e)
-						}
+						.addOnFailureListener { e -> Utils.logError(e) }
 				}
 			}
 			.addOnFailureListener { exec { callback.onFailure(it) } }

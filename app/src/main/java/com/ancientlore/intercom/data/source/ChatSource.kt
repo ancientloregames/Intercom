@@ -8,5 +8,7 @@ interface ChatSource : DataSource<String, Chat> {
 
 	fun updateItem(item: Chat, callback: RequestCallback<Any> = RequestCallbackAny)
 
+	fun setMessageRecieved(id: String, callback: RequestCallback<Any> = RequestCallbackAny)
+
 	fun getBroadcasts(callback: RequestCallback<List<Chat>>)
 }

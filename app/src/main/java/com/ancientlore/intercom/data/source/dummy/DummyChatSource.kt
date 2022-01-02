@@ -33,6 +33,10 @@ object DummyChatSource : ChatSource {
 		callback.onFailure(EmptyResultException)
 	}
 
+	override fun setMessageRecieved(id: String, callback: RequestCallback<Any>) {
+		callback.onFailure(EmptyResultException)
+	}
+
 	override fun getBroadcasts(callback: RequestCallback<List<Chat>>) {
 		callback.onFailure(EmptyResultException)
 	}

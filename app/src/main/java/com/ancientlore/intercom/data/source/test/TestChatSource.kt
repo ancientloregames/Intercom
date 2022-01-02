@@ -97,9 +97,18 @@ abstract class TestChatSource: TestSource(), ChatSource {
 					it.name = item.name
 				if (item.iconUrl.isNotEmpty())
 					it.iconUrl = item.iconUrl
+				if (item.newMsgCount > 0)
+					it.newMsgCount = item.newMsgCount
 				callback.onSuccess(EmptyObject)
 			}
 			?: callback.onFailure(EmptyResultException)
+	}
+
+	override fun setMessageRecieved(id: String, callback: RequestCallback<Any>) {
+		testChatData[id]
+			?.let {
+				it.newMsgCount = 0
+			}
 	}
 
 	override fun deleteItem(id: String, callback: RequestCallback<Any>) {

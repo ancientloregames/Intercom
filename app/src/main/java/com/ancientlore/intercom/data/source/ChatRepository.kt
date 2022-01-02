@@ -115,6 +115,19 @@ object ChatRepository : ChatSource {
 		})
 	}
 
+	override fun setMessageRecieved(id: String, callback: RequestCallback<Any>) {
+
+		remoteSource.setMessageRecieved(id, object : RequestCallback<Any> {
+			override fun onSuccess(result: Any) {
+				cacheSource.setMessageRecieved(id)
+				localSource?.setMessageRecieved(id)
+			}
+			override fun onFailure(error: Throwable) {
+				callback.onFailure(error)
+			}
+		})
+	}
+
 	override fun getBroadcasts(callback: RequestCallback<List<Chat>>) {
 
 		remoteSource.getBroadcasts(object : RequestCallback<List<Chat>> {

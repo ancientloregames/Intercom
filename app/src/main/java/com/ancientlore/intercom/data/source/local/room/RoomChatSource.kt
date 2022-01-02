@@ -67,8 +67,13 @@ class RoomChatSource(private val userId: String,
 				dao.updateName(item.id, item.name)
 			if (item.iconUrl.isNotEmpty())
 				dao.updateIconUrl(item.id, item.iconUrl)
+			// TODO
 			callback.onSuccess(EmptyObject)
 		}
+	}
+
+	override fun setMessageRecieved(id: String, callback: RequestCallback<Any>) {
+		TODO("Not yet implemented")
 	}
 
 	override fun getBroadcasts(callback: RequestCallback<List<Chat>>) {

@@ -121,6 +121,9 @@ class ChatFlowViewModel(
 
 		if (params.chatId.isNotEmpty()) {
 			initMessageRepository(params.chatId)
+
+			ChatRepository.setMessageRecieved(params.chatId)
+
 			loadNextPage {
 
 				attachRepositoryChangeListener()

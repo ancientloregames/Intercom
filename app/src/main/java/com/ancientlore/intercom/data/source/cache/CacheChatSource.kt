@@ -13,7 +13,16 @@ object CacheChatSource : CacheSource<String, Chat>() {
 					it.iconUrl = item.iconUrl
 				if (item.participants.isNotEmpty())
 					it.participants = item.participants
+				if (item.newMsgCount != 0)
+					it.newMsgCount = item.newMsgCount
 				true
 			} ?: false
+	}
+
+	fun setMessageRecieved(id: String) {
+		cache[id]
+			?.let {
+				it.newMsgCount = 0
+			}
 	}
 }

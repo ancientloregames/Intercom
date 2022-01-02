@@ -25,7 +25,8 @@ data class Chat(@field:PrimaryKey @DocumentId var id: String = "",
                 @field:ColumnInfo var pin: Boolean? = null,
                 @field:ColumnInfo var mute: Boolean? = null,
                 @field:ColumnInfo @get:Exclude var userId: String = "",
-                @field:ColumnInfo var undeletable: Boolean = false)
+                @field:ColumnInfo var undeletable: Boolean = false,
+                @field:ColumnInfo var newMsgCount: Int = 0)
 	: Comparable<Chat>, Identifiable<String> {
 
 	companion object {
@@ -70,6 +71,7 @@ data class Chat(@field:PrimaryKey @DocumentId var id: String = "",
 				&& pin == other.pin
 				&& mute == other.mute
 				&& undeletable == other.undeletable
+				&& newMsgCount == other.newMsgCount
 	}
 
 	override fun hashCode(): Int {
@@ -85,6 +87,7 @@ data class Chat(@field:PrimaryKey @DocumentId var id: String = "",
 		pin?.let { result = 31 * result + pin.hashCode() }
 		mute?.let { result = 31 * result + mute.hashCode() }
 		result = 31 * result + undeletable.hashCode()
+		result = 31 * result + newMsgCount.hashCode()
 		return result
 	}
 

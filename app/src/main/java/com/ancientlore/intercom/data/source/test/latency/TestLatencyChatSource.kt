@@ -38,6 +38,12 @@ abstract class TestLatencyChatSource: TestChatSource(), LatencySource {
 		}
 	}
 
+	override fun setMessageRecieved(id: String, callback: RequestCallback<Any>) {
+		schedule {
+			super.setMessageRecieved(id, callback)
+		}
+	}
+
 	override fun deleteItem(id: String, callback: RequestCallback<Any>) {
 		schedule {
 			super.deleteItem(id, callback)

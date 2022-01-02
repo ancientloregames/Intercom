@@ -28,6 +28,7 @@ object C {
 	const val FIELD_LAST_MSG_SENDER = "lastMsgSenderId"
 	const val FIELD_LAST_MSG_TEXT = "lastMsgText"
 	const val FIELD_LAST_MSG_TIME = "lastMsgTime"
+	const val FIELD_NEW_MSG_COUNT = "newMsgCount"
 
 	const val FIELD_ATTACH_URL = "attachUrl"
 }

@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.annotation.ColorInt
 import androidx.annotation.Px
 import androidx.core.content.ContextCompat
+import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableField
 import com.ancientlore.intercom.App
 import com.ancientlore.intercom.BR
@@ -82,8 +83,11 @@ class ChatListAdapter(context: Context,
 		val messageField = ObservableField<CharSequence>("")
 		val dateField = ObservableField("")
 
-		val pinField = ObservableField(false)
-		val muteField = ObservableField(false)
+		val pinField = ObservableBoolean(false)
+		val muteField = ObservableBoolean(false)
+		val newMsgCountField = ObservableField("")
+		// FIXME reductant field, but haven't been able to make size check work in layout
+		val newMsgVisibleField = ObservableBoolean(false)
 
 		@ColorInt
 		private val iconColor: Int
@@ -129,6 +133,9 @@ class ChatListAdapter(context: Context,
 
 			pinField.set(data.pin == true)
 			muteField.set(data.mute == true)
+
+			newMsgCountField.set(data.newMsgCount.toString())
+			newMsgVisibleField.set(data.newMsgCount > 0)
 		}
 
 		fun onClick() = listener?.onItemClicked()
