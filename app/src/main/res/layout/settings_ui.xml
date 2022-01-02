@@ -15,9 +15,15 @@
 			android:layout_height="match_parent"
 			tools:context=".ui.settings.SettingsFragment">
 
-		<LinearLayout
+		<ScrollView
 				android:layout_width="match_parent"
 				android:layout_height="match_parent"
+				android:background="@android:color/white"
+			>
+
+		<LinearLayout
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
 				android:orientation="vertical"
 				android:background="@android:color/white"
 				android:clickable="true">
@@ -52,6 +58,8 @@
 					app:abbrSize="@{@dimen/settingsUserNameAbSize}"
 					app:abbrTextColor="@{@android:color/white}"
 					app:abbrBackColor="@{@color/colorPrimaryDark}"
+					app:placeholder="@{@drawable/ic_avatar}"
+					app:placeholderTint="@{@android:color/white}"
 					app:backgroundColor="@color/colorPrimaryDark"
 					tools:backgroundColor="@color/colorPrimaryDark"
 					tools:srcCompat="@drawable/ic_avatar"
@@ -148,7 +156,46 @@
 
 			</LinearLayout>
 
+			<TextView
+					android:id="@+id/deviceSectionTitle"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:layout_marginTop="15dp"
+					android:text="@string/device_settings"
+					style="@style/settingsSectionTitle" />
+
+			<com.ancientlore.intercom.view.DrawableCompatTextView
+					android:id="@+id/appSettingsButton"
+					android:layout_width="match_parent"
+					android:layout_height="60dp"
+					app:drawableStart="@drawable/ic_settings_24dp"
+					app:drawableTint="@color/defaultGreyColor"
+					android:background="?android:attr/selectableItemBackground"
+					android:onClick="@{() -> ui.onAppSettingsButtonClicked()}"
+					android:text="@string/app_settings"
+					style="@style/settingsIconedTextItem"
+					/>
+
+			<View
+					android:layout_width="match_parent"
+					style="@style/userSettingsItemDivider"
+					/>
+
+			<com.ancientlore.intercom.view.DrawableCompatTextView
+					android:id="@+id/notificationsButton"
+					android:layout_width="match_parent"
+					android:layout_height="60dp"
+					app:drawableStart="@drawable/ic_bell_24dp"
+					app:drawableTint="@color/defaultGreyColor"
+					android:background="?android:attr/selectableItemBackground"
+					android:onClick="@{() -> ui.onNotificationsButtonClicked()}"
+					android:text="@string/notification_settings"
+					style="@style/settingsIconedTextItem"
+					/>
+
 		</LinearLayout>
+
+		</ScrollView>
 
 	</com.ancientlore.intercom.view.SwipableLayout>
 </layout>

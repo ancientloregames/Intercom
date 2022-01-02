@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
+import android.provider.Settings
 import android.view.View
 import android.widget.EditText
 import androidx.core.content.ContextCompat
@@ -19,6 +20,9 @@ import com.ancientlore.intercom.utils.extensions.getAppCacheDir
 import com.ancientlore.intercom.utils.extensions.getFileData
 import com.ancientlore.intercom.utils.extensions.showKeyboard
 import java.io.File
+import android.content.ComponentName
+import android.net.Uri
+
 
 class SettingsFragment : BasicFragment<SettingsViewModel, SettingsUiBinding>()  {
 
@@ -107,6 +111,23 @@ class SettingsFragment : BasicFragment<SettingsViewModel, SettingsUiBinding>()  
 				editStatusView.setText(it)
 				editStatusDialog?.show()
 				Utils.runOnUiThread({ editStatusView.showKeyboard() }, 20)
+			})
+		subscriptions.add(viewModel.openAppSettingsRequest()
+			.subscribe {
+				val intent = Intent().apply {
+					action = "android.settings.APPLICATION_DETAILS_SETTINGS"
+					data = Uri.parse("package:${context.packageName}")
+					component = ComponentName(
+						"com.android.settings",
+						"com.android.settings.applications.InstalledAppDetails")
+				}
+				startActivity(intent)
+			})
+		subscriptions.add(viewModel.openNotificationSettingsRequest()
+			.subscribe {
+				val intent: Intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+					.putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+				startActivity(intent)
 			})
 	}
 

@@ -43,6 +43,10 @@ class SettingsViewModel(private val user: User)
 
 	private val showStatusEditorSubj = PublishSubject.create<String>()
 
+	private val openAppSettingsSubj = PublishSubject.create<Any>()
+
+	private val openNotificationSettingsSubj = PublishSubject.create<Any>()
+
 	@Px
 	private var abbrSize: Int = 0
 	@ColorInt
@@ -63,6 +67,8 @@ class SettingsViewModel(private val user: User)
 		openImageViewerSubj.onComplete()
 		showNameEditorSubj.onComplete()
 		showStatusEditorSubj.onComplete()
+		openAppSettingsSubj.onComplete()
+		openNotificationSettingsSubj.onComplete()
 
 		super.clean()
 	}
@@ -83,13 +89,25 @@ class SettingsViewModel(private val user: User)
 		showStatusEditorSubj.onNext(userStatusField.get()!!)
 	}
 
-	fun observeOpenGalleryRequest() = openGallerySub as Observable<*>
+	fun onAppSettingsButtonClicked() {
+		openAppSettingsSubj.onNext(EmptyObject)
+	}
+
+	fun onNotificationsButtonClicked() {
+		openNotificationSettingsSubj.onNext(EmptyObject)
+	}
+
+	fun observeOpenGalleryRequest() = openGallerySub as Observable<Any>
 
 	fun openImageViewerRequest() = openImageViewerSubj as Observable<Uri>
 
 	fun showNameEditorRequest() = showNameEditorSubj as Observable<String>
 
 	fun showStatusEditorRequest() = showStatusEditorSubj as Observable<String>
+
+	fun openAppSettingsRequest() = openAppSettingsSubj as Observable<Any>
+
+	fun openNotificationSettingsRequest() = openNotificationSettingsSubj as Observable<Any>
 
 	fun handleSelectedProfileIcon(fileData: FileData) {
 
