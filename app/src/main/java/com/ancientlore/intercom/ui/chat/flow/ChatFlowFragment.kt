@@ -332,7 +332,6 @@ class ChatFlowFragment : FilterableFragment<ChatFlowViewModel, ChatFlowUiBinding
 					startService(Intent(this, ChatIconUploadService::class.java)
 						.putParcelableArrayListExtra(FileUploadService.EXTRA_URI_LIST, arrayListOf(params.iconUri))
 						.putExtra(FileUploadService.EXTRA_PATH, ICON_DIR_PATH)
-						.putExtra(FileUploadService.EXTRA_NOTIFY, true)
 						.putExtra(ChatIconUploadService.EXTRA_CHAT_ID, chatId)
 						.putExtra(ChatIconUploadService.EXTRA_USER_ID, params.userId)
 						.putExtra(ChatIconUploadService.EXTRA_CHAT_TYPE, params.chatType)

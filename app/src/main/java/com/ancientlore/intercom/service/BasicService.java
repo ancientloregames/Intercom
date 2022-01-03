@@ -1,6 +1,5 @@
 package com.ancientlore.intercom.service;
 
-import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -9,6 +8,7 @@ import android.content.Intent;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.NotificationCompat;
 
 import com.ancientlore.intercom.R;
 
@@ -44,6 +44,15 @@ public abstract class BasicService extends Service
 
 	private int mumTasks = 0;
 
+	private String notificationChannelId;
+
+	@Override
+	public void onCreate()
+	{
+		super.onCreate();
+		notificationChannelId = getResources().getString(R.string.basic_notification_channel_id);
+	}
+
 	public void taskStarted()
 	{
 		changeNumberOfTasks(1);
@@ -74,7 +83,7 @@ public abstract class BasicService extends Service
 	protected void showProgressNotification(@NonNull NotificationParams params)
 	{
 		Log.d(TAG, "showProgressNotification:" + params.progress);
-		Notification.Builder builder = new Notification.Builder(this)
+		NotificationCompat.Builder builder = new NotificationCompat.Builder(this, notificationChannelId)
 				.setSmallIcon(params.smallIcon)
 				.setContentTitle(getString(R.string.app_name))
 				.setContentText(getString(params.contentText))
@@ -94,7 +103,7 @@ public abstract class BasicService extends Service
 		PendingIntent pendingIntent = PendingIntent.getActivity(this, CODE_FINISHED, intent,
 				PendingIntent.FLAG_UPDATE_CURRENT);
 
-		Notification.Builder builder = new Notification.Builder(this)
+		NotificationCompat.Builder builder = new NotificationCompat.Builder(this, notificationChannelId)
 				.setSmallIcon(params.smallIcon)
 				.setContentTitle(getString(R.string.app_name))
 				.setContentText(getString(params.contentText))
