@@ -40,6 +40,5 @@ abstract class FirestoreSource<T> {
 
 	protected fun cleanInternal() {
 		service.shutdown()
-		db.terminate()
 	}
 }
