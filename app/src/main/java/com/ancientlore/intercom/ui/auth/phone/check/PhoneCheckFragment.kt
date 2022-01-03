@@ -39,29 +39,29 @@ class PhoneCheckFragment
 
 	override fun createDataBinding(view: View) = PhoneCheckUiBinding.bind(view)
 
-	override fun createViewModel() = PhoneCheckViewModel()
+	override fun createViewModel() = PhoneCheckViewModel(params)
 
 	override fun init(viewModel: PhoneCheckViewModel, savedState: Bundle?) {
 		super.init(viewModel, savedState)
 
 		dataBinding.viewModel = viewModel
 
-		auth?.loginViaPhone(params, object : RequestCallback<User> {
-			override fun onSuccess(result: User) {
-				onSuccessfulAuth(result)
-			}
-			override fun onFailure(error: Throwable) {
-				runOnUiThread {
-					Toast.makeText(context, R.string.verification_failure_msg, LENGTH_LONG).show()
-				}
-			}
-		})
+		subscriptions.addAll(
+			viewModel.openChatListRequest()
+				.subscribe {
+					onSuccessfulAuth(it)
+				},
+				viewModel.observeToastRequest()
+				.subscribe {
 
-		subscriptions.add(viewModel.observeEnterRequest()
-			.subscribe { verifyCode(it) })
+				}
+		)
 	}
 
-	private fun verifyCode(code: String) {
-		// TODO
+	override fun getToastStringRes(toastId: Int): Int {
+		return when (toastId) {
+			PhoneCheckViewModel.TOAST_CODE_ERR ->R.string.verification_failure_msg
+			else -> super.getToastStringRes(toastId)
+		}
 	}
 }

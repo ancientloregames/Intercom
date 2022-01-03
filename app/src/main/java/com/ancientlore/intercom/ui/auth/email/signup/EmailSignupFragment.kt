@@ -55,6 +55,7 @@ class EmailSignupFragment : AuthFragment<EmailSignupViewModel, EmailSignupUiBind
 
 	private fun signup(params: EmailAuthParams) {
 		auth.signupViaEmail(params, object : AuthCallback {
+			override fun onVerification(id: String) {}
 			override fun onSuccess(result: User) = onSuccessfulAuth(result)
 			override fun onFailure(error: Throwable) = onFailedAuth(error)
 		})

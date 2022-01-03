@@ -1,7 +1,8 @@
 package com.ancientlore.intercom.ui.auth.phone.login
 
 import androidx.databinding.ObservableField
-import com.ancientlore.intercom.backend.RequestCallback
+import com.ancientlore.intercom.App
+import com.ancientlore.intercom.backend.auth.AuthCallback
 import com.ancientlore.intercom.backend.auth.PhoneAuthParams
 import com.ancientlore.intercom.data.model.User
 import com.ancientlore.intercom.ui.auth.AuthViewModel
@@ -20,7 +21,7 @@ class PhoneLoginViewModel : AuthViewModel() {
 
 	val phoneField = ObservableField<String>("")
 
-	private val userPhone get() = phoneField.get()!!
+	private val userPhone get() = Utils.formatPhoneNumber(phoneField.get()!!)
 
 	private val loginSuccessEvent = PublishSubject.create<User>()
 	private val validationRequestEvent = PublishSubject.create<PhoneAuthParams>()
@@ -45,18 +46,21 @@ class PhoneLoginViewModel : AuthViewModel() {
 	}
 
 	private fun isValidPhone() : Boolean {
-		// TODO
-		return true
+		return userPhone.run { matches(Regex("\\+[0-9]+")) && length > 3 && length < 14 }
 	}
 
 	private fun login() {
-		val number = userPhone
-		authManager.loginViaPhone(PhoneAuthParams(number), object : RequestCallback<User> {
-			override fun onSuccess(result: User) {
-				if (authManager.isNeedPhoneCheck())
-					validationRequestEvent.onNext(PhoneAuthParams(number))
+		val rawNumber = userPhone
+		val number = if (rawNumber.startsWith('+')) rawNumber else "+$rawNumber"
+		authManager.loginViaPhone(PhoneAuthParams(number), object : AuthCallback {
+			override fun onVerification(id: String) {
+				if (authManager.isLoggedIn())
+					loginSuccessEvent.onNext(authManager.getCurrentUser())
 				else
-					loginSuccessEvent.onNext(result)
+					validationRequestEvent.onNext(PhoneAuthParams(number, id))
+			}
+			override fun onSuccess(result: User) {
+				loginSuccessEvent.onNext(result)
 			}
 			override fun onFailure(error: Throwable) {
 				Utils.logError(error)

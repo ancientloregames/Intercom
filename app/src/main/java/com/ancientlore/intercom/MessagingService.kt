@@ -21,10 +21,11 @@ class MessagingService: FirebaseMessagingService() {
 	}
 
 	override fun onNewToken(newToken: String) {
-		App.backend.getAuthManager().getCurrentUser()
-			?.let { user ->
+		App.backend.getAuthManager().getCurrentUserId()
+			.takeIf { it.isNotEmpty() }
+			?.let { userId ->
 				if (!UserRepository.hasRemoteSource()) {
-					val remoteSource = App.backend.getDataSourceProvider().getUserSource(user.id)
+					val remoteSource = App.backend.getDataSourceProvider().getUserSource(userId)
 					UserRepository.setRemoteSource(remoteSource)
 				}
 

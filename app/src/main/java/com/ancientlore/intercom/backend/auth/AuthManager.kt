@@ -8,8 +8,8 @@ interface AuthManager {
 	fun signupViaEmail(params: EmailAuthParams, callback: RequestCallback<User>)
 	fun loginViaEmail(params: EmailAuthParams, callback: RequestCallback<User>)
 
-	fun loginViaPhone(params: PhoneAuthParams, callback: RequestCallback<User>)
-	fun verifySmsCode(smsCode: String, callback: RequestCallback<User>)
+	fun loginViaPhone(params: PhoneAuthParams, callback: AuthCallback)
+	fun verifySmsCode(smsCode: String, validationId: String, callback: RequestCallback<User>)
 	fun isNeedPhoneCheck() : Boolean
 
 	fun isLoggedIn() : Boolean

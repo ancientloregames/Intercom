@@ -18,7 +18,7 @@ object FirebaseAuthManager : AuthManager {
 
 	private val authExecutor: Executor by lazy { Executors.newSingleThreadExecutor() }
 
-	private var verificationId: String? = null
+	private var resendToken: PhoneAuthProvider.ForceResendingToken? = null
 
 	override fun isLoggedIn() = auth.currentUser != null
 
@@ -74,16 +74,17 @@ object FirebaseAuthManager : AuthManager {
 			.addOnFailureListener { error -> callback.onFailure(error) }
 	}
 
-	override fun loginViaPhone(params: PhoneAuthParams, callback: RequestCallback<User>) {
+	override fun loginViaPhone(params: PhoneAuthParams, callback: AuthCallback) {
 		PhoneAuthProvider.getInstance(auth).verifyPhoneNumber(params.phone,
 			60, TimeUnit.SECONDS,
 			authExecutor,
 			object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
 				override fun onCodeSent(id: String?, token: PhoneAuthProvider.ForceResendingToken) {
-					verificationId = id
-					verificationId?.let {
+					id?.let {
+						resendToken = token
 						if (params.phone.startsWith("+123456789")) // FIXME Test auth, remove on release
-							verifySmsCode("123456", callback)
+							verifySmsCode("123456", it, callback)
+						else callback.onVerification(it)
 					}
 				}
 				override fun onVerificationCompleted(creds: PhoneAuthCredential) =
@@ -91,14 +92,12 @@ object FirebaseAuthManager : AuthManager {
 				override fun onVerificationFailed(exception: FirebaseException) =
 					callback.onFailure(exception)
 			}
-		)
+		, resendToken)
 	}
 
-	override fun verifySmsCode(smsCode: String, callback: RequestCallback<User>) {
-		if (verificationId != null) {
-			val credential = PhoneAuthProvider.getCredential(verificationId!!, "123456")
-			onPhoneAuthCredential(credential, callback)
-		} else callback.onFailure(AuthException("No verification id. Did you forget to request for phone verification?"))
+	override fun verifySmsCode(smsCode: String, validationId: String, callback: RequestCallback<User>) {
+		val credential = PhoneAuthProvider.getCredential(validationId, smsCode)
+		onPhoneAuthCredential(credential, callback)
 	}
 
 	private fun onPhoneAuthCredential(credential: PhoneAuthCredential, callback: RequestCallback<User>) {

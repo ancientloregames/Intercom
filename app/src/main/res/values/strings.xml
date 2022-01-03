@@ -13,6 +13,7 @@
 	<string name="login_form_title">Authorization</string>
 	<string name="signup_form_title">Registration</string>
 	<string name="verification_form_title">Verification</string>
+	<string name="resend_verification_code">send a new code</string>
 	<string name="goto_sighup_button">I do not have an account</string>
 	<string name="goto_login_button">I already have an account</string>
 	<string name="login">Login</string>
@@ -30,6 +31,8 @@
 	<string name="auth_password">Password</string>
 	<string name="auth_confirmpass">Confirm password</string>
 	<string name="auth_code">Code</string>
+	<string name="auth_phone_hint">+380XXXXXXXXX</string>
+	<string name="enter_phone">Enter your phone number</string>
 
 	<string name="default_empty_list_hint">The list is empty</string>
 	<string name="chat_list_empty_hint">Your chat list is currently empty</string>
@@ -160,4 +163,8 @@
 	<string name="create_broadcast">Create Broadcast</string>
 	<string name="new_broadcast">New Broadcast</string>
 	<string name="broadcast_name_field_hint">Enter broadcast name</string>
+
+	<string name="device_settings">Device settings</string>
+	<string name="app_settings">App settings</string>
+	<string name="notification_settings">Notifications and sounds</string>
 </resources>

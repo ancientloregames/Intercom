@@ -53,6 +53,7 @@ class EmailLoginFragment : AuthFragment<EmailLoginViewModel, EmailLoginUiBinding
 
 	private fun login(params: EmailAuthParams) {
 		auth.loginViaEmail(params, object : AuthCallback {
+			override fun onVerification(id: String) {}
 			override fun onSuccess(result: User) = onSuccessfulAuth(result)
 			override fun onFailure(error: Throwable) = onFailedAuth(error)
 		})
