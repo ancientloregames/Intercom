@@ -14,14 +14,14 @@ import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 
 class BroadcastListViewModel(context: Context)
-	: FilterableViewModel<ChatListAdapter>(ChatListAdapter(context)) {
+	: FilterableViewModel<BroadcastListAdapter>(BroadcastListAdapter(context)) {
 
 	val broadcastListIsEmpty = ObservableBoolean(false)
 
 	private val openBroadcastSubj = PublishSubject.create<ChatFlowParams>()
 
 	init {
-		listAdapter.setListener(object : ChatListAdapter.Listener {
+		listAdapter.setListener(object : BroadcastListAdapter.Listener {
 			override fun onChatSelected(chat: Chat) {
 				openBroadcastSubj.onNext(ChatFlowParams(
 					userId = App.backend.getAuthManager().getCurrentUserId(),

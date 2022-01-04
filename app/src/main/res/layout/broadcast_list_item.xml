@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+		xmlns:android="http://schemas.android.com/apk/res/android"
+		xmlns:tools="http://schemas.android.com/tools">
+	<data>
+		<variable
+				name="viewModel"
+				type="com.ancientlore.intercom.ui.boadcast.list.BroadcastListAdapter.ViewHolder"/>
+	</data>
+	<androidx.constraintlayout.widget.ConstraintLayout
+			android:layout_width="match_parent"
+			android:layout_height="75dp"
+			android:paddingStart="8dp"
+			android:paddingEnd="8dp"
+			android:orientation="vertical"
+			android:background="?android:attr/selectableItemBackground"
+			android:onClick="@{() -> viewModel.onClick()}"
+			>
+		<com.ancientlore.intercom.view.CircleImageView
+				android:id="@+id/iconView"
+				android:layout_width="50dp"
+				android:layout_height="50dp"
+				android:layout_marginRight="8dp"
+				android:layout_marginEnd="8dp"
+				android:src="@{viewModel.iconField}"
+				app:layout_constraintStart_toStartOf="parent"
+				app:layout_constraintBottom_toBottomOf="parent"
+				app:layout_constraintTop_toTopOf="parent"
+				app:layout_constraintEnd_toStartOf="@+id/titleView"
+				tools:src="@drawable/ic_avatar"
+				tools:tint="@android:color/white"
+				tools:backgroundColor="@color/chatIconBackColor"
+				/>
+
+		<androidx.appcompat.widget.AppCompatTextView
+				android:id="@+id/titleView"
+				android:layout_width="0dp"
+				android:layout_height="0dp"
+				android:gravity="center_vertical"
+				android:textSize="18sp"
+				android:textColor="@color/defaultTextColor"
+				android:textStyle="bold"
+				app:layout_constraintStart_toEndOf="@+id/iconView"
+				app:layout_constraintBottom_toBottomOf="@+id/iconView"
+				app:layout_constraintTop_toTopOf="@+id/iconView"
+				app:layout_constraintEnd_toEndOf="parent"
+				android:text="@={viewModel.titleField}"
+				tools:text="Title"
+				/>
+
+		<View android:id="@+id/dividerView"
+				android:layout_width="match_parent"
+				android:layout_height="0.5dp"
+				android:background="@color/defaultListItemDividerColor"
+				app:layout_constraintEnd_toEndOf="parent"
+				app:layout_constraintStart_toStartOf="parent"
+				app:layout_constraintTop_toBottomOf="@id/titleView"
+				app:layout_constraintBottom_toBottomOf="parent"
+				app:layout_constraintVertical_bias="100"
+				/>
+
+	</androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
