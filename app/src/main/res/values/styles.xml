@@ -6,6 +6,12 @@
 		<item name="colorPrimary">@color/colorPrimary</item>
 		<item name="colorPrimaryDark">@color/colorPrimaryDark</item>
 		<item name="colorAccent">@color/colorAccent</item>
+	</style>
+
+	<style name="AppThemeSplashScreen" parent="AppTheme">
+		<item name="colorPrimary">@android:color/white</item>
+		<item name="colorPrimaryDark">@android:color/white</item>
+		<item name="colorAccent">@android:color/white</item>
 		<item name="android:windowBackground">@drawable/splashscreen</item>
 	</style>
 
@@ -23,7 +29,7 @@
 	</style>
 
 	<style name="authTitle" parent="@style/TextAppearance.AppCompat.Title">
-		<item name="android:textColor">@color/defaultTextColor</item>
+		<item name="android:textColor">@color/defaultGreyColor</item>
 		<item name="android:maxLines">1</item>
 		<item name="android:singleLine">true</item>
 		<item name="android:gravity">center</item>

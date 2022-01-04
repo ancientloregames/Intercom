@@ -14,7 +14,6 @@
 			android:label="@string/app_name"
 			android:roundIcon="@mipmap/ic_launcher_round"
 			android:supportsRtl="true"
-			android:theme="@style/AppTheme"
 			android:name=".App"
 	>
 
@@ -33,9 +32,11 @@
 				android:name="firebase_analytics_collection_enabled"
 				android:value="false" />
 
-		<activity android:name=".MainActivity"
-				android:configChanges="orientation|screenSize"
-				android:windowSoftInputMode="adjustResize">
+		<activity android:name=".StartActivity"
+				android:label="@string/app_name"
+				android:screenOrientation="portrait"
+				android:theme="@style/AppThemeSplashScreen"
+			>
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN"/>
 
@@ -44,6 +45,13 @@
 				<action android:name="com.ancientlore.intercom.action.OPEN_FROM_PUSH"/>
 			</intent-filter>
 		</activity>
+
+		<activity android:name=".MainActivity"
+				android:label="@string/app_name"
+				android:configChanges="orientation|screenSize"
+				android:windowSoftInputMode="adjustResize"
+				android:theme="@style/AppTheme"
+				/>
 
 		<activity android:name="com.ancientlore.intercom.ui.notification.NotificationAnswerActivity"
 		          android:theme="@style/AnswerDialog"
