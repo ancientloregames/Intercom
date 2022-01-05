@@ -211,6 +211,7 @@ class ChatListViewModel(context: Context)
 	}
 
 	private fun logout() {
+		UserRepository.updateOnlineStatus(false)
 		App.backend.getAuthManager().logout()
 	}
 }
