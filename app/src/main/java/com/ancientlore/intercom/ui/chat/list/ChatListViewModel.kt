@@ -10,6 +10,7 @@ import com.ancientlore.intercom.backend.RepositorySubscription
 import com.ancientlore.intercom.data.model.Chat
 import com.ancientlore.intercom.data.model.Chat.Companion.TYPE_PRIVATE
 import com.ancientlore.intercom.data.source.ChatRepository
+import com.ancientlore.intercom.data.source.UserRepository
 import com.ancientlore.intercom.manager.DeviceContactsManager
 import com.ancientlore.intercom.ui.FilterableViewModel
 import com.ancientlore.intercom.ui.chat.flow.ChatFlowParams
@@ -22,6 +23,12 @@ class ChatListViewModel(context: Context)
 	: FilterableViewModel<ChatListAdapter>(ChatListAdapter(context)) {
 
 	companion object {
+		const val OPTION_CREATE_GROUP = 0
+		const val OPTION_OPEN_CONTACTS = 1
+		const val OPTION_OPEN_BROADCAST = 2
+		const val OPTION_OPEN_SETTINGS = 3
+		const val OPTION_LOGOUT = 4
+
 		const val ITEM_OPTION_PIN = 0
 		const val ITEM_OPTION_MUTE = 1
 		const val ITEM_OPTION_DELETE = 2
@@ -30,6 +37,10 @@ class ChatListViewModel(context: Context)
 		const val TOAST_CHAT_DELETED_NOT = 1
 		const val TOAST_CHAT_UNDELETABLE = 2
 	}
+
+	@IntDef(OPTION_CREATE_GROUP, OPTION_OPEN_CONTACTS, OPTION_OPEN_BROADCAST, OPTION_OPEN_SETTINGS, OPTION_LOGOUT)
+	@Retention(AnnotationRetention.SOURCE)
+	annotation class Option
 
 	@IntDef(ITEM_OPTION_PIN, ITEM_OPTION_MUTE, ITEM_OPTION_DELETE)
 	@Retention(AnnotationRetention.SOURCE)
@@ -42,6 +53,11 @@ class ChatListViewModel(context: Context)
 	private val chatCreationSub = PublishSubject.create<Any>()
 	private val chatOpenSub = PublishSubject.create<ChatFlowParams>()
 	private val openChatMenuSub = PublishSubject.create<Chat>()
+	private val createGroupSubj = PublishSubject.create<Any>()
+	private val openContactsSubj = PublishSubject.create<Any>()
+	private val openBroadcastSubj = PublishSubject.create<Any>()
+	private val openSettingsSubj = PublishSubject.create<Any>()
+	private val openAuthFormSubj = PublishSubject.create<Any>()
 
 	private var repositorySub: RepositorySubscription? = null
 
@@ -49,6 +65,11 @@ class ChatListViewModel(context: Context)
 		chatCreationSub.onComplete()
 		chatOpenSub.onComplete()
 		openChatMenuSub.onComplete()
+		createGroupSubj.onComplete()
+		openContactsSubj.onComplete()
+		openBroadcastSubj.onComplete()
+		openSettingsSubj.onComplete()
+		openAuthFormSubj.onComplete()
 		repositorySub?.remove()
 		listAdapter.setListener(null)
 
@@ -99,9 +120,14 @@ class ChatListViewModel(context: Context)
 
 	fun onCreateChatClicked() = chatCreationSub.onNext(EmptyObject)
 
-	fun observeChatCreationRequest() = chatCreationSub as Observable<*>
-	fun observeChatOpenRequest() = chatOpenSub as Observable<ChatFlowParams>
-	fun observeOpenChatMenuRequest() = openChatMenuSub as Observable<Chat>
+	fun chatCreationRequest() = chatCreationSub as Observable<Any>
+	fun chatOpenRequest() = chatOpenSub as Observable<ChatFlowParams>
+	fun openChatMenuRequest() = openChatMenuSub as Observable<Chat>
+	fun createGroupRequest() = createGroupSubj as Observable<Any>
+	fun openContactRequest() = openContactsSubj as Observable<Any>
+	fun openBroadcastRequest() = openBroadcastSubj as Observable<Any>
+	fun openSettingsRequest() = openSettingsSubj as Observable<Any>
+	fun openAuthFormRequest() = openAuthFormSubj as Observable<Any>
 
 	fun assignPrivateChatNames(chats: List<Chat>, contacts: List<DeviceContactsManager.Item>) {
 
@@ -121,6 +147,19 @@ class ChatListViewModel(context: Context)
 					contactListIter.remove()
 					break
 				}
+			}
+		}
+	}
+
+	fun onOptionSelected(@Option selectedId: Int) {
+		when (selectedId) {
+			OPTION_CREATE_GROUP -> createGroupSubj.onNext(EmptyObject)
+			OPTION_OPEN_CONTACTS -> openContactsSubj.onNext(EmptyObject)
+			OPTION_OPEN_BROADCAST -> openBroadcastSubj.onNext(EmptyObject)
+			OPTION_OPEN_SETTINGS -> openSettingsSubj.onNext(EmptyObject)
+			OPTION_LOGOUT -> {
+				logout()
+				openAuthFormSubj.onNext(EmptyObject)
 			}
 		}
 	}
@@ -169,5 +208,9 @@ class ChatListViewModel(context: Context)
 		else {
 			toastRequest.onNext(TOAST_CHAT_UNDELETABLE)
 		}
+	}
+
+	private fun logout() {
+		App.backend.getAuthManager().logout()
 	}
 }

@@ -45,35 +45,45 @@ class ChatListFragment : FilterableFragment<ChatListViewModel, ChatListUiBinding
 
 		viewModel.init(DeviceContactsManager.getContacts(requireContext()))
 
-		subscriptions.add(viewModel.observeChatCreationRequest()
-			.subscribe { openChatCreation() })
-		subscriptions.add(viewModel.observeChatOpenRequest()
-			.subscribe { openChatFlow(it) })
-		subscriptions.add(viewModel.observeOpenChatMenuRequest()
-			.subscribe { openChatMenu(it) })
+		subscriptions.addAll(
+			viewModel.chatCreationRequest().subscribe { openChatCreation() },
+
+			viewModel.chatOpenRequest().subscribe { openChatFlow(it) },
+
+			viewModel.openChatMenuRequest().subscribe { openChatMenu(it) },
+
+			viewModel.createGroupRequest().subscribe { navigator?.openChatCreationGroup() },
+
+			viewModel.openContactRequest().subscribe { navigator?.openContactList() },
+
+			viewModel.openBroadcastRequest().subscribe { navigator?.openBroadcastList() },
+
+			viewModel.openSettingsRequest().subscribe { navigator?.openSettings() },
+
+			viewModel.openAuthFormRequest().subscribe { navigator?.openPhoneAuthForm() }
+		)
 	}
 
 	override fun onOptionsItemSelected(item: MenuItem): Boolean {
 		return when (item.itemId) {
 			R.id.createGroup -> {
-				navigator?.openChatCreationGroup()
+				viewModel.onOptionSelected(ChatListViewModel.OPTION_CREATE_GROUP)
 				true
 			}
 			R.id.contacts -> {
-				navigator?.openContactList()
+				viewModel.onOptionSelected(ChatListViewModel.OPTION_OPEN_CONTACTS)
 				true
 			}
 			R.id.broadcasts -> {
-				navigator?.openBroadcastList()
+				viewModel.onOptionSelected(ChatListViewModel.OPTION_OPEN_BROADCAST)
 				true
 			}
 			R.id.settings -> {
-				navigator?.openSettings()
+				viewModel.onOptionSelected(ChatListViewModel.OPTION_OPEN_SETTINGS)
 				true
 			}
 			R.id.logout -> {
-				App.backend.getAuthManager().logout()
-				navigator?.openPhoneAuthForm()
+				viewModel.onOptionSelected(ChatListViewModel.OPTION_LOGOUT)
 				true
 			}
 			else -> super.onOptionsItemSelected(item)
