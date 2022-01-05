@@ -59,10 +59,6 @@ class SettingsFragment : BasicFragment<SettingsViewModel, SettingsUiBinding>()  
 
 		dataBinding.swipableLayout.setListener { close(false) }
 
-		viewModel.init(
-			context.resources.getDimensionPixelSize(R.dimen.settingsUserNameAbSize),
-			ContextCompat.getColor(context, R.color.colorPrimaryDark))
-
 		val editNameView = EditText(context).apply {
 			setHint(R.string.dialog_edit_user_name_hint)
 		}

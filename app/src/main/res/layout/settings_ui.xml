@@ -54,15 +54,8 @@
 					android:onClick="@{() -> ui.onUserIconClicked()}"
 					android:src="@{ui.userIconField}"
 					app:asCircle="@{true}"
-					app:abbrText="@{ui.userNameField}"
-					app:abbrSize="@{@dimen/settingsUserNameAbSize}"
-					app:abbrTextColor="@{@android:color/white}"
-					app:abbrBackColor="@{@color/colorPrimaryDark}"
-					app:placeholder="@{@drawable/ic_avatar}"
-					app:placeholderTint="@{@android:color/white}"
-					app:backgroundColor="@color/colorPrimaryDark"
-					tools:backgroundColor="@color/colorPrimaryDark"
-					tools:srcCompat="@drawable/ic_avatar"
+					app:placeholder="@{@drawable/ic_avatar_placeholder}"
+					tools:srcCompat="@drawable/ic_avatar_placeholder"
 					android:contentDescription="@string/icon"
 					/>
 
@@ -80,7 +73,8 @@
 					android:ellipsize="end"
 					android:text="@{ui.userNameField}"
 					android:onClick="@{() -> ui.onChangeUserNameClicked()}"
-					tools:text="User Name" />
+					android:visibility="@{ui.showUserNameLabel}"
+					/>
 
 			<TextView
 					android:id="@+id/accountSectionTitle"

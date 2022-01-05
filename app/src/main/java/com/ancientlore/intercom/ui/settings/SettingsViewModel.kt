@@ -10,14 +10,11 @@ import com.ancientlore.intercom.data.model.FileData
 import com.ancientlore.intercom.data.model.User
 import com.ancientlore.intercom.data.source.UserRepository
 import com.ancientlore.intercom.ui.BasicViewModel
-import com.ancientlore.intercom.utils.ImageUtils
 import com.ancientlore.intercom.utils.Utils
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
-import androidx.annotation.ColorInt
-import androidx.annotation.Px
+import androidx.databinding.ObservableBoolean
 import com.ancientlore.intercom.utils.extensions.runOnUiThread
-import com.ancientlore.intercom.view.TextDrawable
 import java.util.regex.Pattern
 
 
@@ -34,6 +31,7 @@ class SettingsViewModel(private val user: User)
 	val userIconField = ObservableField<Any>(user.iconUri)
 	val userNameField = ObservableField(user.name)
 	val userStatusField = ObservableField(user.status)
+	val showUserNameLabel = ObservableBoolean(user.name.isNotEmpty())
 
 	private val openGallerySub = PublishSubject.create<Any>()
 
@@ -46,21 +44,6 @@ class SettingsViewModel(private val user: User)
 	private val openAppSettingsSubj = PublishSubject.create<Any>()
 
 	private val openNotificationSettingsSubj = PublishSubject.create<Any>()
-
-	@Px
-	private var abbrSize: Int = 0
-	@ColorInt
-	private var abbrColor: Int = 0
-
-	fun init(abbrSize: Int, abbrColor: Int) {
-
-		this.abbrSize = abbrSize
-		this.abbrColor = abbrColor
-
-		if (user.iconUrl.isEmpty()) {
-			userIconField.set(ImageUtils.createAbbreviationDrawable(user.name, abbrColor, abbrSize))
-		}
-	}
 
 	override fun clean() {
 		openGallerySub.onComplete()
@@ -150,10 +133,7 @@ class SettingsViewModel(private val user: User)
 
 					runOnUiThread {
 						userNameField.set(newUserName)
-
-						val icon = userIconField.get()
-						if (icon is TextDrawable || icon == Uri.EMPTY)
-							userIconField.set(ImageUtils.createAbbreviationDrawable(newUserName, abbrColor, abbrSize))
+						showUserNameLabel.set(true)
 					}
 				}
 				override fun onFailure(error: Throwable) {
