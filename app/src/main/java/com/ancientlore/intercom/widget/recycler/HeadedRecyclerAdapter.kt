@@ -72,8 +72,8 @@ abstract class HeadedRecyclerAdapter<I: Comparable<I>, H: BasicRecyclerAdapter.V
 	}
 
 	@UiThread
-	fun notifyHeaderChanged() {
-		if (withHeader) notifyItemChanged(getFirstViewPosition())
+	fun notifyHeaderChanged(payload: Bundle? = null) {
+		if (withHeader) notifyItemChanged(getFirstViewPosition(), payload)
 	}
 
 	@UiThread

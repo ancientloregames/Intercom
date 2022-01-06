@@ -462,8 +462,10 @@ class ChatFlowViewModel(
 	}
 
 	fun onScrolledToTop() {
-		if (paginationCompleted.not())
+		if (paginationCompleted.not()) {
+			listAdapter.onPaginationStart(true)
 			loadNextPage()
+		}
 	}
 
 	fun onOptionSelected(@Option selectedId: Int) {
@@ -600,8 +602,15 @@ class ChatFlowViewModel(
 
 			override fun onSuccess(result: List<Message>) {
 				runOnUiThread {
-					if (result.isNotEmpty())
+					if (result.isNotEmpty()) {
+						if (result.size < C.DEF_MSG_PAGINATION_LIMIT)
+							paginationCompleted = true
+
 						listAdapter.prependItems(result)
+					}
+					else
+						paginationCompleted = true
+					listAdapter.onPaginationStart(false)
 				}
 				updateMessagesStatus(result)
 

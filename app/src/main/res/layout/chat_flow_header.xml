@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+		xmlns:app="http://schemas.android.com/apk/res-auto"
+		xmlns:tools="http://schemas.android.com/tools"
+		>
+	<data>
+		<variable
+				name="ui"
+				type="com.ancientlore.intercom.ui.chat.flow.ChatFlowAdapter.HeaderViewHolder"/>
+	</data>
+	<FrameLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:padding="10dp"
+			android:visibility="@{ui.show}"
+		>
+
+		<com.ancientlore.intercom.view.ColoredProgressBar
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_gravity="center"
+				app:color="@color/defaultGreyColor"
+				/>
+	</FrameLayout>
+</layout>

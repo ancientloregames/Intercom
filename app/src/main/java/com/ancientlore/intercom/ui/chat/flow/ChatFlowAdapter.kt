@@ -13,11 +13,8 @@ import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableField
 import androidx.databinding.ObservableInt
 import androidx.databinding.ViewDataBinding
-import com.ancientlore.intercom.App
-import com.ancientlore.intercom.BR
-import com.ancientlore.intercom.C
+import com.ancientlore.intercom.*
 import com.ancientlore.intercom.C.INVALID_INDEX
-import com.ancientlore.intercom.R
 import com.ancientlore.intercom.backend.ProgressRequestCallback
 import com.ancientlore.intercom.data.model.Message
 import com.ancientlore.intercom.data.source.ListChanges
@@ -41,8 +38,8 @@ import kotlin.collections.ArrayList
 class ChatFlowAdapter(private val userId: String,
                       context: Context,
                       items: MutableList<Message> = mutableListOf())
-	: MutableRecyclerAdapter<Message, ChatFlowAdapter.ViewHolder, ViewDataBinding>
-		(context, items, autoSort = true) {
+	: MutableRecyclerAdapter<Message, ChatFlowAdapter.BasicViewHolder, ViewDataBinding>
+		(context, items, withHeader = true, autoSort = true) {
 
 	private companion object {
 		private const val VIEW_TYPE_USER = 0
@@ -91,11 +88,16 @@ class ChatFlowAdapter(private val userId: String,
 			VIEW_TYPE_FILE_OTHER -> ChatFlowFileItemOtherBinding.inflate(layoutInflater, parent, false)
 			VIEW_TYPE_AUDIO_USER -> ChatFlowAudioUserBinding.inflate(layoutInflater, parent, false)
 			VIEW_TYPE_AUDIO_OTHER -> ChatFlowAudioOtherBinding.inflate(layoutInflater, parent, false)
+			VIEW_TYPE_HEADER -> ChatFlowHeaderBinding.inflate(layoutInflater, parent, false)
 			else -> throw RuntimeException("Error! Unknown view extension. Check getItemViewType method")
 		}
 	}
 
-	override fun createItemViewHolder(binding: ViewDataBinding, viewType: Int): ViewHolder {
+	override fun createHeaderViewHolder(binding: ViewDataBinding): BasicViewHolder {
+		return HeaderViewHolder(binding as ChatFlowHeaderBinding)
+	}
+
+	override fun createItemViewHolder(binding: ViewDataBinding, viewType: Int): BasicViewHolder {
 		return when (viewType) {
 			VIEW_TYPE_USER, VIEW_TYPE_OTHER -> ItemViewHolder(binding)
 			VIEW_TYPE_FILE_USER, VIEW_TYPE_FILE_OTHER -> FileItemViewHolder(binding)
@@ -104,7 +106,18 @@ class ChatFlowAdapter(private val userId: String,
 		}
 	}
 
-	override fun bindItemViewHolder(holder: ViewHolder, position: Int, payloads: MutableList<Any>) {
+	override fun bindHeaderViewHolder(holder: BasicViewHolder, payloads: MutableList<Any>) {
+		holder as HeaderViewHolder
+
+		if (payloads.isNotEmpty())
+			holder.bind(payloads[0] as Bundle)
+		else
+			holder.bind(null)
+	}
+
+	override fun bindItemViewHolder(holder: BasicViewHolder, position: Int, payloads: MutableList<Any>) {
+
+		holder as ViewHolder
 
 		val item = getItem(position)!!
 
@@ -131,6 +144,13 @@ class ChatFlowAdapter(private val userId: String,
 			holder.bind(payloads[0] as Bundle)
 		else
 			holder.bind(item)
+	}
+
+	@UiThread
+	fun onPaginationStart(start: Boolean) {
+		notifyHeaderChanged(Bundle().apply {
+			putBoolean(HeaderViewHolder.KEY_SHOW, start)
+		})
 	}
 
 	@UiThread
@@ -361,7 +381,7 @@ class ChatFlowAdapter(private val userId: String,
 	}
 
 	abstract class ViewHolder(binding: ViewDataBinding)
-		: BasicRecyclerAdapter.ViewHolder<Message, ViewDataBinding>(binding) {
+		: BasicViewHolder(binding) {
 
 		interface LongClickListener {
 			fun onLongClick()
@@ -409,6 +429,32 @@ class ChatFlowAdapter(private val userId: String,
 			}
 		}
 	}
+
+
+	class HeaderViewHolder(binding: ChatFlowHeaderBinding)
+		: BasicViewHolder(binding) {
+
+		companion object {
+			const val KEY_SHOW = "show"
+		}
+
+		val show = ObservableBoolean(false)
+
+		init {
+			binding.setVariable(BR.ui, this)
+		}
+
+		override fun bind(data: Message) {}
+
+		fun bind(payload: Bundle?) {
+			payload?.getBoolean(KEY_SHOW)?.let {
+				show.set(it)
+			} ?: show.set(false)
+		}
+	}
+
+	abstract class BasicViewHolder(binding: ViewDataBinding)
+		: BasicRecyclerAdapter.ViewHolder<Message, ViewDataBinding>(binding)
 
 	class DiffCallback(private val oldItems: List<Message>,
 	                   private val newItems: List<Message>)
