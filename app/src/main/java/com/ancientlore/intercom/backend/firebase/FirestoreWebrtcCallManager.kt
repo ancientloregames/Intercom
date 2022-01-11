@@ -38,6 +38,9 @@ object FirestoreWebrtcCallManager : WebrtcCallManager() {
 	}
 
 	override fun sendAnswer(targetId: String, answer: HashMap<*, *>) {
+
+		removeOffer(targetId)
+
 		calls
 			.document(targetId)
 			.collection(ANSWERS)
@@ -175,5 +178,15 @@ object FirestoreWebrtcCallManager : WebrtcCallManager() {
 				throw RuntimeException()
 			}
 		}
+	}
+
+	/**
+	 *  remove the offer corresponding to the ongoing answer. Otherwise relogin will lead to the call ui showing
+	 */
+	private fun removeOffer(targetId: String) {
+		calls.document(userId)
+			.collection(OFFERS)
+			.document(targetId)
+			.delete()
 	}
 }
