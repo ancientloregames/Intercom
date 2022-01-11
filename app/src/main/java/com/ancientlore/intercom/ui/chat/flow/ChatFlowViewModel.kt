@@ -202,6 +202,9 @@ class ChatFlowViewModel(
 	}
 
 	override fun clean() {
+		if (repository.getSourceId().isNotEmpty())
+			ChatRepository.setMessageRecieved(repository.getSourceId())
+
 		listAdapter.clean()
 
 		openAttachMenuSubj.onComplete()
