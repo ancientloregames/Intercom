@@ -228,6 +228,7 @@ class ChatFlowFragment : FilterableFragment<ChatFlowViewModel, ChatFlowUiBinding
 			ChatFlowViewModel.TOAST_MSG_DELETED -> R.string.message_deleted
 			ChatFlowViewModel.TOAST_MSG_DELETED_NOT -> R.string.message_deleted_not
 			ChatFlowViewModel.TOAST_MSG_UNDELETABLE -> R.string.alert_message_undeletable
+			ChatFlowViewModel.TOAST_FILE_TOO_BIG -> R.string.alert_error_attach_file_big
 			else -> super.getToastStringRes(toastId)
 		}
 	}

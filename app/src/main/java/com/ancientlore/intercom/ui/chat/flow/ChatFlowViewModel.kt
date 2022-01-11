@@ -49,6 +49,7 @@ class ChatFlowViewModel(
 		const val TOAST_MSG_DELETED = 2
 		const val TOAST_MSG_DELETED_NOT = 3
 		const val TOAST_MSG_UNDELETABLE = 4
+		const val TOAST_FILE_TOO_BIG = 5
 	}
 
 	@IntDef(OPTION_AUDIO_CALL, OPTION_VIDEO_CALL)
@@ -354,6 +355,12 @@ class ChatFlowViewModel(
 	}
 
 	fun handleAttachedFile(fileData: FileData) {
+
+		if (fileData.size > C.MAX_ATTACH_FILE_SIZE) {
+			toastRequest.onNext(TOAST_FILE_TOO_BIG)
+			return
+		}
+
 		guarantyChat { chatId ->
 			showSendProgressField.set(true)
 

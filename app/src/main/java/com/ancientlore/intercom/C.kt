@@ -5,6 +5,8 @@ object C {
 
 	const val MAX_ATTACH_IMG_SIZE_PX = 1600
 
+	const val MAX_ATTACH_FILE_SIZE = 2097152L // 2 MB
+
 	const val SMALL_SIZE_BYTES = 204800L // 200 KB
 
 	const val THUMBNAIL_SIZE = 100

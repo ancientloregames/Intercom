@@ -70,6 +70,7 @@
 	<string name="alert_chat_undeletable">This chat is marked as undeletable</string>
 	<string name="alert_message_undeletable">This message is marked as undeletable</string>
 	<string name="alert_error_open_file">Failed to find an App to open the file</string>
+	<string name="alert_error_attach_file_big">The file is too big. Corrent limit: 2 Mb</string>
 
 	<string name="record">Record</string>
 	<string name="stop">Stop</string>

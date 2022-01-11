@@ -9,6 +9,7 @@ import android.widget.SeekBar
 import androidx.annotation.CallSuper
 import androidx.annotation.UiThread
 import androidx.annotation.DrawableRes
+import androidx.core.content.FileProvider
 import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableField
 import androidx.databinding.ObservableInt
@@ -134,8 +135,8 @@ class ChatFlowAdapter(private val userId: String,
 				}
 			}
 			is FileItemViewHolder -> holder.fileClickListener = object : FileItemViewHolder.FileClickListener {
-				override fun onItemClick() {
-					openFileSubj.onNext(item.attachUri)
+				override fun onItemClick(fileUri: Uri) {
+					openFileSubj.onNext(fileUri)
 				}
 			}
 		}
@@ -215,7 +216,7 @@ class ChatFlowAdapter(private val userId: String,
 	fun findItem(messageId: String) = getItems().find { it.id == messageId }
 
 	class AudioItemViewHolder(binding: ViewDataBinding)
-		: ViewHolder(binding), MediaPlayerManager.Listener {
+		: AttachItemViewHolder(binding), MediaPlayerManager.Listener {
 
 		val iconRes = ObservableInt(R.drawable.ic_play)
 		val durationField = ObservableField("")
@@ -224,8 +225,6 @@ class ChatFlowAdapter(private val userId: String,
 
 		private val player = MediaPlayerManager
 
-		private lateinit var filePath: String
-
 		init {
 			binding.setVariable(BR.message, this)
 		}
@@ -233,7 +232,7 @@ class ChatFlowAdapter(private val userId: String,
 		override fun bind(data: Message) {
 			super.bind(data)
 
-			manageAttachAudio(data.attachUrl)
+			downloadAttachment(data.attachUrl)
 		}
 
 		override fun bind(payload: Bundle) {
@@ -241,35 +240,7 @@ class ChatFlowAdapter(private val userId: String,
 
 			val newAudioUrl = payload.getString(DiffCallback.KEY_URL)
 			if (newAudioUrl != null)
-				manageAttachAudio(newAudioUrl)
-		}
-
-		private fun manageAttachAudio(url: String) {
-			if (Utils.isExternalUrl(url)) {
-				val filename = Utils.getFileName(url)
-				val dir = itemView.context.getAudioMessagesDir()
-				val file = File(dir, filename)
-				filePath = file.absolutePath
-
-				if (!file.exists()) {
-					if (file.createNewFile()) {
-						progressVisibility.set(true)
-
-						App.backend.getStorageManager().download(url, file, object : ProgressRequestCallback<Any> {
-							override fun onProgress(progress: Int) {
-								uploadProgress.set(progress)
-							}
-							override fun onSuccess(result: Any) {
-								onFileReady(file)
-							}
-							override fun onFailure(error: Throwable) {
-								Utils.logError(error)
-							}
-						})
-					}
-				} else onFileReady(file)
-			} else
-				progressVisibility.set(true)
+				downloadAttachment(newAudioUrl)
 		}
 
 		override fun onComplete() {
@@ -308,7 +279,7 @@ class ChatFlowAdapter(private val userId: String,
 			}
 		}
 
-		private fun onFileReady(file: File) {
+		override fun onFileReady(file: File) {
 			val duration = Utils.getDuration(file)
 			seekBarMax.set(duration.toInt())
 
@@ -319,16 +290,18 @@ class ChatFlowAdapter(private val userId: String,
 	}
 
 	class FileItemViewHolder(binding: ViewDataBinding)
-		: ViewHolder(binding) {
+		: AttachItemViewHolder(binding) {
 
 		interface FileClickListener {
-			fun onItemClick()
+			fun onItemClick(fileUri: Uri)
 		}
 
 		var fileClickListener: FileClickListener? = null
 
 		val titleField = ObservableField("")
 		val subtitleField = ObservableField("")
+
+		private var fileUrl: String? = null
 
 		init {
 			binding.setVariable(BR.message, this)
@@ -338,9 +311,62 @@ class ChatFlowAdapter(private val userId: String,
 			super.bind(data)
 			titleField.set(data.text)
 			subtitleField.set(data.info)
+
+			fileUrl = data.attachUrl
 		}
 
-		fun onItemClick() = fileClickListener?.onItemClick()
+		override fun bind(payload: Bundle) {
+			super.bind(payload)
+
+			fileUrl = payload.getString(DiffCallback.KEY_URL)
+		}
+
+		override fun onFileReady(file: File) {
+			progressVisibility.set(false)
+			val uri = FileProvider.getUriForFile(context, context.applicationContext.packageName + ".provider", file)
+			fileClickListener?.onItemClick(uri)
+		}
+
+		fun onItemClick() {
+			fileUrl?.let {
+				downloadAttachment(it)
+			}
+		}
+	}
+
+	abstract class AttachItemViewHolder(binding: ViewDataBinding)
+		: ViewHolder(binding) {
+
+		protected lateinit var filePath: String
+
+		abstract fun onFileReady(file: File)
+
+		protected fun downloadAttachment(url: String) {
+			if (Utils.isExternalUrl(url)) {
+				val filename = Utils.getFileName(url)
+				val dir = itemView.context.getAudioMessagesDir()
+				val file = File(dir, filename)
+				filePath = file.absolutePath
+
+				if (!file.exists()) {
+					if (file.createNewFile()) {
+						progressVisibility.set(true)
+
+						App.backend.getStorageManager().download(url, file, object : ProgressRequestCallback<Any> {
+							override fun onProgress(progress: Int) {
+								uploadProgress.set(progress)
+							}
+							override fun onSuccess(result: Any) {
+								onFileReady(file)
+							}
+							override fun onFailure(error: Throwable) {
+								Utils.logError(error)
+							}
+						})
+					}
+				} else onFileReady(file)
+			}
+		}
 	}
 
 	class ItemViewHolder(binding: ViewDataBinding)

@@ -19,12 +19,13 @@
 			android:onClick="@{() -> message.onItemClick()}"
 			android:onLongClick="@{() -> message.onLongClick()}">
 
-		<com.ancientlore.intercom.view.CircleImageView
+		<com.ancientlore.intercom.view.SimpleCircleImageView
 				android:id="@+id/imageView"
 				android:layout_width="50dp"
 				android:layout_height="50dp"
 				android:layout_marginEnd="8dp"
 				android:layout_marginRight="8dp"
+				android:scaleType="center"
 				app:tint="@android:color/white"
 				app:srcCompat="@drawable/ic_file"
 				app:backgroundColor="@color/chatFileIconBg"
@@ -33,10 +34,27 @@
 				app:layout_constraintBottom_toBottomOf="parent"
 		/>
 
+		<com.ancientlore.intercom.view.ColoredProgressBar
+				android:id="@+id/progressView"
+				android:layout_width="50dp"
+				android:layout_height="50dp"
+				android:max="100"
+				android:progress="@{message.uploadProgress}"
+				android:visibility="@{message.progressVisibility}"
+				android:clickable="true"
+				android:focusable="true"
+				app:color="@android:color/white"
+				tools:visibility="visible"
+				app:layout_constraintStart_toStartOf="parent"
+				app:layout_constraintTop_toTopOf="parent"
+				app:layout_constraintBottom_toBottomOf="parent"
+				/>
+
 		<TextView
 				android:id="@+id/titleField"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
+				android:maxWidth="200dp"
 				android:text="@{message.titleField}"
 				tools:text="File name"
 				style="@style/chatMsgFileTitle"
