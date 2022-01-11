@@ -23,6 +23,7 @@ import android.content.res.Resources
 import android.util.Log
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import androidx.annotation.UiThread
 import java.util.ArrayList
 
 abstract class BasicFragment<VM : BasicViewModel, B : ViewDataBinding> : Fragment(), MainActivity.BackButtonHandler {
@@ -144,13 +145,21 @@ abstract class BasicFragment<VM : BasicViewModel, B : ViewDataBinding> : Fragmen
 		}
 	}
 
-	protected fun close(animate: Boolean = true) {
+	protected open fun close(animate: Boolean = true) {
 		if (isClosing)
 			return
 		isClosing = true
 
 		if (!animate || context == null)
 			closeNow()
+
+		runOnUiThread {
+			closeWithAnimation()
+		}
+	}
+
+	@UiThread
+	private fun closeWithAnimation() {
 
 		try {
 			AnimationUtils.loadAnimation(context, getCloseAnimation())
