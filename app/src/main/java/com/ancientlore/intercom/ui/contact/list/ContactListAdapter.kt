@@ -1,6 +1,7 @@
 package com.ancientlore.intercom.ui.contact.list
 
 import android.content.Context
+import android.net.Uri
 import android.view.ViewGroup
 import androidx.annotation.ColorInt
 import androidx.annotation.Px
@@ -81,7 +82,9 @@ class ContactListAdapter(context: Context,
 
 			iconField.set(when {
 				data.iconUrl.isNotEmpty() -> data.iconUrl
-				else -> ImageUtils.createAbbreviationDrawable(data.name, iconAbbrColor, iconAbbrTextSize)
+				data.name.isNotEmpty() ->
+					ImageUtils.createAbbreviationDrawable(data.name, iconAbbrColor, iconAbbrTextSize)
+				else -> Uri.EMPTY
 			})
 		}
 

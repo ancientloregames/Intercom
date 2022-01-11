@@ -184,7 +184,8 @@ class ChatFlowAdapter(private val userId: String,
 				break
 		}
 
-		updatedList.addAll(changes.addList)
+		val uniqueAdd = changes.addList.filter { candidate -> fullList.any { it.id == candidate.id } }
+		updatedList.addAll(uniqueAdd)
 		updatedList.addAll(changes.modifyList) // if they weren't removed, they are to be added
 
 		super.setItems(updatedList)

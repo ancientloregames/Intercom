@@ -47,7 +47,8 @@ class ContactListViewModel(context: Context)
 			override fun onSuccess(result: List<Contact>) {
 				runOnUiThread {
 					contactListIsEmpty.set(result.isEmpty())
-					listAdapter.setItems(result)
+					val validItems = result.filter { it.phone.isNotEmpty() } // TODO move to adapted by generic Identifiable
+					listAdapter.setItems(validItems)
 				}
 			}
 			override fun onFailure(error: Throwable) {

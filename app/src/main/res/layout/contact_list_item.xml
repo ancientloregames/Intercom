@@ -16,20 +16,20 @@
 			android:orientation="vertical"
 			android:onClick="@{() -> contact.onClick()}"
 	>
-		<com.ancientlore.intercom.view.CircleImageView
+		<ImageView
 				android:id="@+id/iconView"
 				android:layout_width="40dp"
 				android:layout_height="40dp"
 				android:layout_marginRight="8dp"
 				android:layout_marginEnd="8dp"
 				android:src="@{contact.iconField}"
+				app:asCircle="@{true}"
+				app:placeholder="@{@drawable/ic_avatar_placeholder}"
 				app:layout_constraintStart_toStartOf="parent"
 				app:layout_constraintBottom_toBottomOf="parent"
 				app:layout_constraintTop_toTopOf="parent"
 				app:layout_constraintEnd_toStartOf="@+id/titleView"
-				tools:src="@drawable/ic_avatar"
-				tools:tint="@android:color/white"
-				tools:backgroundColor="@color/chatIconBackColor"
+				tools:src="@drawable/ic_avatar_placeholder"
 		/>
 
 		<androidx.appcompat.widget.AppCompatTextView
@@ -41,6 +41,7 @@
 				app:layout_constraintTop_toTopOf="@+id/iconView"
 				app:layout_constraintEnd_toEndOf="parent"
 				android:text="@={contact.nameField}"
+				android:hint="@string/unknown"
 				tools:text="Title"
 		/>
 

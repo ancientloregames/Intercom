@@ -17,13 +17,13 @@
 			android:layout_marginLeft="5dp"
 			android:layout_marginRight="5dp">
 
-		<com.ancientlore.intercom.view.CircleImageView
+		<ImageView
 				android:layout_width="match_parent"
 				android:layout_height="@dimen/chatCreationGroupSelectedItemImageSize"
 				android:src="@{ui.iconField}"
-				app:backgroundColor="@color/chatIconBackColor"
-				tools:src="@drawable/ic_avatar"
-				tools:tint="@android:color/white"
+				app:asCircle="@{true}"
+				app:placeholder="@{@drawable/ic_avatar_placeholder}"
+				tools:src="@drawable/ic_avatar_placeholder"
 			/>
 
 		<TextView
@@ -31,6 +31,7 @@
 				android:layout_height="wrap_content"
 				android:gravity="center"
 				android:text="@{ui.nameField}"
+				android:hint="@string/unknown"
 				tools:text="@string/username"
 				style="@style/onelineTextField"
 			/>

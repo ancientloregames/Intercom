@@ -3,6 +3,7 @@ package com.ancientlore.intercom.ui.chat.creation
 import android.content.Intent
 import android.os.Bundle
 import android.provider.ContactsContract
+import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.widget.Toolbar
 import com.ancientlore.intercom.R
@@ -30,6 +31,8 @@ class ChatCreationFragment : FilterableFragment<ChatCreationViewModel, ChatCreat
 		super.init(viewModel, savedState)
 
 		dataBinding.ui = viewModel
+
+		setHasOptionsMenu(true)
 
 		ToolbarManager(dataBinding.toolbar).apply {
 			enableBackButton { close() }
@@ -72,6 +75,16 @@ class ChatCreationFragment : FilterableFragment<ChatCreationViewModel, ChatCreat
 		dataBinding.toolbar.setNavigationOnClickListener(null)
 		dataBinding.swipableLayout.setListener(null)
 		super.onDestroyView()
+	}
+
+	override fun onOptionsItemSelected(item: MenuItem): Boolean {
+		return when (item.itemId) {
+			R.id.showUsers -> {
+				viewModel.onOptionSelected(ChatCreationViewModel.OPTION_SHOW_USERS)
+				true
+			}
+			else -> super.onOptionsItemSelected(item)
+		}
 	}
 
 	private fun addContact() {

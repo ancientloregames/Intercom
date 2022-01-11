@@ -168,4 +168,9 @@
 	<string name="device_settings">Device settings</string>
 	<string name="app_settings">App settings</string>
 	<string name="notification_settings">Notifications and sounds</string>
+
+
+	<string name="show_users">Show Users (Demo)</string>
+
+	<string name="unknown">[unknown]</string>
 </resources>

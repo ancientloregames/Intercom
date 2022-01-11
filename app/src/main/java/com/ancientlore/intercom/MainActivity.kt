@@ -615,6 +615,9 @@ class MainActivity : AppCompatActivity(),
 			override fun onSuccess(appUsers: List<User>) {
 
 				userContactExecutor.execute {
+
+					val currentUserId = App.backend.getAuthManager().getCurrentUserId()
+
 					val updateCandidates = mutableListOf<Contact>()
 					val appUsersTmp = LinkedList(appUsers)
 
@@ -627,8 +630,12 @@ class MainActivity : AppCompatActivity(),
 						while (appUserIter.hasNext()) {
 							val user = appUserIter.next()
 
-							if (contact.formatedMainNumber == user.phone) {
-								updateCandidates.add(Contact(phone = user.phone, name = contact.name))
+							if (user.id != currentUserId  // FIXME currently using yourself as a contact leads to various bugs
+								&& contact.formatedMainNumber == user.phone) {
+								updateCandidates.add(Contact(
+									phone = user.phone,
+									name = contact.name,
+									iconUrl = user.iconUrl))
 								appUserIter.remove()
 								break
 							}

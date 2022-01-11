@@ -6,4 +6,9 @@
 			android:icon="@drawable/ic_search"
 			app:showAsAction="ifRoom"
 			app:actionViewClass="android.widget.SearchView" />
+	<item
+			android:id="@+id/showUsers"
+			android:title="@string/show_users"
+			android:icon="@drawable/ic_add_contact_36dp"
+			app:showAsAction="never" />
 </menu>

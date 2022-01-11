@@ -66,6 +66,7 @@
 							android:src="@{ui.contactIconField}"
 							app:asCircle="@{true}"
 							app:abbrText="@{ui.contactNameField}"
+							app:placeholder="@{@drawable/ic_avatar_placeholder}"
 							app:abbrSize="@{@dimen/settingsUserNameAbSize}"
 							app:abbrTextColor="@{@android:color/white}"
 							app:abbrBackColor="@{@color/colorPrimaryDark}"
@@ -86,7 +87,8 @@
 							android:textColor="@color/defaultTextColor"
 							android:textSize="20sp"
 							android:textStyle="bold"
-							tools:text="Contact Name" />
+							android:hint="@string/unknown"
+							/>
 
 					<TextView
 							android:id="@+id/infoSectionTitle"

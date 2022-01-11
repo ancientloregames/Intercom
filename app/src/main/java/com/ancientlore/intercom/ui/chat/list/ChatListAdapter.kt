@@ -1,6 +1,7 @@
 package com.ancientlore.intercom.ui.chat.list
 
 import android.content.Context
+import android.net.Uri
 import android.view.ViewGroup
 import androidx.annotation.ColorInt
 import androidx.annotation.Px
@@ -128,7 +129,8 @@ class ChatListAdapter(context: Context,
 
 			iconField.set(when {
 				data.iconUrl.isNotEmpty() -> data.iconUrl
-				else -> ImageUtils.createAbbreviationDrawable(name, iconColor, iconTextSize)
+				data.name.isNotEmpty()  -> ImageUtils.createAbbreviationDrawable(name, iconColor, iconTextSize)
+				else -> Uri.EMPTY
 			})
 
 			pinField.set(data.pin == true)

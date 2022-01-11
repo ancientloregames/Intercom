@@ -1,5 +1,6 @@
 package com.ancientlore.intercom.data.source.remote.firestore
 
+import com.ancientlore.intercom.App
 import com.ancientlore.intercom.EmptyObject
 import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.data.model.Contact
@@ -152,12 +153,20 @@ class FirestoreContactSource(private val userId: String)
 		if (item.phone.isNotEmpty()) {
 
 			if (item.chatId.isNotEmpty()) {
+				// FIXME bad decision but no other quick solution
+				App.backend.getAuthManager().getCurrentUser().takeIf { !it.dummy }?.let {
+
 				db.collection(USERS)
 					.document(item.phone)
 					.collection(CONTACTS)
 					.document(userId)
-					.set(hashMapOf(FIELD_CHAT_ID to item.chatId), SetOptions.merge())
-					.addOnFailureListener { Utils.logError(it) }
+					.set(hashMapOf(
+						FIELD_PHONE to it.id,
+						FIELD_ICON_URL to it.iconUrl,
+						FIELD_CHAT_ID to item.chatId
+					), SetOptions.merge())
+					.addOnFailureListener { e -> Utils.logError(e) }
+				}
 			}
 
 			userContacts.document(item.phone)

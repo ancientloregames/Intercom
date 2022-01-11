@@ -1,6 +1,7 @@
 package com.ancientlore.intercom.ui.chat.creation.group
 
 import android.content.Context
+import android.net.Uri
 import android.view.ViewGroup
 import androidx.annotation.ColorInt
 import androidx.annotation.Px
@@ -98,7 +99,8 @@ class ChatCreationSelectedAdapter(context: Context,
 
 			iconField.set(when {
 				data.iconUrl.isNotEmpty() -> data.iconUrl
-				else -> ImageUtils.createAbbreviationDrawable(data.name, iconAbbrColor, iconAbbrTextSize)
+				data.name.isNotEmpty() -> ImageUtils.createAbbreviationDrawable(data.name, iconAbbrColor, iconAbbrTextSize)
+				else -> Uri.EMPTY
 			})
 		}
 	}
