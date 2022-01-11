@@ -382,6 +382,8 @@ class ChatFlowAdapter(private val userId: String,
 		val textField = ObservableField("")
 		val imageUri = ObservableField(Uri.EMPTY)
 
+		val showImage = ObservableBoolean(false)
+
 		init {
 			binding.setVariable(BR.message, this)
 		}
@@ -390,6 +392,7 @@ class ChatFlowAdapter(private val userId: String,
 			super.bind(data)
 			textField.set(data.text)
 			imageUri.set(data.attachUri)
+			showImage.set(data.attachUri != Uri.EMPTY)
 		}
 
 		override fun bind(payload: Bundle) {
@@ -400,8 +403,10 @@ class ChatFlowAdapter(private val userId: String,
 				textField.set(newText)
 
 			val newImageUrl = payload.getString(DiffCallback.KEY_URL)
-			if (newImageUrl != null)
+			if (newImageUrl != null) {
 				imageUri.set(Uri.parse(newImageUrl))
+				showImage.set(newImageUrl.isNotEmpty())
+			}
 		}
 
 		fun onImageClick() = imageClickListener?.onImageClick(imageUri.get()!!)

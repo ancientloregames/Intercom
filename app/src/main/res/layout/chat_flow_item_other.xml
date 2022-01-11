@@ -23,14 +23,15 @@
 				android:id="@+id/imageView"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:maxHeight="250dp"
+				android:layout_gravity="center_horizontal"
+				android:scaleType="fitXY"
 				android:maxWidth="250dp"
-				android:adjustViewBounds="true"
+				android:maxHeight="250dp"
 				android:src="@{message.imageUri}"
 				android:onClick="@{() -> message.onImageClick()}"
 				android:contentDescription="@string/image"
-				tools:visibility="visible"
-				tools:src="@drawable/chat_bg"
+				android:visibility="@{message.showImage}"
+				tools:src="@drawable/ic_avatar_placeholder"
 		/>
 
 		<LinearLayout

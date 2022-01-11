@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<integer name="defaultShowHideAnimationDelay">300</integer>
+	<integer name="chatflowShowHideAnimationDelay">400</integer>
 
 	<integer name="defaultShowHideAnimationDuration">@android:integer/config_shortAnimTime</integer>
 </resources>

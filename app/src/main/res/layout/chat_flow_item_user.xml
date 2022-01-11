@@ -22,20 +22,21 @@
 				android:layout_marginStart="8dp"
 				android:layout_marginLeft="8dp"
 				android:layout_marginBottom="4dp">
-			<!-- FIXME for yet to be known reason setting wrap_content with minHeight/Width leads to the
-			     view disappearance on recyclerView.smoothScrollToPosition -->
+
 			<com.ancientlore.intercom.view.ChatImageView
 					android:id="@+id/imageView"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:maxHeight="250dp"
+					android:layout_gravity="center_horizontal"
+					android:scaleType="fitXY"
 					android:maxWidth="250dp"
-					android:adjustViewBounds="true"
+					android:maxHeight="250dp"
 					android:src="@{message.imageUri}"
 					android:onClick="@{() -> message.onImageClick()}"
 					android:contentDescription="@string/image"
+					android:visibility="@{message.showImage}"
 					tools:visibility="visible"
-					tools:src="@drawable/chat_bg"
+					tools:src="@drawable/ic_avatar_placeholder"
 			/>
 
 			<LinearLayout

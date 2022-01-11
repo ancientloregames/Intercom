@@ -6,7 +6,6 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.util.AttributeSet;
-import android.util.Log;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.core.content.ContextCompat;
@@ -44,8 +43,6 @@ public class ChatImageView extends AppCompatImageView
 	{
 		super(context, attrs, defStyle);
 
-		setScaleType(ScaleType.CENTER_CROP);
-
 		Resources resources = context.getResources();
 
 		progressRadius = resources.getDimension(R.dimen.chatImageProgressRadius);
@@ -81,14 +78,6 @@ public class ChatImageView extends AppCompatImageView
 	{
 		Drawable d = RoundedDrawable.fromBitmap(bm, cornerRadius);
 		super.setImageDrawable(d);
-	}
-
-	@Override
-	public final void setScaleType(ScaleType scaleType)
-	{
-		if (scaleType == ScaleType.CENTER_CROP)
-			super.setScaleType(scaleType);
-		else Log.e(getClass().getSimpleName(), "Only center crop scale type is allowed");
 	}
 
 	@Override

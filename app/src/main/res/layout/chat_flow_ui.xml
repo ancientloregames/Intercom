@@ -85,6 +85,7 @@
 								app:layout_constraintEnd_toEndOf="parent"
 								app:layout_constraintTop_toTopOf="parent"
 								app:layout_constraintBottom_toTopOf="@+id/subtitleTextView"
+								android:hint="@string/unknown"
 								tools:text="Chat title"
 								/>
 						<TextView

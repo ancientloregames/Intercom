@@ -66,6 +66,8 @@ class ChatFlowFragment : FilterableFragment<ChatFlowViewModel, ChatFlowUiBinding
 		else R.menu.chat_flow_group_menu
 	}
 
+	override fun getOpenAnimation(): Int = R.anim.slide_in_right_chatflow
+
 	override fun getLayoutResId() = R.layout.chat_flow_ui
 
 	override fun createDataBinding(view: View) = ChatFlowUiBinding.bind(view)
