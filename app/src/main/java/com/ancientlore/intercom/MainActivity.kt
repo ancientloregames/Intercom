@@ -651,6 +651,9 @@ class MainActivity : AppCompatActivity(),
 	}
 
 	private fun initRepositories(userId: String) {
+
+		App.backend.getCrashreportManager().setUserId(userId)
+
 		val remoteDataSourceProvider = App.backend.getDataSourceProvider()
 		//val localDataSourceProvider = App.frontend.getDataSourceProvider()
 		UserRepository.apply {

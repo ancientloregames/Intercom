@@ -1,6 +1,7 @@
 package com.ancientlore.intercom.backend.firebase
 
 import com.ancientlore.intercom.backend.BackendFactory
+import com.ancientlore.intercom.backend.crashreport.FirebaseCrashreportManager
 
 object FirebaseFactory : BackendFactory() {
 
@@ -13,4 +14,6 @@ object FirebaseFactory : BackendFactory() {
 	override fun getMessagingManager() = FirebaseMessagingManager
 
 	override fun getCallManager() = FirestoreWebrtcCallManager
+
+	override fun getCrashreportManager() = FirebaseCrashreportManager
 }

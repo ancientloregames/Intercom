@@ -13,6 +13,8 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.MimeTypeMap;
 
+import com.ancientlore.intercom.App;
+import com.ancientlore.intercom.BuildConfig;
 import com.ancientlore.intercom.C;
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
@@ -65,13 +67,16 @@ public final class Utils
 
 	public static void logError(@Nullable Throwable throwable, @Nullable String tag, @Nullable String text)
 	{
-		// TODO: use fabric crashlytycs logException later
 		String logTag = tag != null ? tag : C.DEFAULT_LOG_TAG;
 		String logText = text != null ? text : "";
-		if (throwable != null)
-			Log.e(logTag, logText, throwable);
-		else
-			Log.e(logTag, logText);
+		if (BuildConfig.DEBUG) {
+			if (throwable != null)
+				Log.e(logTag, logText, throwable);
+			else
+				Log.e(logTag, logText);
+		}
+		else App.Companion.getBackend().getCrashreportManager().report(
+				new RuntimeException(logTag + ": " + logText, throwable));
 	}
 
 	public static void logError(Throwable throwable, @Nullable String tag)

@@ -10,6 +10,8 @@ apply plugin: 'kotlinx-serialization'
 
 apply plugin: 'com.google.gms.google-services'
 
+apply plugin: 'com.google.firebase.crashlytics'
+
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
@@ -82,6 +84,8 @@ dependencies {
     implementation('com.google.firebase:firebase-messaging:20.2.3') {
 //        exclude module: 'protobuf-javalite'
     }
+
+    implementation 'com.google.firebase:firebase-crashlytics:18.2.6'
 
     implementation 'com.firebaseui:firebase-ui-storage:5.0.0'
 
