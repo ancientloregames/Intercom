@@ -121,6 +121,10 @@ class MessageInputManager(view: View) {
 		chronometer.stop()
 	}
 
+	fun onMessageSending() {
+		cancelButton.visibility = View.GONE
+	}
+
 	fun onMessageSent() {
 		microphoneImage.visibility = View.INVISIBLE
 		stopButton.visibility = View.GONE

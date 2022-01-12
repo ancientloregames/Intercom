@@ -278,6 +278,7 @@ class ChatFlowViewModel(
 	fun onSendButtonClicked() {
 		recordedAudioFileRef?.get()
 			?.let {
+				inputManager?.onMessageSending()
 				recordedAudioFileRef = null
 				handleAudioMessage(it)
 			}
