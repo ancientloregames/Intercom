@@ -116,7 +116,7 @@ class ChatListAdapter(context: Context,
 
 			titleField.set(name)
 
-			if (data.participants.size > 2) {
+			if (data.participants.size > 2 && data.lastMsgText.isNotEmpty()) {
 				val senderName = if (data.lastMsgSenderId == userId)
 					selfDescriptor
 				else (data.lastMsgSenderLocalName ?: data.lastMsgSenderId)

@@ -78,6 +78,7 @@
 	<string name="attachment">Attachment</string>
 	<string name="document">Document</string>
 	<string name="gallery">Gallery</string>
+	<string name="attachment_hint">[Attachment]</string>
 
 	<string name="reply">Reply</string>
 	<string name="cancel">Cancel</string>

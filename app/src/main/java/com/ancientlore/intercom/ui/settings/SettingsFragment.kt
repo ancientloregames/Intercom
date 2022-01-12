@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.provider.Settings
 import android.view.View
 import android.widget.EditText
-import androidx.core.content.ContextCompat
 import com.ancientlore.intercom.App
 import com.ancientlore.intercom.C
 import com.ancientlore.intercom.R
@@ -22,6 +21,8 @@ import com.ancientlore.intercom.utils.extensions.showKeyboard
 import java.io.File
 import android.content.ComponentName
 import android.net.Uri
+import android.os.Build
+import android.view.inputmethod.EditorInfo
 
 
 class SettingsFragment : BasicFragment<SettingsViewModel, SettingsUiBinding>()  {
@@ -61,6 +62,9 @@ class SettingsFragment : BasicFragment<SettingsViewModel, SettingsUiBinding>()  
 
 		val editNameView = EditText(context).apply {
 			setHint(R.string.dialog_edit_user_name_hint)
+			inputType = EditorInfo.TYPE_TEXT_FLAG_CAP_SENTENCES
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+				importantForAutofill = View.IMPORTANT_FOR_AUTOFILL_NO
 		}
 		val editNameDialog = AlertDialog.Builder(context)
 			.setTitle(R.string.dialog_edit_user_name_title)
@@ -74,7 +78,10 @@ class SettingsFragment : BasicFragment<SettingsViewModel, SettingsUiBinding>()  
 			.create()
 
 		val editStatusView = EditText(context).apply {
-			setHint(R.string.dialog_edit_user_name_hint)
+			setHint(R.string.dialog_edit_user_status_hint)
+			inputType = EditorInfo.TYPE_TEXT_FLAG_CAP_SENTENCES
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+				importantForAutofill = View.IMPORTANT_FOR_AUTOFILL_NO
 		}
 		val editStatusDialog = AlertDialog.Builder(context)
 			.setTitle(R.string.dialog_edit_user_status_title)

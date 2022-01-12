@@ -27,6 +27,7 @@
 				android:layout_marginRight="8dp"
 				android:layout_marginEnd="8dp"
 				android:src="@{chat.iconField}"
+				app:placeholder="@{@drawable/ic_avatar_placeholder}"
 				app:layout_constraintStart_toStartOf="parent"
 				app:layout_constraintBottom_toBottomOf="parent"
 				app:layout_constraintTop_toTopOf="parent"
@@ -64,7 +65,7 @@
 				app:layout_constraintBottom_toBottomOf="parent"
 				app:layout_constraintTop_toBottomOf="@+id/titleView"
 				app:layout_constraintEnd_toEndOf="@+id/titleView"
-				tools:text="Last message"
+				android:hint="@string/attachment_hint"
 				style="@style/onelineTextField"
 		/>
 
