@@ -15,8 +15,6 @@ abstract class MutableRecyclerAdapter<I: Comparable<I>, H: BasicRecyclerAdapter.
 	: FilterableRecyclerAdapter<I, H, B>(context, items, withHeader, withFooter),
 	MutableAdapter<I> {
 
-	abstract fun getDiffCallback(newItems: List<I>): HeadedRecyclerDiffUtil.Callback
-
 	@UiThread
 	override fun setItems(newItems: List<I>) {
 

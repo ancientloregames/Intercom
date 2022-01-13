@@ -20,8 +20,6 @@ abstract class AsyncMutableRecyclerAdapter<I: Comparable<I>, H: BasicRecyclerAda
 
 	private val executor = Executors.newSingleThreadExecutor(LoggingThreadFactory("mutableListAdapter_thread"))
 
-	abstract fun getDiffCallback(newItems: List<I>): HeadedRecyclerDiffUtil.Callback
-
 	protected fun runAsync(command: Runnable) {
 		executor.execute(command)
 	}
