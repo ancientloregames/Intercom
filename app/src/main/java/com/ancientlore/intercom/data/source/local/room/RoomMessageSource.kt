@@ -6,9 +6,9 @@ import com.ancientlore.intercom.backend.RepositorySubscription
 import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.data.model.Message
 import com.ancientlore.intercom.data.source.EmptyResultException
-import com.ancientlore.intercom.data.source.ListChanges
 import com.ancientlore.intercom.data.source.MessageSource
 import com.ancientlore.intercom.utils.Utils
+import io.reactivex.Single
 
 class RoomMessageSource(private val chatId: String,
                         private val dao: RoomMessageDao) : RoomSource(), MessageSource {
@@ -22,6 +22,19 @@ class RoomMessageSource(private val chatId: String,
 	override fun getWorkerThreadName() = "roomMessageSource_thread"
 
 	override fun getSourceId() = chatId
+
+	override fun getAll(): Single<List<Message>> {
+
+		return Single.create { callback ->
+			exec {
+				val items = dao.getAll(chatId)
+				if (items.isNotEmpty())
+					callback.onSuccess(items)
+				else
+					callback.onError(EmptyResultException)
+			}
+		}
+	}
 
 	override fun getAll(callback: RequestCallback<List<Message>>) {
 
@@ -119,10 +132,6 @@ class RoomMessageSource(private val chatId: String,
 			this.paginationLimit = limit
 		else
 			Utils.logError("Pagination limit must be > 1")
-	}
-
-	override fun attachChangeListener(callback: RequestCallback<ListChanges<Message>>): RepositorySubscription {
-		TODO("Not yet implemented")
 	}
 
 	override fun attachListener(callback: RequestCallback<List<Message>>): RepositorySubscription {

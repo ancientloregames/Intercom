@@ -11,6 +11,7 @@ import com.ancientlore.intercom.data.model.crypto.SignalPrivateKeys
 import com.ancientlore.intercom.data.model.crypto.SignalPublicKeys
 import com.ancientlore.intercom.utils.Logger
 import com.ancientlore.intercom.utils.Utils
+import io.reactivex.Single
 import java.util.*
 
 class SignalCryptoManager(private val userId: String): CryptoManager {
@@ -66,117 +67,126 @@ class SignalCryptoManager(private val userId: String): CryptoManager {
 			})
 	}
 
-	override fun decryptChats(chats: List<Chat>, callback: RequestCallback<Any>) {
+	override fun decryptChats(chats: List<Chat>): Single<List<Chat>> {
 		logger.d("Decrypting chats: ${chats.size}")
 
-		// TODO
+		return Single.create { callback ->
+			// TODO
+			callback.onSuccess(chats)
+		}
 	}
 
-	override fun encrypt(message: Message, callback: RequestCallback<Any>) {
+	override fun encrypt(message: Message): Single<Message> {
 		logger.d("Encrypting a message")
 
-		if (message.receivers.isEmpty()) {
-			callback.onSuccess(EmptyObject)
-			return
-		}
+		return Single.create { callback ->
 
-		val remoteUserId = message.receivers.first { it != userId }
+			if (message.receivers.isEmpty()) {
+				callback.onSuccess(message)
+				return@create
+			}
 
-		if (signalSession == null || signalSession!!.remoteUserName != remoteUserId) {
-			logger.d("Creating a session")
+			val remoteUserId = message.receivers.first { it != userId }
 
-			App.backend.getDataSourceProvider()
-				.getSignalKeychainSource(remoteUserId)
-				.getKeychain(remoteUserId, object : RequestCallback<SignalPublicKeys> {
+			if (signalSession == null || signalSession!!.remoteUserName != remoteUserId) {
+				logger.d("Creating a session")
 
-					override fun onSuccess(result: SignalPublicKeys) {
-						logger.d("Acquiring the remote public keychain: Success")
+				App.backend.getDataSourceProvider()
+					.getSignalKeychainSource(remoteUserId)
+					.getKeychain(remoteUserId, object : RequestCallback<SignalPublicKeys> {
 
-						signalSession = SignalSession(
-							localUser,
-							SignalRemoteUser(remoteUserId, result))
+						override fun onSuccess(result: SignalPublicKeys) {
+							logger.d("Acquiring the remote public keychain: Success")
 
-						message.apply {
-							message.text = signalSession!!.encrypt(message.text)
+							signalSession = SignalSession(
+								localUser,
+								SignalRemoteUser(remoteUserId, result))
+
+							message.apply {
+								message.text = signalSession!!.encrypt(message.text)
+							}
+							callback.onSuccess(message)
 						}
-						callback.onSuccess(EmptyObject)
+						override fun onFailure(error: Throwable) {
+							logger.d("Acquiring the remote public keychain: Failure")
+							Utils.logError(error)
+							callback.onSuccess(message) // Remote messages not decrypted
+						}
+					})
+			}
+			else { // signal session exists and consistent
+				logger.d("Present session is consistent")
+				message.apply {
+					message.text = signalSession!!.encrypt(message.text)
+				}
+				callback.onSuccess(message)
+			}
+		}
+	}
+
+	override fun decryptMessages(messages: List<Message>): Single<List<Message>> {
+		logger.d("Decrypting messages: ${messages.size}")
+
+		return Single.create { callback ->
+
+			if (messages.isEmpty()) {
+				callback.onSuccess(messages)
+				return@create
+			}
+
+			val userMessages = LinkedList<Message>()
+			val remoteMessages = LinkedList<Message>()
+			for (message in messages) {
+				if (message.senderId == userId)
+					userMessages.add(message)
+				else
+					remoteMessages.add(message)
+			}
+			val userMessagesIds = userMessages.map { it.id }.toTypedArray()
+
+			val chatId = messages[0].chatId // Assume all are from one chat otherwise something went horribly wrong
+
+			App.frontend.getDataSourceProvider()
+				.getMessageSource(chatId)
+				.getAllByIds(userMessagesIds, object : RequestCallback<List<Message>> {
+
+					override fun onSuccess(result: List<Message>) {
+						logger.d("Loading the user messages: Success ${userMessages.size}")
+
+						val decryptedMessages = LinkedList(result)
+						for (message in userMessages) {
+							val iter = decryptedMessages.iterator()
+							while (iter.hasNext()) {
+								val decryptedMessage = iter.next()
+								if (decryptedMessage.id == message.id) {
+									message.text = decryptedMessage.text
+									iter.remove()
+									break
+								}
+							}
+						}
+
+						if (remoteMessages.isNotEmpty()) {
+							decryptRemoteMessages(remoteMessages, object : SimpleRequestCallback<Any>() {
+
+								override fun onSuccess(result: Any) {
+									logger.d("Decrypting the remote messages: Success")
+									callback.onSuccess(messages)
+								}
+							})
+						}
+						else { // Only user messages in list
+							logger.d("No remote messages to decrypt")
+							callback.onSuccess(messages)
+						}
 					}
 					override fun onFailure(error: Throwable) {
-						logger.d("Acquiring the remote public keychain: Failure")
-						Utils.logError(error)
-						callback.onSuccess(EmptyObject) // Remote messages not decrypted
+						logger.d("Decrypting the remote messages: Success")
+						Utils.logError("SignalCryptoManager. Failed to decrypt local user message")
+						callback.onSuccess(messages)
 					}
 				})
 		}
-		else { // signal session exists and consistent
-			logger.d("Present session is consistent")
-			message.apply {
-				message.text = signalSession!!.encrypt(message.text)
-			}
-			callback.onSuccess(EmptyObject)
-		}
-	}
-
-	override fun decryptMessages(messages: List<Message>, callback: RequestCallback<Any>) {
-		logger.d("Decrypting messages: ${messages.size}")
-
-		if (messages.isEmpty()) {
-			callback.onSuccess(EmptyObject)
-			return
-		}
-
-		val userMessages = LinkedList<Message>()
-		val remoteMessages = LinkedList<Message>()
-		for (message in messages) {
-			if (message.senderId == userId)
-				userMessages.add(message)
-			else
-				remoteMessages.add(message)
-		}
-		val userMessagesIds = userMessages.map { it.id }.toTypedArray()
-
-		val chatId = messages[0].chatId // Assume all are from one chat otherwise something went horribly wrong
-
-		App.frontend.getDataSourceProvider()
-			.getMessageSource(chatId)
-			.getAllByIds(userMessagesIds, object : RequestCallback<List<Message>> {
-
-				override fun onSuccess(result: List<Message>) {
-					logger.d("Loading the user messages: Success ${userMessages.size}")
-
-					val decryptedMessages = LinkedList(result)
-					for (message in userMessages) {
-						val iter = decryptedMessages.iterator()
-						while (iter.hasNext()) {
-							val decryptedMessage = iter.next()
-							if (decryptedMessage.id == message.id) {
-								message.text = decryptedMessage.text
-								iter.remove()
-								break
-							}
-						}
-					}
-
-					if (remoteMessages.isNotEmpty()) {
-						decryptRemoteMessages(remoteMessages, object : SimpleRequestCallback<Any>() {
-
-							override fun onSuccess(result: Any) {
-								logger.d("Decrypting the remote messages: Success")
-								callback.onSuccess(EmptyObject)
-							}
-						})
-					}
-					else { // Only user messages in list
-						logger.d("No remote messages to decrypt")
-						callback.onSuccess(EmptyObject)
-					}
-				}
-				override fun onFailure(error: Throwable) {
-					logger.d("Decrypting the remote messages: Success")
-					Utils.logError("SignalCryptoManager. Failed to decrypt local user message")
-					callback.onSuccess(EmptyObject)
-				}
-			})
 	}
 
 	private fun decryptRemoteMessages(messages: List<Message>, callback: RequestCallback<Any>) {

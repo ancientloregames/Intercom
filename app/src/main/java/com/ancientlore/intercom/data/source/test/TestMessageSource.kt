@@ -10,6 +10,7 @@ import com.ancientlore.intercom.data.model.Message
 import com.ancientlore.intercom.data.source.EmptyResultException
 import com.ancientlore.intercom.data.source.ListChanges
 import com.ancientlore.intercom.data.source.MessageSource
+import io.reactivex.Observable
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -158,11 +159,6 @@ abstract class TestMessageSource: TestSource(), MessageSource {
 	override fun attachListener(id: String, callback: RequestCallback<Message>): RepositorySubscription {
 
 		getItem(id, callback)
-
-		return DummyRepositorySubscription
-	}
-
-	override fun attachChangeListener(callback: RequestCallback<ListChanges<Message>>): RepositorySubscription {
 
 		return DummyRepositorySubscription
 	}

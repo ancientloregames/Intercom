@@ -5,6 +5,7 @@ import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.data.source.DataSource
 import com.ancientlore.intercom.data.source.EmptyResultException
 import com.ancientlore.intercom.utils.Identifiable
+import io.reactivex.Single
 import java.util.*
 
 abstract class CacheSource<I, T: Identifiable<I>> : DataSource<I, T> {
@@ -14,6 +15,15 @@ abstract class CacheSource<I, T: Identifiable<I>> : DataSource<I, T> {
 	fun isNotEmpty() = cache.isNotEmpty()
 
 	fun isEmpty() = cache.isEmpty()
+
+	override fun getAll(): Single<List<T>> {
+		return Single.create { callback ->
+			if (isNotEmpty())
+				callback.onSuccess(cache.values.toList())
+			else
+				callback.onError(EmptyResultException)
+		}
+	}
 
 	override fun getAll(callback: RequestCallback<List<T>>) {
 		if (isNotEmpty())

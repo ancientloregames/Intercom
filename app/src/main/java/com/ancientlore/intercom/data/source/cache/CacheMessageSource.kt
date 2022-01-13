@@ -4,16 +4,25 @@ import android.net.Uri
 import com.ancientlore.intercom.C
 import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.data.model.Message
+import com.ancientlore.intercom.data.source.MessageSource
 import com.ancientlore.intercom.utils.Utils
 
-object CacheMessageSource : CacheSource<String, Message>() {
+object CacheMessageSource : CacheSource<String, Message>(), MessageSource {
 
 	private var paginationLimit: Long = C.DEF_MSG_PAGINATION_LIMIT
 	private var currentPageOffset: Long = 0
 
 	private var paginationCompleted: Boolean = false
 
-	fun getNextPage(callback: RequestCallback<List<Message>>) {
+	override fun getAllByIds(ids: Array<String>, callback: RequestCallback<List<Message>>) {
+		TODO("Not yet implemented")
+	}
+
+	override fun setMessageStatusReceived(id: String, callback: RequestCallback<Any>) {
+		TODO("Not yet implemented")
+	}
+
+	override fun getNextPage(callback: RequestCallback<List<Message>>) {
 		if (paginationCompleted) {
 			return
 		}
@@ -21,7 +30,7 @@ object CacheMessageSource : CacheSource<String, Message>() {
 		// TODO need index of cache values by timestamp (desc) and separate thread
 	}
 
-	fun updateMessageUri(id: String, uri: Uri) {
+	override fun updateMessageUri(id: String, uri: Uri, callback: RequestCallback<Any>) {
 
 		cache[id]?.attachUrl = uri.toString()
 	}
@@ -31,7 +40,7 @@ object CacheMessageSource : CacheSource<String, Message>() {
 		cache[id]?.status = Message.STATUS_RECEIVED
 	}
 
-	fun setPaginationLimit(limit: Long) {
+	override fun setPaginationLimit(limit: Long) {
 		if (limit > 1) {
 			this.paginationLimit = limit
 		}
@@ -42,6 +51,6 @@ object CacheMessageSource : CacheSource<String, Message>() {
 		paginationLimit = C.DEF_MSG_PAGINATION_LIMIT
 		currentPageOffset = 0
 		paginationCompleted = false
-		super.clean()
+		super<CacheSource>.clean()
 	}
 }

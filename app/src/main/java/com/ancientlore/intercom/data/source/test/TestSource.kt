@@ -1,5 +1,6 @@
 package com.ancientlore.intercom.data.source.test
 
+import io.reactivex.schedulers.Schedulers
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -17,5 +18,7 @@ abstract class TestSource {
 		val testCurrentUserId: String by lazy {
 			Random().nextInt(userListSize).toString()
 		}
+
+		val resultScheduler = Schedulers.io()
 	}
 }

@@ -51,10 +51,6 @@ object DummyMessageSource : MessageSource {
 	override fun setPaginationLimit(limit: Long) {
 	}
 
-	override fun attachChangeListener(callback: RequestCallback<ListChanges<Message>>): RepositorySubscription {
-		TODO("Not yet implemented")
-	}
-
 	override fun attachListener(callback: RequestCallback<List<Message>>): RepositorySubscription {
 		callback.onFailure(EmptyResultException)
 

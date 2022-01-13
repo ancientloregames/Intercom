@@ -15,7 +15,9 @@ import com.ancientlore.intercom.manager.DeviceContactsManager
 import com.ancientlore.intercom.ui.FilterableViewModel
 import com.ancientlore.intercom.ui.chat.flow.ChatFlowParams
 import com.ancientlore.intercom.utils.extensions.runOnUiThread
+import com.ancientlore.intercom.utils.rx.LogErrorObserver
 import io.reactivex.Observable
+import io.reactivex.disposables.Disposable
 import io.reactivex.subjects.PublishSubject
 import java.util.*
 
@@ -78,9 +80,11 @@ class ChatListViewModel(context: Context)
 
 	fun init(contacts: List<DeviceContactsManager.Item>) {
 
-		repositorySub = ChatRepository.attachListener(object : CrashlyticsRequestCallback<List<Chat>>() {
-			override fun onSuccess(chats: List<Chat>) {
+		ChatRepository.attachListener().subscribe(object : LogErrorObserver<List<Chat>>() {
 
+			override fun onSubscribe(d: Disposable) { subscribe(d) }
+
+			override fun onNext(chats: List<Chat>) {
 				assignPrivateChatNames(chats, contacts)
 				runOnUiThread {
 					chatListIsEmpty.set(chats.isEmpty())
@@ -88,8 +92,8 @@ class ChatListViewModel(context: Context)
 					listAdapter.setItems(chats)
 				}
 			}
-			override fun onFailure(error: Throwable) {
-				super.onFailure(error)
+			override fun onError(e: Throwable) {
+				super.onError(e)
 				chatListIsEmpty.set(true)
 				chatListFirstLoad.set(true)
 			}

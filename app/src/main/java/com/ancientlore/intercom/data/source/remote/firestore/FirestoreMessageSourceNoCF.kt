@@ -1,6 +1,5 @@
 package com.ancientlore.intercom.data.source.remote.firestore
 
-import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.data.model.Message
 import com.ancientlore.intercom.data.model.PushMessage
 import com.ancientlore.intercom.data.model.User
@@ -16,49 +15,54 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.RemoteMessage
+import io.reactivex.Single
 
 class FirestoreMessageSourceNoCF(chatId: String): FirestoreMessageSource(chatId) {
 
-	override fun addItem(item: Message, callback: RequestCallback<String>) {
+	override fun addItem(item: Message): Single<String> {
 
-		chatMessages.add(item)
-			.addOnSuccessListener {
+		return Single.create<String> { callback ->
 
-				val senderId = item.senderId
-				val messageId = it.id
+			chatMessages.add(item)
+				.addOnSuccessListener {
 
-				chatMessages.document(messageId)
-					.set(HashMap<String, Any>().apply {
-						put(FIELD_STATUS, Message.STATUS_SENT)
-					}, SetOptions.merge())
-					.addOnFailureListener { e -> Utils.logError(e) }
+					val senderId = item.senderId
+					val messageId = it.id
 
-				val userChatInfoUpdate = HashMap<String, Any>().apply {
-					put(FIELD_LAST_MSG_SENDER, senderId)
-					put(FIELD_LAST_MSG_TEXT, item.text)
-					put(FIELD_LAST_MSG_TIME, FieldValue.serverTimestamp())
-				}
+					chatMessages.document(messageId)
+						.set(HashMap<String, Any>().apply {
+							put(FIELD_STATUS, Message.STATUS_SENT)
+						}, SetOptions.merge())
+						.addOnFailureListener { e -> Utils.logError(e) }
 
-				db.collection(USERS)
-					.document(senderId)
-					.collection(CHATS)
-					.document(getSourceId())
-					.set(userChatInfoUpdate, SetOptions.merge())
-					.addOnSuccessListener { exec { callback.onSuccess(messageId) } }
-					.addOnFailureListener { e -> exec { callback.onFailure(e) } }
+					val userChatInfoUpdate = HashMap<String, Any>().apply {
+						put(FIELD_LAST_MSG_SENDER, senderId)
+						put(FIELD_LAST_MSG_TEXT, item.text)
+						put(FIELD_LAST_MSG_TIME, FieldValue.serverTimestamp())
+					}
 
-				userChatInfoUpdate[FIELD_NEW_MSG_COUNT] = FieldValue.increment(1)
-
-				for (receiverId in item.receivers.minus(senderId)) {
 					db.collection(USERS)
-						.document(receiverId)
+						.document(senderId)
 						.collection(CHATS)
 						.document(getSourceId())
 						.set(userChatInfoUpdate, SetOptions.merge())
-						.addOnFailureListener { e -> Utils.logError(e) }
+						.addOnSuccessListener { exec { callback.onSuccess(messageId) } }
+						.addOnFailureListener { e -> exec { callback.onError(e) } }
+
+					userChatInfoUpdate[FIELD_NEW_MSG_COUNT] = FieldValue.increment(1)
+
+					for (receiverId in item.receivers.minus(senderId)) {
+						db.collection(USERS)
+							.document(receiverId)
+							.collection(CHATS)
+							.document(getSourceId())
+							.set(userChatInfoUpdate, SetOptions.merge())
+							.addOnFailureListener { e -> Utils.logError(e) }
+					}
 				}
-			}
-			.addOnFailureListener { exec { callback.onFailure(it) } }
+				.addOnFailureListener { exec { callback.onError(it) } }
+		}
+			.observeOn(resultScheduler)
 	}
 
 	/*

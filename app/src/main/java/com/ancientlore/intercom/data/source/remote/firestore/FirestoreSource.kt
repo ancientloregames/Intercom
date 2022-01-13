@@ -5,10 +5,16 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QueryDocumentSnapshot
 import com.google.firebase.firestore.QuerySnapshot
+import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 abstract class FirestoreSource<T> {
+
+	companion object {
+
+		val resultScheduler = Schedulers.io()
+	}
 
 	private val service: ExecutorService = Executors.newSingleThreadExecutor { r ->
 		object : Thread(r, getWorkerThreadName()) {

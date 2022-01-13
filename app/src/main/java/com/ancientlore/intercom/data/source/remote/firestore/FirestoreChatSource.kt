@@ -14,6 +14,8 @@ import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_NAME
 import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_NEW_MSG_COUNT
 import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_TYPE
 import com.google.firebase.firestore.SetOptions
+import io.reactivex.Observable
+import io.reactivex.Single
 import java.lang.RuntimeException
 
 open class FirestoreChatSource protected constructor(protected val userId: String)
@@ -35,6 +37,17 @@ open class FirestoreChatSource protected constructor(protected val userId: Strin
 	override fun getWorkerThreadName() = "fsChatSource_thread"
 
 	override fun getSourceId() = userId
+
+	override fun getAll(): Single<List<Chat>> {
+		val single = Single.create<List<Chat>> { callback ->
+			exec {
+				userChats.get()
+					.addOnSuccessListener { callback.onSuccess(deserialize(it)) }
+					.addOnFailureListener { callback.onError(it) }
+			}
+		}
+		return single.observeOn(resultScheduler)
+	}
 
 	override fun getAll(callback: RequestCallback<List<Chat>>) {
 		userChats.get()
@@ -117,23 +130,23 @@ open class FirestoreChatSource protected constructor(protected val userId: Strin
 			.addOnFailureListener { exec { callback.onFailure(it) } }
 	}
 
-	override fun attachListener(callback: RequestCallback<List<Chat>>) : RepositorySubscription {
-		val registration = userChats
-			.orderBy(FIELD_LAST_MSG_TIME)
-			.addSnapshotListener { snapshot, error ->
-				exec {
-					if (error != null)
-						callback.onFailure(error)
-					else if (snapshot != null)
-						callback.onSuccess(deserialize(snapshot))
-				}
-			}
+	override fun attachListener(): Observable<List<Chat>> {
 
-		return object : RepositorySubscription {
-			override fun remove() {
-				registration.remove()
-			}
+		val observable = Observable.create<List<Chat>> { callback ->
+			val registration = userChats
+				.orderBy(FIELD_LAST_MSG_TIME)
+				.addSnapshotListener { snapshot, error ->
+					exec {
+						if (error != null)
+							callback.onError(error)
+						else if (snapshot != null)
+							callback.onNext(deserialize(snapshot))
+					}
+				}
+			callback.setCancellable { registration.remove() }
 		}
+
+		return observable.observeOn(resultScheduler)
 	}
 
 	override fun attachListener(id: String, callback: RequestCallback<Chat>): RepositorySubscription {

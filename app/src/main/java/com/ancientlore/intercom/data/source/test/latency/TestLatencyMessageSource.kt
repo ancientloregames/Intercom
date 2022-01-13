@@ -83,12 +83,4 @@ abstract class TestLatencyMessageSource: TestMessageSource(), LatencySource {
 
 		return DummyRepositorySubscription
 	}
-
-	override fun attachChangeListener(callback: RequestCallback<ListChanges<Message>>): RepositorySubscription {
-		schedule {
-			super.attachChangeListener(callback)
-		}
-
-		return DummyRepositorySubscription
-	}
 }

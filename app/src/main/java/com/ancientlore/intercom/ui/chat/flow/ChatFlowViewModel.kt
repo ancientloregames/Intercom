@@ -23,8 +23,11 @@ import com.ancientlore.intercom.utils.Utils
 import com.ancientlore.intercom.utils.extensions.createAudioMessageFile
 import com.ancientlore.intercom.utils.extensions.isInternal
 import com.ancientlore.intercom.utils.extensions.runOnUiThread
+import com.ancientlore.intercom.utils.rx.LogErrorObserver
+import com.ancientlore.intercom.utils.rx.LogErrorSingleObserver
 import com.ancientlore.intercom.view.MessageInputManager
 import io.reactivex.Observable
+import io.reactivex.disposables.Disposable
 import io.reactivex.subjects.PublishSubject
 import java.io.File
 import java.lang.ref.WeakReference
@@ -311,16 +314,13 @@ class ChatFlowViewModel(
 				senderId = params.userId,
 				text = text,
 				receivers = params.participants)
-			repository.addItem(message, object : RequestCallback<String> {
-				override fun onSuccess(result: String) {
-					runOnUiThread {
-						showSendProgressField.set(false)
-					}
-				}
-				override fun onFailure(error: Throwable) {
-					onFailureSendingMessage(error)
-				}
-			})
+
+			repository.addItem(message).subscribe(LogErrorSingleObserver<String>(
+				{
+					runOnUiThread { showSendProgressField.set(false) }
+				},
+				{ onFailureSendingMessage(it) }
+			))
 		}
 	}
 
@@ -332,8 +332,9 @@ class ChatFlowViewModel(
 				attachUrl = conpressed.toString(),
 				type = Message.TYPE_IMAGE,
 				receivers = params.participants)
-			repository.addItem(message, object : RequestCallback<String> {
-				override fun onSuccess(messageId: String) {
+
+			repository.addItem(message).subscribe(LogErrorSingleObserver<String>(
+				{ messageId ->
 					App.backend.getStorageManager().uploadImage(fileData, chatId, object : ProgressRequestCallback<Uri> {
 						override fun onProgress(progress: Int) {
 							runOnUiThread {
@@ -341,20 +342,18 @@ class ChatFlowViewModel(
 							}
 						}
 						override fun onSuccess(uri: Uri) {
-							repository.updateMessageUri(messageId, uri, object : RequestCallback<Any> {
-								override fun onSuccess(result: Any) {
-									runOnUiThread {
-										showSendProgressField.set(false)
-									}
-								}
-								override fun onFailure(error: Throwable) { onFailureSendingMessage(error) }
-							})
+							repository.updateMessageUri(messageId, uri).subscribe(LogErrorSingleObserver<Any>(
+								{
+									runOnUiThread { showSendProgressField.set(false) }
+								},
+								{ onFailureSendingMessage(it) }
+							))
 						}
 						override fun onFailure(error: Throwable) { onFailureSendingMessage(error) }
 					})
-				}
-				override fun onFailure(error: Throwable) { onFailureSendingMessage(error) }
-			})
+				},
+				{ onFailureSendingMessage(it) }
+			))
 		}
 	}
 
@@ -375,10 +374,9 @@ class ChatFlowViewModel(
 				attachUrl = fileData.uri.toString(),
 				type = Message.TYPE_FILE,
 				receivers = params.participants)
-			repository.addItem(message, object : RequestCallback<String> {
 
-				override fun onSuccess(messageId: String) {
-
+			repository.addItem(message).subscribe(LogErrorSingleObserver<String>(
+				{ messageId ->
 					App.backend.getStorageManager().uploadFile(fileData, chatId, object : ProgressRequestCallback<Uri> {
 						override fun onProgress(progress: Int) {
 							runOnUiThread {
@@ -386,20 +384,18 @@ class ChatFlowViewModel(
 							}
 						}
 						override fun onSuccess(result: Uri) {
-							repository.updateMessageUri(messageId, result, object : RequestCallback<Any> {
-								override fun onSuccess(result: Any) {
-									runOnUiThread {
-										showSendProgressField.set(false)
-									}
-								}
-								override fun onFailure(error: Throwable) { onFailureSendingMessage(error) }
-							})
+							repository.updateMessageUri(messageId, result).subscribe(LogErrorSingleObserver<Any>(
+								{
+									runOnUiThread { showSendProgressField.set(false) }
+								},
+								{ onFailureSendingMessage(it) }
+							))
 						}
 						override fun onFailure(error: Throwable) { onFailureSendingMessage(error) }
 					})
-				}
-				override fun onFailure(error: Throwable) { onFailureSendingMessage(error) }
-			})
+				},
+				{ onFailureSendingMessage(it) }
+			))
 		}
 	}
 
@@ -412,10 +408,9 @@ class ChatFlowViewModel(
 				attachUrl = file.name,
 				type = Message.TYPE_AUDIO,
 				receivers = params.participants)
-			repository.addItem(message, object : RequestCallback<String> {
 
-				override fun onSuccess(messageId: String) {
-
+			repository.addItem(message).subscribe(LogErrorSingleObserver<String>(
+				{ messageId ->
 					val uri = Uri.fromFile(file)
 					App.backend.getStorageManager().uploadAudioMessage(uri, chatId, object : ProgressRequestCallback<Uri> {
 
@@ -426,22 +421,21 @@ class ChatFlowViewModel(
 						}
 						override fun onSuccess(result: Uri) {
 
-							repository.updateMessageUri(messageId, result, object : RequestCallback<Any> {
-
-								override fun onSuccess(result: Any) {
+							repository.updateMessageUri(messageId, result).subscribe(LogErrorSingleObserver<Any>(
+								{
 									runOnUiThread {
 										showSendProgressField.set(false)
 										inputManager?.onMessageSent()
 									}
-								}
-								override fun onFailure(error: Throwable) { onFailureSendingMessage(error) }
-							})
+								},
+								{ onFailureSendingMessage(it) }
+							))
 						}
 						override fun onFailure(error: Throwable) { onFailureSendingMessage(error) }
 					})
-				}
-				override fun onFailure(error: Throwable) { onFailureSendingMessage(error) }
-			})
+				},
+				{ onFailureSendingMessage(it) }
+			))
 		}
 	}
 
@@ -518,8 +512,7 @@ class ChatFlowViewModel(
 	// ----------- Private logics -----------
 
 	private fun onFailureSendingMessage(error: Throwable) {
-		if (error !is EmptyResultException)
-			Utils.logError(error)
+
 		runOnUiThread {
 			showSendProgressField.set(false)
 			inputManager?.onMessageSent()
@@ -540,8 +533,8 @@ class ChatFlowViewModel(
 				pin = false,
 				mute = false)
 
-			ChatRepository.addItem(chat, object : RequestCallback<String> {
-				override fun onSuccess(id: String) {
+			ChatRepository.addItem(chat).subscribe(LogErrorSingleObserver<String>(
+				{ id ->
 					initMessageRepository(id)
 					attachRepositoryChangeListener()
 
@@ -551,12 +544,9 @@ class ChatFlowViewModel(
 					runOnUiThread {
 						callback.run(id)
 					}
-				}
-				override fun onFailure(error: Throwable) {
-					Utils.logError(error)
-					toastRequest.onNext(TOAST_CHAT_CREATION_ERR)
-				}
-			})
+				},
+				{ toastRequest.onNext(TOAST_CHAT_CREATION_ERR) }
+			))
 		}
 		else callback.run(repository.getSourceId())
 	}
@@ -570,16 +560,15 @@ class ChatFlowViewModel(
 
 	private fun attachRepositoryChangeListener() {
 
-		repositorySub = repository.attachChangeListener(object : RequestCallback<ListChanges<Message>> {
-			override fun onSuccess(result: ListChanges<Message>) {
+		repository.attachChangeListener().subscribe(object : LogErrorObserver<ListChanges<Message>>() {
+
+			override fun onSubscribe(d: Disposable) { subscribe(d) }
+
+			override fun onNext(changes: ListChanges<Message>) {
 				runOnUiThread {
-					listAdapter.applyChanges(result)
+					listAdapter.applyChanges(changes)
 				}
-				updateMessagesStatus(result.addList)
-			}
-			override fun onFailure(error: Throwable) {
-				if (error !is EmptyResultException)
-					Utils.logError(error)
+				updateMessagesStatus(changes.addList)
 			}
 		})
 	}
@@ -609,24 +598,22 @@ class ChatFlowViewModel(
 
 	private fun loadNextPage(onLoaded: Runnable? = null) {
 
-		repository.getNextPage(object: CrashlyticsRequestCallback<List<Message>>() {
+		repository.getNextPage().subscribe(LogErrorSingleObserver({
 
-			override fun onSuccess(result: List<Message>) {
-				runOnUiThread {
-					if (result.isNotEmpty()) {
-						if (result.size < C.DEF_MSG_PAGINATION_LIMIT)
-							paginationCompleted = true
-
-						listAdapter.prependItems(result)
-					}
-					else
+			runOnUiThread {
+				if (it.isNotEmpty()) {
+					if (it.size < C.DEF_MSG_PAGINATION_LIMIT)
 						paginationCompleted = true
-					listAdapter.onPaginationStart(false)
-				}
-				updateMessagesStatus(result)
 
-				onLoaded?.run()
+					listAdapter.prependItems(it)
+				}
+				else
+					paginationCompleted = true
+				listAdapter.onPaginationStart(false)
 			}
-		})
+			updateMessagesStatus(it)
+
+			onLoaded?.run()
+		}))
 	}
 }

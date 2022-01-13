@@ -1,13 +1,13 @@
 package com.ancientlore.intercom.crypto.symmetric
 
-import com.ancientlore.intercom.EmptyObject
-import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.crypto.CryptoException
 import com.ancientlore.intercom.crypto.CryptoManager
 import com.ancientlore.intercom.crypto.CryptoUtils
 import com.ancientlore.intercom.data.model.Chat
 import com.ancientlore.intercom.data.model.Message
+import com.ancientlore.intercom.utils.Logger
 import com.ancientlore.intercom.utils.Utils
+import io.reactivex.Single
 import java.io.UnsupportedEncodingException
 import java.security.InvalidKeyException
 import java.security.NoSuchAlgorithmException
@@ -18,6 +18,11 @@ import javax.crypto.NoSuchPaddingException
 import javax.crypto.spec.SecretKeySpec
 
 abstract class SymmetricCryptoManager: CryptoManager {
+
+	companion object {
+
+		private val logger: Logger = Logger("Symmetric")
+	}
 
 	private var cipher: Cipher? = null
 	private var decipher: Cipher? = null
@@ -88,38 +93,45 @@ abstract class SymmetricCryptoManager: CryptoManager {
 		return decrypted
 	}
 
-	override fun encrypt(message: Message, callback: RequestCallback<Any>) {
+	override fun encrypt(message: Message): Single<Message> {
 
-		cipher
-			?.let {
-				message.text = encrypt(message.text)
-				callback.onSuccess(EmptyObject)
-			}
-			?: callback.onFailure(CryptoException)
-
+		return Single.create { callback ->
+			cipher
+				?.let {
+					message.text = encrypt(message.text)
+					callback.onSuccess(message)
+				}
+				?: callback.onError(CryptoException)
+		}
 	}
 
-	override fun decryptMessages(messages: List<Message>, callback: RequestCallback<Any>) {
+	override fun decryptMessages(messages: List<Message>): Single<List<Message>> {
+		logger.d("Decrypting messages: ${messages.size}")
 
-		decipher
-			?.let {
-				for (message in messages) {
-					message.text = decrypt(message.text)
+		return Single.create { callback ->
+			decipher
+				?.let {
+					for (message in messages) {
+						message.text = decrypt(message.text)
+					}
+					callback.onSuccess(messages)
 				}
-				callback.onSuccess(EmptyObject)
-			}
-			?: callback.onFailure(CryptoException)
+				?: callback.onError(CryptoException)
+		}
 	}
 
-	override fun decryptChats(chats: List<Chat>, callback: RequestCallback<Any>) {
+	override fun decryptChats(chats: List<Chat>): Single<List<Chat>> {
+		logger.d("Decrypting chats: ${chats.size}")
 
-		decipher
-			?.let {
-				for (chat in chats) {
-					chat.lastMsgText = decrypt(chat.lastMsgText)
+		return Single.create { callback ->
+			decipher
+				?.let {
+					for (chat in chats) {
+						chat.lastMsgText = decrypt(chat.lastMsgText)
+					}
+					callback.onSuccess(chats)
 				}
-				callback.onSuccess(EmptyObject)
-			}
-			?: callback.onFailure(CryptoException)
+				?: callback.onError(CryptoException)
+		}
 	}
 }

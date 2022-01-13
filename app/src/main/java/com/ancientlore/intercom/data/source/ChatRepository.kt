@@ -7,6 +7,8 @@ import com.ancientlore.intercom.data.model.Chat
 import com.ancientlore.intercom.data.source.cache.CacheChatSource
 import com.ancientlore.intercom.data.source.dummy.DummyChatSource
 import com.ancientlore.intercom.utils.Utils
+import io.reactivex.Observable
+import io.reactivex.Single
 
 object ChatRepository : ChatSource {
 
@@ -16,31 +18,45 @@ object ChatRepository : ChatSource {
 
 	override fun getSourceId() = remoteSource.getSourceId()
 
-	override fun getAll(callback: RequestCallback<List<Chat>>) {
+	override fun getAll(): Single<List<Chat>> {
 
-		remoteSource.getAll(object : RequestCallback<List<Chat>> {
+//		cacheSource.getAll()
+//			.takeUntil(remoteSource.getAll()
+//				.flatMap { all ->
+//					val userId = App.backend.getAuthManager().getCurrentUserId()
+//					App.frontend.getCryptoManager(userId)
+//						.decryptChats(all)
+//						.flatMap {
+//							cacheSource.reset(it)
+//							localSource?.addItems(it)
+//							Single.just(it)
+//						}
+//				})
+//			.onErrorResumeNext {
+//				Utils.logError(it)
+//				localSource?.getAll()
+//					?: Single.error(EmptyResultException)
+//			}
 
-			override fun onSuccess(result: List<Chat>) {
-
-				val userId = App.backend.getAuthManager().getCurrentUserId()
-				App.frontend.getCryptoManager(userId).decryptChats(result, object : RequestCallback<Any> {
-
-					override fun onSuccess(ignore: Any) {
-						cacheSource.reset(result)
-						localSource?.addItems(result)
-						callback.onSuccess(result)
+		return remoteSource.getAll()
+			.flatMap { all ->
+				App.frontend.getCryptoManager(getSourceId())
+					.decryptChats(all)
+					.flatMap {
+						cacheSource.reset(it)
+						localSource?.addItems(it)
+						Single.just(it)
 					}
-					override fun onFailure(error: Throwable) {
-						Utils.logError(error)
-						getAllFallback(callback)
-					}
-				})
 			}
-			override fun onFailure(error: Throwable) {
-				Utils.logError(error)
-				getAllFallback(callback)
+			.onErrorResumeNext {
+				Utils.logError(it)
+				cacheSource.getAll()
 			}
-		})
+			.onErrorResumeNext {
+				Utils.logError(it)
+				localSource?.getAll()
+					?: Single.error(EmptyResultException)
+			}
 	}
 
 	override fun getItem(id: String, callback: RequestCallback<Chat>) {
@@ -59,18 +75,14 @@ object ChatRepository : ChatSource {
 		})
 	}
 
-	override fun addItem(item: Chat, callback: RequestCallback<String>) {
+	override fun addItem(item: Chat): Single<String> {
 
-		remoteSource.addItem(item, object : RequestCallback<String> {
-
-			override fun onSuccess(result: String) {
-				item.id = result
+		return remoteSource.addItem(item)
+			.doAfterSuccess {
+				item.id = it
 				cacheSource.addItem(item)
 				localSource?.addItem(item)
-				callback.onSuccess(result)
 			}
-			override fun onFailure(error: Throwable) { callback.onFailure(error) }
-		})
 	}
 
 	override fun addItems(items: List<Chat>, callback: RequestCallback<List<String>>) {
@@ -142,32 +154,34 @@ object ChatRepository : ChatSource {
 			}
 		})
 	}
+	override fun attachListener(): Observable<List<Chat>> {
 
-	override fun attachListener(callback: RequestCallback<List<Chat>>) : RepositorySubscription {
-
-		return remoteSource.attachListener(object : RequestCallback<List<Chat>> {
-
-			override fun onSuccess(result: List<Chat>) {
-
-				val userId = App.backend.getAuthManager().getCurrentUserId()
-				App.frontend.getCryptoManager(userId).decryptChats(result, object : RequestCallback<Any> {
-
-					override fun onSuccess(ignore: Any) {
-						cacheSource.reset(result)
-						localSource?.addItems(result)
-						callback.onSuccess(result)
-					}
-					override fun onFailure(error: Throwable) {
-						Utils.logError(error)
-						getAllFallback(callback)
-					}
-				})
+		return remoteSource.attachListener()
+			.flatMap { chats ->
+				App.frontend.getCryptoManager(getSourceId())
+					.decryptChats(chats)
+					.toObservable()
 			}
-			override fun onFailure(error: Throwable) {
-				Utils.logError(error)
-				getAllFallback(callback)
+			.flatMap {
+				cacheSource.reset(it)
+				localSource?.addItems(it)
+
+				Observable.just(it)
 			}
-		})
+//			.onErrorResumeNext {
+//				Utils.logError(it)
+//				cacheSource.getAll().toObservable()
+//			}
+//			.onErrorResumeNext {
+//				Utils.logError(it)
+//				localSource?.getAll()
+//					?.flatMap {
+//						cacheSource.reset(it)
+//						Single.just(it)
+//					}
+//					?.toObservable()
+//					?: Observable.error(EmptyResultException)
+//			}
 	}
 
 	override fun attachListener(id: String, callback: RequestCallback<Chat>): RepositorySubscription {
@@ -216,29 +230,6 @@ object ChatRepository : ChatSource {
 			remoteSource.clean()
 			remoteSource = DummyChatSource
 		}
-	}
-
-	private fun getAllFallback(callback: RequestCallback<List<Chat>>) {
-
-		cacheSource.getAll(object : RequestCallback<List<Chat>> {
-
-			override fun onSuccess(result: List<Chat>) {
-				callback.onSuccess(result)
-			}
-			override fun onFailure(error: Throwable) {
-				localSource
-					?.run { getAll(object : RequestCallback<List<Chat>> {
-
-						override fun onSuccess(result: List<Chat>) {
-							cacheSource.reset(result)
-							callback.onSuccess(result)
-						}
-						override fun onFailure(error: Throwable) {
-							callback.onFailure(EmptyResultException)
-						}
-					}) }
-			}
-		})
 	}
 
 	private fun getItemFallback(id: String, callback: RequestCallback<Chat>) {

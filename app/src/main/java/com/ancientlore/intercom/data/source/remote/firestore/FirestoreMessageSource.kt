@@ -19,6 +19,8 @@ import com.ancientlore.intercom.utils.Utils
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.Query
+import io.reactivex.Observable
+import io.reactivex.Single
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -50,52 +52,59 @@ open class FirestoreMessageSource(protected val chatId: String)
 
 	override fun getSourceId() = chatId
 
-	override fun getAll(callback: RequestCallback<List<Message>>) {
-		chatMessages
-			.get()
-			.addOnSuccessListener { exec { callback.onSuccess(deserialize(it)) } }
-			.addOnFailureListener { exec { callback.onFailure(it) } }
+	override fun getAll(): Single<List<Message>> {
+
+		return Single.create { callback ->
+			chatMessages
+				.get()
+				.addOnSuccessListener { exec { callback.onSuccess(deserialize(it)) } }
+				.addOnFailureListener { exec { callback.onError(it) } }
+		}
 	}
 
 	override fun getAllByIds(ids: Array<String>, callback: RequestCallback<List<Message>>) {
 		callback.onFailure(EmptyResultException)
 	}
 
-	override fun getNextPage(callback: RequestCallback<List<Message>>) {
+	override fun getNextPage(): Single<List<Message>> {
 
 		if (paginationCompleted) {
-			callback.onSuccess(emptyList())
-			return
+			return Single.never()
 		}
 
-		val queryNextPage = if (lastDocument != null) {
-			chatMessages
-				.orderBy(FIELD_TIMESTAMP, Query.Direction.DESCENDING)
-				.startAfter(lastDocument!!)
-				.limit(paginationLimit)
-		}
-		else {
-			chatMessages
-				.orderBy(FIELD_TIMESTAMP, Query.Direction.DESCENDING)
-				.limit(paginationLimit)
-		}
+		return Single.create<List<Message>> { callback ->
 
-		queryNextPage
-			.get()
-			.addOnSuccessListener { snapshot ->
-				exec {
-					if (snapshot.isEmpty.not()) {
-						lastDocument = snapshot.documents[snapshot.size() - 1]
-						callback.onSuccess(deserialize(snapshot))
-					}
-					else {
-						paginationCompleted = true
-						lastDocument = null
-						callback.onSuccess(emptyList())
-					}
+			exec {
+
+				val queryNextPage = if (lastDocument != null) {
+					chatMessages
+						.orderBy(FIELD_TIMESTAMP, Query.Direction.DESCENDING)
+						.startAfter(lastDocument!!)
+						.limit(paginationLimit)
 				}
+				else {
+					chatMessages
+						.orderBy(FIELD_TIMESTAMP, Query.Direction.DESCENDING)
+						.limit(paginationLimit)
+				}
+
+				queryNextPage
+					.get()
+					.addOnSuccessListener { snapshot ->
+
+						if (snapshot.isEmpty.not()) {
+							lastDocument = snapshot.documents[snapshot.size() - 1]
+							callback.onSuccess(deserialize(snapshot))
+						}
+						else {
+							paginationCompleted = true
+							lastDocument = null
+							callback.onSuccess(emptyList())
+						}
+					}
+					.addOnFailureListener { callback.onError(it) }
 			}
-			.addOnFailureListener { callback.onFailure(it) }
+		}.observeOn(resultScheduler)
 	}
 
 	override fun setPaginationLimit(limit: Long) {
@@ -118,6 +127,18 @@ open class FirestoreMessageSource(protected val chatId: String)
 				}
 			}
 			.addOnFailureListener { exec { callback.onFailure(it) } }
+	}
+
+	override fun addItem(item: Message): Single<String> {
+
+		return Single.create<String> { callback ->
+
+			chatMessages
+				.add(item)
+				.addOnSuccessListener { exec { callback.onSuccess(it.id) } }
+				.addOnFailureListener { exec { callback.onError(it) } }
+		}
+			.observeOn(resultScheduler)
 	}
 
 	override fun addItem(item: Message, callback: RequestCallback<String>) {
@@ -155,12 +176,17 @@ open class FirestoreMessageSource(protected val chatId: String)
 			.addOnFailureListener { exec { callback.onFailure(it) } }
 	}
 
-	override fun updateMessageUri(messageId: String, uri: Uri, callback: RequestCallback<Any>) {
-		chatMessages
-			.document(messageId)
-			.update(FIELD_ATTACH_URL, uri.toString())
-			.addOnSuccessListener { exec { callback.onSuccess(EmptyObject) } }
-			.addOnFailureListener { exec { callback.onFailure(it) } }
+	override fun updateMessageUri(id: String, uri: Uri): Single<Any> {
+
+		return Single.create<Any> { callback ->
+
+			chatMessages
+				.document(id)
+				.update(FIELD_ATTACH_URL, uri.toString())
+				.addOnSuccessListener { exec { callback.onSuccess(EmptyObject) } }
+				.addOnFailureListener { exec { callback.onError(it) } }
+		}
+			.observeOn(resultScheduler)
 	}
 
 	override fun setMessageStatusReceived(id: String, callback: RequestCallback<Any>) {
@@ -191,73 +217,77 @@ open class FirestoreMessageSource(protected val chatId: String)
 		}
 	}
 
-	override fun attachChangeListener(callback: RequestCallback<ListChanges<Message>>) : RepositorySubscription {
-		val registration = chatMessages
-			.orderBy(FIELD_TIMESTAMP, Query.Direction.DESCENDING)
-			.limit(paginationLimit)
-			.addSnapshotListener { snapshot, error ->
-				exec {
-					when {
-						error != null -> callback.onFailure(error)
-						snapshot != null -> {
+	override fun attachChangeListener(): Observable<ListChanges<Message>> {
 
-							val limitIndex = paginationLimit.toInt() - 1
+		return Observable.create<ListChanges<Message>> { callback ->
 
-							val addList = LinkedList<Message>()
-							val modifyList = LinkedList<Message>()
-							val removeList = LinkedList<Message>()
+			val registration =  chatMessages
+				.orderBy(FIELD_TIMESTAMP, Query.Direction.DESCENDING)
+				.limit(paginationLimit)
+				.addSnapshotListener { snapshot, error ->
 
-							for (change in snapshot.documentChanges) {
-								// Only the real changes
-								val document = change.document
-								when (change.type) {
-									DocumentChange.Type.ADDED -> {
-										// Ignore the addition via query limit and cache (first call)
-										if (change.newIndex != limitIndex && document.metadata.isFromCache.not()) {
-											val messageToAdd = deserialize(document)
-											// ensure id and timestamp (pending addition comes without them)
-											if (messageToAdd.id.isEmpty())
-												messageToAdd.id = document.id
-											if (messageToAdd.timestamp == null)
-												messageToAdd.timestamp = Date(System.currentTimeMillis())
-											addList.add(messageToAdd)
-										}
-									}
-									DocumentChange.Type.REMOVED -> {
-										// Ignore the deletion via query limit
-										if (change.oldIndex != limitIndex)
-											removeList.add(deserialize(document))
-									}
-									DocumentChange.Type.MODIFIED -> {
-										val messageToModify = deserialize(document)
-										// ensure id and timestamp
-										if (messageToModify.id.isEmpty())
-											messageToModify.id = document.id
-										if (messageToModify.timestamp == null)
-											messageToModify.timestamp = Date(System.currentTimeMillis())
-										modifyList.add(messageToModify)
+					exec {
+						if (error != null) {
+							callback.onError(error)
+							return@exec
+						}
+						if (snapshot == null)
+							return@exec
+
+						val limitIndex = paginationLimit.toInt() - 1
+
+						val addList = LinkedList<Message>()
+						val modifyList = LinkedList<Message>()
+						val removeList = LinkedList<Message>()
+
+						for (change in snapshot.documentChanges) {
+							// Only the real changes
+							val document = change.document
+							when (change.type) {
+								DocumentChange.Type.ADDED -> {
+									// Ignore the addition via query limit and cache (first call)
+									if (change.newIndex != limitIndex && document.metadata.isFromCache.not()) {
+										val messageToAdd = deserialize(document)
+										// ensure id and timestamp (pending addition comes without them)
+										if (messageToAdd.id.isEmpty())
+											messageToAdd.id = document.id
+										if (messageToAdd.timestamp == null)
+											messageToAdd.timestamp = Date(System.currentTimeMillis())
+										addList.add(messageToAdd)
 									}
 								}
-							}
-
-							if (addList.isNotEmpty() || modifyList.isNotEmpty() || removeList.isNotEmpty()) {
-								Log.d(C.DEFAULT_LOG_TAG, "OnMessageListChange:" +
-										"\n\raddList: ${addList.size}" +
-										"\n\rremoveList: ${removeList.size}" +
-										"\n\rupdateList: ${modifyList.size}")
-								callback.onSuccess(ListChanges(addList, modifyList, removeList))
+								DocumentChange.Type.REMOVED -> {
+									// Ignore the deletion via query limit
+									if (change.oldIndex != limitIndex)
+										removeList.add(deserialize(document))
+								}
+								DocumentChange.Type.MODIFIED -> {
+									val messageToModify = deserialize(document)
+									// ensure id and timestamp
+									if (messageToModify.id.isEmpty())
+										messageToModify.id = document.id
+									if (messageToModify.timestamp == null)
+										messageToModify.timestamp = Date(System.currentTimeMillis())
+									modifyList.add(messageToModify)
+								}
 							}
 						}
-						else -> callback.onFailure(EmptyResultException)
+
+						if (addList.isNotEmpty() || modifyList.isNotEmpty() || removeList.isNotEmpty()) {
+							Log.d(C.DEFAULT_LOG_TAG, "OnMessageListChange:" +
+									"\n\raddList: ${addList.size}" +
+									"\n\rremoveList: ${removeList.size}" +
+									"\n\rupdateList: ${modifyList.size}")
+							callback.onNext(ListChanges(addList, modifyList, removeList))
+						}
 					}
 				}
-			}
-
-		return object : RepositorySubscription {
-			override fun remove() {
+			callback.setCancellable {
+				Log.d("Intercom", "sub removed")
 				registration.remove()
 			}
 		}
+			.observeOn(resultScheduler)
 	}
 
 	override fun attachListener(id: String, callback: RequestCallback<Message>): RepositorySubscription {
