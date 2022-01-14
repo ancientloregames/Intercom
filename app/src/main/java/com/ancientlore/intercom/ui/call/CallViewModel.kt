@@ -2,15 +2,18 @@ package com.ancientlore.intercom.ui.call
 
 import android.os.Parcel
 import android.os.Parcelable
+import android.util.Log
 import androidx.annotation.CallSuper
 import androidx.databinding.ObservableField
 import com.ancientlore.intercom.EmptyObject
+import com.ancientlore.intercom.TelephonyBroadcastReceiver
 import com.ancientlore.intercom.backend.CallConnectionListener
 import com.ancientlore.intercom.ui.BasicViewModel
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 
-abstract class CallViewModel(protected val params: Params) : BasicViewModel(), CallConnectionListener {
+abstract class CallViewModel(protected val params: Params)
+	: BasicViewModel(), CallConnectionListener, TelephonyBroadcastReceiver.Listener {
 
 	val collocutorNameField = ObservableField(params.name ?: params.targetId)
 
@@ -22,14 +25,27 @@ abstract class CallViewModel(protected val params: Params) : BasicViewModel(), C
 
 	protected var conversationStarted: Boolean = false
 
+	private val telephonyBroadcastReceiver = TelephonyBroadcastReceiver()
+
 	@CallSuper
 	override fun onConnected() {
+		telephonyBroadcastReceiver.addListener(this)
 		conversationStarted = true
 		startChronometerSubj.onNext(EmptyObject)
 	}
 
 	override fun onDisconnected() {
+		telephonyBroadcastReceiver.removeListener(this)
 		onHangupCall()
+	}
+
+	override fun clean() {
+		telephonyBroadcastReceiver.removeListener(this)
+		super.clean()
+	}
+
+	override fun onTelephonyStateChange(state: Int) {
+		Log.d("Call", "Telephony state changed: $state")
 	}
 
 	fun onHangupCall() = hangupSubj.onNext(EmptyObject)
