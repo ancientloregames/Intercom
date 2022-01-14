@@ -69,7 +69,60 @@ class SignalCryptoManager(private val userId: String): CryptoManager {
 	override fun decryptChats(chats: List<Chat>, callback: RequestCallback<Any>) {
 		logger.d("Decrypting chats: ${chats.size}")
 
-		// TODO
+		if (chats.isEmpty()) {
+			callback.onSuccess(EmptyObject)
+			return
+		}
+
+		val userChats = LinkedList<Chat>()
+		val remoteChats = LinkedList<Chat>()
+		for (chat in chats) {
+			if (chat.lastMsgSenderId == userId)
+				userChats.add(chat)
+			else
+				remoteChats.add(chat)
+		}
+
+		App.frontend.getDataSourceProvider()
+			.getChatSource(userId)
+			.getItems(userChats.map { it.id }, object : RequestCallback<List<Chat>> {
+
+				override fun onSuccess(result: List<Chat>) {
+					logger.d("Loading the user chats: Success ${userChats.size}")
+
+					val decryptedChats = LinkedList(result)
+					for (message in userChats) {
+						val iter = decryptedChats.iterator()
+						while (iter.hasNext()) {
+							val decryptedMessage = iter.next()
+							if (decryptedMessage.id == message.id) {
+								message.lastMsgText = decryptedMessage.lastMsgText
+								iter.remove()
+								break
+							}
+						}
+					}
+
+					if (remoteChats.isNotEmpty()) {
+						decryptRemoteChats(remoteChats, object : SimpleRequestCallback<Any>() {
+
+							override fun onSuccess(result: Any) {
+								logger.d("Decrypting the remote chats: Success")
+								callback.onSuccess(EmptyObject)
+							}
+						})
+					}
+					else { // Only user chats in list
+						logger.d("No remote chats to decrypt")
+						callback.onSuccess(EmptyObject)
+					}
+				}
+				override fun onFailure(error: Throwable) {
+					logger.d("Decrypting the remote chats: Success")
+					Utils.logError("SignalCryptoManager. Failed to decrypt local user chats")
+					callback.onSuccess(EmptyObject)
+				}
+			})
 	}
 
 	override fun encrypt(message: Message, callback: RequestCallback<Any>) {
@@ -133,13 +186,12 @@ class SignalCryptoManager(private val userId: String): CryptoManager {
 			else
 				remoteMessages.add(message)
 		}
-		val userMessagesIds = userMessages.map { it.id }.toTypedArray()
 
 		val chatId = messages[0].chatId // Assume all are from one chat otherwise something went horribly wrong
 
 		App.frontend.getDataSourceProvider()
 			.getMessageSource(chatId)
-			.getAllByIds(userMessagesIds, object : RequestCallback<List<Message>> {
+			.getItems(userMessages.map { it.id }, object : RequestCallback<List<Message>> {
 
 				override fun onSuccess(result: List<Message>) {
 					logger.d("Loading the user messages: Success ${userMessages.size}")
@@ -217,6 +269,50 @@ class SignalCryptoManager(private val userId: String): CryptoManager {
 			for (message in messages) {
 				message.apply {
 					message.text = signalSession!!.decrypt(message.text)
+				}
+			}
+			callback.onSuccess(EmptyObject)
+		}
+	}
+
+	private fun decryptRemoteChats(chats: List<Chat>, callback: RequestCallback<Any>) {
+		logger.d("Decrypt the remote chats ${chats.size}")
+
+		val remoteUserId = chats[0].lastMsgSenderId // Only individual chats supported
+
+		if (signalSession == null || signalSession!!.remoteUserName != remoteUserId) {
+			logger.d("Creating a session")
+
+			App.backend.getDataSourceProvider()
+				.getSignalKeychainSource(remoteUserId)
+				.getKeychain(remoteUserId, object : RequestCallback<SignalPublicKeys> {
+
+					override fun onSuccess(result: SignalPublicKeys) {
+						logger.d("Acquiring the remote public keychain: Success")
+
+						signalSession = SignalSession(
+							localUser,
+							SignalRemoteUser(remoteUserId, result))
+
+						for (chat in chats) {
+							chat.apply {
+								chat.lastMsgText = signalSession!!.decrypt(chat.lastMsgText)
+							}
+						}
+						callback.onSuccess(EmptyObject)
+					}
+					override fun onFailure(error: Throwable) {
+						logger.d("Acquiring the remote public keychain: Failure")
+						Utils.logError(error)
+						callback.onSuccess(EmptyObject) // Remote chats not decrypted
+					}
+				})
+		}
+		else { // signal session exists and consistent
+			logger.d("Present session is consistent")
+			for (chat in chats) {
+				chat.apply {
+					chat.lastMsgText = signalSession!!.decrypt(chat.lastMsgText)
 				}
 			}
 			callback.onSuccess(EmptyObject)

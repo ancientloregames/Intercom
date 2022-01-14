@@ -13,6 +13,7 @@ import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_LAST_MSG_TI
 import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_NAME
 import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_NEW_MSG_COUNT
 import com.ancientlore.intercom.data.source.remote.firestore.C.FIELD_TYPE
+import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.SetOptions
 import java.lang.RuntimeException
 
@@ -38,6 +39,14 @@ open class FirestoreChatSource protected constructor(protected val userId: Strin
 
 	override fun getAll(callback: RequestCallback<List<Chat>>) {
 		userChats.get()
+			.addOnSuccessListener { exec { callback.onSuccess(deserialize(it)) } }
+			.addOnFailureListener { exec { callback.onFailure(it) } }
+	}
+
+	override fun getItems(ids: List<String>, callback: RequestCallback<List<Chat>>) {
+		userChats
+			.whereIn(FieldPath.documentId(), ids.toList())
+			.get()
 			.addOnSuccessListener { exec { callback.onSuccess(deserialize(it)) } }
 			.addOnFailureListener { exec { callback.onFailure(it) } }
 	}

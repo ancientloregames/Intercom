@@ -16,9 +16,9 @@ abstract class TestLatencyMessageSource: TestMessageSource(), LatencySource {
 		}
 	}
 
-	override fun getAllByIds(ids: Array<String>, callback: RequestCallback<List<Message>>) {
+	override fun getItems(ids: List<String>, callback: RequestCallback<List<Message>>) {
 		schedule {
-			super.getAllByIds(ids, callback)
+			super.getItems(ids, callback)
 		}
 	}
 

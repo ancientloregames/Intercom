@@ -14,6 +14,8 @@ interface DataSource<I, T: Identifiable<I>> {
 
 	fun getAll(callback: RequestCallback<List<T>>)
 
+	fun getItems(ids: List<String>, callback: RequestCallback<List<T>>) {}
+
 	fun getItem(id: I, callback: RequestCallback<T>)
 
 	/**

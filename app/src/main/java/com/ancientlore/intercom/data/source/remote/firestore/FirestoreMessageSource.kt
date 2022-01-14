@@ -18,6 +18,7 @@ import com.ancientlore.intercom.data.source.remote.firestore.C.MESSAGES
 import com.ancientlore.intercom.utils.Utils
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.Query
 import java.util.*
 import kotlin.collections.ArrayList
@@ -57,8 +58,12 @@ open class FirestoreMessageSource(protected val chatId: String)
 			.addOnFailureListener { exec { callback.onFailure(it) } }
 	}
 
-	override fun getAllByIds(ids: Array<String>, callback: RequestCallback<List<Message>>) {
-		callback.onFailure(EmptyResultException)
+	override fun getItems(ids: List<String>, callback: RequestCallback<List<Message>>) {
+		chatMessages
+			.whereIn(FieldPath.documentId(), ids.toList())
+			.get()
+			.addOnSuccessListener { exec { callback.onSuccess(deserialize(it)) } }
+			.addOnFailureListener { exec { callback.onFailure(it) } }
 	}
 
 	override fun getNextPage(callback: RequestCallback<List<Message>>) {

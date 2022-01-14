@@ -16,7 +16,7 @@ object DummyMessageSource : MessageSource {
 		callback.onFailure(EmptyResultException)
 	}
 
-	override fun getAllByIds(ids: Array<String>, callback: RequestCallback<List<Message>>) {
+	override fun getItems(ids: List<String>, callback: RequestCallback<List<Message>>) {
 		callback.onFailure(EmptyResultException)
 	}
 

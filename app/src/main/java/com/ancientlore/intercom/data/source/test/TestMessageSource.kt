@@ -61,7 +61,7 @@ abstract class TestMessageSource: TestSource(), MessageSource {
 		callback.onSuccess(testMessageData.values.toList())
 	}
 
-	override fun getAllByIds(ids: Array<String>, callback: RequestCallback<List<Message>>) {
+	override fun getItems(ids: List<String>, callback: RequestCallback<List<Message>>) {
 
 		val result = testMessageData.filter { ids.contains(it.key) }.values.toList()
 		if (result.isNotEmpty())
