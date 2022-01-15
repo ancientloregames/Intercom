@@ -1,6 +1,7 @@
 package com.ancientlore.intercom.ui.boadcast.list
 
 import android.content.Context
+import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.annotation.ColorInt
 import androidx.annotation.Px
@@ -15,10 +16,10 @@ import com.ancientlore.intercom.widget.recycler.BasicRecyclerAdapter
 import com.ancientlore.intercom.widget.recycler.HeadedRecyclerDiffUtil
 import com.ancientlore.intercom.widget.recycler.MutableRecyclerAdapter
 
-class BroadcastListAdapter(context: Context,
-                           items: MutableList<Chat> = mutableListOf())
-	: MutableRecyclerAdapter<Chat, BroadcastListAdapter.ViewHolder, BroadcastListItemBinding>(
-	context = context,
+class BroadcastListAdapter(
+	context: Context,
+	items: MutableList<Chat> = mutableListOf()
+) : MutableRecyclerAdapter<Chat, BroadcastListAdapter.ViewHolder, BroadcastListItemBinding>(
 	items = items,
 	autoSort = true) {
 
@@ -26,6 +27,8 @@ class BroadcastListAdapter(context: Context,
 		fun onChatSelected(chat: Chat)
 		fun onItemLongClick(chat: Chat)
 	}
+
+	private val layoutInflater: LayoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
 	private var listener: Listener? = null
 

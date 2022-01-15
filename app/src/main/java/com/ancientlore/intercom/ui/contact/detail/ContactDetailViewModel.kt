@@ -10,16 +10,19 @@ import com.ancientlore.intercom.backend.CrashlyticsRequestCallback
 import com.ancientlore.intercom.data.model.Chat
 import com.ancientlore.intercom.data.model.User
 import com.ancientlore.intercom.data.source.UserRepository
+import com.ancientlore.intercom.di.contact.detail.ContactDetailScreenScope
 import com.ancientlore.intercom.ui.BasicViewModel
 import com.ancientlore.intercom.ui.call.CallViewModel
 import com.ancientlore.intercom.ui.chat.flow.ChatFlowParams
 import com.ancientlore.intercom.utils.Utils
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
+import javax.inject.Inject
 
-
-class ContactDetailViewModel(private val params: ContactDetailParams)
-	: BasicViewModel() {
+@ContactDetailScreenScope
+class ContactDetailViewModel @Inject constructor(
+	private val params: ContactDetailParams
+	) : BasicViewModel() {
 
 	companion object {
 		const val OPTION_AUDIO_CALL = 0

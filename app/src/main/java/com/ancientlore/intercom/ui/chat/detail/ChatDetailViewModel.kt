@@ -2,6 +2,8 @@ package com.ancientlore.intercom.ui.chat.detail
 
 import android.content.Context
 import android.net.Uri
+import android.os.Parcel
+import android.os.Parcelable
 import androidx.databinding.Observable
 import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableField
@@ -14,13 +16,14 @@ import com.ancientlore.intercom.data.source.ChatRepository
 import com.ancientlore.intercom.data.source.ContactRepository
 import com.ancientlore.intercom.ui.FilterableViewModel
 import com.ancientlore.intercom.ui.chat.creation.description.ChatCreationDescAdapter
-import com.ancientlore.intercom.ui.chat.flow.ChatFlowParams
 import com.ancientlore.intercom.utils.extensions.runOnUiThread
 import io.reactivex.subjects.PublishSubject
+import javax.inject.Inject
 
-class ChatDetailViewModel(context: Context,
-                          private val params: ChatFlowParams)
-	: FilterableViewModel<ChatCreationDescAdapter>(ChatCreationDescAdapter(context)) {
+class ChatDetailViewModel @Inject constructor(
+	context: Context,
+	private val params: Params
+	) : FilterableViewModel<ChatCreationDescAdapter>() {
 
 	companion object {
 		const val TOAST_SET_PHOTO_ERR = 0
@@ -36,6 +39,8 @@ class ChatDetailViewModel(context: Context,
 	private val openImageViewerSubj = PublishSubject.create<Uri>()
 	private val openGallarySubj = PublishSubject.create<Any>()
 	private val closeSubj = PublishSubject.create<Any>()
+
+	private val listAdapter: ChatCreationDescAdapter = ChatCreationDescAdapter(context)
 
 	init {
 		ContactRepository.getItems(params.participants, object : CrashlyticsRequestCallback<List<Contact>>() {
@@ -54,6 +59,8 @@ class ChatDetailViewModel(context: Context,
 			}
 		})
 	}
+
+	override fun getListAdapter(): ChatCreationDescAdapter = listAdapter
 
 	override fun clean() {
 		openGallarySubj.onComplete()
@@ -107,4 +114,34 @@ class ChatDetailViewModel(context: Context,
 	fun observeOpenGallaryRequest() = openGallarySubj as io.reactivex.Observable<Any>
 
 	fun observeCloseRequest() = closeSubj as io.reactivex.Observable<Any>
+
+	data class Params(val title: String = "",
+	                  val iconUri: Uri = Uri.EMPTY,
+	                  val participants: List<String> = emptyList()) : Parcelable {
+
+		constructor(parcel: Parcel) : this(
+			parcel.readString(),
+			parcel.readParcelable(Uri::class.java.classLoader),
+			parcel.createStringArrayList())
+
+		override fun writeToParcel(parcel: Parcel, flags: Int) {
+			parcel.writeString(title)
+			parcel.writeParcelable(iconUri, flags)
+			parcel.writeStringList(participants)
+		}
+
+		override fun describeContents(): Int {
+			return 0
+		}
+
+		companion object CREATOR : Parcelable.Creator<Params> {
+			override fun createFromParcel(parcel: Parcel): Params {
+				return Params(parcel)
+			}
+
+			override fun newArray(size: Int): Array<Params?> {
+				return arrayOfNulls(size)
+			}
+		}
+	}
 }

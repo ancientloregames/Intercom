@@ -2,33 +2,32 @@ package com.ancientlore.intercom.ui.auth.phone.check
 
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
-import android.widget.Toast.LENGTH_LONG
+import com.ancientlore.intercom.C.ARG_FRAGMENT_PARAMS
 import com.ancientlore.intercom.R
-import com.ancientlore.intercom.backend.RequestCallback
 import com.ancientlore.intercom.backend.auth.PhoneAuthParams
-import com.ancientlore.intercom.data.model.User
 import com.ancientlore.intercom.ui.auth.AuthFragment
 import com.ancientlore.intercom.databinding.PhoneCheckUiBinding
-import java.lang.RuntimeException
+import javax.inject.Inject
 
 class PhoneCheckFragment
 	: AuthFragment<PhoneCheckViewModel, PhoneCheckUiBinding>() {
 
 	companion object {
-		private const val ARG_PARAMS = "params"
 
 		fun newInstance(params: PhoneAuthParams) : PhoneCheckFragment {
 			return PhoneCheckFragment().apply {
 				arguments = Bundle().apply {
-					putParcelable(ARG_PARAMS, params)
+					putParcelable(ARG_FRAGMENT_PARAMS, params)
 				}
 			}
 		}
 	}
 
-	private val params get() = arguments?.getParcelable<PhoneAuthParams>(ARG_PARAMS)
-		?: throw RuntimeException("Phone number is a mandotory arg")
+	@Inject
+	protected lateinit var params: PhoneAuthParams
+
+	@Inject
+	protected lateinit var viewModel: PhoneCheckViewModel
 
 	override fun getAlertMessage(alertCode: Int): String {
 		// TODO
@@ -39,10 +38,10 @@ class PhoneCheckFragment
 
 	override fun createDataBinding(view: View) = PhoneCheckUiBinding.bind(view)
 
-	override fun createViewModel() = PhoneCheckViewModel(params)
+	override fun requestViewModel(): PhoneCheckViewModel = viewModel
 
-	override fun init(viewModel: PhoneCheckViewModel, savedState: Bundle?) {
-		super.init(viewModel, savedState)
+	override fun init(savedState: Bundle?) {
+		super.init(savedState)
 
 		dataBinding.viewModel = viewModel
 

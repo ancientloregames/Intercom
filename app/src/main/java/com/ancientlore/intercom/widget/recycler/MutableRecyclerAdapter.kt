@@ -1,18 +1,16 @@
 package com.ancientlore.intercom.widget.recycler
 
-import android.content.Context
 import androidx.annotation.UiThread
 import androidx.databinding.ViewDataBinding
 import com.ancientlore.intercom.widget.MutableAdapter
 import java.util.*
 
 abstract class MutableRecyclerAdapter<I: Comparable<I>, H: BasicRecyclerAdapter.ViewHolder<I, B>, B: ViewDataBinding>(
-	context: Context,
 	items: MutableList<I> = mutableListOf(),
 	withHeader: Boolean = false,
 	withFooter: Boolean = false,
-	protected var autoSort: Boolean = false)
-	: FilterableRecyclerAdapter<I, H, B>(context, items, withHeader, withFooter),
+	protected var autoSort: Boolean = false
+) : FilterableRecyclerAdapter<I, H, B>(items, withHeader, withFooter),
 	MutableAdapter<I> {
 
 	@UiThread

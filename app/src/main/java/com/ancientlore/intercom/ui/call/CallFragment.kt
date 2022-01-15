@@ -70,8 +70,8 @@ abstract class CallFragment<VM : CallViewModel, B : ViewDataBinding>  : BasicFra
 	}
 
 	@CallSuper
-	override fun init(viewModel: VM, savedState: Bundle?) {
-		super.init(viewModel, savedState)
+	override fun init(savedState: Bundle?) {
+		super.init(savedState)
 
 		mediaPlayer.run {
 			isLooping = true
@@ -82,9 +82,9 @@ abstract class CallFragment<VM : CallViewModel, B : ViewDataBinding>  : BasicFra
 			}
 		}
 
-		subscriptions.add(viewModel.startChronometerRequest()
+		subscriptions.add(requestViewModel().startChronometerRequest()
 			.subscribe { startChronometer() })
-		subscriptions.add(viewModel.hangupCallRequest()
+		subscriptions.add(requestViewModel().hangupCallRequest()
 			.subscribe { endCall() })
 	}
 
@@ -116,7 +116,6 @@ abstract class CallFragment<VM : CallViewModel, B : ViewDataBinding>  : BasicFra
 
 		getChronometer().stop()
 
-		App.backend.getCallManager().hungup()
 		close()
 	}
 

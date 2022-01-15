@@ -9,6 +9,7 @@ import com.ancientlore.intercom.data.model.Contact
 import com.ancientlore.intercom.data.model.User
 import com.ancientlore.intercom.data.model.call.Offer
 import com.ancientlore.intercom.ui.call.CallViewModel
+import com.ancientlore.intercom.ui.chat.detail.ChatDetailViewModel
 import com.ancientlore.intercom.ui.chat.flow.ChatFlowParams
 import com.ancientlore.intercom.ui.contact.detail.ContactDetailParams
 import com.ancientlore.intercom.utils.Runnable1
@@ -25,7 +26,7 @@ interface Navigator {
 	fun openSettings()
 	fun openChatCreationGroup()
 	fun openChatCreationDesc(contacts: List<Contact>)
-	fun openChatDetail(params: ChatFlowParams)
+	fun openChatDetail(params: ChatDetailViewModel.Params)
 	fun openContactDetail(params: ContactDetailParams)
 
 	fun openBroadcastList()

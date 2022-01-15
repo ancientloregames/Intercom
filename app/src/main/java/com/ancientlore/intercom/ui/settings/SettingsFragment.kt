@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.provider.Settings
 import android.view.View
 import android.widget.EditText
-import com.ancientlore.intercom.App
 import com.ancientlore.intercom.C
 import com.ancientlore.intercom.R
 import com.ancientlore.intercom.databinding.SettingsUiBinding
@@ -21,17 +20,21 @@ import com.ancientlore.intercom.utils.extensions.showKeyboard
 import java.io.File
 import android.content.ComponentName
 import android.net.Uri
+import javax.inject.Inject
 import android.os.Build
 import android.view.inputmethod.EditorInfo
 
-
-class SettingsFragment : BasicFragment<SettingsViewModel, SettingsUiBinding>()  {
+class SettingsFragment
+	: BasicFragment<SettingsViewModel, SettingsUiBinding>()  {
 
 	companion object {
 		const val INTENT_GET_IMAGE = 101
 
 		fun newInstance() = SettingsFragment()
 	}
+
+	@Inject
+	protected lateinit var viewModel: SettingsViewModel
 
 	override fun getOpenAnimation(): Int = R.anim.slide_in_bottom
 
@@ -41,10 +44,10 @@ class SettingsFragment : BasicFragment<SettingsViewModel, SettingsUiBinding>()  
 
 	override fun createDataBinding(view: View) = SettingsUiBinding.bind(view)
 
-	override fun createViewModel() = SettingsViewModel(App.backend.getAuthManager().getCurrentUser())
+	override fun requestViewModel() = viewModel
 
-	override fun init(viewModel: SettingsViewModel, savedState: Bundle?) {
-		super.init(viewModel, savedState)
+	override fun init(savedState: Bundle?) {
+		super.init(savedState)
 
 		val context = context!!
 

@@ -12,15 +12,21 @@ import com.ancientlore.intercom.utils.Utils
 import com.ancientlore.intercom.utils.extensions.runOnUiThread
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
+import javax.inject.Inject
 
-class ContactListViewModel(context: Context)
-	: FilterableViewModel<ContactListAdapter>(ContactListAdapter(context)) {
+class ContactListViewModel @Inject constructor(
+	context: Context
+) : FilterableViewModel<ContactListAdapter>() {
 
 	val contactListIsEmpty = ObservableBoolean(false)
 
 	private val openContactDetailSub = PublishSubject.create<ContactDetailParams>()
 
+	private val listAdapter: ContactListAdapter = ContactListAdapter(context)
+
 	private var repositorySub: RepositorySubscription? = null
+
+	override fun getListAdapter(): ContactListAdapter = listAdapter
 
 	override fun clean() {
 		openContactDetailSub.onComplete()

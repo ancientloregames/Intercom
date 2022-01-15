@@ -2,6 +2,7 @@ package com.ancientlore.intercom.ui.contact.list
 
 import android.content.Context
 import android.net.Uri
+import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.annotation.ColorInt
 import androidx.annotation.Px
@@ -16,13 +17,16 @@ import com.ancientlore.intercom.utils.ImageUtils
 import com.ancientlore.intercom.widget.recycler.MutableRecyclerAdapter
 import com.ancientlore.intercom.widget.recycler.HeadedRecyclerDiffUtil
 
-class ContactListAdapter(context: Context,
-                         items: MutableList<Contact> = mutableListOf())
-	: MutableRecyclerAdapter<Contact, ContactListAdapter.ViewHolder, ContactListItemBinding>(context, items) {
+class ContactListAdapter(
+	context: Context,
+	items: MutableList<Contact> = mutableListOf()
+) : MutableRecyclerAdapter<Contact, ContactListAdapter.ViewHolder, ContactListItemBinding>(items) {
 
 	interface Listener {
 		fun onContactSelected(contact: Contact)
 	}
+
+	private val layoutInflater: LayoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
 	private var listener: Listener? = null
 

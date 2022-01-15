@@ -11,6 +11,7 @@ import com.ancientlore.intercom.data.model.Chat
 import com.ancientlore.intercom.data.model.Chat.Companion.TYPE_PRIVATE
 import com.ancientlore.intercom.data.source.ChatRepository
 import com.ancientlore.intercom.data.source.UserRepository
+import com.ancientlore.intercom.di.chat.list.ChatListScreenScope
 import com.ancientlore.intercom.manager.DeviceContactsManager
 import com.ancientlore.intercom.ui.FilterableViewModel
 import com.ancientlore.intercom.ui.chat.flow.ChatFlowParams
@@ -20,9 +21,12 @@ import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.subjects.PublishSubject
 import java.util.*
+import javax.inject.Inject
 
-class ChatListViewModel(context: Context)
-	: FilterableViewModel<ChatListAdapter>(ChatListAdapter(context)) {
+@ChatListScreenScope
+class ChatListViewModel @Inject constructor(
+	context: Context
+) : FilterableViewModel<ChatListAdapter>() {
 
 	companion object {
 		const val OPTION_CREATE_GROUP = 0
@@ -61,7 +65,11 @@ class ChatListViewModel(context: Context)
 	private val openSettingsSubj = PublishSubject.create<Any>()
 	private val openAuthFormSubj = PublishSubject.create<Any>()
 
+	private val listAdapter: ChatListAdapter = ChatListAdapter(context)
+
 	private var repositorySub: RepositorySubscription? = null
+
+	override fun getListAdapter(): ChatListAdapter = listAdapter
 
 	override fun clean() {
 		chatCreationSub.onComplete()

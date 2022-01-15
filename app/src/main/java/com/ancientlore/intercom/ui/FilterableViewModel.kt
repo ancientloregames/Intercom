@@ -2,11 +2,13 @@ package com.ancientlore.intercom.ui
 
 import com.ancientlore.intercom.widget.recycler.FilterableRecyclerAdapter
 
-abstract class FilterableViewModel<T: FilterableRecyclerAdapter<*, *, *>>(val listAdapter: T)
+abstract class FilterableViewModel<T: FilterableRecyclerAdapter<*, *, *>>
 	: BasicViewModel() {
 
+	abstract fun getListAdapter(): T
+
 	fun filter(text: String) {
-		listAdapter.filter(text)
+		getListAdapter().filter(text)
 	}
 
 	override fun clean() {

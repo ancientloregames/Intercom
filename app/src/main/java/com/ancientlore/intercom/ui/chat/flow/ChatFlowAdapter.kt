@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.SeekBar
 import androidx.annotation.CallSuper
@@ -40,7 +41,7 @@ class ChatFlowAdapter(private val userId: String,
                       context: Context,
                       items: MutableList<Message> = mutableListOf())
 	: MutableRecyclerAdapter<Message, ChatFlowAdapter.BasicViewHolder, ViewDataBinding>
-		(context, items, withHeader = true, autoSort = true) {
+		(items, withHeader = true, autoSort = true) {
 
 	private companion object {
 		private const val VIEW_TYPE_USER = 0
@@ -56,6 +57,8 @@ class ChatFlowAdapter(private val userId: String,
 	private val openImageSubj = PublishSubject.create<Uri>()
 
 	private val openOptionMenuSubj = PublishSubject.create<Message>()
+
+	private val layoutInflater: LayoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
 	fun clean() {
 		openFileSubj.onComplete()

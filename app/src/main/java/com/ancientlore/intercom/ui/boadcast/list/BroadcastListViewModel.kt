@@ -8,17 +8,20 @@ import com.ancientlore.intercom.data.model.Chat
 import com.ancientlore.intercom.data.source.ChatRepository
 import com.ancientlore.intercom.ui.FilterableViewModel
 import com.ancientlore.intercom.ui.chat.flow.ChatFlowParams
-import com.ancientlore.intercom.ui.chat.list.ChatListAdapter
 import com.ancientlore.intercom.utils.extensions.runOnUiThread
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
+import javax.inject.Inject
 
-class BroadcastListViewModel(context: Context)
-	: FilterableViewModel<BroadcastListAdapter>(BroadcastListAdapter(context)) {
+class BroadcastListViewModel @Inject constructor(
+	context: Context
+) : FilterableViewModel<BroadcastListAdapter>() {
 
 	val broadcastListIsEmpty = ObservableBoolean(false)
 
 	private val openBroadcastSubj = PublishSubject.create<ChatFlowParams>()
+
+	private val listAdapter: BroadcastListAdapter = BroadcastListAdapter(context)
 
 	init {
 		listAdapter.setListener(object : BroadcastListAdapter.Listener {
@@ -50,6 +53,8 @@ class BroadcastListViewModel(context: Context)
 			}
 		})
 	}
+
+	override fun getListAdapter(): BroadcastListAdapter = listAdapter
 
 	override fun clean() {
 		openBroadcastSubj.onComplete()

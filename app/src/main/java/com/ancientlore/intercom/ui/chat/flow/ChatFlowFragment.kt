@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.ancientlore.intercom.App
 import com.ancientlore.intercom.C
+import com.ancientlore.intercom.C.ARG_FRAGMENT_PARAMS
 import com.ancientlore.intercom.C.ICON_DIR_PATH
 import com.ancientlore.intercom.R
 import com.ancientlore.intercom.data.model.Chat
@@ -33,26 +34,29 @@ import com.ancientlore.intercom.utils.extensions.*
 import com.ancientlore.intercom.view.MessageInputManager
 import com.ancientlore.intercom.widget.list.simple.SimpleListItem
 import java.io.File
+import javax.inject.Inject
 
-class ChatFlowFragment : FilterableFragment<ChatFlowViewModel, ChatFlowUiBinding>() {
+class ChatFlowFragment
+	: FilterableFragment<ChatFlowViewModel, ChatFlowUiBinding>() {
 
 	companion object {
 		const val INTENT_GET_FILES = 101
 		const val INTENT_GET_IMAGES = 102
 
-		private const val ARG_PARAMS = "params"
-
 		fun newInstance(params: ChatFlowParams) : ChatFlowFragment {
 			return ChatFlowFragment().apply {
 				arguments = Bundle().apply {
-					putParcelable(ARG_PARAMS, params)
+					putParcelable(ARG_FRAGMENT_PARAMS, params)
 				}
 			}
 		}
 	}
 
-	private val params : ChatFlowParams by lazy { arguments?.getParcelable<ChatFlowParams>(ARG_PARAMS)
-		?: throw RuntimeException("Chat id is a mandotory arg") }
+	@Inject
+	protected lateinit var params: ChatFlowParams
+
+	@Inject
+	protected lateinit var viewModel: ChatFlowViewModel
 
 	private val sendButtonAnimDuration: Long by lazy {
 		resources.getInteger(R.integer.defaultShowHideAnimationDuration).toLong()
@@ -72,10 +76,10 @@ class ChatFlowFragment : FilterableFragment<ChatFlowViewModel, ChatFlowUiBinding
 
 	override fun createDataBinding(view: View) = ChatFlowUiBinding.bind(view)
 
-	override fun createViewModel() = ChatFlowViewModel(requireContext(), params)
+	override fun requestViewModel(): ChatFlowViewModel = viewModel
 
-	override fun init(viewModel: ChatFlowViewModel, savedState: Bundle?) {
-		super.init(viewModel, savedState)
+	override fun init(savedState: Bundle?) {
+		super.init(savedState)
 
 		dataBinding.ui = viewModel
 
@@ -88,7 +92,7 @@ class ChatFlowFragment : FilterableFragment<ChatFlowViewModel, ChatFlowUiBinding
 		dataBinding.swipableLayout.setListener { close(false) }
 
 		with(dataBinding.listView) {
-			adapter = viewModel.listAdapter
+			adapter = viewModel.getListAdapter()
 
 			enableChatBehavior()
 
@@ -116,15 +120,15 @@ class ChatFlowFragment : FilterableFragment<ChatFlowViewModel, ChatFlowUiBinding
 		// FIXME should set via viewModel
 		viewModel.onContactStatusChanged(getString(R.string.member_count, params.participants.size))
 
-		subscriptions.add(viewModel.listAdapter.fileOpenRequest()
+		subscriptions.add(viewModel.getListAdapter().fileOpenRequest()
 			.subscribe {
 				navigator?.openFileViewer(it)
 			})
-		subscriptions.add(viewModel.listAdapter.imageOpenRequest()
+		subscriptions.add(viewModel.getListAdapter().imageOpenRequest()
 			.subscribe {
 				navigator?.openImageViewer(it)
 			})
-		subscriptions.add(viewModel.listAdapter.optionMenuOpenRequest()
+		subscriptions.add(viewModel.getListAdapter().optionMenuOpenRequest()
 			.subscribe {
 				openMessageMenu(it)
 			})
@@ -150,7 +154,7 @@ class ChatFlowFragment : FilterableFragment<ChatFlowViewModel, ChatFlowUiBinding
 			})
 		subscriptions.add(viewModel.openChatDetailRequest()
 			.subscribe {
-				navigator?.openChatDetail(params)
+				navigator?.openChatDetail(it)
 			})
 		subscriptions.add(viewModel.openContactDetailRequest()
 			.subscribe {

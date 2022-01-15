@@ -3,16 +3,16 @@ package com.ancientlore.intercom.ui.image.viewer
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import com.ancientlore.intercom.C.ARG_FRAGMENT_PARAMS
 import com.ancientlore.intercom.R
 import com.ancientlore.intercom.databinding.ImageViewerUiBinding
 import com.ancientlore.intercom.ui.BasicFragment
+import javax.inject.Inject
 
 class ImageViewerFragment
 	: BasicFragment<ImageViewerViewModel, ImageViewerUiBinding>() {
 
 	companion object {
-
-		private const val ARG_IMAGE_URI = "imageUri"
 
 		fun newInstance(imageUrl: String) : ImageViewerFragment {
 			return newInstance(Uri.parse(imageUrl))
@@ -21,15 +21,18 @@ class ImageViewerFragment
 		fun newInstance(imageUri: Uri) : ImageViewerFragment {
 			return ImageViewerFragment().apply {
 				arguments = Bundle().apply {
-					putParcelable(ARG_IMAGE_URI, imageUri)
+					putParcelable(ARG_FRAGMENT_PARAMS,
+						ImageViewerViewModel.Params(imageUri))
 				}
 			}
 		}
 	}
 
-	private val imageUri : Uri by lazy {
-		arguments?.getParcelable<Uri>(ARG_IMAGE_URI)
-		?: throw RuntimeException("Image uri is a mandotory arg") }
+	@Inject
+	protected lateinit var params: ImageViewerViewModel.Params
+
+	@Inject
+	protected lateinit var viewModel: ImageViewerViewModel
 
 	override fun getOpenAnimation(): Int = R.anim.center_scale_fade_in
 
@@ -39,10 +42,10 @@ class ImageViewerFragment
 
 	override fun createDataBinding(view: View) = ImageViewerUiBinding.bind(view)
 
-	override fun createViewModel() = ImageViewerViewModel(imageUri)
+	override fun requestViewModel(): ImageViewerViewModel = viewModel
 
-	override fun init(viewModel: ImageViewerViewModel, savedState: Bundle?) {
-		super.init(viewModel, savedState)
+	override fun init(savedState: Bundle?) {
+		super.init(savedState)
 
 		dataBinding.ui = viewModel
 

@@ -7,12 +7,17 @@ import com.ancientlore.intercom.R
 import com.ancientlore.intercom.databinding.ChatCreationGroupUiBinding
 import com.ancientlore.intercom.ui.FilterableFragment
 import com.ancientlore.intercom.utils.ToolbarManager
+import javax.inject.Inject
 
-class ChatCreationGroupFragment : FilterableFragment<ChatCreationGroupViewModel, ChatCreationGroupUiBinding>() {
+class ChatCreationGroupFragment
+	: FilterableFragment<ChatCreationGroupViewModel, ChatCreationGroupUiBinding>() {
 
 	companion object {
 		fun newInstance() = ChatCreationGroupFragment()
 	}
+
+	@Inject
+	protected lateinit var viewModel: ChatCreationGroupViewModel
 
 	override fun getToolbar(): Toolbar = dataBinding.toolbar
 
@@ -22,10 +27,10 @@ class ChatCreationGroupFragment : FilterableFragment<ChatCreationGroupViewModel,
 
 	override fun createDataBinding(view: View) = ChatCreationGroupUiBinding.bind(view)
 
-	override fun createViewModel() = ChatCreationGroupViewModel(requireContext())
+	override fun requestViewModel(): ChatCreationGroupViewModel = viewModel
 
-	override fun init(viewModel: ChatCreationGroupViewModel, savedState: Bundle?) {
-		super.init(viewModel, savedState)
+	override fun init(savedState: Bundle?) {
+		super.init(savedState)
 
 		dataBinding.ui = viewModel
 
@@ -35,7 +40,7 @@ class ChatCreationGroupFragment : FilterableFragment<ChatCreationGroupViewModel,
 
 		dataBinding.swipableLayout.setListener { close(false) }
 
-		dataBinding.listView.adapter = viewModel.listAdapter
+		dataBinding.listView.adapter = viewModel.getListAdapter()
 		dataBinding.selectedListView.adapter = viewModel.selectedListAdapter
 
 		viewModel.init()

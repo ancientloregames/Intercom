@@ -2,6 +2,7 @@ package com.ancientlore.intercom.ui.chat.list
 
 import android.content.Context
 import android.net.Uri
+import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.annotation.ColorInt
 import androidx.annotation.Px
@@ -19,10 +20,10 @@ import com.ancientlore.intercom.utils.extensions.setColorRegion
 import com.ancientlore.intercom.widget.recycler.MutableRecyclerAdapter
 import com.ancientlore.intercom.widget.recycler.HeadedRecyclerDiffUtil
 
-class ChatListAdapter(context: Context,
-                      items: MutableList<Chat> = mutableListOf())
+class ChatListAdapter(
+	context: Context,
+	items: MutableList<Chat> = mutableListOf())
 	: MutableRecyclerAdapter<Chat, ChatListAdapter.ViewHolder, ChatListItemBinding>(
-	context = context,
 	items = items,
 	autoSort = true) {
 
@@ -30,6 +31,8 @@ class ChatListAdapter(context: Context,
 		fun onChatSelected(chat: Chat)
 		fun onItemLongClick(chat: Chat)
 	}
+
+	private val layoutInflater: LayoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
 	private var listener: Listener? = null
 

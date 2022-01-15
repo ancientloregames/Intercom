@@ -1,6 +1,7 @@
 package com.ancientlore.intercom.ui.call.answer
 
 import androidx.databinding.ObservableField
+import com.ancientlore.intercom.App
 import com.ancientlore.intercom.EmptyObject
 import com.ancientlore.intercom.ui.call.CallAnswerParams
 import com.ancientlore.intercom.ui.call.CallViewModel
@@ -11,8 +12,10 @@ abstract class CallAnswerViewModel(params: CallAnswerParams) : CallViewModel(par
 
 	val showAnswerPanelField = ObservableField(true)
 
-	private val answerCallSubj = PublishSubject.create<Any>()
-	private val declineCallSubj = PublishSubject.create<Any>()
+	private val stopCallSoundSubj = PublishSubject.create<Any>()
+	private val closeSubj = PublishSubject.create<Any>()
+
+	abstract fun answer()
 
 	override fun onConnected() {
 		super.onConnected()
@@ -20,12 +23,16 @@ abstract class CallAnswerViewModel(params: CallAnswerParams) : CallViewModel(par
 	}
 
 	fun onAnswerCall() {
-		answerCallSubj.onNext(EmptyObject)
+		stopCallSoundSubj.onNext(EmptyObject)
+		answer()
 	}
 
-	fun onDeclineCall() = declineCallSubj.onNext(EmptyObject)
+	fun onDeclineCall() {
+		App.backend.getCallManager().hungup()
+		closeSubj.onNext(EmptyObject)
+	}
 
-	fun answerCallRequest() = answerCallSubj as Observable<Any>
+	fun stopCallSoundRequest() = stopCallSoundSubj as Observable<Any>
 
-	fun declineCallRequest() = declineCallSubj as Observable<Any>
+	fun closeRequest() = closeSubj as Observable<Any>
 }

@@ -9,10 +9,10 @@ abstract class CallOfferFragment<VM : CallOfferViewModel, B : ViewDataBinding>
 
 	override fun getCallSound(): Int = R.raw.outgoing_call
 
-	override fun init(viewModel: VM, savedState: Bundle?) {
-		super.init(viewModel, savedState)
+	override fun init(savedState: Bundle?) {
+		super.init(savedState)
 
-		subscriptions.add(viewModel.stopCallSoundRequest()
+		subscriptions.add(requestViewModel().stopCallSoundRequest()
 			.subscribe { stopCallSound() })
 	}
 }

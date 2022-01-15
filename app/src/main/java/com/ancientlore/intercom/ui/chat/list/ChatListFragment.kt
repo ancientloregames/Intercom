@@ -8,17 +8,24 @@ import com.ancientlore.intercom.App
 import com.ancientlore.intercom.R
 import com.ancientlore.intercom.data.model.Chat
 import com.ancientlore.intercom.databinding.ChatListUiBinding
+import com.ancientlore.intercom.di.chat.list.ChatListScreenScope
 import com.ancientlore.intercom.manager.DeviceContactsManager
 import com.ancientlore.intercom.ui.FilterableFragment
 import com.ancientlore.intercom.ui.chat.flow.ChatFlowParams
 import com.ancientlore.intercom.ui.dialog.option.chat.ChatOptionMenuDialog
 import com.ancientlore.intercom.ui.dialog.option.chat.ChatOptionMenuParams
+import javax.inject.Inject
 
-class ChatListFragment : FilterableFragment<ChatListViewModel, ChatListUiBinding>() {
+@ChatListScreenScope
+class ChatListFragment
+	: FilterableFragment<ChatListViewModel, ChatListUiBinding>() {
 
 	companion object {
 		fun newInstance() = ChatListFragment()
 	}
+
+	@Inject
+	protected lateinit var viewModel: ChatListViewModel
 
 	override fun onBackPressed(): Boolean {
 		return false
@@ -32,16 +39,16 @@ class ChatListFragment : FilterableFragment<ChatListViewModel, ChatListUiBinding
 
 	override fun createDataBinding(view: View) = ChatListUiBinding.bind(view)
 
-	override fun createViewModel() = ChatListViewModel(requireContext())
+	override fun requestViewModel(): ChatListViewModel = viewModel
 
-	override fun init(viewModel: ChatListViewModel, savedState: Bundle?) {
-		super.init(viewModel, savedState)
+	override fun init(savedState: Bundle?) {
+		super.init(savedState)
 
 		dataBinding.ui = viewModel
 
 		setHasOptionsMenu(true)
 
-		dataBinding.listView.adapter = viewModel.listAdapter
+		dataBinding.listView.adapter = viewModel.getListAdapter()
 
 		viewModel.init(DeviceContactsManager.getContacts(requireContext()))
 

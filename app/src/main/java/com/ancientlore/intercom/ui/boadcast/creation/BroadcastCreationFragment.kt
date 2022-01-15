@@ -8,9 +8,9 @@ import android.view.View
 import com.ancientlore.intercom.R
 import com.ancientlore.intercom.databinding.BroadcastCreationUiBinding
 import com.ancientlore.intercom.ui.BasicFragment
-import com.ancientlore.intercom.ui.chat.creation.description.ChatCreationDescFragment
 import com.ancientlore.intercom.utils.ToolbarManager
 import com.ancientlore.intercom.utils.Utils
+import javax.inject.Inject
 
 class BroadcastCreationFragment
 	: BasicFragment<BroadcastCreationViewModel, BroadcastCreationUiBinding>() {
@@ -21,14 +21,17 @@ class BroadcastCreationFragment
 		fun newInstance() = BroadcastCreationFragment()
 	}
 
+	@Inject
+	protected lateinit var viewModel: BroadcastCreationViewModel
+
 	override fun getLayoutResId(): Int = R.layout.broadcast_creation_ui
 
 	override fun createDataBinding(view: View) = BroadcastCreationUiBinding.bind(view)
 
-	override fun createViewModel() = BroadcastCreationViewModel()
+	override fun requestViewModel() = BroadcastCreationViewModel()
 
-	override fun init(viewModel: BroadcastCreationViewModel, savedState: Bundle?) {
-		super.init(viewModel, savedState)
+	override fun init(savedState: Bundle?) {
+		super.init(savedState)
 
 		dataBinding.ui = viewModel
 

@@ -1,6 +1,5 @@
 package com.ancientlore.intercom.widget.recycler
 
-import android.content.Context
 import androidx.databinding.ViewDataBinding
 import com.ancientlore.intercom.utils.LoggingThreadFactory
 import com.ancientlore.intercom.utils.extensions.runOnUiThread
@@ -10,12 +9,11 @@ import java.util.*
 import java.util.concurrent.Executors
 
 abstract class AsyncMutableRecyclerAdapter<I: Comparable<I>, H: BasicRecyclerAdapter.ViewHolder<I, B>, B: ViewDataBinding>(
-	context: Context,
 	items: MutableList<I> = mutableListOf(),
 	withHeader: Boolean = false,
 	withFooter: Boolean = false,
 	protected var autoSort: Boolean = false)
-	: FilterableRecyclerAdapter<I, H, B>(context, items, withHeader, withFooter),
+	: FilterableRecyclerAdapter<I, H, B>(items, withHeader, withFooter),
 	AsyncMutableListAdapter<I> {
 
 	private val executor = Executors.newSingleThreadExecutor(LoggingThreadFactory("mutableListAdapter_thread"))

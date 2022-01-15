@@ -6,32 +6,34 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.widget.Toolbar
+import com.ancientlore.intercom.C.ARG_FRAGMENT_PARAMS
 import com.ancientlore.intercom.R
 import com.ancientlore.intercom.databinding.ChatDetailUiBinding
 import com.ancientlore.intercom.ui.FilterableFragment
 import com.ancientlore.intercom.ui.chat.creation.description.ChatCreationDescFragment
-import com.ancientlore.intercom.ui.chat.flow.ChatFlowParams
 import com.ancientlore.intercom.utils.ToolbarManager
 import com.ancientlore.intercom.utils.Utils
+import javax.inject.Inject
 
-class ChatDetailFragment : FilterableFragment<ChatDetailViewModel, ChatDetailUiBinding>() {
+class ChatDetailFragment
+	: FilterableFragment<ChatDetailViewModel, ChatDetailUiBinding>() {
 
 	companion object {
 		const val INTENT_GET_IMAGE = 101
 
-		private const val ARG_PARAMS = "params"
-
-		fun newInstance(params: ChatFlowParams) : ChatDetailFragment {
+		fun newInstance(params: ChatDetailViewModel.Params) : ChatDetailFragment {
 			return ChatDetailFragment().apply {
 				arguments = Bundle().apply {
-					putParcelable(ARG_PARAMS, params)
+					putParcelable(ARG_FRAGMENT_PARAMS, params)
 				}
 			}
 		}
 	}
 
-	private val params : ChatFlowParams by lazy { arguments?.getParcelable<ChatFlowParams>(ARG_PARAMS)
-		?: throw RuntimeException("Chat params are a mandotory arg") }
+	protected lateinit var params: ChatDetailViewModel.Params
+
+	@Inject
+	protected lateinit var viewModel: ChatDetailViewModel
 
 	override fun getToolbar(): Toolbar = dataBinding.toolbar
 
@@ -41,12 +43,10 @@ class ChatDetailFragment : FilterableFragment<ChatDetailViewModel, ChatDetailUiB
 
 	override fun createDataBinding(view: View) = ChatDetailUiBinding.bind(view)
 
-	override fun createViewModel() = ChatDetailViewModel(
-		requireContext(),
-		params)
+	override fun requestViewModel(): ChatDetailViewModel = viewModel
 
-	override fun init(viewModel: ChatDetailViewModel, savedState: Bundle?) {
-		super.init(viewModel, savedState)
+	override fun init(savedState: Bundle?) {
+		super.init(savedState)
 
 		dataBinding.ui = viewModel
 
@@ -57,7 +57,7 @@ class ChatDetailFragment : FilterableFragment<ChatDetailViewModel, ChatDetailUiB
 
 		dataBinding.swipableLayout.setListener { close(false) }
 
-		dataBinding.listView.adapter = viewModel.listAdapter
+		dataBinding.listView.adapter = viewModel.getListAdapter()
 
 		subscriptions.add(viewModel.observeOpenGallaryRequest()
 			.subscribe {

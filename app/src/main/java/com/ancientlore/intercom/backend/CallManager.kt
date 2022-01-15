@@ -5,6 +5,9 @@ import com.ancientlore.intercom.utils.Runnable1
 
 interface CallManager<T> {
 
+	data class VideoViews<T>(val localVideoView: T,
+	                         val remoteVideoView: T)
+
 	data class CallParams<T>(val targetId: String,
 	                         val localVideoView: T,
 	                         val remoteVideoView: T)
@@ -12,6 +15,8 @@ interface CallManager<T> {
 	data class AudioCallParams(val targetId: String)
 
 	fun dispose()
+
+	fun call(targetId: String, videoViews: VideoViews<T>? = null)
 
 	fun call(params: CallParams<T>)
 

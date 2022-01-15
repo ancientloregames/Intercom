@@ -3,12 +3,15 @@ package com.ancientlore.intercom
 import android.annotation.SuppressLint
 import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.multidex.MultiDexApplication
+import androidx.multidex.MultiDex
 import com.ancientlore.intercom.backend.firebase.FirebaseFactory
+import com.ancientlore.intercom.di.DaggerAppComponent
 import com.ancientlore.intercom.frontend.FrontendFactory
 import com.ancientlore.intercom.frontend.IntercomFrontendFactory
+import dagger.android.AndroidInjector
+import dagger.android.support.DaggerApplication
 
-class App : MultiDexApplication() {
+class App : DaggerApplication() {
 
 	companion object {
 
@@ -25,6 +28,12 @@ class App : MultiDexApplication() {
 		lateinit var context: Context
 	}
 
+	override fun attachBaseContext(base: Context?) {
+		super.attachBaseContext(base)
+
+		MultiDex.install(this)
+	}
+
 	override fun onCreate() {
 		try {
 			context = applicationContext
@@ -37,5 +46,9 @@ class App : MultiDexApplication() {
 			context = applicationContext
 			frontend = IntercomFrontendFactory(context)
 		}
+	}
+
+	override fun applicationInjector(): AndroidInjector<out DaggerApplication> {
+		return DaggerAppComponent.factory().create(this)
 	}
 }

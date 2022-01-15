@@ -1,17 +1,15 @@
 package com.ancientlore.intercom.widget.recycler
 
-import android.content.Context
 import android.widget.Filter
 import android.widget.Filterable
 import androidx.annotation.UiThread
 import androidx.databinding.ViewDataBinding
 
 abstract class FilterableRecyclerAdapter<I: Comparable<I>, H: BasicRecyclerAdapter.ViewHolder<I, B>, B: ViewDataBinding>(
-	context: Context,
 	items: List<I> = emptyList(),
 	withHeader: Boolean = false,
-	withFooter: Boolean = false)
-	: HeadedRecyclerAdapter<I, H, B>(context, items, withHeader, withFooter), Filterable {
+	withFooter: Boolean = false
+) : HeadedRecyclerAdapter<I, H, B>(items, withHeader, withFooter), Filterable {
 
 	abstract fun getDiffCallback(newItems: List<I>): HeadedRecyclerDiffUtil.Callback
 

@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
+import com.ancientlore.intercom.C.ARG_FRAGMENT_PARAMS
 import com.ancientlore.intercom.R
 import com.ancientlore.intercom.databinding.ContactDetailUiBinding
 import com.ancientlore.intercom.ui.BasicFragment
@@ -12,32 +13,36 @@ import com.ancientlore.intercom.ui.contact.detail.ContactDetailViewModel.Compani
 import com.ancientlore.intercom.ui.contact.detail.ContactDetailViewModel.Companion.OPTION_VIDEO_CALL
 import com.ancientlore.intercom.utils.ToolbarManager
 import com.ancientlore.intercom.utils.extensions.putToClipboard
+import javax.inject.Inject
 
-class ContactDetailFragment : BasicFragment<ContactDetailViewModel, ContactDetailUiBinding>() {
+class ContactDetailFragment
+	: BasicFragment<ContactDetailViewModel, ContactDetailUiBinding>() {
 
 	companion object {
-		private const val ARG_PARAMS = "params"
 
 		fun newInstance(params: ContactDetailParams) : ContactDetailFragment {
 			return ContactDetailFragment().apply {
 				arguments = Bundle().apply {
-					putParcelable(ARG_PARAMS, params)
+					putParcelable(ARG_FRAGMENT_PARAMS, params)
 				}
 			}
 		}
 	}
 
-	private val params : ContactDetailParams by lazy { arguments?.getParcelable<ContactDetailParams>(ARG_PARAMS)
-		?: throw RuntimeException("Contact params are a mandotory arg") }
+	@Inject
+	protected lateinit var params: ContactDetailParams
+
+	@Inject
+	protected lateinit var viewModel: ContactDetailViewModel
 
 	override fun getLayoutResId(): Int = R.layout.contact_detail_ui
 
 	override fun createDataBinding(view: View) = ContactDetailUiBinding.bind(view)
 
-	override fun createViewModel() = ContactDetailViewModel(params)
+	override fun requestViewModel(): ContactDetailViewModel = viewModel
 
-	override fun init(viewModel: ContactDetailViewModel, savedState: Bundle?) {
-		super.init(viewModel, savedState)
+	override fun init(savedState: Bundle?) {
+		super.init(savedState)
 
 		dataBinding.ui = viewModel
 

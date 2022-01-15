@@ -13,21 +13,26 @@ import com.ancientlore.intercom.ui.auth.email.signup.EmailSignupViewModel.Compan
 import com.ancientlore.intercom.ui.auth.email.signup.EmailSignupViewModel.Companion.ERROR_NO_PASS
 import com.ancientlore.intercom.ui.auth.email.signup.EmailSignupViewModel.Companion.ERROR_PASS2
 import java.lang.RuntimeException
+import javax.inject.Inject
 
-class EmailSignupFragment : AuthFragment<EmailSignupViewModel, EmailSignupUiBinding>() {
+class EmailSignupFragment
+	: AuthFragment<EmailSignupViewModel, EmailSignupUiBinding>() {
 
 	companion object {
 		fun newInstance() = EmailSignupFragment()
 	}
 
+	@Inject
+	protected lateinit var viewModel: EmailSignupViewModel
+
 	override fun getLayoutResId() = R.layout.email_signup_ui
 
 	override fun createDataBinding(view: View) = EmailSignupUiBinding.bind(view)
 
-	override fun createViewModel() = EmailSignupViewModel()
+	override fun requestViewModel() = EmailSignupViewModel()
 
-	override fun init(viewModel: EmailSignupViewModel, savedState: Bundle?) {
-		super.init(viewModel, savedState)
+	override fun init(savedState: Bundle?) {
+		super.init(savedState)
 
 		dataBinding.viewModel = viewModel
 

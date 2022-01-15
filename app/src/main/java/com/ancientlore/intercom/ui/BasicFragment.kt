@@ -10,7 +10,6 @@ import android.widget.Toast
 import androidx.annotation.CallSuper
 import androidx.annotation.StringRes
 import androidx.databinding.ViewDataBinding
-import androidx.fragment.app.Fragment
 import com.ancientlore.intercom.MainActivity
 import com.ancientlore.intercom.R
 import com.ancientlore.intercom.utils.PermissionManager
@@ -24,11 +23,12 @@ import android.util.Log
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import androidx.annotation.UiThread
+import dagger.android.support.DaggerFragment
 import java.util.ArrayList
 
-abstract class BasicFragment<VM : BasicViewModel, B : ViewDataBinding> : Fragment(), MainActivity.BackButtonHandler {
+abstract class BasicFragment<VM : BasicViewModel, B : ViewDataBinding>
+	: DaggerFragment(), MainActivity.BackButtonHandler {
 
-	protected lateinit var viewModel: VM
 	protected lateinit var dataBinding: B
 
 	protected val subscriptions = ListCompositeDisposable()
@@ -45,7 +45,7 @@ abstract class BasicFragment<VM : BasicViewModel, B : ViewDataBinding> : Fragmen
 
 	protected abstract fun createDataBinding(view: View): B
 
-	protected abstract fun createViewModel(): VM
+	protected abstract fun requestViewModel(): VM
 
 	override fun onBackPressed(): Boolean {
 		close()
@@ -103,15 +103,13 @@ abstract class BasicFragment<VM : BasicViewModel, B : ViewDataBinding> : Fragmen
 
 		dataBinding = createDataBinding(view)
 
-		viewModel = createViewModel()
-
-		init(viewModel, savedInstanceState)
+		init(savedInstanceState)
 	}
 
 	@CallSuper
-	protected open fun init(viewModel: VM, savedState: Bundle?) {
+	protected open fun init(savedState: Bundle?) {
 
-		subscriptions.add(viewModel.observeToastRequest()
+		subscriptions.add(requestViewModel().observeToastRequest()
 			.subscribe {
 				val stringRes = getToastStringRes(it)
 				if (stringRes != -1)
@@ -121,7 +119,7 @@ abstract class BasicFragment<VM : BasicViewModel, B : ViewDataBinding> : Fragmen
 
 	override fun onDestroyView() {
 		subscriptions.clear()
-		viewModel.clean()
+		requestViewModel().clean()
 		dataBinding.unbind()
 		super.onDestroyView()
 	}

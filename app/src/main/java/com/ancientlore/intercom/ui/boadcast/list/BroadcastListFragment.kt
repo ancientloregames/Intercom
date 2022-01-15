@@ -7,13 +7,18 @@ import com.ancientlore.intercom.R
 import com.ancientlore.intercom.databinding.BroadcastListUiBinding
 import com.ancientlore.intercom.ui.FilterableFragment
 import com.ancientlore.intercom.utils.ToolbarManager
+import javax.inject.Inject
 
-class BroadcastListFragment: FilterableFragment<BroadcastListViewModel, BroadcastListUiBinding>() {
+class BroadcastListFragment
+	: FilterableFragment<BroadcastListViewModel, BroadcastListUiBinding>() {
 
 	companion object {
 
 		fun newInstance() = BroadcastListFragment()
 	}
+
+	@Inject
+	protected lateinit var viewModel: BroadcastListViewModel
 
 	override fun getToolbar(): Toolbar  = dataBinding.toolbar
 
@@ -23,10 +28,10 @@ class BroadcastListFragment: FilterableFragment<BroadcastListViewModel, Broadcas
 
 	override fun createDataBinding(view: View) = BroadcastListUiBinding.bind(view)
 
-	override fun createViewModel() = BroadcastListViewModel(requireContext())
+	override fun requestViewModel(): BroadcastListViewModel = viewModel
 
-	override fun init(viewModel: BroadcastListViewModel, savedState: Bundle?) {
-		super.init(viewModel, savedState)
+	override fun init(savedState: Bundle?) {
+		super.init(savedState)
 
 		dataBinding.ui = viewModel
 
@@ -36,7 +41,7 @@ class BroadcastListFragment: FilterableFragment<BroadcastListViewModel, Broadcas
 
 		dataBinding.swipableLayout.setListener { close(false) }
 
-		dataBinding.listView.adapter = viewModel.listAdapter
+		dataBinding.listView.adapter = viewModel.getListAdapter()
 
 		subscriptions.add(viewModel.openBroadcastRequest()
 			.subscribe {

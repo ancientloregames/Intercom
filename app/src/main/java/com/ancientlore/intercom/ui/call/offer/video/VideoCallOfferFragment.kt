@@ -5,32 +5,35 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Chronometer
 import com.ancientlore.intercom.App
+import com.ancientlore.intercom.C.ARG_FRAGMENT_PARAMS
 import com.ancientlore.intercom.R
 import com.ancientlore.intercom.backend.CallManager
 import com.ancientlore.intercom.databinding.CallVideoOfferUiBinding
 import com.ancientlore.intercom.ui.call.CallViewModel
 import com.ancientlore.intercom.ui.call.offer.CallOfferFragment
-import java.lang.RuntimeException
+import javax.inject.Inject
+import javax.inject.Named
 
 class VideoCallOfferFragment
 	: CallOfferFragment<VideoCallOfferViewModel, CallVideoOfferUiBinding>() {
 
 	companion object {
 
-		const val ARG_PARAMS = "params"
-
 		fun newInstance(params: CallViewModel.Params) : VideoCallOfferFragment {
 			return VideoCallOfferFragment().apply {
 				arguments = Bundle().apply {
-					putParcelable(ARG_PARAMS, params)
+					putParcelable(ARG_FRAGMENT_PARAMS, params)
 				}
 			}
 		}
 	}
 
-	private val params : CallViewModel.Params by lazy {
-		arguments?.getParcelable<CallViewModel.Params>(ARG_PARAMS)
-			?: throw RuntimeException("Params are a mandotory arg") }
+	@Inject
+	@Named("VideoCallOffer")
+	protected lateinit var params: CallViewModel.Params
+
+	@Inject
+	protected lateinit var viewModel: VideoCallOfferViewModel
 
 	private var hudAnimationDuration: Long = 200
 
@@ -50,10 +53,10 @@ class VideoCallOfferFragment
 
 	override fun createDataBinding(view: View) = CallVideoOfferUiBinding.bind(view)
 
-	override fun createViewModel() = VideoCallOfferViewModel(params)
+	override fun requestViewModel(): VideoCallOfferViewModel = viewModel
 
-	override fun init(viewModel: VideoCallOfferViewModel, savedState: Bundle?) {
-		super.init(viewModel, savedState)
+	override fun init(savedState: Bundle?) {
+		super.init(savedState)
 
 		dataBinding.ui = viewModel
 

@@ -2,6 +2,8 @@ package com.ancientlore.intercom.ui.chat.creation.description
 
 import android.content.Context
 import android.net.Uri
+import android.os.Parcel
+import android.os.Parcelable
 import androidx.databinding.ObservableField
 import com.ancientlore.intercom.App
 import com.ancientlore.intercom.EmptyObject
@@ -11,9 +13,12 @@ import com.ancientlore.intercom.ui.FilterableViewModel
 import com.ancientlore.intercom.ui.chat.flow.ChatFlowParams
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
+import javax.inject.Inject
 
-class ChatCreationDescViewModel(context: Context)
-	: FilterableViewModel<ChatCreationDescAdapter>(ChatCreationDescAdapter(context)) {
+class ChatCreationDescViewModel @Inject constructor(
+	context: Context,
+	params: Params
+) : FilterableViewModel<ChatCreationDescAdapter>() {
 
 	companion object {
 		const val TOAST_REQUIRED_NAME_ERR = 0
@@ -25,9 +30,13 @@ class ChatCreationDescViewModel(context: Context)
 	private val createChatSub = PublishSubject.create<ChatFlowParams>()
 	private val openGallarySub = PublishSubject.create<Any>()
 
+	private val listAdapter: ChatCreationDescAdapter = ChatCreationDescAdapter(context)
+
 	private val contacts = mutableListOf<Contact>()
 
 	private var iconUri: Uri? = null
+
+	override fun getListAdapter(): ChatCreationDescAdapter = listAdapter
 
 	override fun clean() {
 		createChatSub.onComplete()
@@ -36,9 +45,9 @@ class ChatCreationDescViewModel(context: Context)
 		super.clean()
 	}
 
-	fun init(contacts: List<Contact>) {
-		this.contacts.addAll(contacts)
-		listAdapter.setItems(contacts)
+	init {
+		this.contacts.addAll(params.contacts)
+		listAdapter.setItems(params.contacts)
 	}
 
 	fun onNextClicked() = tryCreateGroupChat()
@@ -69,5 +78,22 @@ class ChatCreationDescViewModel(context: Context)
 			))
 		}
 		else toastRequest.onNext(TOAST_REQUIRED_NAME_ERR)
+	}
+
+	data class Params(val contacts: List<Contact>): Parcelable {
+
+		constructor(parcel: Parcel) : this(parcel.createTypedArrayList(Contact))
+
+		override fun writeToParcel(parcel: Parcel, flags: Int) {
+			parcel.writeTypedList(contacts)
+		}
+
+		override fun describeContents(): Int = 0
+
+		companion object CREATOR : Parcelable.Creator<Params> {
+			override fun createFromParcel(parcel: Parcel): Params = Params(parcel)
+
+			override fun newArray(size: Int): Array<Params?> = arrayOfNulls(size)
+		}
 	}
 }

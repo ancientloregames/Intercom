@@ -12,6 +12,7 @@ import com.ancientlore.intercom.ui.auth.phone.login.PhoneLoginViewModel.Companio
 import com.ancientlore.intercom.ui.auth.phone.login.PhoneLoginViewModel.Companion.ERROR_INVALID_PHONE
 import com.ancientlore.intercom.ui.auth.phone.login.PhoneLoginViewModel.Companion.ERROR_NO_PHONE
 import java.lang.RuntimeException
+import javax.inject.Inject
 
 class PhoneLoginFragment
 	: AuthFragment<PhoneLoginViewModel, PhoneLoginUiBinding>() {
@@ -19,6 +20,9 @@ class PhoneLoginFragment
 	companion object {
 		fun newInstance() = PhoneLoginFragment()
 	}
+
+	@Inject
+	protected lateinit var viewModel: PhoneLoginViewModel
 
 	override fun getAlertMessage(alertCode: Int): String {
 		return when (alertCode) {
@@ -37,10 +41,10 @@ class PhoneLoginFragment
 
 	override fun createDataBinding(view: View) = PhoneLoginUiBinding.bind(view)
 
-	override fun createViewModel() = PhoneLoginViewModel()
+	override fun requestViewModel() = PhoneLoginViewModel()
 
-	override fun init(viewModel: PhoneLoginViewModel, savedState: Bundle?) {
-		super.init(viewModel, savedState)
+	override fun init(savedState: Bundle?) {
+		super.init(savedState)
 
 		dataBinding.viewModel = viewModel
 

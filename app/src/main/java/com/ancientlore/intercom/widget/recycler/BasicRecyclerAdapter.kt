@@ -2,22 +2,18 @@ package com.ancientlore.intercom.widget.recycler
 
 import android.content.Context
 import android.content.res.Resources
-import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
 import com.ancientlore.intercom.ui.Bindable
 
 abstract class BasicRecyclerAdapter<I, H: BasicRecyclerAdapter.ViewHolder<I, B>, B: ViewDataBinding>(
-	context: Context,
 	private val items: List<I> = emptyList())
 	: RecyclerView.Adapter<H>() {
 
 	companion object {
 		const val VIEW_TYPE_ITEM = 0
 	}
-
-	protected val layoutInflater: LayoutInflater = LayoutInflater.from(context)
 
 	abstract fun createItemViewDataBinding(parent: ViewGroup, viewType: Int): B
 

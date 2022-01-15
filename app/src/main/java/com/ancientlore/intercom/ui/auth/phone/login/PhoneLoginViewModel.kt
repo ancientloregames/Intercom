@@ -1,7 +1,6 @@
 package com.ancientlore.intercom.ui.auth.phone.login
 
 import androidx.databinding.ObservableField
-import com.ancientlore.intercom.App
 import com.ancientlore.intercom.backend.auth.AuthCallback
 import com.ancientlore.intercom.backend.auth.PhoneAuthParams
 import com.ancientlore.intercom.data.model.User
@@ -9,8 +8,10 @@ import com.ancientlore.intercom.ui.auth.AuthViewModel
 import com.ancientlore.intercom.utils.Utils
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
+import javax.inject.Inject
 
-class PhoneLoginViewModel : AuthViewModel() {
+class PhoneLoginViewModel @Inject constructor()
+	: AuthViewModel() {
 
 	companion object {
 		const val VALIDITY_OK = 0

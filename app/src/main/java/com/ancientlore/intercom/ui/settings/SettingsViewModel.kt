@@ -7,18 +7,18 @@ import com.ancientlore.intercom.EmptyObject
 import com.ancientlore.intercom.backend.ProgressRequestCallback
 import com.ancientlore.intercom.backend.SimpleRequestCallback
 import com.ancientlore.intercom.data.model.FileData
-import com.ancientlore.intercom.data.model.User
 import com.ancientlore.intercom.data.source.UserRepository
 import com.ancientlore.intercom.ui.BasicViewModel
 import com.ancientlore.intercom.utils.Utils
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import androidx.databinding.ObservableBoolean
+import com.ancientlore.intercom.data.model.User
 import com.ancientlore.intercom.utils.extensions.runOnUiThread
 import java.util.regex.Pattern
+import javax.inject.Inject
 
-
-class SettingsViewModel(private val user: User)
+class SettingsViewModel @Inject constructor()
 	: BasicViewModel() {
 
 	companion object {
@@ -28,7 +28,9 @@ class SettingsViewModel(private val user: User)
 		const val TOAST_ERR_CHANGE_STATUS = 3
 	}
 
-	val userIconField = ObservableField<Any>(user.iconUri)
+	private val user: User = App.backend.getAuthManager().getCurrentUser()
+
+	val userIconField = ObservableField<Any>(user.iconUrl)
 	val userNameField = ObservableField(user.name)
 	val userStatusField = ObservableField(user.status)
 	val showUserNameLabel = ObservableBoolean(user.name.isNotEmpty())

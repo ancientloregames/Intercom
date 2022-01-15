@@ -7,11 +7,23 @@ import com.ancientlore.intercom.ui.call.CallAnswerParams
 import com.ancientlore.intercom.ui.call.answer.CallAnswerViewModel
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
+import javax.inject.Inject
+import javax.inject.Named
 
-class AudioCallAnswerViewModel(params: CallAnswerParams)
-	: CallAnswerViewModel(params) {
+class AudioCallAnswerViewModel @Inject constructor(
+	@Named("AudioCallAnswer") params: CallAnswerParams
+) : CallAnswerViewModel(params) {
 
 	private val turnOnProximitySensorSubj = PublishSubject.create<Any>()
+
+	override fun answer() {
+		App.backend.getCallManager().apply {
+			setCallConnectionListener(this@AudioCallAnswerViewModel)
+			answer(
+				CallManager.AudioCallParams(
+					params.targetId), (params as CallAnswerParams).sdp)
+		}
+	}
 
 	override fun onConnected() {
 		super.onConnected()

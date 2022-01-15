@@ -6,8 +6,10 @@ import com.ancientlore.intercom.backend.auth.EmailAuthParams
 import com.ancientlore.intercom.ui.auth.AuthViewModel
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
+import javax.inject.Inject
 
-class EmailSignupViewModel: AuthViewModel() {
+class EmailSignupViewModel @Inject constructor()
+	: AuthViewModel() {
 
 	companion object {
 		const val VALIDITY_OK = 0

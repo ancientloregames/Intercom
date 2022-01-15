@@ -11,9 +11,13 @@ import com.ancientlore.intercom.utils.Utils
 import com.ancientlore.intercom.utils.extensions.runOnUiThread
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
+import javax.inject.Inject
 
-class ChatCreationGroupViewModel(context: Context)
-	: FilterableViewModel<ChatCreationGroupAdapter>(ChatCreationGroupAdapter(context)) {
+class ChatCreationGroupViewModel @Inject constructor(
+	context: Context
+) : FilterableViewModel<ChatCreationGroupAdapter>() {
+
+	private val listAdapter: ChatCreationGroupAdapter = ChatCreationGroupAdapter(context)
 
 	val selectedListAdapter: ChatCreationSelectedAdapter = ChatCreationSelectedAdapter(context)
 
@@ -22,6 +26,7 @@ class ChatCreationGroupViewModel(context: Context)
 	private val openNextSub = PublishSubject.create<List<Contact>>()
 
 	private var repositorySub: RepositorySubscription? = null
+
 
 	private var adapterListener = object : ChatCreationGroupAdapter.Listener {
 		override fun onContactSelected(contact: Contact) {
@@ -45,6 +50,8 @@ class ChatCreationGroupViewModel(context: Context)
 			hasSelection.set(selectedListAdapter.isNotEmpty())
 		}
 	}
+
+	override fun getListAdapter(): ChatCreationGroupAdapter = listAdapter
 
 	override fun clean() {
 		openNextSub.onComplete()

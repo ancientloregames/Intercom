@@ -17,6 +17,7 @@ import com.ancientlore.intercom.data.model.Chat.Companion.TYPE_PRIVATE
 import com.ancientlore.intercom.data.source.*
 import com.ancientlore.intercom.ui.FilterableViewModel
 import com.ancientlore.intercom.ui.call.CallViewModel
+import com.ancientlore.intercom.ui.chat.detail.ChatDetailViewModel
 import com.ancientlore.intercom.ui.contact.detail.ContactDetailParams
 import com.ancientlore.intercom.utils.Runnable1
 import com.ancientlore.intercom.utils.Utils
@@ -31,12 +32,12 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.subjects.PublishSubject
 import java.io.File
 import java.lang.ref.WeakReference
+import javax.inject.Inject
 
-class ChatFlowViewModel(
+class ChatFlowViewModel @Inject constructor(
 	context: Context,
-	private val params: ChatFlowParams,
-)
-	: FilterableViewModel<ChatFlowAdapter>(ChatFlowAdapter(params.userId, context)) {
+	private val params: ChatFlowParams
+	) : FilterableViewModel<ChatFlowAdapter>() {
 
 	companion object {
 		const val OPTION_AUDIO_CALL = 0
@@ -93,7 +94,7 @@ class ChatFlowViewModel(
 
 	private val uploadIconSubj = PublishSubject.create<String>() // Chat Id
 
-	private val openChatDetailSubj = PublishSubject.create<ChatFlowParams>()
+	private val openChatDetailSubj = PublishSubject.create<ChatDetailViewModel.Params>()
 
 	private val openContactDetailSubj = PublishSubject.create<ContactDetailParams>()
 
@@ -112,6 +113,8 @@ class ChatFlowViewModel(
 	private val pickImageSubj = PublishSubject.create<EmptyObject>()
 
 	private val showSendButtonSubj = PublishSubject.create<Boolean>()
+
+	private val listAdapter: ChatFlowAdapter = ChatFlowAdapter(params.userId, context)
 
 	private var inputManager: MessageInputManager? = null
 
@@ -139,6 +142,8 @@ class ChatFlowViewModel(
 			observeContactOnlineStatus(contactId)
 		}
 	}
+
+	override fun getListAdapter(): ChatFlowAdapter = listAdapter
 
 	fun attachInputPanelManager(manager: MessageInputManager) {
 		inputManager = manager
@@ -239,7 +244,7 @@ class ChatFlowViewModel(
 
 	fun uploadIconRequest() = uploadIconSubj as Observable<String>
 
-	fun openChatDetailRequest() = openChatDetailSubj as Observable<ChatFlowParams>
+	fun openChatDetailRequest() = openChatDetailSubj as Observable<ChatDetailViewModel.Params>
 
 	fun openContactDetailRequest() = openContactDetailSubj as Observable<ContactDetailParams>
 
@@ -275,7 +280,11 @@ class ChatFlowViewModel(
 				params.iconUri.toString(),
 				true))
 		else
-			openChatDetailSubj.onNext(params)
+			openChatDetailSubj.onNext(ChatDetailViewModel.Params(
+				params.title,
+				params.iconUri,
+				params.participants
+			))
 	}
 
 	fun onSendButtonClicked() {

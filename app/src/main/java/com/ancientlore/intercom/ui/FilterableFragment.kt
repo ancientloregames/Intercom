@@ -20,7 +20,7 @@ abstract class FilterableFragment<VM : FilterableViewModel<*>, B : ViewDataBindi
 		search!!.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
 			override fun onQueryTextSubmit(query: String?): Boolean {
 				query?.let { constraint ->
-					viewModel.filter(constraint)
+					requestViewModel().filter(constraint)
 				}
 				return true
 			}
@@ -28,8 +28,8 @@ abstract class FilterableFragment<VM : FilterableViewModel<*>, B : ViewDataBindi
 			override fun onQueryTextChange(newText: String?): Boolean {
 				newText
 					?.takeIf { it.length > 1 }
-					?.let { viewModel.filter(it) }
-					?: run { viewModel.filter("") }
+					?.let { requestViewModel().filter(it) }
+					?: run { requestViewModel().filter("") }
 				return true
 			}
 		})
@@ -40,8 +40,8 @@ abstract class FilterableFragment<VM : FilterableViewModel<*>, B : ViewDataBindi
 	@MenuRes
 	abstract fun getToolbarMenuResId() : Int
 
-	override fun init(viewModel: VM, savedState: Bundle?) {
-		super.init(viewModel, savedState)
+	override fun init(savedState: Bundle?) {
+		super.init(savedState)
 
 		navigator?.createToolbarMenu(getToolbar(), menuCallback)
 	}

@@ -10,8 +10,11 @@ import com.ancientlore.intercom.ui.auth.AuthViewModel
 import com.ancientlore.intercom.utils.Utils
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
+import javax.inject.Inject
 
-class PhoneCheckViewModel(private val params: PhoneAuthParams) : AuthViewModel() {
+class PhoneCheckViewModel @Inject constructor(
+	private val params: PhoneAuthParams
+	) : AuthViewModel() {
 
 	companion object {
 		const val TOAST_CODE_ERR = 0

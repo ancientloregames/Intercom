@@ -10,7 +10,7 @@ import com.ancientlore.intercom.ui.BasicViewModel
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 
-abstract class CallViewModel(protected val params: Params) : BasicViewModel(), CallConnectionListener {
+abstract class CallViewModel(internal val params: Params) : BasicViewModel(), CallConnectionListener {
 
 	val collocutorNameField = ObservableField(params.name ?: params.targetId)
 

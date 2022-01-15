@@ -5,32 +5,35 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Chronometer
 import com.ancientlore.intercom.App
+import com.ancientlore.intercom.C.ARG_FRAGMENT_PARAMS
 import com.ancientlore.intercom.R
 import com.ancientlore.intercom.backend.CallManager
 import com.ancientlore.intercom.databinding.CallVideoAnswerUiBinding
 import com.ancientlore.intercom.ui.call.CallAnswerParams
 import com.ancientlore.intercom.ui.call.answer.CallAnswerFragment
-import java.lang.RuntimeException
+import javax.inject.Inject
+import javax.inject.Named
 
 class VideoCallAnswerFragment
 	: CallAnswerFragment<VideoCallAnswerViewModel, CallVideoAnswerUiBinding>() {
 
 	companion object {
 
-		const val ARG_PARAMS = "params"
-
 		fun newInstance(params: CallAnswerParams) : VideoCallAnswerFragment {
 			return VideoCallAnswerFragment().apply {
 				arguments = Bundle().apply {
-					putParcelable(ARG_PARAMS, params)
+					putParcelable(ARG_FRAGMENT_PARAMS, params)
 				}
 			}
 		}
 	}
 
-	private val params : CallAnswerParams by lazy {
-		arguments?.getParcelable<CallAnswerParams>(ARG_PARAMS)
-			?: throw RuntimeException("Params are a mandotory arg") }
+	@Inject
+	@Named("VideoCallAnswer")
+	protected lateinit var params: CallAnswerParams
+
+	@Inject
+	protected lateinit var viewModel: VideoCallAnswerViewModel
 
 	private var hudAnimationDuration: Long = 200
 
@@ -50,17 +53,20 @@ class VideoCallAnswerFragment
 
 	override fun createDataBinding(view: View) = CallVideoAnswerUiBinding.bind(view)
 
-	override fun createViewModel() = VideoCallAnswerViewModel(params)
+	override fun requestViewModel(): VideoCallAnswerViewModel = viewModel
 
-	override fun init(viewModel: VideoCallAnswerViewModel, savedState: Bundle?) {
-		super.init(viewModel, savedState)
+	override fun init(savedState: Bundle?) {
+		super.init(savedState)
 
 		dataBinding.ui = viewModel
 
 		audioManager.isSpeakerphoneOn = true
 
-		subscriptions.add(viewModel.showHUDRequest()
-			.subscribe { animateHud(it) })
+		subscriptions.addAll(
+			viewModel.showHUDRequest().subscribe { animateHud(it) },
+
+			viewModel.makeCallRequest().subscribe { answer() }
+			)
 	}
 
 	private fun animateHud(show: Boolean) {
@@ -82,15 +88,17 @@ class VideoCallAnswerFragment
 		}
 	}
 
-	override fun answer() {
+	// FIXME ViewModel should communicate with backand, buy sholdn't know about videoViews. This need refactoring
+	private fun answer() {
+
 		App.backend.getCallManager().apply {
 			setCallConnectionListener(viewModel)
 			answer(
 				CallManager.CallParams(
-					params.targetId,
+					viewModel.params.targetId,
 					dataBinding.localVideoRenderer,
 					dataBinding.remoteVideoRenderer),
-				params.sdp)
+				(viewModel.params as CallAnswerParams).sdp)
 		}
 	}
 

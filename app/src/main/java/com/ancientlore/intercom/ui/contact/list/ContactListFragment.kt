@@ -7,12 +7,18 @@ import com.ancientlore.intercom.R
 import com.ancientlore.intercom.databinding.ContactListUiBinding
 import com.ancientlore.intercom.ui.FilterableFragment
 import com.ancientlore.intercom.utils.ToolbarManager
+import javax.inject.Inject
 
-class ContactListFragment : FilterableFragment<ContactListViewModel, ContactListUiBinding>() {
+
+class ContactListFragment
+	: FilterableFragment<ContactListViewModel, ContactListUiBinding>() {
 
 	companion object {
 		fun newInstance() = ContactListFragment()
 	}
+
+	@Inject
+	protected lateinit var viewModel: ContactListViewModel
 
 	override fun getOpenAnimation(): Int = R.anim.slide_in_bottom
 
@@ -26,10 +32,10 @@ class ContactListFragment : FilterableFragment<ContactListViewModel, ContactList
 
 	override fun createDataBinding(view: View) = ContactListUiBinding.bind(view)
 
-	override fun createViewModel() = ContactListViewModel(requireContext())
+	override fun requestViewModel(): ContactListViewModel = viewModel
 
-	override fun init(viewModel: ContactListViewModel, savedState: Bundle?) {
-		super.init(viewModel, savedState)
+	override fun init(savedState: Bundle?) {
+		super.init(savedState)
 
 		dataBinding.ui = viewModel
 
@@ -41,7 +47,7 @@ class ContactListFragment : FilterableFragment<ContactListViewModel, ContactList
 
 		dataBinding.swipableLayout.setListener { close(false) }
 
-		dataBinding.listView.adapter = viewModel.listAdapter
+		dataBinding.listView.adapter = viewModel.getListAdapter()
 
 		subscriptions.add(viewModel.observeOpenContactDetail()
 			.subscribe {

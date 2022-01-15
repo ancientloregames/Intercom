@@ -19,9 +19,11 @@ import com.ancientlore.intercom.utils.Utils
 import com.ancientlore.intercom.utils.extensions.runOnUiThread
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
+import javax.inject.Inject
 
-class ChatCreationViewModel(context: Context)
-	: FilterableViewModel<ChatCreationAdapter>(ChatCreationAdapter(context)) {
+class ChatCreationViewModel @Inject constructor(
+	context: Context
+) : FilterableViewModel<ChatCreationAdapter>() {
 
 	companion object {
 		const val OPTION_SHOW_USERS = 0
@@ -35,7 +37,11 @@ class ChatCreationViewModel(context: Context)
 	private val addContactSub = PublishSubject.create<Any>()
 	private val updateContactCountSub = PublishSubject.create<Int>()
 
+	private val listAdapter: ChatCreationAdapter = ChatCreationAdapter(context)
+
 	private var repositorySub: RepositorySubscription? = null
+
+	override fun getListAdapter(): ChatCreationAdapter = listAdapter
 
 	override fun clean() {
 		listAdapter.setListener(null)

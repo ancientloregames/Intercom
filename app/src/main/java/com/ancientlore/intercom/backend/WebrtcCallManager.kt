@@ -156,6 +156,28 @@ abstract class WebrtcCallManager : CallManager<SurfaceViewRenderer> {
 		} ?: false
 	}
 
+	override fun call(targetId: String, videoViews: CallManager.VideoViews<SurfaceViewRenderer>?) {
+
+		val offerType = videoViews?.run {
+			localVideoView.apply {
+				init(rootEglBase.eglBaseContext, null)
+				setEnableHardwareScaler(true)
+				setZOrderOnTop(true)
+				setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT)
+				setMirror(true)
+			}
+			remoteVideoView.apply {
+				init(rootEglBase.eglBaseContext, null)
+				setEnableHardwareScaler(true)
+				setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FILL)
+				setMirror(true)
+			}
+
+			Offer.CALL_TYPE_VIDEO
+		} ?: Offer.CALL_TYPE_AUDIO
+
+	}
+
 	override fun call(params: CallManager.CallParams<SurfaceViewRenderer>) {
 		Logging.d(TAG, "call: ${params.targetId}")
 

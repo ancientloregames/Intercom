@@ -18,4 +18,6 @@ object C {
 	const val CALLS_LOG_TAG = "Calls"
 
 	const val DEF_MSG_PAGINATION_LIMIT = 16L // Approx. two full screens of oneliners
+
+	const val ARG_FRAGMENT_PARAMS = "params"
 }

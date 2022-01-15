@@ -7,7 +7,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -28,6 +27,7 @@ import com.ancientlore.intercom.data.model.call.Offer
 import com.ancientlore.intercom.data.source.ChatRepository
 import com.ancientlore.intercom.data.source.ContactRepository
 import com.ancientlore.intercom.data.source.UserRepository
+import com.ancientlore.intercom.di.MainActivityScope
 import com.ancientlore.intercom.manager.DeviceContactsManager
 import com.ancientlore.intercom.ui.Navigator
 import com.ancientlore.intercom.ui.auth.email.login.EmailLoginFragment
@@ -47,6 +47,7 @@ import com.ancientlore.intercom.ui.boadcast.creation.BroadcastCreationFragment
 import com.ancientlore.intercom.ui.chat.creation.description.ChatCreationDescFragment
 import com.ancientlore.intercom.ui.chat.creation.group.ChatCreationGroupFragment
 import com.ancientlore.intercom.ui.chat.detail.ChatDetailFragment
+import com.ancientlore.intercom.ui.chat.detail.ChatDetailViewModel
 import com.ancientlore.intercom.ui.chat.flow.ChatFlowFragment
 import com.ancientlore.intercom.ui.chat.flow.ChatFlowParams
 import com.ancientlore.intercom.ui.chat.list.ChatListFragment
@@ -65,10 +66,12 @@ import com.ancientlore.intercom.utils.extensions.checkPermission
 import com.ancientlore.intercom.utils.extensions.createChannel
 import com.ancientlore.intercom.utils.extensions.hideKeyboard
 import com.ancientlore.intercom.utils.extensions.openFile
+import dagger.android.support.DaggerAppCompatActivity
 import java.util.*
 import java.util.concurrent.Executors
 
-class MainActivity : AppCompatActivity(),
+@MainActivityScope
+class MainActivity : DaggerAppCompatActivity(),
 	Navigator,
 	PermissionManager,
 	DeviceContactsManager.UpdateListener {
@@ -329,7 +332,7 @@ class MainActivity : AppCompatActivity(),
 		}
 	}
 
-	override fun openChatDetail(params: ChatFlowParams) {
+	override fun openChatDetail(params: ChatDetailViewModel.Params) {
 		runOnUiThread {
 			val fragment = ChatDetailFragment.newInstance(params)
 			supportFragmentManager.beginTransaction()

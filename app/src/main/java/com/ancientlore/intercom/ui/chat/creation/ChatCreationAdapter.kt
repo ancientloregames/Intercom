@@ -2,6 +2,7 @@ package com.ancientlore.intercom.ui.chat.creation
 
 import android.content.Context
 import android.net.Uri
+import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.annotation.ColorInt
 import androidx.annotation.Px
@@ -20,10 +21,11 @@ import com.ancientlore.intercom.widget.recycler.MutableRecyclerAdapter
 import com.ancientlore.intercom.widget.recycler.HeadedRecyclerDiffUtil
 import java.lang.RuntimeException
 
-class ChatCreationAdapter(context: Context,
-                          items: MutableList<Contact> = mutableListOf())
-	: MutableRecyclerAdapter<Contact, ChatCreationAdapter.ViewHolder<ViewDataBinding>, ViewDataBinding>(
-			context, items, withHeader = true) {
+class ChatCreationAdapter(
+	context: Context,
+	items: MutableList<Contact> = mutableListOf()
+) : MutableRecyclerAdapter<Contact, ChatCreationAdapter.ViewHolder<ViewDataBinding>, ViewDataBinding>(
+			items, withHeader = true) {
 
 	interface Listener {
 		fun onContactSelected(contact: Contact)
@@ -31,6 +33,8 @@ class ChatCreationAdapter(context: Context,
 		fun onAddContact()
 		fun onCreateBroadcast()
 	}
+
+	private val layoutInflater: LayoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
 	private var listener: Listener? = null
 

@@ -1,16 +1,14 @@
 package com.ancientlore.intercom.widget.recycler
 
-import android.content.Context
 import android.os.Bundle
 import androidx.annotation.UiThread
 import androidx.databinding.ViewDataBinding
 
 abstract class HeadedRecyclerAdapter<I: Comparable<I>, H: BasicRecyclerAdapter.ViewHolder<I, B>, B: ViewDataBinding>(
-	context: Context,
 	items: List<I> = emptyList(),
 	private val withHeader: Boolean = false,
 	private val withFooter: Boolean = false)
-	: BasicRecyclerAdapter<I, H, B>(context, items) {
+	: BasicRecyclerAdapter<I, H, B>(items) {
 
 	companion object {
 		const val VIEW_TYPE_HEADER = Int.MIN_VALUE

@@ -9,20 +9,17 @@ import com.ancientlore.intercom.ui.call.CallFragment
 // TODO maybe better to show local stream as main before actual answer?
 abstract class CallAnswerFragment<VM : CallAnswerViewModel, B : ViewDataBinding> : CallFragment<VM, B>() {
 
-	abstract fun answer()
-
 	override fun getCallSound(): Int = R.raw.incoming_call
 
 	@CallSuper
-	override fun init(viewModel: VM, savedState: Bundle?) {
-		super.init(viewModel, savedState)
+	override fun init(savedState: Bundle?) {
+		super.init(savedState)
 
-		subscriptions.add(viewModel.answerCallRequest()
+		subscriptions.add(requestViewModel().stopCallSoundRequest()
 			.subscribe {
 				stopCallSound()
-				answer()
 			})
-		subscriptions.add(viewModel.declineCallRequest()
+		subscriptions.add(requestViewModel().closeRequest()
 			.subscribe {
 				endCall()
 			})

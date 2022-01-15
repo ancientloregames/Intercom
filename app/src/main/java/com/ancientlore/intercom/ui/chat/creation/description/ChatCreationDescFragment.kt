@@ -13,27 +13,33 @@ import com.ancientlore.intercom.ui.FilterableFragment
 import com.ancientlore.intercom.utils.ToolbarManager
 import com.ancientlore.intercom.utils.Utils
 import com.ancientlore.intercom.utils.extensions.showKeyboard
-import java.lang.RuntimeException
+import javax.inject.Inject
 
-class ChatCreationDescFragment : FilterableFragment<ChatCreationDescViewModel, ChatCreationDescUiBinding>() {
+class ChatCreationDescFragment
+	: FilterableFragment<ChatCreationDescViewModel, ChatCreationDescUiBinding>() {
 
 	companion object {
 		const val INTENT_GET_IMAGE = 101
 
-		private const val ARG_CONTACTS = "contacts"
+		const val ARG_PARAMS = "params"
 
 		fun newInstance(contacts: List<Contact>) : ChatCreationDescFragment {
 			return ChatCreationDescFragment().apply {
 				arguments = Bundle().apply {
-					putParcelableArrayList(ARG_CONTACTS,
-						if (contacts is ArrayList) contacts else ArrayList(contacts))
+					putParcelable(ARG_PARAMS,
+						ChatCreationDescViewModel.Params(
+							if (contacts is ArrayList) contacts else ArrayList(contacts)
+						))
 				}
 			}
 		}
 	}
 
-	private val contacts: List<Contact> by lazy { arguments?.getParcelableArrayList(ARG_CONTACTS)
-		?: throw RuntimeException("Contacts list is a mandotory arg") }
+	@Inject
+	lateinit var params: ChatCreationDescViewModel.Params
+
+	@Inject
+	protected lateinit var viewModel: ChatCreationDescViewModel
 
 	override fun getToolbar(): Toolbar = dataBinding.toolbar
 
@@ -43,23 +49,21 @@ class ChatCreationDescFragment : FilterableFragment<ChatCreationDescViewModel, C
 
 	override fun createDataBinding(view: View) = ChatCreationDescUiBinding.bind(view)
 
-	override fun createViewModel() = ChatCreationDescViewModel(requireContext())
+	override fun requestViewModel(): ChatCreationDescViewModel = viewModel
 
-	override fun init(viewModel: ChatCreationDescViewModel, savedState: Bundle?) {
-		super.init(viewModel, savedState)
+	override fun init(savedState: Bundle?) {
+		super.init(savedState)
 
 		dataBinding.ui = viewModel
 
 		ToolbarManager(dataBinding.toolbar).apply {
 			enableBackButton { close() }
-			setSubtitle(getString(R.string.member_count, contacts.size))
+			setSubtitle(getString(R.string.member_count, params.contacts.size))
 		}
 
 		dataBinding.swipableLayout.setListener { close(false) }
 
-		dataBinding.listView.adapter = viewModel.listAdapter
-
-		viewModel.init(contacts)
+		dataBinding.listView.adapter = viewModel.getListAdapter()
 
 		subscriptions.add(viewModel.observeCreateChatRequest()
 			.subscribe {

@@ -9,8 +9,10 @@ import com.ancientlore.intercom.ui.BasicViewModel
 import com.ancientlore.intercom.ui.chat.flow.ChatFlowParams
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
+import javax.inject.Inject
 
-class BroadcastCreationViewModel: BasicViewModel() {
+class BroadcastCreationViewModel @Inject constructor()
+	: BasicViewModel() {
 
 	val broadcastIconField = ObservableField(Uri.EMPTY)
 	val broadcastTitleField = ObservableField("")
