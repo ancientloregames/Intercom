@@ -14,39 +14,39 @@
 			android:orientation="vertical"
 			>
 
-		<TextView
+		<com.ancientlore.intercom.view.DrawableCompatTextView
 				android:id="@+id/createGroupView"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:gravity="center_vertical"
 				android:text="@string/create_group"
-				android:drawableStart="@drawable/ic_group_36dp"
-				android:drawableLeft="@drawable/ic_group_36dp"
-				app:drawableTint="@color/settingsItemTextColor"
+				app:drawableStart="@drawable/ic_group_36dp"
+				app:drawableTint="@color/defaultGreyColor"
+				android:background="?android:attr/selectableItemBackground"
 				android:onClick="@{() -> ui.onClick()}"
 				style="@style/settingsIconedTextItem" />
 
-		<TextView
+		<com.ancientlore.intercom.view.DrawableCompatTextView
 				android:id="@+id/createBroadcastView"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:gravity="center_vertical"
 				android:text="@string/create_broadcast"
-				android:drawableStart="@drawable/ic_broadcast_36dp"
-				android:drawableLeft="@drawable/ic_broadcast_36dp"
-				app:drawableTint="@color/settingsItemTextColor"
+				app:drawableStart="@drawable/ic_broadcast_36dp"
+				app:drawableTint="@color/defaultGreyColor"
+				android:background="?android:attr/selectableItemBackground"
 				android:onClick="@{() -> ui.createBroadcastClick()}"
 				style="@style/settingsIconedTextItem" />
 
-		<TextView
+		<com.ancientlore.intercom.view.DrawableCompatTextView
 				android:id="@+id/addContactView"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:gravity="center_vertical"
 				android:text="@string/add_contact"
-				android:drawableStart="@drawable/ic_add_contact_36dp"
-				android:drawableLeft="@drawable/ic_add_contact_36dp"
-				app:drawableTint="@color/settingsItemTextColor"
+				app:drawableStart="@drawable/ic_add_contact_36dp"
+				app:drawableTint="@color/defaultGreyColor"
+				android:background="?android:attr/selectableItemBackground"
 				android:onClick="@{() -> ui.onAddContactClick()}"
 				style="@style/settingsIconedTextItem" />
 
